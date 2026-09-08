@@ -493,6 +493,38 @@ Clima Mendoza Pro
 </footer>
 
 <script>
+async function actualizarAltaMontana() {
+
+    const url =
+    "https://api.open-meteo.com/v1/forecast?latitude=-32.82&longitude=-69.77&current=temperature_2m";
+
+    const data = await fetch(url).then(r => r.json());
+
+    const temp = Math.round(data.current.temperature_2m);
+
+    document.getElementById("montanaTemp").textContent =
+        temp + "°C";
+const icono = document.getElementById("montanaIcono");
+const estado = document.getElementById("montanaEstado");
+
+if(temp <= -5){
+    icono.textContent = "❄️";
+    estado.textContent = "Nevadas probables";
+}
+else if(temp <= 0){
+    icono.textContent = "🥶";
+    estado.textContent = "Muy frío";
+}
+else if(temp <= 10){
+    icono.textContent = "⛅";
+    estado.textContent = "Frío";
+}
+else{
+    icono.textContent = "☀️";
+    estado.textContent = "Templado";
+}
+``
+}
 
 function iconoClima(codigo){
 
@@ -835,7 +867,7 @@ function actualizarFechaHora(){
 
 cargarClima();
 actualizarFechaHora();
-
+actualizarAltaMontana();
 setInterval(actualizarFechaHora,1000);
 setInterval(cargarClima,300000);
 
