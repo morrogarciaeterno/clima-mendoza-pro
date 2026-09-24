@@ -147,6 +147,17 @@ footer {
     margin: 0;
 }
 
+.btn-notif {
+    background-color: #38bdf8;
+    color: #0b1329;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
 @media (max-width: 768px) {
     .zonda-montana {
         flex-direction: column !important;
@@ -273,6 +284,7 @@ footer {
                         <div id="zondaIcono" style="font-size:55px; margin-top:10px;">🟢</div>
                         <div id="zondaEstado" style="font-size:32px; font-weight:bold; color:#38bdf8;">Bajo</div>
                         <div id="zondaDetalle" style="color:#94a3b8;">Sin indicios</div>
+                        <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
                     </div>
 
                     <div class="separador" style="width:1px; background:#1e293b;"></div>
@@ -319,6 +331,23 @@ footer {
 </footer>
 
 <script>
+let ultimaAlertaId = null;
+
+function solicitarPermisoNotificacion() {
+    if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                const btn = document.getElementById("btnNotif");
+                if (btn) btn.innerText = "🔔 Alertas Activadas";
+                new Notification("Clima Mendoza Pro", {
+                    body: "Las notificaciones de alertas meteorológicas están activadas.",
+                    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
+                });
+            }
+        });
+    }
+}
+
 function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo === 1 || codigo === 2) return "🌤️";
@@ -328,7 +357,7 @@ function iconoClima(codigo) {
     return "🌥️";
 }
 
-// Cargar Alertas SMN
+// Cargar Alertas SMN con Notificación Push
 async function cargarAlertasSMN() {
     try {
         const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&alerts=true&timezone=auto");
@@ -349,6 +378,14 @@ async function cargarAlertasSMN() {
             }
             if (elZondaDetalle) {
                 elZondaDetalle.innerText = alerta.event || "Alerta Meteorológica Emitida";
+            }
+
+            if (Notification.permission === "granted" && ultimaAlertaId !== alerta.event) {
+                ultimaAlertaId = alerta.event;
+                new Notification("⚠️ ALERTA METEOROLÓGICA - MENDOZA", {
+                    body: alerta.event + "\n" + (alerta.description || ""),
+                    icon: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+                });
             }
         }
     } catch (e) {
@@ -511,7 +548,7 @@ async function cargarClima() {
         if (temp >= 25 && humedad >= 60 && viento >= 15) riesgo = "Alto";
         if (temp >= 30 && humedad >= 70 && viento >= 25) riesgo = "Muy Alto";
 
-        // Pronóstico por Horas (siguientes 6 horas)
+        // Pronóstico por Horas
         const hourlyContainer = document.getElementById("hourlyForecast");
         if (hourlyContainer && data.hourly) {
             hourlyContainer.innerHTML = "";
