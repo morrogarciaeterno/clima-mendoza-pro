@@ -152,19 +152,34 @@ header {
     align-items: center;
 }
 
+/* SISMOS CENTRADOS DERECHO EN LA TABLET */
+.sismos-container-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
 .sismos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
     margin-top: 15px;
+    width: 100%;
 }
 
 .sismo-card {
     background: var(--card-inner);
     border-top: 4px solid #ef4444;
     border-radius: 12px;
-    padding: 12px 8px;
+    padding: 12px 10px;
     text-align: center;
+    min-width: 130px;
+    flex: 1 1 130px;
+    max-width: 160px;
 }
 
 .sismo-mag {
@@ -456,12 +471,12 @@ header {
 
     <br>
 
-    <!-- TARJETA UNIFICADA (SISMOS | RELOJ | SOL | LUNA) -->
+    <!-- TARJETA UNIFICADA (SISMOS CENTRADOS | RELOJ | SOL | LUNA) -->
     <div class="card">
         <div class="dashboard-row">
-            <!-- Columna 1: Sismos -->
-            <div>
-                <h3>🌋 Actividad Sísmica Reciente</h3>
+            <!-- Columna 1: Sismos Centrados -->
+            <div class="sismos-container-block">
+                <h3 style="text-align: center; width: 100%;">🌋 Actividad Sísmica Reciente</h3>
                 <div id="sismosLista" class="sismos-grid">Cargando sismos...</div>
             </div>
 
@@ -565,7 +580,6 @@ function iconoClima(codigo) {
     return "⛈️";
 }
 
-// CÁLCULO ASTRONÓMICO DE LA FASE LUNAR
 function calcularFaseLunar() {
     const ahora = new Date();
     let year = ahora.getFullYear();
@@ -580,15 +594,14 @@ function calcularFaseLunar() {
     ++month;
     let c = 365.25 * year;
     let e = 30.6 * month;
-    let jd = c + e + day - 694039.09; // Días desde luna nueva de referencia
-    jd /= 29.5305882; // Periodo sinódico lunar
+    let jd = c + e + day - 694039.09;
+    jd /= 29.5305882;
     let b = parseInt(jd);
-    jd -= b; // Fracción del ciclo (0.0 a 1.0)
+    jd -= b;
 
     let fase = Math.round(jd * 8);
     if (fase >= 8) fase = 0;
 
-    // Porcentaje aproximado de iluminación
     let iluminacion = Math.round((1 - Math.cos(jd * 2 * Math.PI)) / 2 * 100);
 
     let nombre = "Luna Nueva";
