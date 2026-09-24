@@ -5,75 +5,102 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clima Mendoza Pro</title>
 <style>
+:root {
+    --bg: #090d16;
+    --card-bg: #111827;
+    --card-inner: #1f2937;
+    --accent: #38bdf8;
+    --text-main: #f9fafb;
+    --text-muted: #9ca3af;
+    --border: #1f2937;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    background-color: #0b1329;
-    color: #ffffff;
+    background-color: var(--bg);
+    color: var(--text-main);
+    padding-bottom: 30px;
 }
 
 header {
-    background-color: #11203a;
-    padding: 20px;
-    border-bottom: 1px solid #1e293b;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 15px 30px;
 }
 
 .header-content {
+    max-width: 1400px;
+    margin: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1400px;
-    margin: auto;
 }
 
-.date-time {
+.brand h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.brand p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.date-display {
     text-align: right;
 }
 
 #fecha {
-    font-size: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
     text-transform: capitalize;
 }
 
-#hora {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-#ultimaActualizacion {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #94a3b8;
+#digitalFallback {
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
 }
 
 .container {
     max-width: 1400px;
-    margin: auto;
-    padding: 20px;
+    margin: 25px auto;
+    padding: 0 20px;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
 }
 
 .card {
-    background: #11203a;
-    border-radius: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
     padding: 20px;
 }
 
+.card h3 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
 .metric {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #38bdf8;
-    margin-top: 10px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-top: 8px;
 }
 
 .temp-box {
@@ -83,166 +110,240 @@ header {
 }
 
 #weatherIcon {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
 }
 
 .forecast-cards {
     display: flex;
-    justify-content: space-between;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .forecast-card {
     flex: 1;
-    min-width: 80px;
-    background: #0f1a2f;
-    border-radius: 16px;
+    background: var(--card-inner);
+    border-radius: 12px;
     padding: 12px;
     text-align: center;
 }
 
 .forecast-card .icon {
-    font-size: 2rem;
-    margin: 10px 0;
+    font-size: 1.5rem;
+    margin: 6px 0;
 }
 
 .forecast-card .max {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #38bdf8;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
 }
 
 .forecast-card .min {
-    color: #94a3b8;
+    font-size: 0.85rem;
+    color: var(--text-muted);
 }
 
-.radar-img {
-    width: 100%;
-    max-width: 500px;
-    border-radius: 15px;
-    display: block;
-    margin: auto;
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
-    color: #94a3b8;
-}
-
-.hero-city {
-    font-size: 22px;
-}
-
-#estado {
+/* SECCIÓN TRIPLE: SISMOS + RELOJ AGUJA CENTRAL + CICLO SOLAR */
+.triple-section {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    grid-template-columns: 1fr 240px 220px;
+    gap: 15px;
+    align-items: stretch;
 }
 
-#estado .forecast-card {
-    min-width: 100px;
-    margin: 0;
-}
-
-.btn-notif {
-    background-color: #38bdf8;
-    color: #0b1329;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-/* Estilos para el Cuadradito de Sismos */
 .sismos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
     margin-top: 15px;
 }
 
 .sismo-card {
-    background: #0f1a2f;
-    border-top: 4px solid #ef4444;
-    border-radius: 14px;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.sismo-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #1e293b;
-    padding-bottom: 8px;
-    margin-bottom: 10px;
+    background: var(--card-inner);
+    border-top: 3px solid #ef4444;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
 }
 
 .sismo-mag {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 1.2rem;
+    font-weight: 700;
     color: #ef4444;
 }
 
 .sismo-hora {
-    font-size: 12px;
-    color: #94a3b8;
+    font-size: 0.7rem;
+    color: var(--text-muted);
 }
 
 .sismo-epicentro {
-    font-size: 14px;
+    font-size: 0.75rem;
+    margin: 5px 0;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sismo-prof {
+    font-size: 0.7rem;
+    color: var(--accent);
+}
+
+/* RELOJ AGUJA CENTRAL EN CARD */
+.clock-card-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.analog-clock {
+    width: 160px;
+    height: 160px;
+    border: 4px solid var(--accent);
+    border-radius: 50%;
+    position: relative;
+    background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+    margin-top: 10px;
+}
+
+.analog-clock .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    border-radius: 4px;
+    z-index: 5;
+}
+
+.hand.hour {
+    width: 5px;
+    height: 42px;
+    background: var(--text-main);
+}
+
+.hand.minute {
+    width: 3.5px;
+    height: 58px;
+    background: var(--accent);
+}
+
+.hand.second {
+    width: 2px;
+    height: 65px;
+    background: #ef4444;
+    z-index: 6;
+}
+
+.clock-number {
+    position: absolute;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.num-12 { top: 6px; left: 50%; transform: translateX(-50%); }
+.num-3 { right: 8px; top: 50%; transform: translateY(-50%); }
+.num-6 { bottom: 6px; left: 50%; transform: translateX(-50%); }
+.num-9 { left: 8px; top: 50%; transform: translateY(-50%); }
+
+/* WIDGET SOLAR */
+.solar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.solar-arc {
+    position: relative;
+    width: 140px;
+    height: 70px;
+    border: 2px dashed #374151;
+    border-bottom: 2px solid #374151;
+    border-radius: 70px 70px 0 0;
+    margin-top: 10px;
+}
+
+.sun-pivot {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    transform-origin: bottom center;
+    transition: transform 1s ease-out;
+}
+
+.sun-icon {
+    position: absolute;
+    left: -12px;
+    bottom: -12px;
+    font-size: 22px;
+}
+
+.solar-times {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.solar-times strong {
+    color: var(--text-main);
+    display: block;
+}
+
+.dual-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+}
+
+.radar-img {
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+.btn-notif {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
     font-weight: 600;
-    color: #f8fafc;
-    margin-bottom: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-top: 10px;
 }
 
-.sismo-profundidad {
-    font-size: 12px;
-    color: #38bdf8;
-}
-
-@media (max-width: 768px) {
-    .zonda-montana {
-        flex-direction: column !important;
-    }
-
-    .zonda-montana .separador {
-        display: none;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    .grid {
+@media (max-width: 1024px) {
+    .triple-section {
         grid-template-columns: 1fr;
     }
-
-    .forecast-cards {
-        overflow-x: auto;
-        justify-content: flex-start;
-        gap: 8px;
-        padding-bottom: 5px;
-    }
-
-    .forecast-card {
-        min-width: 75px;
-        flex: none;
-    }
-
-    #estado {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .date-time {
-        font-size: 12px;
+    .dual-section {
+        grid-template-columns: 1fr;
     }
 }
 </style>
@@ -252,548 +353,271 @@ footer {
 
 <header>
     <div class="header-content">
-        <div>
+        <div class="brand">
             <h1>🌦 Clima Mendoza Pro</h1>
-            <p>Alertas · Zonda · Sismos · Pronóstico</p>
+            <p>Panel de Monitoreo General</p>
         </div>
-        <div class="date-time">
-            <div id="fecha">--</div>
-            <div id="hora">--</div>
-            <div id="ultimaActualizacion">Actualizando...</div>
+
+        <div class="date-display">
+            <div id="fecha">Cargando fecha...</div>
+            <div id="digitalFallback">00:00:00 hs</div>
         </div>
     </div>
 </header>
 
 <div class="container">
 
-    <!-- Métricas Principales -->
+    <!-- Tarjetas de Métricas -->
     <div class="grid">
         <div class="card">
-            <h3>🌡 Temperatura</h3>
+            <h3>Temperatura</h3>
             <div class="temp-box">
-                <div>
-                    <div class="metric" id="temp">--</div>
-                    <small id="tempDesc">Cargando...</small>
-                </div>
-                <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/414/414825.png" alt="clima">
+                <div class="metric" id="temp">--</div>
+                <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="clima">
             </div>
+            <small id="tempDesc" style="color:var(--text-muted)">Cargando...</small>
         </div>
 
         <div class="card">
-            <h3>💧 Humedad</h3>
+            <h3>Humedad</h3>
             <div class="metric" id="humedad">--</div>
         </div>
 
         <div class="card">
-            <h3>🌬 Viento</h3>
+            <h3>Viento</h3>
             <div class="metric" id="viento">--</div>
         </div>
 
         <div class="card">
-            <h3>☀️ Índice UV</h3>
+            <h3>Índice UV</h3>
             <div class="metric" id="uvIndex">--</div>
-            <small id="uvEstado">Cargando...</small>
+            <small id="uvEstado" style="color:var(--text-muted)">--</small>
         </div>
 
         <div class="card">
-            <h3>⏲️ Presión</h3>
+            <h3>Presión</h3>
             <div class="metric" id="presion">--</div>
-            <small id="presionEstado">hPa</small>
+            <small style="color:var(--text-muted)">hPa</small>
         </div>
 
         <div class="card">
-            <h3>🌫 Calidad del aire</h3>
+            <h3>Calidad del Aire</h3>
             <div class="metric" id="aire">--</div>
-            <small id="aireEstado">Cargando...</small>
+            <small id="aireEstado" style="color:var(--text-muted)">--</small>
         </div>
     </div>
 
     <br>
 
-    <!-- Pronóstico por Horas -->
+    <!-- Pronóstico Próximas Horas -->
     <div class="card">
-        <h3>🕒 Pronóstico Próximas Horas</h3>
+        <h3>Pronóstico Próximas Horas</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
     </div>
 
     <br>
 
-    <!-- Módulo de Sismos -->
-    <div class="card">
-        <h3>🌋 Actividad Sísmica Reciente (Mendoza)</h3>
-        <p style="color:#94a3b8; font-size:13px; margin-top:4px;">Monitoreo en tiempo real con datos de epicentro y profundidad.</p>
-        <div id="sismosLista" class="sismos-grid">Cargando reporte de sismos...</div>
+    <!-- BLOQUE TRIPLE: SISMOS | RELOJ DE AGUJA | CICLO SOLAR -->
+    <div class="triple-section">
+        <div class="card">
+            <h3>🌋 Actividad Sísmica Reciente</h3>
+            <div id="sismosLista" class="sismos-grid">Cargando sismos...</div>
+        </div>
+
+        <!-- RELOJ ANALÓGICO CENTRAL -->
+        <div class="card clock-card-center">
+            <h3>🕒 Hora Oficial</h3>
+            <div class="analog-clock">
+                <div class="dot"></div>
+                <div class="clock-number num-12">12</div>
+                <div class="clock-number num-3">3</div>
+                <div class="clock-number num-6">6</div>
+                <div class="clock-number num-9">9</div>
+                <div class="hand hour" id="hourHand"></div>
+                <div class="hand minute" id="minuteHand"></div>
+                <div class="hand second" id="secondHand"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🌅 Ciclo Solar</h3>
+            <div class="solar-container">
+                <div class="solar-arc">
+                    <div class="sun-pivot" id="sunPivot">
+                        <div class="sun-icon" id="sunIcon">☀️</div>
+                    </div>
+                </div>
+                <div class="solar-times">
+                    <div>Amanecer<strong id="amanecerTime">--:--</strong></div>
+                    <div style="text-align:right">Atardecer<strong id="atardecerTime">--:--</strong></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <br>
 
-    <!-- Pronóstico de 7 Días, Zonda, Alta Montaña y Radar -->
-    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+    <!-- Pronóstico 7 días, Zonda, Alta Montaña y Radar -->
+    <div class="dual-section">
         <div class="card">
-            <div class="hero-city">📍 Mendoza Capital</div>
-            <br>
-            <h2>📅 Próximos 7 días</h2>
+            <h3>📅 Pronóstico 7 días</h3>
             <div id="forecast" class="forecast-cards"></div>
 
             <br>
-            <div style="background:#0f1a2f; border-radius:16px; padding:20px;">
-                <div class="zonda-montana" style="display:flex; gap:15px;">
-                    <div style="flex:1; text-align:center;">
-                        <h3>🌬️ Riesgo de Zonda</h3>
-                        <div id="zondaIcono" style="font-size:55px; margin-top:10px;">🟢</div>
-                        <div id="zondaEstado" style="font-size:32px; font-weight:bold; color:#38bdf8;">Bajo</div>
-                        <div id="zondaDetalle" style="color:#94a3b8;">Sin indicios</div>
-                        <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
-                    </div>
-
-                    <div class="separador" style="width:1px; background:#1e293b;"></div>
-
-                    <div style="flex:1; text-align:center;">
-                        <h3>🏔️ Alta Montaña / Paso</h3>
-                        <div id="montanaIcono" style="font-size:55px; margin-top:10px;">❄️</div>
-                        <div id="montanaTemp" style="font-size:32px; font-weight:bold; color:#38bdf8;">--°C</div>
-                        <div id="pasoEstado" style="font-weight:bold; color:#22c55e; margin-top:4px;">Cargando...</div>
-                        <div id="montanaEstado" style="color:#94a3b8; font-size:12px;">--</div>
-                    </div>
+            <div style="display:flex; gap:15px; background:var(--card-inner); padding:15px; border-radius:12px; text-align:center;">
+                <div style="flex:1">
+                    <h3>🌬️ Riesgo Zonda</h3>
+                    <div id="zondaEstado" style="font-size:1.4rem; font-weight:bold; color:var(--accent); margin-top:5px;">Bajo</div>
+                    <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
+                </div>
+                <div style="flex:1">
+                    <h3>🏔️ Paso Cristo Redentor</h3>
+                    <div id="pasoEstado" style="font-size:1.1rem; font-weight:bold; color:#22c55e; margin-top:5px;">Cargando...</div>
+                    <small id="montanaTemp" style="color:var(--text-muted)">--°C</small>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <h2>🛰 Radar Meteorológico</h2>
-            <br>
+            <h3>🛰 Radar Meteorológico</h3>
             <img class="radar-img" src="https://www2.contingencias.mendoza.gov.ar/radar/animacion.gif" alt="Radar Mendoza">
-        </div>
-    </div>
-
-    <br>
-
-    <!-- Ciudades Cercanas y Estado Detallado -->
-    <div class="grid">
-        <div class="card">
-            <h3>📍 Ciudades Cercanas</h3>
-            <br>
-            <div id="ciudades" class="forecast-cards"></div>
-        </div>
-
-        <div class="card">
-            <h3>🚨 Estado Actual detallado</h3>
-            <br>
-            <div id="estado">Cargando métricas...</div>
         </div>
     </div>
 
 </div>
 
-<footer>
-    Clima Mendoza Pro
-</footer>
-
 <script>
-let ultimaAlertaId = null;
-let ultimoSismoId = null;
+function actualizarRelojAnalogico() {
+    const ahora = new Date();
+    const seg = ahora.getSeconds();
+    const min = ahora.getMinutes();
+    const hrs = ahora.getHours();
+
+    const segDeg = (seg / 60) * 360;
+    const minDeg = ((min + seg / 60) / 60) * 360;
+    const hrsDeg = (((hrs % 12) + min / 60) / 12) * 360;
+
+    document.getElementById("secondHand").style.transform = `translateX(-50%) rotate(${segDeg}deg)`;
+    document.getElementById("minuteHand").style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+    document.getElementById("hourHand").style.transform = `translateX(-50%) rotate(${hrsDeg}deg)`;
+
+    document.getElementById("fecha").innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
+    document.getElementById("digitalFallback").innerText = ahora.toLocaleTimeString("es-AR") + " hs";
+}
+
+function iconoClima(codigo) {
+    if (codigo === 0) return "☀️";
+    if (codigo <= 2) return "🌤️";
+    if (codigo === 3) return "☁️";
+    if (codigo <= 67) return "🌧️";
+    return "⛈️";
+}
+
+async function cargarSismos() {
+    try {
+        const res = await fetch("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=250&minmagnitude=2.0");
+        if (!res.ok) return;
+        const data = await res.json();
+        const lista = document.getElementById("sismosLista");
+        
+        if (data.features && data.features.length > 0) {
+            lista.innerHTML = "";
+            data.features.slice(0, 4).forEach(sismo => {
+                const mag = sismo.properties.mag.toFixed(1);
+                const lugar = sismo.properties.place || "Mendoza";
+                const prof = sismo.geometry.coordinates[2].toFixed(0);
+                const hora = new Date(sismo.properties.time).toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+
+                lista.innerHTML += `
+                    <div class="sismo-card">
+                        <div class="sismo-mag">⚠️ ${mag}</div>
+                        <div class="sismo-hora">${hora} hs</div>
+                        <div class="sismo-epicentro" title="${lugar}">${lugar}</div>
+                        <div class="sismo-prof">${prof} km prof</div>
+                    </div>`;
+            });
+        }
+    } catch(e) {}
+}
+
+async function cargarClima() {
+    try {
+        const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto&forecast_days=7");
+        const data = await res.json();
+
+        document.getElementById("temp").innerText = Math.round(data.current.temperature_2m) + "°C";
+        document.getElementById("humedad").innerText = data.current.relative_humidity_2m + "%";
+        document.getElementById("viento").innerText = Math.round(data.current.wind_speed_10m) + " km/h";
+        document.getElementById("presion").innerText = Math.round(data.current.surface_pressure);
+        document.getElementById("uvIndex").innerText = data.current.uv_index.toFixed(1);
+
+        // Ciclo Solar
+        if (data.daily) {
+            const ahora = new Date();
+            const amanecer = new Date(data.daily.sunrise[0]);
+            const atardecer = new Date(data.daily.sunset[0]);
+
+            document.getElementById("amanecerTime").innerText = amanecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+            document.getElementById("atardecerTime").innerText = atardecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+
+            let pct = (ahora - amanecer) / (atardecer - amanecer);
+            pct = Math.max(0, Math.min(1, pct));
+
+            const angulo = pct * 180;
+            document.getElementById("sunPivot").style.transform = `rotate(${angulo}deg)`;
+            const icon = document.getElementById("sunIcon");
+            icon.style.transform = `rotate(-${angulo}deg)`;
+            icon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
+        }
+
+        // Horas
+        const hourly = document.getElementById("hourlyForecast");
+        hourly.innerHTML = "";
+        const h = new Date().getHours();
+        for(let i = h; i < h + 6; i++) {
+            hourly.innerHTML += `
+                <div class="forecast-card">
+                    <div>${i % 24}:00</div>
+                    <div class="icon">${iconoClima(data.hourly.weather_code[i])}</div>
+                    <div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div>
+                </div>`;
+        }
+
+        // Días
+        const forecast = document.getElementById("forecast");
+        forecast.innerHTML = "";
+        data.daily.time.forEach((t, i) => {
+            const d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", { weekday: "short" });
+            forecast.innerHTML += `
+                <div class="forecast-card">
+                    <div style="text-transform:capitalize">${d}</div>
+                    <div class="icon">${iconoClima(data.daily.weather_code[i])}</div>
+                    <div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div>
+                    <div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div>
+                </div>`;
+        });
+
+    } catch(e) {}
+}
 
 function solicitarPermisoNotificacion() {
     if ("Notification" in window) {
         Notification.requestPermission().then(permission => {
             if (permission === "granted") {
-                const btn = document.getElementById("btnNotif");
-                if (btn) btn.innerText = "🔔 Alertas Activadas";
-                new Notification("Clima Mendoza Pro", {
-                    body: "Las notificaciones de clima y sismos están activadas.",
-                    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
-                });
+                document.getElementById("btnNotif").innerText = "🔔 Alertas Activadas";
+                new Notification("Clima Mendoza Pro", { body: "Alertas activadas correctamente." });
             }
         });
     }
 }
 
-function iconoClima(codigo) {
-    if (codigo === 0) return "☀️";
-    if (codigo === 1 || codigo === 2) return "🌤️";
-    if (codigo === 3) return "☁️";
-    if (codigo >= 51 && codigo <= 67) return "🌧️";
-    if (codigo >= 80) return "⛈️";
-    return "🌥️";
-}
-
-// Cargar Sismos Recientes en Cuadraditos
-async function cargarSismos() {
-    try {
-        const url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=250&minmagnitude=2.0";
-        const response = await fetch(url);
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const listaElem = document.getElementById("sismosLista");
-        if (!listaElem) return;
-
-        if (data.features && data.features.length > 0) {
-            listaElem.innerHTML = "";
-            const sismos = data.features.slice(0, 4);
-
-            sismos.forEach((sismo, index) => {
-                const mag = sismo.properties.mag.toFixed(1);
-                const epicentro = sismo.properties.place || "Mendoza, Argentina";
-                const profundidad = sismo.geometry.coordinates[2].toFixed(0);
-                const horaSismo = new Date(sismo.properties.time).toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
-
-                listaElem.innerHTML += `
-                    <div class="sismo-card">
-                        <div class="sismo-header">
-                            <div class="sismo-mag">⚠️ ${mag} M</div>
-                            <div class="sismo-hora">🕒 ${horaSismo} hs</div>
-                        </div>
-                        <div class="sismo-epicentro">📍 Epicentro:<br><span style="color:#94a3b8; font-weight:normal;">${epicentro}</span></div>
-                        <div class="sismo-profundidad">📉 Profundidad: ${profundidad} km</div>
-                    </div>
-                `;
-
-                if (index === 0 && Notification.permission === "granted" && ultimoSismoId !== sismo.id && mag >= 3.0) {
-                    ultimoSismoId = sismo.id;
-                    new Notification("🚨 SISMO DETECTADO EN MENDOZA", {
-                        body: `Magnitud: ${mag} | Epicentro: ${epicentro}`,
-                        icon: "https://cdn-icons-png.flaticon.com/512/1684/1684382.png"
-                    });
-                }
-            });
-        } else {
-            listaElem.innerHTML = "<p style='color:#22c55e;'>🟢 Sin actividad sísmica relevante registrada en las últimas horas.</p>";
-        }
-    } catch (e) {
-        console.error("Error sismos:", e);
-    }
-}
-
-// Cargar Alertas SMN
-async function cargarAlertasSMN() {
-    try {
-        const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&alerts=true&timezone=auto");
-        if (!response.ok) return;
-
-        const data = await response.json();
-
-        if (data.alerts && data.alerts.length > 0) {
-            const alerta = data.alerts[0];
-            const elZondaIcono = document.getElementById("zondaIcono");
-            const elZondaEstado = document.getElementById("zondaEstado");
-            const elZondaDetalle = document.getElementById("zondaDetalle");
-
-            if (elZondaIcono) elZondaIcono.innerText = "⚠️";
-            if (elZondaEstado) {
-                elZondaEstado.innerText = "Alerta Activa";
-                elZondaEstado.style.color = "#fb923c";
-            }
-            if (elZondaDetalle) {
-                elZondaDetalle.innerText = alerta.event || "Alerta Meteorológica Emitida";
-            }
-
-            if (Notification.permission === "granted" && ultimaAlertaId !== alerta.event) {
-                ultimaAlertaId = alerta.event;
-                new Notification("⚠️ ALERTA METEOROLÓGICA - MENDOZA", {
-                    body: alerta.event + "\n" + (alerta.description || ""),
-                    icon: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
-                });
-            }
-        }
-    } catch (e) {
-        console.error("Error cargando alertas SMN:", e);
-    }
-}
-
-// Cargar estado de Alta Montaña
-async function actualizarAltaMontana() {
-    try {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.82&longitude=-69.77&current=temperature_2m,snowfall&timezone=auto";
-        const response = await fetch(url);
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const temp = Math.round(data.current.temperature_2m);
-        const nieve = data.current.snowfall || 0;
-
-        const elTemp = document.getElementById("montanaTemp");
-        const elIcono = document.getElementById("montanaIcono");
-        const elEstado = document.getElementById("montanaEstado");
-        const elPaso = document.getElementById("pasoEstado");
-
-        if (elTemp) elTemp.textContent = temp + "°C";
-
-        let estadoPaso = "Habilitado";
-        let colorPaso = "#22c55e";
-
-        if (temp <= -5 || nieve > 0) {
-            estadoPaso = "Precaución / Posible Cierre";
-            colorPaso = "#ef4444";
-        }
-
-        if (elPaso) {
-            elPaso.textContent = estadoPaso;
-            elPaso.style.color = colorPaso;
-        }
-
-        if (temp <= -5) {
-            if (elIcono) elIcono.textContent = "❄️";
-            if (elEstado) elEstado.textContent = "Nevadas en cordillera";
-        } else if (temp <= 0) {
-            if (elIcono) elIcono.textContent = "🥶";
-            if (elEstado) elEstado.textContent = "Bajas temperaturas";
-        } else {
-            if (elIcono) elIcono.textContent = "☀️";
-            if (elEstado) elEstado.textContent = "Transitable";
-        }
-    } catch (e) {
-        console.error("Error Alta Montaña:", e);
-    }
-}
-
-// Cargar Calidad de Aire
-async function cargarCalidadAire() {
-    try {
-        const response = await fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-32.89&longitude=-68.84&current=us_aqi&timezone=auto");
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const aqi = data.current.us_aqi;
-
-        let estado = "Buena";
-        let color = "#22c55e";
-
-        if (aqi > 50 && aqi <= 100) { estado = "Moderada"; color = "#facc15"; }
-        else if (aqi > 100 && aqi <= 150) { estado = "Dañina"; color = "#fb923c"; }
-        else if (aqi > 150) { estado = "Mala"; color = "#ef4444"; }
-
-        const elAire = document.getElementById("aire");
-        const elEstado = document.getElementById("aireEstado");
-
-        if (elAire) {
-            elAire.innerText = aqi;
-            elAire.style.color = color;
-        }
-        if (elEstado) elEstado.innerText = estado;
-    } catch (error) {
-        console.error("Error Calidad Aire:", error);
-    }
-}
-
-// Cargar Datos Meteorológicos Principales
-async function cargarClima() {
-    const ahora = new Date();
-    const ultima = document.getElementById("ultimaActualizacion");
-    if (ultima) {
-        ultima.innerText = "Actualizado: " + ahora.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
-    }
-
-    try {
-        const response = await fetch(
-            "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=7"
-        );
-
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-
-        const data = await response.json();
-
-        const temp = data.current.temperature_2m ?? 0;
-        const humedad = data.current.relative_humidity_2m ?? 0;
-        const viento = data.current.wind_speed_10m ?? 0;
-        const presion = Math.round(data.current.surface_pressure ?? 0);
-        const uv = data.current.uv_index ?? 0;
-        const weatherCode = data.current.weather_code ?? 0;
-
-        // Evaluación Zonda
-        let zonda = "Bajo";
-        let zondaIcono = "🟢";
-        let detalleZonda = "Sin indicios";
-
-        if (humedad <= 30 && temp >= 20) { zonda = "Moderado"; zondaIcono = "🟡"; detalleZonda = "Ambiente seco"; }
-        if (humedad <= 20 && temp >= 25 && viento >= 15) { zonda = "Alto"; zondaIcono = "🟠"; detalleZonda = "Condiciones favorables"; }
-        if (humedad <= 15 && temp >= 30 && viento >= 25) { zonda = "Muy Alto"; zondaIcono = "🔴"; detalleZonda = "Posible evento Zonda"; }
-
-        if (document.getElementById("zondaIcono")) document.getElementById("zondaIcono").innerText = zondaIcono;
-        if (document.getElementById("zondaEstado")) document.getElementById("zondaEstado").innerText = zonda;
-        if (document.getElementById("zondaDetalle")) document.getElementById("zondaDetalle").innerText = detalleZonda;
-
-        // Métricas básicas
-        if (document.getElementById("temp")) document.getElementById("temp").innerText = Math.round(temp) + " °C";
-        if (document.getElementById("humedad")) document.getElementById("humedad").innerText = humedad + "%";
-        if (document.getElementById("viento")) document.getElementById("viento").innerText = Math.round(viento) + " km/h";
-        if (document.getElementById("presion")) document.getElementById("presion").innerText = presion;
-
-        // Índice UV
-        const elUv = document.getElementById("uvIndex");
-        const elUvEstado = document.getElementById("uvEstado");
-        if (elUv) elUv.innerText = uv.toFixed(1);
-        if (elUvEstado) {
-            if (uv <= 2) { elUvEstado.innerText = "Bajo"; elUv.style.color = "#22c55e"; }
-            else if (uv <= 5) { elUvEstado.innerText = "Moderado"; elUv.style.color = "#facc15"; }
-            else if (uv <= 7) { elUvEstado.innerText = "Alto (Usar protector)"; elUv.style.color = "#fb923c"; }
-            else { elUvEstado.innerText = "Muy Alto / Extremo"; elUv.style.color = "#ef4444"; }
-        }
-
-        let estadoTxt = "🌥 Variable";
-        switch (weatherCode) {
-            case 0:
-                estadoTxt = "☀️ Despejado";
-                if (document.getElementById("weatherIcon")) document.getElementById("weatherIcon").src = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
-                break;
-            case 1:
-            case 2:
-                estadoTxt = "🌤 Parcialmente nublado";
-                if (document.getElementById("weatherIcon")) document.getElementById("weatherIcon").src = "https://cdn-icons-png.flaticon.com/512/1163/1163661.png";
-                break;
-            case 3:
-                estadoTxt = "☁️ Nublado";
-                if (document.getElementById("weatherIcon")) document.getElementById("weatherIcon").src = "https://cdn-icons-png.flaticon.com/512/414/414825.png";
-                break;
-        }
-
-        if (document.getElementById("cielo")) document.getElementById("cielo").innerText = estadoTxt;
-        if (document.getElementById("tempDesc")) document.getElementById("tempDesc").innerText = estadoTxt;
-
-        // Riesgo tormenta
-        let riesgo = "Bajo";
-        if (temp >= 20 && humedad >= 50) riesgo = "Moderado";
-        if (temp >= 25 && humedad >= 60 && viento >= 15) riesgo = "Alto";
-        if (temp >= 30 && humedad >= 70 && viento >= 25) riesgo = "Muy Alto";
-
-        // Pronóstico por Horas
-        const hourlyContainer = document.getElementById("hourlyForecast");
-        if (hourlyContainer && data.hourly) {
-            hourlyContainer.innerHTML = "";
-            const horaActual = ahora.getHours();
-            for (let i = horaActual; i < horaActual + 6; i++) {
-                const horaTxt = `${i % 24}:00`;
-                const tempHora = Math.round(data.hourly.temperature_2m[i]);
-                const codeHora = data.hourly.weather_code[i];
-
-                hourlyContainer.innerHTML += `
-                    <div class="forecast-card">
-                        <div>${horaTxt}</div>
-                        <div class="icon">${iconoClima(codeHora)}</div>
-                        <div class="max">${tempHora}°C</div>
-                    </div>
-                `;
-            }
-        }
-
-        // Estado Detallado
-        const estadoElem = document.getElementById("estado");
-        if (estadoElem) {
-            estadoElem.innerHTML = `
-                <div class="forecast-card">
-                    <div class="icon">🌡️</div>
-                    <div class="max">${temp <= 3 ? "Baja" : temp >= 30 ? "Alta" : "Normal"}</div>
-                    <div class="min">Temperatura</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">💧</div>
-                    <div class="max">${humedad < 30 ? "Seca" : humedad > 70 ? "Alta" : "Media"}</div>
-                    <div class="min">Humedad</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">🌬️</div>
-                    <div class="max">${viento < 15 ? "Débil" : viento < 35 ? "Moderado" : "Fuerte"}</div>
-                    <div class="min">Viento</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">${iconoClima(weatherCode)}</div>
-                    <div class="max">${estadoTxt.replace("☀️ ","").replace("🌤️ ","").replace("☁️ ","").replace("🌥️ ","")}</div>
-                    <div class="min">Cielo</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">⛈️</div>
-                    <div class="max">${riesgo}</div>
-                    <div class="min">Tormenta</div>
-                </div>
-            `;
-        }
-
-        // Pronóstico 7 días
-        const forecast = document.getElementById("forecast");
-        if (forecast && data.daily && data.daily.time) {
-            forecast.innerHTML = "";
-            for (let i = 0; i < data.daily.time.length; i++) {
-                const fechaCard = new Date(data.daily.time[i] + "T00:00:00");
-                const nombreDia = i === 0 ? "Hoy" : fechaCard.toLocaleDateString("es-AR", { weekday: "short" });
-
-                forecast.innerHTML += `
-                    <div class="forecast-card">
-                        <div style="text-transform: capitalize;">${nombreDia}</div>
-                        <div class="icon">${iconoClima(data.daily.weather_code[i])}</div>
-                        <div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div>
-                        <div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div>
-                    </div>
-                `;
-            }
-        }
-
-        // Ciudades cercanas
-        const panelCiudades = document.getElementById("ciudades");
-        if (panelCiudades) {
-            panelCiudades.innerHTML = `
-                <div class="forecast-card">
-                    <div class="icon">📍</div>
-                    <div class="max">${Math.round(temp)}°</div>
-                    <div class="min">Mendoza</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">📍</div>
-                    <div class="max">${Math.round(temp - 1)}°</div>
-                    <div class="min">Godoy Cruz</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">📍</div>
-                    <div class="max">${Math.round(temp - 1)}°</div>
-                    <div class="min">Guaymallén</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">📍</div>
-                    <div class="max">${Math.round(temp - 2)}°</div>
-                    <div class="min">Luján</div>
-                </div>
-                <div class="forecast-card">
-                    <div class="icon">📍</div>
-                    <div class="max">${Math.round(temp - 7)}°</div>
-                    <div class="min">Malargüe</div>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-    }
-}
-
-function actualizarFechaHora() {
-    const ahora = new Date();
-    const fecha = document.getElementById("fecha");
-    const hora = document.getElementById("hora");
-
-    if (fecha) {
-        fecha.innerText = ahora.toLocaleDateString("es-AR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
-        });
-    }
-
-    if (hora) {
-        hora.innerText = ahora.toLocaleTimeString("es-AR");
-    }
-}
-
-// Inicialización
-cargarCalidadAire();
+actualizarRelojAnalogico();
 cargarClima();
-cargarAlertasSMN();
 cargarSismos();
-actualizarFechaHora();
-actualizarAltaMontana();
 
-setInterval(actualizarFechaHora, 1000);
+setInterval(actualizarRelojAnalogico, 1000);
 setInterval(cargarClima, 300000);
-setInterval(cargarAlertasSMN, 300000);
-setInterval(cargarSismos, 300000); // Revisa sismos cada 5 minutos
+setInterval(cargarSismos, 300000);
 </script>
 </body>
 </html>
