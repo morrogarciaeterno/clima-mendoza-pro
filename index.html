@@ -144,15 +144,15 @@ header {
     color: var(--text-muted);
 }
 
-/* SECCIÓN CUÁDRUPLE DENTRO DE TARJETA CENTRAL */
+/* SECCIÓN CUÁDRUPLE EN DENTRO DE LA TARJETA CENTRAL */
 .dashboard-row {
     display: grid;
-    grid-template-columns: 2fr 1.2fr 1fr 1fr;
+    grid-template-columns: 2fr 1.2fr 1fr 1.2fr;
     gap: 15px;
     align-items: center;
 }
 
-/* SISMOS CENTRADOS DERECHO EN LA TABLET */
+/* SISMOS CENTRADOS */
 .sismos-container-block {
     display: flex;
     flex-direction: column;
@@ -333,7 +333,7 @@ header {
     display: block;
 }
 
-/* CICLO LUNAR */
+/* CICLO LUNAR AMPLIADO PARA TABLET */
 .lunar-container {
     display: flex;
     flex-direction: column;
@@ -344,22 +344,23 @@ header {
 }
 
 .moon-display {
-    font-size: 3rem;
+    font-size: 4.5rem;
     line-height: 1;
-    margin: 8px 0;
+    margin: 4px 0;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
 }
 
 .moon-phase-title {
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 1.1rem;
+    font-weight: 800;
     color: var(--text-main);
     text-align: center;
 }
 
 .moon-illumination {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 700;
     margin-top: 2px;
 }
 
@@ -471,7 +472,7 @@ header {
 
     <br>
 
-    <!-- TARJETA UNIFICADA (SISMOS CENTRADOS | RELOJ | SOL | LUNA) -->
+    <!-- TARJETA UNIFICADA (SISMOS CENTRADOS | RELOJ | SOL | LUNA GRANDE) -->
     <div class="card">
         <div class="dashboard-row">
             <!-- Columna 1: Sismos Centrados -->
@@ -509,7 +510,7 @@ header {
                 </div>
             </div>
 
-            <!-- Columna 4: Ciclo Lunar -->
+            <!-- Columna 4: Ciclo Lunar Ampliado -->
             <div class="lunar-container">
                 <h3 style="width:100%; text-align:center;">🌙 Fase Lunar</h3>
                 <div class="moon-display" id="moonIcon">🌑</div>
