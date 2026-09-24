@@ -158,6 +158,56 @@ footer {
     margin-top: 10px;
 }
 
+/* Estilos para el Cuadradito de Sismos */
+.sismos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.sismo-card {
+    background: #0f1a2f;
+    border-top: 4px solid #ef4444;
+    border-radius: 14px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sismo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.sismo-mag {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ef4444;
+}
+
+.sismo-hora {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.sismo-epicentro {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f8fafc;
+    margin-bottom: 6px;
+}
+
+.sismo-profundidad {
+    font-size: 12px;
+    color: #38bdf8;
+}
+
 @media (max-width: 768px) {
     .zonda-montana {
         flex-direction: column !important;
@@ -204,7 +254,7 @@ footer {
     <div class="header-content">
         <div>
             <h1>🌦 Clima Mendoza Pro</h1>
-            <p>Alertas · Zonda · Pronóstico</p>
+            <p>Alertas · Zonda · Sismos · Pronóstico</p>
         </div>
         <div class="date-time">
             <div id="fecha">--</div>
@@ -264,6 +314,15 @@ footer {
     <div class="card">
         <h3>🕒 Pronóstico Próximas Horas</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
+    </div>
+
+    <br>
+
+    <!-- Módulo de Sismos -->
+    <div class="card">
+        <h3>🌋 Actividad Sísmica Reciente (Mendoza)</h3>
+        <p style="color:#94a3b8; font-size:13px; margin-top:4px;">Monitoreo en tiempo real con datos de epicentro y profundidad.</p>
+        <div id="sismosLista" class="sismos-grid">Cargando reporte de sismos...</div>
     </div>
 
     <br>
@@ -332,6 +391,7 @@ footer {
 
 <script>
 let ultimaAlertaId = null;
+let ultimoSismoId = null;
 
 function solicitarPermisoNotificacion() {
     if ("Notification" in window) {
@@ -340,7 +400,7 @@ function solicitarPermisoNotificacion() {
                 const btn = document.getElementById("btnNotif");
                 if (btn) btn.innerText = "🔔 Alertas Activadas";
                 new Notification("Clima Mendoza Pro", {
-                    body: "Las notificaciones de alertas meteorológicas están activadas.",
+                    body: "Las notificaciones de clima y sismos están activadas.",
                     icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
                 });
             }
@@ -357,7 +417,55 @@ function iconoClima(codigo) {
     return "🌥️";
 }
 
-// Cargar Alertas SMN con Notificación Push
+// Cargar Sismos Recientes en Cuadraditos
+async function cargarSismos() {
+    try {
+        const url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=250&minmagnitude=2.0";
+        const response = await fetch(url);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const listaElem = document.getElementById("sismosLista");
+        if (!listaElem) return;
+
+        if (data.features && data.features.length > 0) {
+            listaElem.innerHTML = "";
+            const sismos = data.features.slice(0, 4);
+
+            sismos.forEach((sismo, index) => {
+                const mag = sismo.properties.mag.toFixed(1);
+                const epicentro = sismo.properties.place || "Mendoza, Argentina";
+                const profundidad = sismo.geometry.coordinates[2].toFixed(0);
+                const horaSismo = new Date(sismo.properties.time).toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+
+                listaElem.innerHTML += `
+                    <div class="sismo-card">
+                        <div class="sismo-header">
+                            <div class="sismo-mag">⚠️ ${mag} M</div>
+                            <div class="sismo-hora">🕒 ${horaSismo} hs</div>
+                        </div>
+                        <div class="sismo-epicentro">📍 Epicentro:<br><span style="color:#94a3b8; font-weight:normal;">${epicentro}</span></div>
+                        <div class="sismo-profundidad">📉 Profundidad: ${profundidad} km</div>
+                    </div>
+                `;
+
+                if (index === 0 && Notification.permission === "granted" && ultimoSismoId !== sismo.id && mag >= 3.0) {
+                    ultimoSismoId = sismo.id;
+                    new Notification("🚨 SISMO DETECTADO EN MENDOZA", {
+                        body: `Magnitud: ${mag} | Epicentro: ${epicentro}`,
+                        icon: "https://cdn-icons-png.flaticon.com/512/1684/1684382.png"
+                    });
+                }
+            });
+        } else {
+            listaElem.innerHTML = "<p style='color:#22c55e;'>🟢 Sin actividad sísmica relevante registrada en las últimas horas.</p>";
+        }
+    } catch (e) {
+        console.error("Error sismos:", e);
+    }
+}
+
+// Cargar Alertas SMN
 async function cargarAlertasSMN() {
     try {
         const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&alerts=true&timezone=auto");
@@ -678,12 +786,14 @@ function actualizarFechaHora() {
 cargarCalidadAire();
 cargarClima();
 cargarAlertasSMN();
+cargarSismos();
 actualizarFechaHora();
 actualizarAltaMontana();
 
 setInterval(actualizarFechaHora, 1000);
 setInterval(cargarClima, 300000);
 setInterval(cargarAlertasSMN, 300000);
+setInterval(cargarSismos, 300000); // Revisa sismos cada 5 minutos
 </script>
 </body>
 </html>
