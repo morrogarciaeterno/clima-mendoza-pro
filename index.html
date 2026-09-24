@@ -144,55 +144,58 @@ header {
     color: var(--text-muted);
 }
 
-/* SECCIÓN TRIPLE */
+/* SECCIÓN CUÁDRUPLE DENTRO DE TARJETA CENTRAL */
 .dashboard-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr;
+    gap: 15px;
     align-items: center;
 }
 
 .sismos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 10px;
     margin-top: 15px;
 }
 
 .sismo-card {
     background: var(--card-inner);
-    border-top: 3px solid #ef4444;
-    border-radius: 10px;
-    padding: 10px;
+    border-top: 4px solid #ef4444;
+    border-radius: 12px;
+    padding: 12px 8px;
     text-align: center;
 }
 
 .sismo-mag {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 800;
     color: #ef4444;
+    line-height: 1;
 }
 
 .sismo-hora {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--text-muted);
+    margin-top: 4px;
 }
 
 .sismo-epicentro {
-    font-size: 0.75rem;
-    margin: 5px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 6px 0 4px;
     color: var(--text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .sismo-prof {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: var(--accent);
 }
 
-/* RELOJ DE AGUJA */
+/* RELOJ DE AGUJA CENTRAL */
 .clock-center-container {
     display: flex;
     flex-direction: column;
@@ -200,18 +203,18 @@ header {
     justify-content: center;
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
-    padding: 0 15px;
+    padding: 0 10px;
 }
 
 .analog-clock {
-    width: 140px;
-    height: 140px;
+    width: 130px;
+    height: 130px;
     border: 3.5px solid var(--accent);
     border-radius: 50%;
     position: relative;
     background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
     box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .analog-clock .dot {
@@ -237,19 +240,19 @@ header {
 
 .hand.hour {
     width: 4px;
-    height: 36px;
+    height: 34px;
     background: var(--text-main);
 }
 
 .hand.minute {
     width: 3px;
-    height: 50px;
+    height: 46px;
     background: var(--accent);
 }
 
 .hand.second {
     width: 1.5px;
-    height: 56px;
+    height: 52px;
     background: #ef4444;
     z-index: 6;
 }
@@ -266,7 +269,7 @@ header {
 .num-6 { bottom: 4px; left: 50%; transform: translateX(-50%); }
 .num-9 { left: 6px; top: 50%; transform: translateY(-50%); }
 
-/* WIDGET SOLAR */
+/* CICLO SOLAR */
 .solar-container {
     display: flex;
     flex-direction: column;
@@ -276,11 +279,11 @@ header {
 
 .solar-arc {
     position: relative;
-    width: 140px;
-    height: 70px;
+    width: 120px;
+    height: 60px;
     border: 2px dashed #374151;
     border-bottom: 2px solid #374151;
-    border-radius: 70px 70px 0 0;
+    border-radius: 60px 60px 0 0;
     margin-top: 10px;
 }
 
@@ -298,21 +301,51 @@ header {
     position: absolute;
     left: -12px;
     bottom: -12px;
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .solar-times {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 15px;
-    font-size: 0.8rem;
+    margin-top: 12px;
+    font-size: 0.75rem;
     color: var(--text-muted);
 }
 
 .solar-times strong {
     color: var(--text-main);
     display: block;
+}
+
+/* CICLO LUNAR */
+.lunar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--border);
+    padding-left: 15px;
+}
+
+.moon-display {
+    font-size: 3rem;
+    line-height: 1;
+    margin: 8px 0;
+}
+
+.moon-phase-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-align: center;
+}
+
+.moon-illumination {
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 2px;
 }
 
 .dual-section {
@@ -339,17 +372,14 @@ header {
     margin-top: 10px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
     .dashboard-row {
         grid-template-columns: 1fr;
         gap: 25px;
     }
-    .clock-center-container {
-        border-left: none;
-        border-right: none;
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-        padding: 20px 0;
+    .clock-center-container, .lunar-container {
+        border: none;
+        padding: 0;
     }
     .dual-section {
         grid-template-columns: 1fr;
@@ -426,7 +456,7 @@ header {
 
     <br>
 
-    <!-- TARJETA UNIFICADA CON 3 SECCIONES -->
+    <!-- TARJETA UNIFICADA (SISMOS | RELOJ | SOL | LUNA) -->
     <div class="card">
         <div class="dashboard-row">
             <!-- Columna 1: Sismos -->
@@ -462,6 +492,14 @@ header {
                     <div>Amanecer<strong id="amanecerTime">--:--</strong></div>
                     <div style="text-align:right">Atardecer<strong id="atardecerTime">--:--</strong></div>
                 </div>
+            </div>
+
+            <!-- Columna 4: Ciclo Lunar -->
+            <div class="lunar-container">
+                <h3 style="width:100%; text-align:center;">🌙 Fase Lunar</h3>
+                <div class="moon-display" id="moonIcon">🌑</div>
+                <div class="moon-phase-title" id="moonPhaseName">Cargando...</div>
+                <div class="moon-illumination" id="moonIllumination">--%</div>
             </div>
         </div>
     </div>
@@ -527,6 +565,51 @@ function iconoClima(codigo) {
     return "⛈️";
 }
 
+// CÁLCULO ASTRONÓMICO DE LA FASE LUNAR
+function calcularFaseLunar() {
+    const ahora = new Date();
+    let year = ahora.getFullYear();
+    let month = ahora.getMonth() + 1;
+    let day = ahora.getDate();
+
+    if (month < 3) {
+        year--;
+        month += 12;
+    }
+
+    ++month;
+    let c = 365.25 * year;
+    let e = 30.6 * month;
+    let jd = c + e + day - 694039.09; // Días desde luna nueva de referencia
+    jd /= 29.5305882; // Periodo sinódico lunar
+    let b = parseInt(jd);
+    jd -= b; // Fracción del ciclo (0.0 a 1.0)
+
+    let fase = Math.round(jd * 8);
+    if (fase >= 8) fase = 0;
+
+    // Porcentaje aproximado de iluminación
+    let iluminacion = Math.round((1 - Math.cos(jd * 2 * Math.PI)) / 2 * 100);
+
+    let nombre = "Luna Nueva";
+    let icono = "🌑";
+
+    switch(fase) {
+        case 0: nombre = "Luna Nueva"; icono = "🌑"; break;
+        case 1: nombre = "Creciente"; icono = "🌒"; break;
+        case 2: nombre = "Cuarto Creciente"; icono = "🌓"; break;
+        case 3: nombre = "Gibosa Creciente"; icono = "🌔"; break;
+        case 4: nombre = "Luna Llena"; icono = "🌕"; break;
+        case 5: nombre = "Gibosa Menguante"; icono = "🌖"; break;
+        case 6: nombre = "Cuarto Menguante"; icono = "🌗"; break;
+        case 7: nombre = "Menguante"; icono = "🌘"; break;
+    }
+
+    document.getElementById("moonIcon").innerText = icono;
+    document.getElementById("moonPhaseName").innerText = nombre;
+    document.getElementById("moonIllumination").innerText = iluminacion + "% iluminada";
+}
+
 async function cargarCalidadAire() {
     try {
         const response = await fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-32.89&longitude=-68.84&current=us_aqi&timezone=auto");
@@ -572,10 +655,10 @@ async function cargarSismos() {
 
                 lista.innerHTML += `
                     <div class="sismo-card">
-                        <div class="sismo-mag">⚠️ ${mag}</div>
-                        <div class="sismo-hora">${hora} hs</div>
-                        <div class="sismo-epicentro" title="${lugar}">${lugar}</div>
-                        <div class="sismo-prof">${prof} km prof</div>
+                        <div class="sismo-mag">⚠️ ${mag} M</div>
+                        <div class="sismo-hora">🕒 ${hora} hs</div>
+                        <div class="sismo-epicentro">${lugar}</div>
+                        <div class="sismo-prof">📉 Prof: ${prof} km</div>
                     </div>`;
             });
         }
@@ -632,14 +715,12 @@ async function cargarClima() {
             else { elUvEstado.innerText = "Muy Alto"; elUvEstado.style.color = "#ef4444"; }
         }
 
-        // Descripción temperatura
         const code = data.current.weather_code ?? 0;
         let desc = "Despejado";
         if (code >= 1 && code <= 3) desc = "Parcialmente nublado";
         if (code >= 51) desc = "Lluvioso";
         document.getElementById("tempDesc").innerText = desc;
 
-        // Evaluación Zonda con Icono
         let zonda = "Bajo";
         let zondaIcono = "🟢";
 
@@ -650,7 +731,6 @@ async function cargarClima() {
         document.getElementById("zondaIcono").innerText = zondaIcono;
         document.getElementById("zondaEstado").innerText = zonda;
 
-        // Ciclo Solar
         if (data.daily) {
             const ahora = new Date();
             const amanecer = new Date(data.daily.sunrise[0]);
@@ -669,7 +749,6 @@ async function cargarClima() {
             icon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
         }
 
-        // Horas
         const hourly = document.getElementById("hourlyForecast");
         hourly.innerHTML = "";
         const h = new Date().getHours();
@@ -682,7 +761,6 @@ async function cargarClima() {
                 </div>`;
         }
 
-        // Días
         const forecast = document.getElementById("forecast");
         forecast.innerHTML = "";
         data.daily.time.forEach((t, i) => {
@@ -710,8 +788,9 @@ function solicitarPermisoNotificacion() {
     }
 }
 
-// Iniciar todo correctamente
+// Inicialización
 actualizarRelojAnalogico();
+calcularFaseLunar();
 cargarClima();
 cargarCalidadAire();
 cargarSismos();
