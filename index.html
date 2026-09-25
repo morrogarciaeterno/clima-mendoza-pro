@@ -118,10 +118,12 @@ header {
     display: flex;
     gap: 10px;
     margin-top: 15px;
+    overflow-x: auto;
 }
 
 .forecast-card {
     flex: 1;
+    min-width: 80px;
     background: var(--card-inner);
     border-radius: 12px;
     padding: 12px;
@@ -144,7 +146,6 @@ header {
     color: var(--text-muted);
 }
 
-/* SECCIÓN CUÁDRUPLE EN DENTRO DE LA TARJETA CENTRAL */
 .dashboard-row {
     display: grid;
     grid-template-columns: 2fr 1.2fr 1fr 1.2fr;
@@ -152,7 +153,6 @@ header {
     align-items: center;
 }
 
-/* SISMOS CENTRADOS */
 .sismos-container-block {
     display: flex;
     flex-direction: column;
@@ -210,7 +210,6 @@ header {
     color: var(--accent);
 }
 
-/* RELOJ DE AGUJA CENTRAL */
 .clock-center-container {
     display: flex;
     flex-direction: column;
@@ -284,7 +283,6 @@ header {
 .num-6 { bottom: 4px; left: 50%; transform: translateX(-50%); }
 .num-9 { left: 6px; top: 50%; transform: translateY(-50%); }
 
-/* CICLO SOLAR */
 .solar-container {
     display: flex;
     flex-direction: column;
@@ -333,7 +331,6 @@ header {
     display: block;
 }
 
-/* CICLO LUNAR AMPLIADO PARA TABLET */
 .lunar-container {
     display: flex;
     flex-direction: column;
@@ -464,6 +461,25 @@ header {
 
     <br>
 
+    <!-- BANNER DE ALERTAS METEOROLÓGICAS SMN -->
+    <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span id="smnIcono" style="font-size: 2.5rem;">⛈️</span>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; text-transform: uppercase;">Alerta SMN</span>
+                        <small style="color: var(--text-muted);">Servicio Meteorológico Nacional</small>
+                    </div>
+                    <h3 id="smnTitulo" style="color: var(--text-main); font-size: 1.1rem; margin-top: 4px; font-weight: 700;">Alerta Meteorológica Active</h3>
+                    <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2px;">Se prevén condiciones de tormenta para la región.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br id="smnEspaciador" style="display: none;">
+
     <!-- Pronóstico Próximas Horas -->
     <div class="card">
         <h3>Pronóstico Próximas Horas</h3>
@@ -472,16 +488,14 @@ header {
 
     <br>
 
-    <!-- TARJETA UNIFICADA (SISMOS CENTRADOS | RELOJ | SOL | LUNA GRANDE) -->
+    <!-- TARJETA UNIFICADA -->
     <div class="card">
         <div class="dashboard-row">
-            <!-- Columna 1: Sismos Centrados -->
             <div class="sismos-container-block">
                 <h3 style="text-align: center; width: 100%;">🌋 Actividad Sísmica Reciente</h3>
                 <div id="sismosLista" class="sismos-grid">Cargando sismos...</div>
             </div>
 
-            <!-- Columna 2: Reloj de Aguja Central -->
             <div class="clock-center-container">
                 <h3 style="margin-bottom: 5px;">🕒 Hora Oficial</h3>
                 <div class="analog-clock">
@@ -496,7 +510,6 @@ header {
                 </div>
             </div>
 
-            <!-- Columna 3: Ciclo Solar -->
             <div class="solar-container">
                 <h3 style="width:100%; text-align:center;">🌅 Ciclo Solar</h3>
                 <div class="solar-arc">
@@ -510,7 +523,6 @@ header {
                 </div>
             </div>
 
-            <!-- Columna 4: Ciclo Lunar Ampliado -->
             <div class="lunar-container">
                 <h3 style="width:100%; text-align:center;">🌙 Fase Lunar</h3>
                 <div class="moon-display" id="moonIcon">🌑</div>
@@ -522,7 +534,6 @@ header {
 
     <br>
 
-    <!-- Pronóstico 7 días, Zonda, Alta Montaña y Radar -->
     <div class="dual-section">
         <div class="card">
             <h3>📅 Pronóstico 7 días</h3>
@@ -578,6 +589,7 @@ function iconoClima(codigo) {
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
+    if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
 
@@ -622,6 +634,38 @@ function calcularFaseLunar() {
     document.getElementById("moonIcon").innerText = icono;
     document.getElementById("moonPhaseName").innerText = nombre;
     document.getElementById("moonIllumination").innerText = iluminacion + "% iluminada";
+}
+
+function gestionarAlertaSMN(code) {
+    const card = document.getElementById("smnAlertCard");
+    const espaciador = document.getElementById("smnEspaciador");
+    const badge = document.getElementById("smnNivelBadge");
+    const titulo = document.getElementById("smnTitulo");
+    const desc = document.getElementById("smnDescripcion");
+    const icono = document.getElementById("smnIcono");
+
+    if (code >= 95) {
+        card.style.display = "block";
+        espaciador.style.display = "block";
+        if (code === 96 || code === 99) {
+            card.style.borderLeftColor = "#ef4444";
+            badge.style.background = "#ef4444";
+            badge.innerText = "Alerta Naranja - Granizo";
+            icono.innerText = "🧊⛈️";
+            titulo.innerText = "Alerta Severa por Caída de Granizo";
+            desc.innerText = "Se pronostican tormentas fuertes/severas acompañadas de probable caída de granizo y ráfagas muy intensas.";
+        } else {
+            card.style.borderLeftColor = "#f59e0b";
+            badge.style.background = "#f59e0b";
+            badge.innerText = "Alerta Amarilla - Tormentas";
+            icono.innerText = "⚡⛈️";
+            titulo.innerText = "Alerta por Tormentas Fuertes";
+            desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua en cortor períodos y ráfagas.";
+        }
+    } else {
+        card.style.display = "none";
+        espaciador.style.display = "none";
+    }
 }
 
 async function cargarCalidadAire() {
@@ -681,7 +725,7 @@ async function cargarSismos() {
 
 async function actualizarAltaMontana() {
     try {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.82&longitude=-69.77&current=temperature_2m,snowfall&timezone=auto";
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.81&longitude=-69.80&current=temperature_2m,snowfall&timezone=auto";
         const res = await fetch(url);
         if (!res.ok) return;
 
@@ -692,10 +736,10 @@ async function actualizarAltaMontana() {
         const elTemp = document.getElementById("montanaTemp");
         const elPaso = document.getElementById("pasoEstado");
 
-        if (elTemp) elTemp.textContent = temp + "°C";
+        if (elTemp) elTemp.textContent = temp + "°C en Las Cuevas";
 
         if (temp <= -5 || nieve > 0) {
-            if (elPaso) { elPaso.textContent = "Precaución / Cerrado"; elPaso.style.color = "#ef4444"; }
+            if (elPaso) { elPaso.textContent = "Cerrado / Precaución"; elPaso.style.color = "#ef4444"; }
         } else {
             if (elPaso) { elPaso.textContent = "Habilitado"; elPaso.style.color = "#22c55e"; }
         }
@@ -706,19 +750,26 @@ async function actualizarAltaMontana() {
 
 async function cargarClima() {
     try {
-        const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto&forecast_days=7");
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=America%2FArgentina%2FMendoza";
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Error en servicio de clima");
+        
         const data = await res.json();
 
         const temp = data.current.temperature_2m ?? 0;
         const humedad = data.current.relative_humidity_2m ?? 0;
         const viento = data.current.wind_speed_10m ?? 0;
         const uv = data.current.uv_index ?? 0;
+        const code = data.current.weather_code ?? 0;
 
         document.getElementById("temp").innerText = Math.round(temp) + "°C";
         document.getElementById("humedad").innerText = humedad + "%";
         document.getElementById("viento").innerText = Math.round(viento) + " km/h";
         document.getElementById("presion").innerText = Math.round(data.current.surface_pressure);
         
+        // Evaluar si activar tarjeta de Alerta SMN
+        gestionarAlertaSMN(code);
+
         const elUv = document.getElementById("uvIndex");
         const elUvEstado = document.getElementById("uvEstado");
         if (elUv) elUv.innerText = uv.toFixed(1);
@@ -729,10 +780,10 @@ async function cargarClima() {
             else { elUvEstado.innerText = "Muy Alto"; elUvEstado.style.color = "#ef4444"; }
         }
 
-        const code = data.current.weather_code ?? 0;
         let desc = "Despejado";
         if (code >= 1 && code <= 3) desc = "Parcialmente nublado";
-        if (code >= 51) desc = "Lluvioso";
+        if (code >= 51 && code < 95) desc = "Lluvioso";
+        if (code >= 95) desc = "Tormenta Electrica";
         document.getElementById("tempDesc").innerText = desc;
 
         let zonda = "Bajo";
@@ -767,12 +818,14 @@ async function cargarClima() {
         hourly.innerHTML = "";
         const h = new Date().getHours();
         for(let i = h; i < h + 6; i++) {
-            hourly.innerHTML += `
-                <div class="forecast-card">
-                    <div>${i % 24}:00</div>
-                    <div class="icon">${iconoClima(data.hourly.weather_code[i])}</div>
-                    <div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div>
-                </div>`;
+            if (data.hourly && data.hourly.temperature_2m[i] !== undefined) {
+                hourly.innerHTML += `
+                    <div class="forecast-card">
+                        <div>${i % 24}:00</div>
+                        <div class="icon">${iconoClima(data.hourly.weather_code[i])}</div>
+                        <div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div>
+                    </div>`;
+            }
         }
 
         const forecast = document.getElementById("forecast");
@@ -788,7 +841,9 @@ async function cargarClima() {
                 </div>`;
         });
 
-    } catch(e) {}
+    } catch(e) {
+        console.error("Error al cargar clima:", e);
+    }
 }
 
 function solicitarPermisoNotificacion() {
