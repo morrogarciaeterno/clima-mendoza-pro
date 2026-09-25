@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clima Mendoza Pro</title>
 <style>
 :root {
@@ -22,12 +22,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-html, body {
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-    overflow-y: auto;
-    touch-action: pan-y;
+body {
     background-color: var(--bg);
     color: var(--text-main);
     padding-bottom: 30px;
@@ -37,7 +32,6 @@ header {
     background: var(--card-bg);
     border-bottom: 1px solid var(--border);
     padding: 15px 30px;
-    width: 100%;
 }
 
 .header-content {
@@ -81,7 +75,6 @@ header {
     max-width: 1400px;
     margin: 25px auto;
     padding: 0 20px;
-    width: 100%;
 }
 
 .grid {
@@ -126,7 +119,6 @@ header {
     gap: 10px;
     margin-top: 15px;
     overflow-x: auto;
-    touch-action: pan-x;
 }
 
 .forecast-card {
@@ -427,6 +419,7 @@ header {
 
 <div class="container">
 
+    <!-- Tarjetas de Métricas -->
     <div class="grid">
         <div class="card">
             <h3>Temperatura</h3>
@@ -468,6 +461,7 @@ header {
 
     <br>
 
+    <!-- BANNER DE ALERTAS METEOROLÓGICAS SMN -->
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -477,7 +471,7 @@ header {
                         <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; text-transform: uppercase;">Alerta SMN</span>
                         <small style="color: var(--text-muted);">Servicio Meteorológico Nacional</small>
                     </div>
-                    <h3 id="smnTitulo" style="color: var(--text-main); font-size: 1.1rem; margin-top: 4px; font-weight: 700;">Alerta Meteorológica Activa</h3>
+                    <h3 id="smnTitulo" style="color: var(--text-main); font-size: 1.1rem; margin-top: 4px; font-weight: 700;">Alerta Meteorológica Active</h3>
                     <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2px;">Se prevén condiciones de tormenta para la región.</p>
                 </div>
             </div>
@@ -486,6 +480,7 @@ header {
 
     <br id="smnEspaciador" style="display: none;">
 
+    <!-- Pronóstico Próximas Horas -->
     <div class="card">
         <h3>Pronóstico Próximas Horas</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
@@ -493,6 +488,7 @@ header {
 
     <br>
 
+    <!-- TARJETA UNIFICADA -->
     <div class="card">
         <div class="dashboard-row">
             <div class="sismos-container-block">
@@ -664,7 +660,7 @@ function gestionarAlertaSMN(code) {
             badge.innerText = "Alerta Amarilla - Tormentas";
             icono.innerText = "⚡⛈️";
             titulo.innerText = "Alerta por Tormentas Fuertes";
-            desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua en cortos períodos y ráfagas.";
+            desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua en cortor períodos y ráfagas.";
         }
     } else {
         card.style.display = "none";
@@ -771,6 +767,7 @@ async function cargarClima() {
         document.getElementById("viento").innerText = Math.round(viento) + " km/h";
         document.getElementById("presion").innerText = Math.round(data.current.surface_pressure);
         
+        // Evaluar si activar tarjeta de Alerta SMN
         gestionarAlertaSMN(code);
 
         const elUv = document.getElementById("uvIndex");
@@ -860,6 +857,7 @@ function solicitarPermisoNotificacion() {
     }
 }
 
+// Inicialización
 actualizarRelojAnalogico();
 calcularFaseLunar();
 cargarClima();
