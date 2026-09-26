@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<!-- Previene el zoom accidental y habilita escalado fluido en celulares -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Clima Mendoza Pro</title>
 <style>
@@ -29,9 +30,9 @@ html, body {
     color: var(--text-main);
     width: 100%;
     min-height: 100vh;
-    overflow-x: hidden; /* Evita desplazamiento lateral horizontal */
-    overflow-y: auto;   /* Permite scroll vertical completo */
-    touch-action: pan-y; /* Habilita deslizamiento táctil vertical */
+    overflow-x: hidden;  /* Evita desplazamiento horizontal */
+    overflow-y: auto;    /* Permite desplazamiento vertical nativo */
+    touch-action: pan-y; /* Habilita gestos táctiles hacia arriba/abajo */
 }
 
 header {
@@ -83,7 +84,7 @@ header {
 .container {
     max-width: 1400px;
     margin: 15px auto;
-    padding: 0 15px 40px 15px; /* Margen inferior amplio para ver todo el contenido */
+    padding: 0 15px 60px 15px; /* Margen inferior para que nada quede oculto */
 }
 
 .grid {
@@ -317,17 +318,40 @@ header {
     margin-top: 10px;
 }
 
-@media (max-width: 1100px) {
+/* REGLAS MÓVILES PARA EVITAR PANTALLAS CORTADAS */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .card {
+        padding: 12px !important;
+        border-radius: 12px !important;
+    }
+
+    .metric {
+        font-size: 1.5rem !important;
+    }
+
     .dashboard-row {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
     }
+
     .solar-container, .lunar-container {
-        border: none;
-        padding: 0;
+        border-left: none !important;
+        padding-left: 0 !important;
+        border-top: 1px solid var(--border) !important;
+        padding-top: 15px !important;
     }
+
     .dual-section {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+    }
+
+    .container {
+        padding: 0 10px 100px 10px !important;
     }
 }
 </style>
@@ -351,6 +375,7 @@ header {
 
 <div class="container">
 
+    <!-- Tarjetas de Métricas -->
     <div class="grid">
         <div class="card">
             <h3>Temperatura</h3>
@@ -392,6 +417,7 @@ header {
 
     <br>
 
+    <!-- BANNER DE ALERTAS METEOROLÓGICAS SMN -->
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -410,6 +436,7 @@ header {
 
     <br id="smnEspaciador" style="display: none;">
 
+    <!-- Pronóstico Próximas Horas -->
     <div class="card">
         <h3>Pronóstico Próximas Horas</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
@@ -417,6 +444,7 @@ header {
 
     <br>
 
+    <!-- TARJETA UNIFICADA (SISMOS + SOL + LUNA) -->
     <div class="card">
         <div class="dashboard-row">
             <div class="sismos-container-block">
@@ -469,8 +497,8 @@ header {
             <div id="forecast" class="forecast-cards"></div>
 
             <br>
-            <div style="display:flex; gap:15px; background:var(--card-inner); padding:15px; border-radius:12px; text-align:center; align-items:center;">
-                <div style="flex:1">
+            <div style="display:flex; gap:15px; background:var(--card-inner); padding:15px; border-radius:12px; text-align:center; align-items:center; flex-wrap:wrap;">
+                <div style="flex:1; min-width: 140px;">
                     <h3>🌬️ Riesgo Zonda</h3>
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px;">
                         <span id="zondaIcono" style="font-size:1.5rem;">🟢</span>
@@ -478,7 +506,7 @@ header {
                     </div>
                     <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
                 </div>
-                <div style="flex:1">
+                <div style="flex:1; min-width: 140px;">
                     <h3>🏔️ Paso Cristo Redentor</h3>
                     <div id="pasoEstado" style="font-size:1.1rem; font-weight:bold; color:#22c55e; margin-top:5px;">Cargando...</div>
                     <small id="montanaTemp" style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">--°C</small>
