@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<!-- Bloquea el zoom y gestos de desplazamiento en móviles -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Clima Mendoza Pro</title>
 <style>
@@ -23,24 +22,25 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     user-select: none;
     -webkit-user-select: none;
-    touch-action: none; /* Previene deslizamientos no deseados en móviles */
 }
 
-body {
+html, body {
     background-color: var(--bg);
     color: var(--text-main);
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden; /* Congela el scroll vertical y horizontal en pantalla completa */
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden; /* Evita desplazamiento lateral horizontal */
+    overflow-y: auto;   /* Permite scroll vertical completo */
+    touch-action: pan-y; /* Habilita deslizamiento táctil vertical */
 }
 
 header {
     background: var(--card-bg);
     border-bottom: 1px solid var(--border);
     padding: 12px 20px;
-    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .header-content {
@@ -83,10 +83,7 @@ header {
 .container {
     max-width: 1400px;
     margin: 15px auto;
-    padding: 0 15px;
-    flex: 1;
-    overflow-y: auto; /* Permite scroll solo si la pantalla del cel es muy pequeña */
-    touch-action: pan-y;
+    padding: 0 15px 40px 15px; /* Margen inferior amplio para ver todo el contenido */
 }
 
 .grid {
@@ -159,7 +156,7 @@ header {
     color: var(--text-muted);
 }
 
-/* Fila ajustada a 3 columnas sin el reloj */
+/* Fila de Dashboard ajustada */
 .dashboard-row {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -354,7 +351,6 @@ header {
 
 <div class="container">
 
-    <!-- Tarjetas de Métricas -->
     <div class="grid">
         <div class="card">
             <h3>Temperatura</h3>
@@ -396,7 +392,6 @@ header {
 
     <br>
 
-    <!-- BANNER DE ALERTAS METEOROLÓGICAS SMN -->
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -415,7 +410,6 @@ header {
 
     <br id="smnEspaciador" style="display: none;">
 
-    <!-- Pronóstico Próximas Horas -->
     <div class="card">
         <h3>Pronóstico Próximas Horas</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
@@ -423,7 +417,6 @@ header {
 
     <br>
 
-    <!-- TARJETA UNIFICADA (SISMOS + SOL + LUNA) -->
     <div class="card">
         <div class="dashboard-row">
             <div class="sismos-container-block">
