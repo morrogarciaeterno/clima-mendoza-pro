@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clima Mendoza Pro</title>
 <style>
 :root {
@@ -22,13 +22,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* BLOQUEO TOTAL DE SCROLL HORIZONTAL */
-html, body {
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden !important;
-    overflow-y: auto;
-    touch-action: pan-y;
+body {
     background-color: var(--bg);
     color: var(--text-main);
     padding-bottom: 30px;
@@ -37,24 +31,25 @@ html, body {
 header {
     background: var(--card-bg);
     border-bottom: 1px solid var(--border);
-    padding: 12px 15px;
-    width: 100%;
+    padding: 15px 30px;
 }
 
 .header-content {
-    width: 100%;
+    max-width: 1400px;
+    margin: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .brand h1 {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
 .brand p {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
 }
 
@@ -63,52 +58,49 @@ header {
 }
 
 #fecha {
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-main);
     text-transform: capitalize;
 }
 
 #digitalFallback {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--accent);
     margin-top: 2px;
+    font-variant-numeric: tabular-nums;
 }
 
 .container {
-    width: 100%;
-    padding: 12px;
-    margin: 0 auto;
+    max-width: 1400px;
+    margin: 25px auto;
+    padding: 0 20px;
 }
 
-/* Grilla adaptable sin desbordamiento */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
 }
 
 .card {
     background: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 12px;
-    width: 100%;
-    overflow: hidden;
+    border-radius: 16px;
+    padding: 20px;
 }
 
 .card h3 {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
     font-weight: 500;
 }
 
 .metric {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: var(--text-main);
-    margin-top: 4px;
+    margin-top: 8px;
 }
 
 .temp-box {
@@ -118,122 +110,121 @@ header {
 }
 
 #weatherIcon {
-    width: 35px;
-    height: 35px;
+    width: 45px;
+    height: 45px;
 }
 
 .forecast-cards {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    gap: 10px;
+    margin-top: 15px;
     overflow-x: auto;
-    touch-action: pan-x;
-    padding-bottom: 5px;
-    width: 100%;
 }
 
 .forecast-card {
-    flex: 0 0 70px;
+    flex: 1;
+    min-width: 80px;
     background: var(--card-inner);
-    border-radius: 10px;
-    padding: 8px 4px;
+    border-radius: 12px;
+    padding: 12px;
     text-align: center;
 }
 
 .forecast-card .icon {
-    font-size: 1.2rem;
-    margin: 2px 0;
+    font-size: 1.5rem;
+    margin: 6px 0;
 }
 
 .forecast-card .max {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--accent);
 }
 
 .forecast-card .min {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
 }
 
-/* Fila apilada verticalmente en celulares */
 .dashboard-row {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
+    display: grid;
+    grid-template-columns: 2.2fr 1fr 1fr 1fr;
+    gap: 15px;
+    align-items: center;
 }
 
+/* Contenedor de la Tabla de Sismos */
 .sismos-container-block {
     display: flex;
     flex-direction: column;
-    align-items: center;
     width: 100%;
 }
 
-.sismos-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.sismos-table-wrapper {
+    width: 100%;
+    max-height: 180px;
+    overflow-y: auto;
     margin-top: 10px;
-    width: 100%;
-}
-
-.sismo-card {
     background: var(--card-inner);
-    border-left: 4px solid #ef4444;
-    border-radius: 8px;
-    padding: 8px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.tabla-sismos {
     width: 100%;
-}
-
-.sismo-mag {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: #ef4444;
-}
-
-.sismo-hora {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.sismo-epicentro {
+    border-collapse: collapse;
     font-size: 0.8rem;
-    color: var(--text-main);
-    font-weight: 600;
+    text-align: center;
 }
 
-.sismo-prof {
-    font-size: 0.75rem;
-    color: var(--accent);
+.tabla-sismos th {
+    position: sticky;
+    top: 0;
+    background-color: #374151;
+    color: #d1d5db;
+    padding: 6px 4px;
     font-weight: 700;
 }
 
-.clock-center-container, .solar-container, .lunar-container {
+.tabla-sismos td {
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-main);
+}
+
+.sismo-mendoza {
+    color: #ef4444 !important;
+    font-weight: bold;
+}
+
+.sismo-normal {
+    color: var(--accent);
+}
+
+.clock-center-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 0 10px;
 }
 
 .analog-clock {
-    width: 110px;
-    height: 110px;
-    border: 3px solid var(--accent);
+    width: 130px;
+    height: 130px;
+    border: 3.5px solid var(--accent);
     border-radius: 50%;
     position: relative;
     background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
-    margin-top: 5px;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    margin-top: 8px;
 }
 
 .analog-clock .dot {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     background: var(--accent);
     border-radius: 50%;
     position: absolute;
@@ -252,30 +243,52 @@ header {
     z-index: 5;
 }
 
-.hand.hour { width: 3px; height: 28px; background: var(--text-main); }
-.hand.minute { width: 2.5px; height: 38px; background: var(--accent); }
-.hand.second { width: 1px; height: 42px; background: #ef4444; z-index: 6; }
+.hand.hour {
+    width: 4px;
+    height: 34px;
+    background: var(--text-main);
+}
+
+.hand.minute {
+    width: 3px;
+    height: 46px;
+    background: var(--accent);
+}
+
+.hand.second {
+    width: 1.5px;
+    height: 52px;
+    background: #ef4444;
+    z-index: 6;
+}
 
 .clock-number {
     position: absolute;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: bold;
     color: var(--text-muted);
 }
 
-.num-12 { top: 3px; left: 50%; transform: translateX(-50%); }
-.num-3 { right: 4px; top: 50%; transform: translateY(-50%); }
-.num-6 { bottom: 3px; left: 50%; transform: translateX(-50%); }
-.num-9 { left: 4px; top: 50%; transform: translateY(-50%); }
+.num-12 { top: 4px; left: 50%; transform: translateX(-50%); }
+.num-3 { right: 6px; top: 50%; transform: translateY(-50%); }
+.num-6 { bottom: 4px; left: 50%; transform: translateX(-50%); }
+.num-9 { left: 6px; top: 50%; transform: translateY(-50%); }
+
+.solar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
 .solar-arc {
     position: relative;
-    width: 100px;
-    height: 50px;
+    width: 120px;
+    height: 60px;
     border: 2px dashed #374151;
     border-bottom: 2px solid #374151;
-    border-radius: 50px 50px 0 0;
-    margin-top: 8px;
+    border-radius: 60px 60px 0 0;
+    margin-top: 10px;
 }
 
 .sun-pivot {
@@ -290,62 +303,91 @@ header {
 
 .sun-icon {
     position: absolute;
-    left: -10px;
-    bottom: -10px;
-    font-size: 16px;
+    left: -12px;
+    bottom: -12px;
+    font-size: 20px;
 }
 
 .solar-times {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 200px;
-    margin-top: 8px;
-    font-size: 0.7rem;
+    margin-top: 12px;
+    font-size: 0.75rem;
     color: var(--text-muted);
 }
 
+.solar-times strong {
+    color: var(--text-main);
+    display: block;
+}
+
+.lunar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--border);
+    padding-left: 15px;
+}
+
 .moon-display {
-    font-size: 3rem;
+    font-size: 4.5rem;
     line-height: 1;
-    margin: 2px 0;
+    margin: 4px 0;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
 }
 
 .moon-phase-title {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: var(--text-main);
+    text-align: center;
 }
 
 .moon-illumination {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--accent);
     font-weight: 700;
+    margin-top: 2px;
 }
 
 .dual-section {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
 }
 
 .radar-img {
     width: 100%;
-    border-radius: 10px;
-    margin-top: 8px;
+    border-radius: 12px;
+    margin-top: 10px;
 }
 
 .btn-notif {
     background: var(--accent);
     color: #000;
     border: none;
-    padding: 6px 10px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    font-size: 0.75rem;
-    margin-top: 8px;
+    font-size: 0.8rem;
+    margin-top: 10px;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-row {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    .clock-center-container, .lunar-container {
+        border: none;
+        padding: 0;
+    }
+    .dual-section {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
@@ -410,14 +452,19 @@ header {
 
     <br>
 
-    <!-- BANNER DE ALERTAS SMN -->
-    <div class="card" id="smnAlertCard" style="display: none; border-left: 6px solid #f59e0b;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span id="smnIcono" style="font-size: 1.8rem;">⛈️</span>
-            <div>
-                <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase;">Alerta SMN</span>
-                <h3 id="smnTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 2px; font-weight: 700;">Alerta Meteorológica Activa</h3>
-                <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.75rem;">Se prevén condiciones de tormenta para la región.</p>
+    <!-- BANNER DE ALERTAS METEOROLÓGICAS SMN -->
+    <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span id="smnIcono" style="font-size: 2.5rem;">⛈️</span>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; text-transform: uppercase;">Alerta SMN</span>
+                        <small style="color: var(--text-muted);">Servicio Meteorológico Nacional</small>
+                    </div>
+                    <h3 id="smnTitulo" style="color: var(--text-main); font-size: 1.1rem; margin-top: 4px; font-weight: 700;">Alerta Meteorológica Activa</h3>
+                    <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2px;">Se prevén condiciones de tormenta para la región.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -432,16 +479,31 @@ header {
 
     <br>
 
-    <!-- TARJETA UNIFICADA APILADA -->
+    <!-- TARJETA UNIFICADA (SISMOS + RELOJ + SOL + LUNA) -->
     <div class="card">
         <div class="dashboard-row">
             <div class="sismos-container-block">
-                <h3>🌋 Actividad Sísmica Reciente</h3>
-                <div id="sismosLista" class="sismos-grid">Cargando sismos...</div>
+                <h3>🌋 Últimos Sismos</h3>
+                <div class="sismos-table-wrapper">
+                    <table class="tabla-sismos">
+                        <thead>
+                            <tr>
+                                <th>Día</th>
+                                <th>Hora</th>
+                                <th>Prof</th>
+                                <th>Mag</th>
+                                <th>Lugar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sismosLista">
+                            <tr><td colspan="5">Cargando sismos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="clock-center-container">
-                <h3>🕒 Hora Oficial</h3>
+                <h3 style="margin-bottom: 5px;">🕒 Hora Oficial</h3>
                 <div class="analog-clock">
                     <div class="dot"></div>
                     <div class="clock-number num-12">12</div>
@@ -455,7 +517,7 @@ header {
             </div>
 
             <div class="solar-container">
-                <h3>🌅 Ciclo Solar</h3>
+                <h3 style="width:100%; text-align:center;">🌅 Ciclo Solar</h3>
                 <div class="solar-arc">
                     <div class="sun-pivot" id="sunPivot">
                         <div class="sun-icon" id="sunIcon">☀️</div>
@@ -468,7 +530,7 @@ header {
             </div>
 
             <div class="lunar-container">
-                <h3>🌙 Fase Lunar</h3>
+                <h3 style="width:100%; text-align:center;">🌙 Fase Lunar</h3>
                 <div class="moon-display" id="moonIcon">🌑</div>
                 <div class="moon-phase-title" id="moonPhaseName">Cargando...</div>
                 <div class="moon-illumination" id="moonIllumination">--%</div>
@@ -484,19 +546,19 @@ header {
             <div id="forecast" class="forecast-cards"></div>
 
             <br>
-            <div style="display:flex; gap:10px; background:var(--card-inner); padding:10px; border-radius:10px; text-align:center; align-items:center;">
+            <div style="display:flex; gap:15px; background:var(--card-inner); padding:15px; border-radius:12px; text-align:center; align-items:center;">
                 <div style="flex:1">
                     <h3>🌬️ Riesgo Zonda</h3>
-                    <div style="display:flex; align-items:center; justify-content:center; gap:5px; margin-top:3px;">
-                        <span id="zondaIcono" style="font-size:1.2rem;">🟢</span>
-                        <div id="zondaEstado" style="font-size:1rem; font-weight:bold; color:var(--accent);">Bajo</div>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px;">
+                        <span id="zondaIcono" style="font-size:1.5rem;">🟢</span>
+                        <div id="zondaEstado" style="font-size:1.4rem; font-weight:bold; color:var(--accent);">Bajo</div>
                     </div>
-                    <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Alertas</button>
+                    <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
                 </div>
                 <div style="flex:1">
                     <h3>🏔️ Paso Cristo Redentor</h3>
-                    <div id="pasoEstado" style="font-size:0.9rem; font-weight:bold; color:#22c55e; margin-top:3px;">Cargando...</div>
-                    <small id="montanaTemp" style="color:var(--text-muted); font-size:0.75rem; font-weight:600;">--°C</small>
+                    <div id="pasoEstado" style="font-size:1.1rem; font-weight:bold; color:#22c55e; margin-top:5px;">Cargando...</div>
+                    <small id="montanaTemp" style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">--°C</small>
                 </div>
             </div>
         </div>
@@ -520,12 +582,19 @@ function actualizarRelojAnalogico() {
     const minDeg = ((min + seg / 60) / 60) * 360;
     const hrsDeg = (((hrs % 12) + min / 60) / 12) * 360;
 
-    document.getElementById("secondHand").style.transform = `translateX(-50%) rotate(${segDeg}deg)`;
-    document.getElementById("minuteHand").style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
-    document.getElementById("hourHand").style.transform = `translateX(-50%) rotate(${hrsDeg}deg)`;
+    const elSec = document.getElementById("secondHand");
+    const elMin = document.getElementById("minuteHand");
+    const elHour = document.getElementById("hourHand");
 
-    document.getElementById("fecha").innerText = ahora.toLocaleDateString("es-AR", { weekday: 'short', day: 'numeric', month: 'short' });
-    document.getElementById("digitalFallback").innerText = ahora.toLocaleTimeString("es-AR") + " hs";
+    if (elSec) elSec.style.transform = `translateX(-50%) rotate(${segDeg}deg)`;
+    if (elMin) elMin.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+    if (elHour) elHour.style.transform = `translateX(-50%) rotate(${hrsDeg}deg)`;
+
+    const elFecha = document.getElementById("fecha");
+    const elClock = document.getElementById("digitalFallback");
+
+    if (elFecha) elFecha.innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
+    if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR") + " hs";
 }
 
 function iconoClima(codigo) {
@@ -575,9 +644,13 @@ function calcularFaseLunar() {
         case 7: nombre = "Menguante"; icono = "🌘"; break;
     }
 
-    document.getElementById("moonIcon").innerText = icono;
-    document.getElementById("moonPhaseName").innerText = nombre;
-    document.getElementById("moonIllumination").innerText = iluminacion + "% iluminada";
+    const elIcon = document.getElementById("moonIcon");
+    const elName = document.getElementById("moonPhaseName");
+    const elIllum = document.getElementById("moonIllumination");
+
+    if (elIcon) elIcon.innerText = icono;
+    if (elName) elName.innerText = nombre;
+    if (elIllum) elIllum.innerText = iluminacion + "% iluminada";
 }
 
 function gestionarAlertaSMN(code) {
@@ -588,23 +661,23 @@ function gestionarAlertaSMN(code) {
     const desc = document.getElementById("smnDescripcion");
     const icono = document.getElementById("smnIcono");
 
+    if (!card || !espaciador) return;
+
     if (code >= 95) {
         card.style.display = "block";
         espaciador.style.display = "block";
         if (code === 96 || code === 99) {
             card.style.borderLeftColor = "#ef4444";
-            badge.style.background = "#ef4444";
-            badge.innerText = "Alerta Naranja - Granizo";
-            icono.innerText = "🧊⛈️";
-            titulo.innerText = "Alerta Severa por Caída de Granizo";
-            desc.innerText = "Se pronostican tormentas fuertes/severas acompañadas de probable caída de granizo y ráfagas muy intensas.";
+            if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
+            if (icono) icono.innerText = "🧊⛈️";
+            if (titulo) titulo.innerText = "Alerta Severa por Caída de Granizo";
+            if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas acompañadas de probable caída de granizo y ráfagas muy intensas.";
         } else {
             card.style.borderLeftColor = "#f59e0b";
-            badge.style.background = "#f59e0b";
-            badge.innerText = "Alerta Amarilla - Tormentas";
-            icono.innerText = "⚡⛈️";
-            titulo.innerText = "Alerta por Tormentas Fuertes";
-            desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua en cortos períodos y ráfagas.";
+            if (badge) { badge.style.background = "#f59e0b"; badge.innerText = "Alerta Amarilla - Tormentas"; }
+            if (icono) icono.innerText = "⚡⛈️";
+            if (titulo) titulo.innerText = "Alerta por Tormentas Fuertes";
+            if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua en cortos períodos y ráfagas.";
         }
     } else {
         card.style.display = "none";
@@ -642,33 +715,41 @@ async function cargarCalidadAire() {
 
 async function cargarSismos() {
     try {
-        const res = await fetch("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=250&minmagnitude=2.0");
+        const res = await fetch("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0");
         if (!res.ok) return;
         const data = await res.json();
         const lista = document.getElementById("sismosLista");
         
-        if (data.features && data.features.length > 0) {
+        if (lista && data.features && data.features.length > 0) {
             lista.innerHTML = "";
-            data.features.slice(0, 3).forEach(sismo => {
+            data.features.slice(0, 10).forEach(sismo => {
+                const fechaObj = new Date(sismo.properties.time);
+                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                const hora = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
                 const mag = sismo.properties.mag.toFixed(1);
-                const lugar = sismo.properties.place || "Mendoza";
-                const prof = sismo.geometry.coordinates[2].toFixed(0);
-                const hora = new Date(sismo.properties.time).toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+                const prof = Math.round(sismo.geometry.coordinates[2]);
+                let lugar = sismo.properties.place || "Mendoza";
+
+                if (lugar.includes("of ")) lugar = lugar.split("of ")[1];
+
+                const esMendoza = lugar.toUpperCase().includes("MENDOZA");
+                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
 
                 lista.innerHTML += `
-                    <div class="sismo-card">
-                        <div>
-                            <div class="sismo-mag">⚠️ ${mag} M</div>
-                            <div class="sismo-hora">🕒 ${hora} hs</div>
-                        </div>
-                        <div>
-                            <div class="sismo-epicentro">${lugar}</div>
-                            <div class="sismo-prof">📉 Prof: ${prof} km</div>
-                        </div>
-                    </div>`;
+                    <tr>
+                        <td>${dia}</td>
+                        <td>${hora}</td>
+                        <td>${prof} Km</td>
+                        <td class="${claseColor}">${mag}</td>
+                        <td class="${claseColor}">${lugar}</td>
+                    </tr>`;
             });
+        } else if (lista) {
+            lista.innerHTML = `<tr><td colspan="5">Sin actividad reciente</td></tr>`;
         }
-    } catch(e) {}
+    } catch(e) {
+        console.error("Error Sismos:", e);
+    }
 }
 
 async function actualizarAltaMontana() {
@@ -710,10 +791,15 @@ async function cargarClima() {
         const uv = data.current.uv_index ?? 0;
         const code = data.current.weather_code ?? 0;
 
-        document.getElementById("temp").innerText = Math.round(temp) + "°C";
-        document.getElementById("humedad").innerText = humedad + "%";
-        document.getElementById("viento").innerText = Math.round(viento) + " km/h";
-        document.getElementById("presion").innerText = Math.round(data.current.surface_pressure);
+        const elTemp = document.getElementById("temp");
+        const elHum = document.getElementById("humedad");
+        const elViento = document.getElementById("viento");
+        const elPresion = document.getElementById("presion");
+
+        if (elTemp) elTemp.innerText = Math.round(temp) + "°C";
+        if (elHum) elHum.innerText = humedad + "%";
+        if (elViento) elViento.innerText = Math.round(viento) + " km/h";
+        if (elPresion) elPresion.innerText = Math.round(data.current.surface_pressure);
         
         gestionarAlertaSMN(code);
 
@@ -730,8 +816,9 @@ async function cargarClima() {
         let desc = "Despejado";
         if (code >= 1 && code <= 3) desc = "Parcialmente nublado";
         if (code >= 51 && code < 95) desc = "Lluvioso";
-        if (code >= 95) desc = "Tormenta Electrica";
-        document.getElementById("tempDesc").innerText = desc;
+        if (code >= 95) desc = "Tormenta Eléctrica";
+        const elTempDesc = document.getElementById("tempDesc");
+        if (elTempDesc) elTempDesc.innerText = desc;
 
         let zonda = "Bajo";
         let zondaIcono = "🟢";
@@ -740,53 +827,66 @@ async function cargarClima() {
         if (humedad <= 20 && temp >= 25 && viento >= 15) { zonda = "Alto"; zondaIcono = "🟠"; }
         if (humedad <= 15 && temp >= 30 && viento >= 25) { zonda = "Muy Alto"; zondaIcono = "🔴"; }
 
-        document.getElementById("zondaIcono").innerText = zondaIcono;
-        document.getElementById("zondaEstado").innerText = zonda;
+        const elZondaIcono = document.getElementById("zondaIcono");
+        const elZondaEstado = document.getElementById("zondaEstado");
+        if (elZondaIcono) elZondaIcono.innerText = zondaIcono;
+        if (elZondaEstado) elZondaEstado.innerText = zonda;
 
         if (data.daily) {
             const ahora = new Date();
             const amanecer = new Date(data.daily.sunrise[0]);
             const atardecer = new Date(data.daily.sunset[0]);
 
-            document.getElementById("amanecerTime").innerText = amanecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
-            document.getElementById("atardecerTime").innerText = atardecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+            const elAmanecer = document.getElementById("amanecerTime");
+            const elAtardecer = document.getElementById("atardecerTime");
+
+            if (elAmanecer) elAmanecer.innerText = amanecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+            if (elAtardecer) elAtardecer.innerText = atardecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
 
             let pct = (ahora - amanecer) / (atardecer - amanecer);
             pct = Math.max(0, Math.min(1, pct));
 
             const angulo = pct * 180;
-            document.getElementById("sunPivot").style.transform = `rotate(${angulo}deg)`;
-            const icon = document.getElementById("sunIcon");
-            icon.style.transform = `rotate(-${angulo}deg)`;
-            icon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
+            const elSunPivot = document.getElementById("sunPivot");
+            const elSunIcon = document.getElementById("sunIcon");
+
+            if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
+            if (elSunIcon) {
+                elSunIcon.style.transform = `rotate(-${angulo}deg)`;
+                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
+            }
         }
 
         const hourly = document.getElementById("hourlyForecast");
-        hourly.innerHTML = "";
-        const h = new Date().getHours();
-        for(let i = h; i < h + 6; i++) {
-            if (data.hourly && data.hourly.temperature_2m[i] !== undefined) {
-                hourly.innerHTML += `
-                    <div class="forecast-card">
-                        <div>${i % 24}:00</div>
-                        <div class="icon">${iconoClima(data.hourly.weather_code[i])}</div>
-                        <div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div>
-                    </div>`;
+        if (hourly) {
+            hourly.innerHTML = "";
+            const h = new Date().getHours();
+            for(let i = h; i < h + 6; i++) {
+                if (data.hourly && data.hourly.temperature_2m[i] !== undefined) {
+                    hourly.innerHTML += `
+                        <div class="forecast-card">
+                            <div>${i % 24}:00</div>
+                            <div class="icon">${iconoClima(data.hourly.weather_code[i])}</div>
+                            <div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div>
+                        </div>`;
+                }
             }
         }
 
         const forecast = document.getElementById("forecast");
-        forecast.innerHTML = "";
-        data.daily.time.forEach((t, i) => {
-            const d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", { weekday: "short" });
-            forecast.innerHTML += `
-                <div class="forecast-card">
-                    <div style="text-transform:capitalize">${d}</div>
-                    <div class="icon">${iconoClima(data.daily.weather_code[i])}</div>
-                    <div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div>
-                    <div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div>
-                </div>`;
-        });
+        if (forecast) {
+            forecast.innerHTML = "";
+            data.daily.time.forEach((t, i) => {
+                const d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", { weekday: "short" });
+                forecast.innerHTML += `
+                    <div class="forecast-card">
+                        <div style="text-transform:capitalize">${d}</div>
+                        <div class="icon">${iconoClima(data.daily.weather_code[i])}</div>
+                        <div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div>
+                        <div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div>
+                    </div>`;
+            });
+        }
 
     } catch(e) {
         console.error("Error al cargar clima:", e);
@@ -797,25 +897,29 @@ function solicitarPermisoNotificacion() {
     if ("Notification" in window) {
         Notification.requestPermission().then(permission => {
             if (permission === "granted") {
-                document.getElementById("btnNotif").innerText = "🔔 Alertas";
+                const btn = document.getElementById("btnNotif");
+                if (btn) btn.innerText = "🔔 Alertas Activadas";
                 new Notification("Clima Mendoza Pro", { body: "Alertas activadas correctamente." });
             }
         });
     }
 }
 
-actualizarRelojAnalogico();
-calcularFaseLunar();
-cargarClima();
-cargarCalidadAire();
-cargarSismos();
-actualizarAltaMontana();
+// Inicialización segura
+document.addEventListener("DOMContentLoaded", () => {
+    actualizarRelojAnalogico();
+    calcularFaseLunar();
+    cargarClima();
+    cargarCalidadAire();
+    cargarSismos();
+    actualizarAltaMontana();
 
-setInterval(actualizarRelojAnalogico, 1000);
-setInterval(cargarClima, 300000);
-setInterval(cargarCalidadAire, 300000);
-setInterval(cargarSismos, 300000);
-setInterval(actualizarAltaMontana, 300000);
+    setInterval(actualizarRelojAnalogico, 1000);
+    setInterval(cargarClima, 300000);
+    setInterval(cargarCalidadAire, 300000);
+    setInterval(cargarSismos, 300000);
+    setInterval(actualizarAltaMontana, 300000);
+});
 </script>
 </body>
 </html>
