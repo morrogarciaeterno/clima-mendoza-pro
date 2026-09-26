@@ -511,4 +511,376 @@ header {
 
     <br>
 
-    <div class
+    <div class="dual-section">
+        <div class="card">
+            <h3>📅 Pronóstico 7 días</h3>
+            <div id="forecast" class="forecast-cards"></div>
+
+            <br>
+            <div style="display:flex; gap:15px; background:var(--card-inner); padding:15px; border-radius:12px; text-align:center; align-items:center; flex-wrap:wrap;">
+                <div style="flex:1; min-width: 140px;">
+                    <h3>🌬️ Riesgo Zonda</h3>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px;">
+                        <span id="zondaIcono" style="font-size:1.5rem;">🟢</span>
+                        <div id="zondaEstado" style="font-size:1.4rem; font-weight:bold; color:var(--accent);">Bajo</div>
+                    </div>
+                    <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
+                </div>
+                <div style="flex:1; min-width: 140px;">
+                    <h3>🏔️ Paso Cristo Redentor</h3>
+                    <div id="pasoEstado" style="font-size:1.1rem; font-weight:bold; color:#22c55e; margin-top:5px;">Conectando...</div>
+                    <small id="montanaTemp" style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">--°C</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🛰 Radar Meteorológico</h3>
+            <img class="radar-img" src="https://www2.contingencias.mendoza.gov.ar/radar/animacion.gif" alt="Radar Mendoza">
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Petición directa y limpia sin depender de corsproxy
+async function safeFetch(url) {
+    try {
+        const res = await fetch(url);
+        if (res.ok) return await res.json();
+    } catch (e) {
+        console.warn("Fetch directo falló para: " + url, e);
+    }
+    return null;
+}
+
+function actualizarFechaYHoraDigital() {
+    const ahora = new Date();
+    const elFecha = document.getElementById("fecha");
+    const elClock = document.getElementById("digitalFallback");
+
+    if (elFecha) elFecha.innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
+    if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR") + " hs";
+}
+
+function iconoClima(codigo) {
+    if (codigo === 0) return "☀️";
+    if (codigo <= 2) return "🌤️";
+    if (codigo === 3) return "☁️";
+    if (codigo <= 67) return "🌧️";
+    if (codigo >= 95) return "⛈️";
+    return "⛈️";
+}
+
+function calcularFaseLunar() {
+    const ahora = new Date();
+    let year = ahora.getFullYear();
+    let month = ahora.getMonth() + 1;
+    let day = ahora.getDate();
+
+    if (month < 3) {
+        year--;
+        month += 12;
+    }
+
+    ++month;
+    let c = 365.25 * year;
+    let e = 30.6 * month;
+    let jd = c + e + day - 694039.09;
+    jd /= 29.5305882;
+    let b = parseInt(jd);
+    jd -= b;
+
+    let fase = Math.round(jd * 8);
+    if (fase >= 8) fase = 0;
+
+    let iluminacion = Math.round((1 - Math.cos(jd * 2 * Math.PI)) / 2 * 100);
+
+    let nombre = "Luna Nueva";
+    let icono = "🌑";
+
+    switch(fase) {
+        case 0: nombre = "Luna Nueva"; icono = "🌑"; break;
+        case 1: nombre = "Creciente"; icono = "🌒"; break;
+        case 2: nombre = "Cuarto Creciente"; icono = "🌓"; break;
+        case 3: nombre = "Gibosa Creciente"; icono = "🌔"; break;
+        case 4: nombre = "Luna Llena"; icono = "🌕"; break;
+        case 5: nombre = "Gibosa Menguante"; icono = "🌖"; break;
+        case 6: nombre = "Cuarto Menguante"; icono = "🌗"; break;
+        case 7: nombre = "Menguante"; icono = "🌘"; break;
+    }
+
+    const elIcon = document.getElementById("moonIcon");
+    const elName = document.getElementById("moonPhaseName");
+    const elIllum = document.getElementById("moonIllumination");
+
+    if (elIcon) elIcon.innerText = icono;
+    if (elName) elName.innerText = nombre;
+    if (elIllum) elIllum.innerText = iluminacion + "% iluminada";
+}
+
+function gestionarAlertaSMN(code) {
+    const card = document.getElementById("smnAlertCard");
+    const espaciador = document.getElementById("smnEspaciador");
+    const badge = document.getElementById("smnNivelBadge");
+    const titulo = document.getElementById("smnTitulo");
+    const desc = document.getElementById("smnDescripcion");
+    const icono = document.getElementById("smnIcono");
+
+    if (!card || !espaciador) return;
+
+    if (code >= 95) {
+        card.style.display = "block";
+        espaciador.style.display = "block";
+        if (code === 96 || code === 99) {
+            card.style.borderLeftColor = "#ef4444";
+            if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
+            if (icono) icono.innerText = "🧊⛈️";
+            if (titulo) titulo.innerText = "Alerta Severa por Caída de Granizo";
+            if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas acompañadas de probable caída de granizo y ráfagas muy intensas.";
+        } else {
+            card.style.borderLeftColor = "#f59e0b";
+            if (badge) { badge.style.background = "#f59e0b"; badge.innerText = "Alerta Amarilla - Tormentas"; }
+            if (icono) icono.innerText = "⚡⛈️";
+            if (titulo) titulo.innerText = "Alerta por Tormentas Fuertes";
+            if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua en cortos períodos y ráfagas.";
+        }
+    } else {
+        card.style.display = "none";
+        espaciador.style.display = "none";
+    }
+}
+
+async function cargarCalidadAire() {
+    try {
+        const url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-32.89&longitude=-68.84&current=us_aqi&timezone=auto";
+        const data = await safeFetch(url);
+        if (!data || !data.current) return;
+
+        const aqi = data.current.us_aqi;
+        let estado = "Buena";
+        let color = "#22c55e";
+
+        if (aqi > 50 && aqi <= 100) { estado = "Moderada"; color = "#facc15"; }
+        else if (aqi > 100 && aqi <= 150) { estado = "Dañina"; color = "#fb923c"; }
+        else if (aqi > 150) { estado = "Mala"; color = "#ef4444"; }
+
+        const elAire = document.getElementById("aire");
+        const elEstado = document.getElementById("aireEstado");
+
+        if (elAire) {
+            elAire.innerText = aqi;
+            elAire.style.color = color;
+        }
+        if (elEstado) elEstado.innerText = estado;
+    } catch (error) {
+        console.error("Error Calidad Aire:", error);
+    }
+}
+
+async function cargarSismos() {
+    try {
+        const url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0";
+        const data = await safeFetch(url);
+        const lista = document.getElementById("sismosLista");
+        
+        if (lista && data && data.features && data.features.length > 0) {
+            lista.innerHTML = "";
+            data.features.slice(0, 10).forEach(sismo => {
+                const fechaObj = new Date(sismo.properties.time);
+                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                const hora = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+                const mag = sismo.properties.mag.toFixed(1);
+                const prof = Math.round(sismo.geometry.coordinates[2]);
+                let lugar = sismo.properties.place || "Mendoza";
+
+                if (lugar.includes("of ")) lugar = lugar.split("of ")[1];
+
+                const esMendoza = lugar.toUpperCase().includes("MENDOZA");
+                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+
+                lista.innerHTML += `
+                    <tr>
+                        <td>${dia}</td>
+                        <td>${hora}</td>
+                        <td>${prof} Km</td>
+                        <td class="${claseColor}">${mag}</td>
+                        <td class="${claseColor}">${lugar}</td>
+                    </tr>`;
+            });
+        } else if (lista) {
+            lista.innerHTML = `<tr><td colspan="5">Sin actividad reciente</td></tr>`;
+        }
+    } catch(e) {
+        console.error("Error Sismos:", e);
+    }
+}
+
+async function actualizarAltaMontana() {
+    try {
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.81&longitude=-69.80&current=temperature_2m,snowfall&timezone=auto";
+        const data = await safeFetch(url);
+        if (!data || !data.current) return;
+
+        const temp = Math.round(data.current.temperature_2m);
+        const nieve = data.current.snowfall || 0;
+
+        const elTemp = document.getElementById("montanaTemp");
+        const elPaso = document.getElementById("pasoEstado");
+
+        if (elTemp) elTemp.textContent = temp + "°C en Las Cuevas";
+
+        if (temp <= -5 || nieve > 0) {
+            if (elPaso) { elPaso.textContent = "Cerrado / Precaución"; elPaso.style.color = "#ef4444"; }
+        } else {
+            if (elPaso) { elPaso.textContent = "Habilitado"; elPaso.style.color = "#22c55e"; }
+        }
+    } catch (e) {
+        console.error("Error Alta Montaña:", e);
+    }
+}
+
+async function cargarClima() {
+    try {
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=America%2FArgentina%2FMendoza";
+        const data = await safeFetch(url);
+
+        if (!data || !data.current) return;
+
+        const temp = data.current.temperature_2m ?? 0;
+        const humedad = data.current.relative_humidity_2m ?? 0;
+        const viento = data.current.wind_speed_10m ?? 0;
+        const uv = data.current.uv_index ?? 0;
+        const code = data.current.weather_code ?? 0;
+
+        const elTemp = document.getElementById("temp");
+        const elHum = document.getElementById("humedad");
+        const elViento = document.getElementById("viento");
+        const elPresion = document.getElementById("presion");
+
+        if (elTemp) elTemp.innerText = Math.round(temp) + "°C";
+        if (elHum) elHum.innerText = humedad + "%";
+        if (elViento) elViento.innerText = Math.round(viento) + " km/h";
+        if (elPresion) elPresion.innerText = Math.round(data.current.surface_pressure);
+        
+        gestionarAlertaSMN(code);
+
+        const elUv = document.getElementById("uvIndex");
+        const elUvEstado = document.getElementById("uvEstado");
+        if (elUv) elUv.innerText = uv.toFixed(1);
+        if (elUvEstado) {
+            if (uv <= 2) { elUvEstado.innerText = "Bajo"; elUvEstado.style.color = "#22c55e"; }
+            else if (uv <= 5) { elUvEstado.innerText = "Moderado"; elUvEstado.style.color = "#facc15"; }
+            else if (uv <= 7) { elUvEstado.innerText = "Alto"; elUvEstado.style.color = "#fb923c"; }
+            else { elUvEstado.innerText = "Muy Alto"; elUvEstado.style.color = "#ef4444"; }
+        }
+
+        let desc = "Despejado";
+        if (code >= 1 && code <= 3) desc = "Parcialmente nublado";
+        if (code >= 51 && code < 95) desc = "Lluvioso";
+        if (code >= 95) desc = "Tormenta Eléctrica";
+        const elTempDesc = document.getElementById("tempDesc");
+        if (elTempDesc) elTempDesc.innerText = desc;
+
+        let zonda = "Bajo";
+        let zondaIcono = "🟢";
+
+        if (humedad <= 30 && temp >= 20) { zonda = "Moderado"; zondaIcono = "🟡"; }
+        if (humedad <= 20 && temp >= 25 && viento >= 15) { zonda = "Alto"; zondaIcono = "🟠"; }
+        if (humedad <= 15 && temp >= 30 && viento >= 25) { zonda = "Muy Alto"; zondaIcono = "🔴"; }
+
+        const elZondaIcono = document.getElementById("zondaIcono");
+        const elZondaEstado = document.getElementById("zondaEstado");
+        if (elZondaIcono) elZondaIcono.innerText = zondaIcono;
+        if (elZondaEstado) elZondaEstado.innerText = zonda;
+
+        if (data.daily) {
+            const ahora = new Date();
+            const amanecer = new Date(data.daily.sunrise[0]);
+            const atardecer = new Date(data.daily.sunset[0]);
+
+            const elAmanecer = document.getElementById("amanecerTime");
+            const elAtardecer = document.getElementById("atardecerTime");
+
+            if (elAmanecer) elAmanecer.innerText = amanecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+            if (elAtardecer) elAtardecer.innerText = atardecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+
+            let pct = (ahora - amanecer) / (atardecer - amanecer);
+            pct = Math.max(0, Math.min(1, pct));
+
+            const angulo = pct * 180;
+            const elSunPivot = document.getElementById("sunPivot");
+            const elSunIcon = document.getElementById("sunIcon");
+
+            if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
+            if (elSunIcon) {
+                elSunIcon.style.transform = `rotate(-${angulo}deg)`;
+                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
+            }
+        }
+
+        const hourly = document.getElementById("hourlyForecast");
+        if (hourly && data.hourly) {
+            hourly.innerHTML = "";
+            const h = new Date().getHours();
+            for(let i = h; i < h + 6; i++) {
+                if (data.hourly.temperature_2m[i] !== undefined) {
+                    hourly.innerHTML += `
+                        <div class="forecast-card">
+                            <div>${i % 24}:00</div>
+                            <div class="icon">${iconoClima(data.hourly.weather_code[i])}</div>
+                            <div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div>
+                        </div>`;
+                }
+            }
+        }
+
+        const forecast = document.getElementById("forecast");
+        if (forecast && data.daily) {
+            forecast.innerHTML = "";
+            data.daily.time.forEach((t, i) => {
+                const d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", { weekday: "short" });
+                forecast.innerHTML += `
+                    <div class="forecast-card">
+                        <div style="text-transform:capitalize">${d}</div>
+                        <div class="icon">${iconoClima(data.daily.weather_code[i])}</div>
+                        <div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div>
+                        <div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div>
+                    </div>`;
+            });
+        }
+
+    } catch(e) {
+        console.error("Error al cargar clima:", e);
+    }
+}
+
+function solicitarPermisoNotificacion() {
+    if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                const btn = document.getElementById("btnNotif");
+                if (btn) btn.innerText = "🔔 Alertas Activadas";
+                new Notification("Clima Mendoza Pro", { body: "Alertas activadas correctamente." });
+            }
+        });
+    }
+}
+
+// Ejecución directa
+actualizarFechaYHoraDigital();
+calcularFaseLunar();
+
+cargarClima();
+cargarCalidadAire();
+cargarSismos();
+actualizarAltaMontana();
+
+setInterval(actualizarFechaYHoraDigital, 1000);
+setInterval(cargarClima, 300000);
+setInterval(cargarCalidadAire, 300000);
+setInterval(cargarSismos, 300000);
+setInterval(actualizarAltaMontana, 300000);
+</script>
+</body>
+</html>
