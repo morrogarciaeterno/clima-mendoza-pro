@@ -406,7 +406,7 @@ header {
                 <div class="metric" id="temp">--</div>
                 <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="clima">
             </div>
-            <small id="tempDesc" style="color:var(--text-muted)">Conectando...</small>
+            <small id="tempDesc" style="color:var(--text-muted)">Cargando...</small>
         </div>
 
         <div class="card">
@@ -422,7 +422,7 @@ header {
         <div class="card">
             <h3>Índice UV</h3>
             <div class="metric" id="uvIndex">--</div>
-            <small id="uvEstado" style="color:var(--text-muted)">Conectando...</small>
+            <small id="uvEstado" style="color:var(--text-muted)">Cargando...</small>
         </div>
 
         <div class="card">
@@ -434,7 +434,7 @@ header {
         <div class="card">
             <h3>Calidad del Aire</h3>
             <div class="metric" id="aire">--</div>
-            <small id="aireEstado" style="color:var(--text-muted)">Conectando...</small>
+            <small id="aireEstado" style="color:var(--text-muted)">Cargando...</small>
         </div>
     </div>
 
@@ -543,24 +543,15 @@ header {
 </div>
 
 <script>
-// Petición directa y limpia sin depender de corsproxy
-async function safeFetch(url) {
-    try {
-        const res = await fetch(url);
-        if (res.ok) return await res.json();
-    } catch (e) {
-        console.warn("Fetch directo falló para: " + url, e);
-    }
-    return null;
-}
-
 function actualizarFechaYHoraDigital() {
-    const ahora = new Date();
-    const elFecha = document.getElementById("fecha");
-    const elClock = document.getElementById("digitalFallback");
+    try {
+        const ahora = new Date();
+        const elFecha = document.getElementById("fecha");
+        const elClock = document.getElementById("digitalFallback");
 
-    if (elFecha) elFecha.innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
-    if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR") + " hs";
+        if (elFecha) elFecha.innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
+        if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR") + " hs";
+    } catch(e) { console.error("Error reloj:", e); }
 }
 
 function iconoClima(codigo) {
@@ -573,50 +564,45 @@ function iconoClima(codigo) {
 }
 
 function calcularFaseLunar() {
-    const ahora = new Date();
-    let year = ahora.getFullYear();
-    let month = ahora.getMonth() + 1;
-    let day = ahora.getDate();
+    try {
+        const ahora = new Date();
+        let year = ahora.getFullYear();
+        let month = ahora.getMonth() + 1;
+        let day = ahora.getDate();
 
-    if (month < 3) {
-        year--;
-        month += 12;
-    }
+        if (month < 3) { year--; month += 12; }
+        month++;
+        let c = 365.25 * year;
+        let e = 30.6 * month;
+        let jd = c + e + day - 694039.09;
+        jd /= 29.5305882;
+        let b = Math.floor(jd);
+        jd -= b;
 
-    ++month;
-    let c = 365.25 * year;
-    let e = 30.6 * month;
-    let jd = c + e + day - 694039.09;
-    jd /= 29.5305882;
-    let b = parseInt(jd);
-    jd -= b;
+        let fase = Math.round(jd * 8);
+        if (fase >= 8) fase = 0;
 
-    let fase = Math.round(jd * 8);
-    if (fase >= 8) fase = 0;
+        let iluminacion = Math.round((1 - Math.cos(jd * 2 * Math.PI)) / 2 * 100);
+        let nombre = "Luna Nueva";
+        let icono = "🌑";
 
-    let iluminacion = Math.round((1 - Math.cos(jd * 2 * Math.PI)) / 2 * 100);
+        if (fase === 0) { nombre = "Luna Nueva"; icono = "🌑"; }
+        else if (fase === 1) { nombre = "Creciente"; icono = "🌒"; }
+        else if (fase === 2) { nombre = "Cuarto Creciente"; icono = "🌓"; }
+        else if (fase === 3) { nombre = "Gibosa Creciente"; icono = "🌔"; }
+        else if (fase === 4) { nombre = "Luna Llena"; icono = "🌕"; }
+        else if (fase === 5) { nombre = "Gibosa Menguante"; icono = "🌖"; }
+        else if (fase === 6) { nombre = "Cuarto Menguante"; icono = "🌗"; }
+        else if (fase === 7) { nombre = "Menguante"; icono = "🌘"; }
 
-    let nombre = "Luna Nueva";
-    let icono = "🌑";
+        const elIcon = document.getElementById("moonIcon");
+        const elName = document.getElementById("moonPhaseName");
+        const elIllum = document.getElementById("moonIllumination");
 
-    switch(fase) {
-        case 0: nombre = "Luna Nueva"; icono = "🌑"; break;
-        case 1: nombre = "Creciente"; icono = "🌒"; break;
-        case 2: nombre = "Cuarto Creciente"; icono = "🌓"; break;
-        case 3: nombre = "Gibosa Creciente"; icono = "🌔"; break;
-        case 4: nombre = "Luna Llena"; icono = "🌕"; break;
-        case 5: nombre = "Gibosa Menguante"; icono = "🌖"; break;
-        case 6: nombre = "Cuarto Menguante"; icono = "🌗"; break;
-        case 7: nombre = "Menguante"; icono = "🌘"; break;
-    }
-
-    const elIcon = document.getElementById("moonIcon");
-    const elName = document.getElementById("moonPhaseName");
-    const elIllum = document.getElementById("moonIllumination");
-
-    if (elIcon) elIcon.innerText = icono;
-    if (elName) elName.innerText = nombre;
-    if (elIllum) elIllum.innerText = iluminacion + "% iluminada";
+        if (elIcon) elIcon.innerText = icono;
+        if (elName) elName.innerText = nombre;
+        if (elIllum) elIllum.innerText = iluminacion + "% iluminada";
+    } catch(e) { console.error("Error Luna:", e); }
 }
 
 function gestionarAlertaSMN(code) {
@@ -654,7 +640,8 @@ function gestionarAlertaSMN(code) {
 async function cargarCalidadAire() {
     try {
         const url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-32.89&longitude=-68.84&current=us_aqi&timezone=auto";
-        const data = await safeFetch(url);
+        const res = await fetch(url);
+        const data = await res.json();
         if (!data || !data.current) return;
 
         const aqi = data.current.us_aqi;
@@ -673,15 +660,14 @@ async function cargarCalidadAire() {
             elAire.style.color = color;
         }
         if (elEstado) elEstado.innerText = estado;
-    } catch (error) {
-        console.error("Error Calidad Aire:", error);
-    }
+    } catch (error) { console.error("Error Calidad Aire:", error); }
 }
 
 async function cargarSismos() {
     try {
         const url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0";
-        const data = await safeFetch(url);
+        const res = await fetch(url);
+        const data = await res.json();
         const lista = document.getElementById("sismosLista");
         
         if (lista && data && data.features && data.features.length > 0) {
@@ -711,15 +697,14 @@ async function cargarSismos() {
         } else if (lista) {
             lista.innerHTML = `<tr><td colspan="5">Sin actividad reciente</td></tr>`;
         }
-    } catch(e) {
-        console.error("Error Sismos:", e);
-    }
+    } catch(e) { console.error("Error Sismos:", e); }
 }
 
 async function actualizarAltaMontana() {
     try {
         const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.81&longitude=-69.80&current=temperature_2m,snowfall&timezone=auto";
-        const data = await safeFetch(url);
+        const res = await fetch(url);
+        const data = await res.json();
         if (!data || !data.current) return;
 
         const temp = Math.round(data.current.temperature_2m);
@@ -735,15 +720,14 @@ async function actualizarAltaMontana() {
         } else {
             if (elPaso) { elPaso.textContent = "Habilitado"; elPaso.style.color = "#22c55e"; }
         }
-    } catch (e) {
-        console.error("Error Alta Montaña:", e);
-    }
+    } catch (e) { console.error("Error Alta Montaña:", e); }
 }
 
 async function cargarClima() {
     try {
         const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=America%2FArgentina%2FMendoza";
-        const data = await safeFetch(url);
+        const res = await fetch(url);
+        const data = await res.json();
 
         if (!data || !data.current) return;
 
@@ -850,9 +834,7 @@ async function cargarClima() {
             });
         }
 
-    } catch(e) {
-        console.error("Error al cargar clima:", e);
-    }
+    } catch(e) { console.error("Error al cargar clima:", e); }
 }
 
 function solicitarPermisoNotificacion() {
@@ -867,7 +849,7 @@ function solicitarPermisoNotificacion() {
     }
 }
 
-// Ejecución directa
+// Inicialización de funciones
 actualizarFechaYHoraDigital();
 calcularFaseLunar();
 
