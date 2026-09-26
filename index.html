@@ -29,9 +29,9 @@ html, body {
     color: var(--text-main);
     width: 100%;
     min-height: 100vh;
-    overflow-x: hidden;  /* Evita desplazamiento horizontal */
-    overflow-y: auto;    /* Permite desplazamiento vertical nativo */
-    touch-action: pan-y; /* Habilita gestos táctiles hacia arriba/abajo */
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y;
 }
 
 header {
@@ -83,7 +83,7 @@ header {
 .container {
     max-width: 1400px;
     margin: 15px auto;
-    padding: 0 15px 60px 15px; /* Margen inferior para que nada quede oculto */
+    padding: 0 15px 60px 15px;
 }
 
 .grid {
@@ -156,7 +156,6 @@ header {
     color: var(--text-muted);
 }
 
-/* Fila de Dashboard ajustada */
 .dashboard-row {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -164,7 +163,6 @@ header {
     align-items: center;
 }
 
-/* Contenedor de la Tabla de Sismos */
 .sismos-container-block {
     display: flex;
     flex-direction: column;
@@ -317,7 +315,6 @@ header {
     margin-top: 10px;
 }
 
-/* REGLAS MÓVILES OPTIMIZADAS PARA ACHICAR Y COMPACTAR EL CONTENIDO */
 @media (max-width: 768px) {
     .container {
         transform: scale(0.85);
@@ -394,7 +391,7 @@ header {
         </div>
 
         <div class="date-display">
-            <div id="fecha">Cargando fecha...</div>
+            <div id="fecha">--</div>
             <div id="digitalFallback">00:00:00 hs</div>
         </div>
     </div>
@@ -409,7 +406,7 @@ header {
                 <div class="metric" id="temp">--</div>
                 <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="clima">
             </div>
-            <small id="tempDesc" style="color:var(--text-muted)">Cargando...</small>
+            <small id="tempDesc" style="color:var(--text-muted)">Conectando...</small>
         </div>
 
         <div class="card">
@@ -425,7 +422,7 @@ header {
         <div class="card">
             <h3>Índice UV</h3>
             <div class="metric" id="uvIndex">--</div>
-            <small id="uvEstado" style="color:var(--text-muted)">Cargando...</small>
+            <small id="uvEstado" style="color:var(--text-muted)">Conectando...</small>
         </div>
 
         <div class="card">
@@ -437,7 +434,7 @@ header {
         <div class="card">
             <h3>Calidad del Aire</h3>
             <div class="metric" id="aire">--</div>
-            <small id="aireEstado" style="color:var(--text-muted)">Cargando...</small>
+            <small id="aireEstado" style="color:var(--text-muted)">Conectando...</small>
         </div>
     </div>
 
@@ -484,7 +481,7 @@ header {
                             </tr>
                         </thead>
                         <tbody id="sismosLista">
-                            <tr><td colspan="5">Cargando sismos...</td></tr>
+                            <tr><td colspan="5">Consultando USGS...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -506,7 +503,7 @@ header {
             <div class="lunar-container">
                 <h3 style="width:100%; text-align:center;">🌙 Fase Lunar</h3>
                 <div class="moon-display" id="moonIcon">🌑</div>
-                <div class="moon-phase-title" id="moonPhaseName">Cargando...</div>
+                <div class="moon-phase-title" id="moonPhaseName">--</div>
                 <div class="moon-illumination" id="moonIllumination">--%</div>
             </div>
         </div>
@@ -514,98 +511,4 @@ header {
 
     <br>
 
-    <div class="dual-section">
-        <div class="card">
-            <h3>📅 Pronóstico 7 días</h3>
-            <div id="forecast" class="forecast-cards"></div>
-
-            <br>
-            <div style="display:flex; gap:15px; background:var(--card-inner); padding:15px; border-radius:12px; text-align:center; align-items:center; flex-wrap:wrap;">
-                <div style="flex:1; min-width: 140px;">
-                    <h3>🌬️ Riesgo Zonda</h3>
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px;">
-                        <span id="zondaIcono" style="font-size:1.5rem;">🟢</span>
-                        <div id="zondaEstado" style="font-size:1.4rem; font-weight:bold; color:var(--accent);">Bajo</div>
-                    </div>
-                    <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
-                </div>
-                <div style="flex:1; min-width: 140px;">
-                    <h3>🏔️ Paso Cristo Redentor</h3>
-                    <div id="pasoEstado" style="font-size:1.1rem; font-weight:bold; color:#22c55e; margin-top:5px;">Cargando...</div>
-                    <small id="montanaTemp" style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">--°C</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3>🛰 Radar Meteorológico</h3>
-            <img class="radar-img" src="https://www2.contingencias.mendoza.gov.ar/radar/animacion.gif" alt="Radar Mendoza">
-        </div>
-    </div>
-
-</div>
-
-<script>
-async function safeFetch(url) {
-    try {
-        let res = await fetch(url);
-        if (res.ok) return await res.json();
-    } catch (e) {
-        console.warn("Fetch directo falló, intentando vía proxy...", e);
-    }
-    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
-    let resProxy = await fetch(proxyUrl);
-    if (!resProxy.ok) throw new Error("Error en la petición API");
-    return await resProxy.json();
-}
-
-function actualizarFechaYHoraDigital() {
-    const ahora = new Date();
-    const elFecha = document.getElementById("fecha");
-    const elClock = document.getElementById("digitalFallback");
-
-    if (elFecha) elFecha.innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
-    if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR") + " hs";
-}
-
-function iconoClima(codigo) {
-    if (codigo === 0) return "☀️";
-    if (codigo <= 2) return "🌤️";
-    if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️";
-    if (codigo >= 95) return "⛈️";
-    return "⛈️";
-}
-
-function calcularFaseLunar() {
-    const ahora = new Date();
-    let year = ahora.getFullYear();
-    let month = ahora.getMonth() + 1;
-    let day = ahora.getDate();
-
-    if (month < 3) {
-        year--;
-        month += 12;
-    }
-
-    ++month;
-    let c = 365.25 * year;
-    let e = 30.6 * month;
-    let jd = c + e + day - 694039.09;
-    jd /= 29.5305882;
-    let b = parseInt(jd);
-    jd -= b;
-
-    let fase = Math.round(jd * 8);
-    if (fase >= 8) fase = 0;
-
-    let iluminacion = Math.round((1 - Math.cos(jd * 2 * Math.PI)) / 2 * 100);
-
-    let nombre = "Luna Nueva";
-    let icono = "🌑";
-
-    switch(fase) {
-        case 0: nombre = "Luna Nueva"; icono = "🌑"; break;
-        case 1: nombre = "Creciente"; icono = "🌒"; break;
-        case 2: nombre = "Cuarto Creciente"; icono = "🌓"; break;
-        case
+    <div class
