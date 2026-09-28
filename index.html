@@ -90,11 +90,8 @@ header {
 #headerTemp {
     font-size: 0.85rem;
     font-weight: 700;
-    color: var(--text-main);
-    background: var(--card-inner);
-    padding: 2px 6px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
+    color: var(--accent);
+    display: inline-block;
 }
 
 .container {
@@ -821,7 +818,7 @@ async function cargarClima() {
         const elPresion = document.getElementById("presion");
 
         if (elTemp) elTemp.innerText = tempFormateada;
-        if (elHeaderTemp) elHeaderTemp.innerText = tempFormateada;
+        if (elHeaderTemp) elHeaderTemp.textContent = tempFormateada;
         if (elHum) elHum.innerText = humedad + "%";
         if (elViento) elViento.innerText = Math.round(viento) + " km/h";
         if (elPresion) elPresion.innerText = Math.round(data.current.surface_pressure);
