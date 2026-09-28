@@ -480,7 +480,7 @@ header {
                             </tr>
                         </thead>
                         <tbody id="sismosLista">
-                            <tr><td colspan="4">Consultando INPRES...</td></tr>
+                            <tr><td colspan="4">Cargando sismos en vivo...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -667,69 +667,57 @@ async function cargarSismos() {
         const lista = document.getElementById("sismosLista");
         if (!lista) return;
 
-        // Scraping en tiempo real de la tabla oficial del INPRES
-        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.inpres.gob.ar/desktop/");
-        const res = await fetch(proxyUrl);
-        if (!res.ok) return;
+        // Calculamos solo las últimas 24hs para no mostrar datos antiguos
+        const ahora = new Date();
+        const ayer = new Date(ahora.getTime() - (24 * 60 * 60 * 1000));
+        const startTime = ayer.toISOString().split('T')[0];
 
+        // API USGS filtrada únicamente por el último día (Radio 1000km Cuyo/Chile, Mag >= 1.0)
+        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=1000&minmagnitude=1.0&starttime=${startTime}`;
+        
+        const res = await fetch(urlUSGS);
+        if (!res.ok) throw new Error("Error red USGS");
+        
         const data = await res.json();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(data.contents, "text/html");
 
-        const filas = doc.querySelectorAll("table tr");
-
-        if (filas && filas.length > 1) {
+        if (data && data.features && data.features.length > 0) {
             lista.innerHTML = "";
             let contador = 0;
 
-            filas.forEach((fila) => {
+            data.features.forEach(sismo => {
                 if (contador >= 10) return;
 
-                const celdas = fila.querySelectorAll("td");
-                if (celdas.length >= 6) {
-                    const dia = celdas[1].innerText.trim();
-                    const prof = celdas[3].innerText.trim();
-                    const mag = celdas[4].innerText.trim();
-                    const lugar = celdas[5].innerText.trim();
+                const fechaObj = new Date(sismo.properties.time);
+                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                const mag = sismo.properties.mag.toFixed(1);
+                const prof = Math.round(sismo.geometry.coordinates[2]);
+                let lugar = sismo.properties.place || "Mendoza";
 
-                    // FILTRO DE SEGURIDAD: Evita encabeados y notas al pie ("Sismo negro", "ADVERTENCIA", etc.)
-                    const textoFila = (dia + prof + mag + lugar).toLowerCase();
-                    if (
-                        textoFila.includes("sismo negro") || 
-                        textoFila.includes("advertencia") || 
-                        textoFila.includes("ver mapa") || 
-                        textoFila.includes("prof.") ||
-                        dia === "Dia"
-                    ) {
-                        return;
-                    }
-
-                    const esMendoza = lugar.toUpperCase().includes("MENDOZA");
-                    const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
-
-                    lista.innerHTML += `
-                        <tr>
-                            <td>${dia}</td>
-                            <td>${prof}</td>
-                            <td class="${claseColor}">${mag}</td>
-                            <td class="${claseColor}">${lugar}</td>
-                        </tr>`;
-                    
-                    contador++;
+                if (lugar.includes("of ")) {
+                    lugar = lugar.split("of ")[1];
                 }
-            });
 
-            if (contador === 0) {
-                lista.innerHTML = `<tr><td colspan="4">Sin actividad reciente</td></tr>`;
-            }
+                const esMendoza = lugar.toUpperCase().includes("MENDOZA");
+                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+
+                lista.innerHTML += `
+                    <tr>
+                        <td>${dia}</td>
+                        <td>${prof} Km</td>
+                        <td class="${claseColor}">${mag}</td>
+                        <td class="${claseColor}">${lugar}</td>
+                    </tr>`;
+                
+                contador++;
+            });
         } else {
-            lista.innerHTML = `<tr><td colspan="4">Sin actividad reciente</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4">Sin actividad telúrica registrada hoy</td></tr>`;
         }
     } catch(e) {
-        console.error("Error Sismos INPRES:", e);
+        console.error("Error al cargar sismos:", e);
         const lista = document.getElementById("sismosLista");
         if (lista) {
-            lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">No se pudo actualizar sismos</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Error al conectar con el servicio</td></tr>`;
         }
     }
 }
