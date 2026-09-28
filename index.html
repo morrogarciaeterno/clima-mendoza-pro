@@ -667,16 +667,11 @@ async function cargarSismos() {
         const lista = document.getElementById("sismosLista");
         if (!lista) return;
 
-        // Calculamos solo las últimas 24hs para no mostrar datos antiguos
-        const ahora = new Date();
-        const ayer = new Date(ahora.getTime() - (24 * 60 * 60 * 1000));
-        const startTime = ayer.toISOString().split('T')[0];
-
-        // API USGS filtrada únicamente por el último día (Radio 1000km Cuyo/Chile, Mag >= 1.0)
-        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=1000&minmagnitude=1.0&starttime=${startTime}`;
+        // Petición directa y veloz a la API oficial del USGS
+        const urlUSGS = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=800&minmagnitude=2.0";
         
         const res = await fetch(urlUSGS);
-        if (!res.ok) throw new Error("Error red USGS");
+        if (!res.ok) throw new Error("Error HTTP " + res.status);
         
         const data = await res.json();
 
@@ -684,6 +679,7 @@ async function cargarSismos() {
             lista.innerHTML = "";
             let contador = 0;
 
+            // Filtramos sismos de los últimos días ordenados del más reciente al más antiguo
             data.features.forEach(sismo => {
                 if (contador >= 10) return;
 
@@ -711,13 +707,13 @@ async function cargarSismos() {
                 contador++;
             });
         } else {
-            lista.innerHTML = `<tr><td colspan="4">Sin actividad telúrica registrada hoy</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4">Sin actividad reciente registrada</td></tr>`;
         }
     } catch(e) {
         console.error("Error al cargar sismos:", e);
         const lista = document.getElementById("sismosLista");
         if (lista) {
-            lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Error al conectar con el servicio</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Error al conectar con el servicio de sismos</td></tr>`;
         }
     }
 }
