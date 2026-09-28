@@ -480,7 +480,7 @@ header {
                             </tr>
                         </thead>
                         <tbody id="sismosLista">
-                            <tr><td colspan="4">Cargando sismos...</td></tr>
+                            <tr><td colspan="4">Cargando sismos en vivo...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -662,59 +662,101 @@ async function cargarCalidadAire() {
     } catch (error) { console.error("Error Calidad Aire:", error); }
 }
 
+// Carga resiliente con fallback automático (INPRES -> USGS filtrado por Argentina)
 async function cargarSismos() {
+    const lista = document.getElementById("sismosLista");
+    if (!lista) return;
+
+    // Intento 1: Servidor INPRES mediante Proxy
     try {
-        const lista = document.getElementById("sismosLista");
-        if (!lista) return;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500); // Timeout rápido de 2.5s
 
-        // Petición estándar y compatible con WebView (Mendoza -32.89, -68.84)
-        const urlUSGS = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=800&minmagnitude=2.0";
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.inpres.gob.ar/desktop/sismos.php?x=1");
+        const res = await fetch(proxyUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
 
+        if (res.ok) {
+            const dataWrapper = await res.json();
+            const data = JSON.parse(dataWrapper.contents);
+
+            if (Array.isArray(data) && data.length > 0) {
+                renderizarTablaSismos(data.map(s => {
+                    let dia = "--/--";
+                    if (s.fecha) {
+                        const p = s.fecha.split("-");
+                        if (p.length >= 3) dia = `${p[2]}/${p[1]}`;
+                    }
+                    return {
+                        dia: dia,
+                        prof: s.profundidad ? Math.round(parseFloat(s.profundidad)) + " Km" : "--",
+                        mag: s.magnitud ? parseFloat(s.magnitud).toFixed(1) : "--",
+                        lugar: (s.provincia || s.referencia || "Argentina").toUpperCase().trim()
+                    };
+                }));
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn("Intento INPRES fallido, usando respaldo directo USGS Argentina...");
+    }
+
+    // Intento 2 (Fallback Garantizado): USGS filtrado por región Cuyo / Argentina
+    try {
+        const urlUSGS = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=800&minmagnitude=1.5";
         const res = await fetch(urlUSGS);
-        if (!res.ok) throw new Error("Error HTTP " + res.status);
+        if (!res.ok) throw new Error("Error HTTP USGS " + res.status);
 
         const data = await res.json();
-
         if (data && data.features && data.features.length > 0) {
-            lista.innerHTML = "";
-            let contador = 0;
-
+            const listaSismos = [];
             data.features.forEach(sismo => {
-                if (contador >= 10) return;
-
                 const fechaObj = new Date(sismo.properties.time);
                 const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                 const mag = sismo.properties.mag.toFixed(1);
-                const prof = Math.round(sismo.geometry.coordinates[2]);
-                let lugar = sismo.properties.place || "Mendoza";
+                const prof = Math.round(sismo.geometry.coordinates[2]) + " Km";
+                let lugar = sismo.properties.place || "Mendoza, Argentina";
 
                 if (lugar.includes("of ")) {
                     lugar = lugar.split("of ")[1];
                 }
 
-                const esMendoza = lugar.toUpperCase().includes("MENDOZA");
-                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
-
-                lista.innerHTML += `
-                    <tr>
-                        <td>${dia}</td>
-                        <td>${prof} Km</td>
-                        <td class="${claseColor}">${mag}</td>
-                        <td class="${claseColor}">${lugar}</td>
-                    </tr>`;
-
-                contador++;
+                listaSismos.push({ dia, prof, mag, lugar: lugar.trim() });
             });
+
+            renderizarTablaSismos(listaSismos);
         } else {
-            lista.innerHTML = `<tr><td colspan="4">Sin actividad reciente registrada</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4">Sin actividad telúrica reciente registrada</td></tr>`;
         }
-    } catch (e) {
-        console.error("Error al cargar sismos:", e);
-        const lista = document.getElementById("sismosLista");
-        if (lista) {
-            lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">No se pudo conectar al servicio</td></tr>`;
-        }
+    } catch (err) {
+        console.error("Error final al cargar sismos:", err);
+        lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Servicio en actualización...</td></tr>`;
     }
+}
+
+function renderizarTablaSismos(sismos) {
+    const lista = document.getElementById("sismosLista");
+    if (!lista) return;
+
+    lista.innerHTML = "";
+    let contador = 0;
+
+    sismos.forEach(s => {
+        if (contador >= 10) return;
+
+        const esMendoza = s.lugar.toUpperCase().includes("MENDOZA");
+        const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+
+        lista.innerHTML += `
+            <tr>
+                <td>${s.dia}</td>
+                <td>${s.prof}</td>
+                <td class="${claseColor}">${s.mag}</td>
+                <td class="${claseColor}">${s.lugar}</td>
+            </tr>`;
+
+        contador++;
+    });
 }
 
 async function actualizarAltaMontana() {
