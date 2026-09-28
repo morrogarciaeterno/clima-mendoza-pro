@@ -474,14 +474,13 @@ header {
                         <thead>
                             <tr>
                                 <th>Día</th>
-                                <th>Hora</th>
                                 <th>Prof</th>
                                 <th>Mag</th>
                                 <th>Lugar</th>
                             </tr>
                         </thead>
                         <tbody id="sismosLista">
-                            <tr><td colspan="5">Consultando USGS...</td></tr>
+                            <tr><td colspan="4">Consultando INPRES...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -665,39 +664,55 @@ async function cargarCalidadAire() {
 
 async function cargarSismos() {
     try {
-        const url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0";
-        const res = await fetch(url);
-        const data = await res.json();
         const lista = document.getElementById("sismosLista");
-        
-        if (lista && data && data.features && data.features.length > 0) {
+        if (!lista) return;
+
+        // Scraping en tiempo real de la tabla oficial del INPRES
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.inpres.gob.ar/desktop/");
+        const res = await fetch(proxyUrl);
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, "text/html");
+
+        const filas = doc.querySelectorAll("table tr");
+
+        if (filas && filas.length > 1) {
             lista.innerHTML = "";
-            data.features.slice(0, 10).forEach(sismo => {
-                const fechaObj = new Date(sismo.properties.time);
-                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-                const hora = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
-                const mag = sismo.properties.mag.toFixed(1);
-                const prof = Math.round(sismo.geometry.coordinates[2]);
-                let lugar = sismo.properties.place || "Mendoza";
+            let contador = 0;
 
-                if (lugar.includes("of ")) lugar = lugar.split("of ")[1];
+            filas.forEach((fila, index) => {
+                if (index === 0) return; // Omitir el encabezado de la tabla
+                if (contador >= 10) return; // Limitar a los 10 más recientes
 
-                const esMendoza = lugar.toUpperCase().includes("MENDOZA");
-                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+                const celdas = fila.querySelectorAll("td");
+                if (celdas.length >= 6) {
+                    const dia = celdas[1].innerText.trim();
+                    const prof = celdas[3].innerText.trim();
+                    const mag = celdas[4].innerText.trim();
+                    const lugar = celdas[5].innerText.trim();
 
-                lista.innerHTML += `
-                    <tr>
-                        <td>${dia}</td>
-                        <td>${hora}</td>
-                        <td>${prof} Km</td>
-                        <td class="${claseColor}">${mag}</td>
-                        <td class="${claseColor}">${lugar}</td>
-                    </tr>`;
+                    const esMendoza = lugar.toUpperCase().includes("MENDOZA");
+                    const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+
+                    lista.innerHTML += `
+                        <tr>
+                            <td>${dia}</td>
+                            <td>${prof}</td>
+                            <td class="${claseColor}">${mag}</td>
+                            <td class="${claseColor}">${lugar}</td>
+                        </tr>`;
+                    
+                    contador++;
+                }
             });
-        } else if (lista) {
-            lista.innerHTML = `<tr><td colspan="5">Sin actividad reciente</td></tr>`;
+        } else {
+            lista.innerHTML = `<tr><td colspan="4">Sin actividad reciente</td></tr>`;
         }
-    } catch(e) { console.error("Error Sismos:", e); }
+    } catch(e) {
+        console.error("Error Sismos INPRES:", e);
+    }
 }
 
 async function actualizarAltaMontana() {
