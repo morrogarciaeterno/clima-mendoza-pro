@@ -73,11 +73,28 @@ header {
     text-transform: capitalize;
 }
 
+.time-temp-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 2px;
+}
+
 #digitalFallback {
     font-size: 0.8rem;
     color: var(--accent);
-    margin-top: 2px;
     font-variant-numeric: tabular-nums;
+}
+
+#headerTemp {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+    background: var(--card-inner);
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
 }
 
 .container {
@@ -392,7 +409,10 @@ header {
 
         <div class="date-display">
             <div id="fecha">--</div>
-            <div id="digitalFallback">00:00:00 hs</div>
+            <div class="time-temp-container">
+                <span id="digitalFallback">00:00:00 hs</span>
+                <span id="headerTemp">--°C</span>
+            </div>
         </div>
     </div>
 </header>
@@ -662,15 +682,13 @@ async function cargarCalidadAire() {
     } catch (error) { console.error("Error Calidad Aire:", error); }
 }
 
-// Carga resiliente con fallback automático (INPRES -> USGS filtrado por Argentina)
 async function cargarSismos() {
     const lista = document.getElementById("sismosLista");
     if (!lista) return;
 
-    // Intento 1: Servidor INPRES mediante Proxy
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500); // Timeout rápido de 2.5s
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
 
         const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.inpres.gob.ar/desktop/sismos.php?x=1");
         const res = await fetch(proxyUrl, { signal: controller.signal });
@@ -698,10 +716,9 @@ async function cargarSismos() {
             }
         }
     } catch (e) {
-        console.warn("Intento INPRES fallido, usando respaldo directo USGS Argentina...");
+        console.warn("Intento INPRES fallido, usando respaldo directo USGS...");
     }
 
-    // Intento 2 (Fallback Garantizado): USGS filtrado por región Cuyo / Argentina
     try {
         const urlUSGS = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=800&minmagnitude=1.5";
         const res = await fetch(urlUSGS);
@@ -715,7 +732,7 @@ async function cargarSismos() {
                 const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                 const mag = sismo.properties.mag.toFixed(1);
                 const prof = Math.round(sismo.geometry.coordinates[2]) + " Km";
-                let lugar = sismo.properties.place || "Mendoza, Argentina";
+                let lugar = sismo.properties.place || "Mendoza";
 
                 if (lugar.includes("of ")) {
                     lugar = lugar.split("of ")[1];
@@ -791,17 +808,20 @@ async function cargarClima() {
         if (!data || !data.current) return;
 
         const temp = data.current.temperature_2m ?? 0;
+        const tempFormateada = Math.round(temp) + "°C";
         const humedad = data.current.relative_humidity_2m ?? 0;
         const viento = data.current.wind_speed_10m ?? 0;
         const uv = data.current.uv_index ?? 0;
         const code = data.current.weather_code ?? 0;
 
         const elTemp = document.getElementById("temp");
+        const elHeaderTemp = document.getElementById("headerTemp");
         const elHum = document.getElementById("humedad");
         const elViento = document.getElementById("viento");
         const elPresion = document.getElementById("presion");
 
-        if (elTemp) elTemp.innerText = Math.round(temp) + "°C";
+        if (elTemp) elTemp.innerText = tempFormateada;
+        if (elHeaderTemp) elHeaderTemp.innerText = tempFormateada;
         if (elHum) elHum.innerText = humedad + "%";
         if (elViento) elViento.innerText = Math.round(viento) + " km/h";
         if (elPresion) elPresion.innerText = Math.round(data.current.surface_pressure);
