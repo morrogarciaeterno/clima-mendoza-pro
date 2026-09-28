@@ -468,7 +468,7 @@ header {
     <div class="card">
         <div class="dashboard-row">
             <div class="sismos-container-block">
-                <h3>🌋 Últimos Sismos Argentina</h3>
+                <h3>🌋 Últimos Sismos Argentina (INPRES)</h3>
                 <div class="sismos-table-wrapper">
                     <table class="tabla-sismos">
                         <thead>
@@ -480,7 +480,7 @@ header {
                             </tr>
                         </thead>
                         <tbody id="sismosLista">
-                            <tr><td colspan="4">Cargando sismos en vivo...</td></tr>
+                            <tr><td colspan="4">Conectando con INPRES...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -667,63 +667,56 @@ async function cargarSismos() {
         const lista = document.getElementById("sismosLista");
         if (!lista) return;
 
-        // Anti-caché dinámico para forzar la actualización de datos
-        const timestamp = new Date().getTime();
-        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=1.0&_t=${timestamp}`;
-
-        const res = await fetch(urlUSGS, { cache: "no-store" });
-        if (!res.ok) throw new Error("Error en respuesta USGS");
+        // Endpoint de datos oficiales del INPRES Argentina
+        const res = await fetch("https://www.inpres.gob.ar/desktop/sismos.php?x=1");
+        if (!res.ok) throw new Error("Error HTTP " + res.status);
 
         const data = await res.json();
 
-        if (data && data.features && data.features.length > 0) {
-            // Filtro exclusivo para sismos dentro de Argentina / Cuyo
-            const sismosArgentina = data.features.filter(sismo => {
-                const lugar = (sismo.properties.place || "").toUpperCase();
-                return lugar.includes("ARGENTINA") || lugar.includes("MENDOZA") || lugar.includes("SAN JUAN");
-            });
+        if (Array.isArray(data) && data.length > 0) {
+            lista.innerHTML = "";
+            let contador = 0;
 
-            if (sismosArgentina.length > 0) {
-                lista.innerHTML = "";
-                let contador = 0;
+            data.forEach(sismo => {
+                if (contador >= 10) return;
 
-                sismosArgentina.forEach(sismo => {
-                    if (contador >= 10) return;
-
-                    const fechaObj = new Date(sismo.properties.time);
-                    const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-                    const mag = sismo.properties.mag.toFixed(1);
-                    const prof = Math.round(sismo.geometry.coordinates[2]);
-                    let lugar = sismo.properties.place || "Mendoza, Argentina";
-
-                    if (lugar.includes("of ")) {
-                        lugar = lugar.split("of ")[1];
+                // Extraemos día (DD/MM) descartando el año
+                let dia = "--/--";
+                if (sismo.fecha) {
+                    const partes = sismo.fecha.split("-");
+                    if (partes.length >= 3) {
+                        dia = `${partes[2]}/${partes[1]}`;
                     }
+                }
 
-                    const esMendoza = lugar.toUpperCase().includes("MENDOZA");
-                    const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+                const prof = sismo.profundidad ? Math.round(parseFloat(sismo.profundidad)) + " Km" : "--";
+                const mag = sismo.magnitud ? parseFloat(sismo.magnitud).toFixed(1) : "--";
+                let lugar = sismo.provincia || sismo.referencia || "Argentina";
 
-                    lista.innerHTML += `
-                        <tr>
-                            <td>${dia}</td>
-                            <td>${prof} Km</td>
-                            <td class="${claseColor}">${mag}</td>
-                            <td class="${claseColor}">${lugar}</td>
-                        </tr>`;
+                // Limpiamos texto para dejar la provincia o zona relevante
+                lugar = lugar.toUpperCase().trim();
 
-                    contador++;
-                });
-            } else {
-                lista.innerHTML = `<tr><td colspan="4">Sin sismos registrados hoy en Argentina</td></tr>`;
-            }
+                const esMendoza = lugar.includes("MENDOZA");
+                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+
+                lista.innerHTML += `
+                    <tr>
+                        <td>${dia}</td>
+                        <td>${prof}</td>
+                        <td class="${claseColor}">${mag}</td>
+                        <td class="${claseColor}">${lugar}</td>
+                    </tr>`;
+
+                contador++;
+            });
         } else {
-            lista.innerHTML = `<tr><td colspan="4">Sin actividad telúrica reciente</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4">Sin actividad reciente registrada</td></tr>`;
         }
     } catch (e) {
-        console.error("Error al cargar sismos:", e);
+        console.error("Error al obtener datos del INPRES:", e);
         const lista = document.getElementById("sismosLista");
         if (lista) {
-            lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Error de conexión al actualizar sismos</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Servicio INPRES no disponible momentáneamente</td></tr>`;
         }
     }
 }
