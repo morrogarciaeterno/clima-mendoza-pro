@@ -416,24 +416,16 @@ header {
     object-fit: cover;
 }
 
-/* CONTENEDOR RIESGO ZONDA + PASO CENTRADO */
+/* CONTENEDOR RIESGO ZONDA + PASO CENTRADO Y ALINEADO */
 .info-banner-container {
     display: flex;
-    flex-direction: column;
+    justify-content: space-around;
     align-items: center;
-    gap: 12px;
     background: var(--card-inner);
     padding: 16px;
     border-radius: 12px;
     border: 1px solid var(--border);
     margin-top: 15px;
-    width: 100%;
-}
-
-.info-banner-row {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
     width: 100%;
 }
 
@@ -443,11 +435,6 @@ header {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-}
-
-.info-banner-col small,
-.info-banner-col div {
     text-align: center;
 }
 
@@ -751,24 +738,22 @@ header {
                 </div>
             </div>
 
-            <!-- MÓDULO CENTRADO RIESGO ZONDA Y PASO (SIN BOTÓN) -->
+            <!-- MÓDULO RIESGO ZONDA Y PASO TOTALMENTE CENTRADO Y ALINEADO -->
             <div class="info-banner-container">
-                <div class="info-banner-row">
-                    <div class="info-banner-col">
-                        <small style="color: var(--text-muted); font-size: 0.75rem; display: block;">🌬️ Riesgo Zonda</small>
-                        <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;">
-                            <span id="zondaIcono" style="font-size:1.2rem;">🟢</span>
-                            <div id="zondaEstado" style="font-size:1.2rem; font-weight:bold; color:var(--accent);">Bajo</div>
-                        </div>
+                <div class="info-banner-col">
+                    <small style="color: var(--text-muted); font-size: 0.75rem; text-align: center;">🌬️ Riesgo Zonda</small>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;">
+                        <span id="zondaIcono" style="font-size: 1.2rem;">🟢</span>
+                        <div id="zondaEstado" style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">Bajo</div>
                     </div>
+                </div>
 
-                    <div class="info-banner-divider"></div>
+                <div class="info-banner-divider"></div>
 
-                    <div class="info-banner-col">
-                        <small style="color: var(--text-muted); font-size: 0.75rem; display: block;">🏔️ Paso Cristo Redentor</small>
-                        <div id="pasoEstado" style="font-size:1rem; font-weight:bold; color:#22c55e; margin-top:4px;">Conectando...</div>
-                        <small id="montanaTemp" style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:2px;">--°C en Las Cuevas</small>
-                    </div>
+                <div class="info-banner-col">
+                    <small style="color: var(--text-muted); font-size: 0.75rem; text-align: center;">🏔️ Paso Cristo Redentor</small>
+                    <div id="pasoEstado" style="font-size: 1rem; font-weight: bold; color: #22c55e; margin-top: 4px; text-align: center;">Conectando...</div>
+                    <small id="montanaTemp" style="color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-top: 2px;">--°C en Las Cuevas</small>
                 </div>
             </div>
         </div>
@@ -1157,7 +1142,7 @@ async function cargarClima() {
             if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
             if (elSunIcon) {
                 elSunIcon.style.transform = `rotate(-${angulo}deg)`;
-                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️️";
+                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
             }
         }
 
