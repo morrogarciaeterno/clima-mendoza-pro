@@ -684,53 +684,25 @@ async function cargarSismos() {
     if (!lista) return;
 
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
-
-        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.inpres.gob.ar/desktop/sismos.php?x=1");
-        const res = await fetch(proxyUrl, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        if (res.ok) {
-            const dataWrapper = await res.json();
-            const data = JSON.parse(dataWrapper.contents);
-
-            if (Array.isArray(data) && data.length > 0) {
-                renderizarTablaSismos(data.map(s => {
-                    let dia = "--/--";
-                    if (s.fecha) {
-                        const p = s.fecha.split("-");
-                        if (p.length >= 3) dia = `${p[2]}/${p[1]}`;
-                    }
-                    return {
-                        dia: dia,
-                        prof: s.profundidad ? Math.round(parseFloat(s.profundidad)) + " Km" : "--",
-                        mag: s.magnitud ? parseFloat(s.magnitud).toFixed(1) : "--",
-                        lugar: (s.provincia || s.referencia || "Argentina").toUpperCase().trim()
-                    };
-                }));
-                return;
-            }
-        }
-    } catch (e) {
-        console.warn("Intento INPRES fallido, usando respaldo directo USGS...");
-    }
-
-    try {
-        const urlUSGS = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=800&minmagnitude=1.5";
+        // Petición directa a la API GeoJSON oficial de USGS (Sin proxies caídos)
+        const urlUSGS = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0&limit=15";
         const res = await fetch(urlUSGS);
-        if (!res.ok) throw new Error("Error HTTP USGS " + res.status);
+        if (!res.ok) throw new Error("Error HTTP " + res.status);
 
         const data = await res.json();
         if (data && data.features && data.features.length > 0) {
             const listaSismos = [];
+            
             data.features.forEach(sismo => {
-                const fechaObj = new Date(sismo.properties.time);
-                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-                const mag = sismo.properties.mag.toFixed(1);
-                const prof = Math.round(sismo.geometry.coordinates[2]) + " Km";
-                let lugar = sismo.properties.place || "Mendoza";
+                const props = sismo.properties;
+                const coords = sismo.geometry.coordinates;
 
+                const fechaObj = new Date(props.time);
+                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                const prof = Math.round(coords[2]) + " Km";
+                const mag = props.mag ? props.mag.toFixed(1) : "--";
+
+                let lugar = props.place || "Mendoza, Argentina";
                 if (lugar.includes("of ")) {
                     lugar = lugar.split("of ")[1];
                 }
@@ -743,8 +715,8 @@ async function cargarSismos() {
             lista.innerHTML = `<tr><td colspan="4">Sin actividad telúrica reciente registrada</td></tr>`;
         }
     } catch (err) {
-        console.error("Error final al cargar sismos:", err);
-        lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Servicio en actualización...</td></tr>`;
+        console.error("Error al cargar sismos:", err);
+        lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Servicio de sismos temporalmente no disponible</td></tr>`;
     }
 }
 
