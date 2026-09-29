@@ -695,14 +695,13 @@ async function cargarCalidadAire() {
     } catch (error) { console.error("Error Calidad Aire:", error); }
 }
 
-// Lógica idéntica al feed global en tiempo real de USGS (como figura en la imagen)
+// Feed estático ligero de alta disponibilidad del USGS (Sismos M4.5+ globales)
 async function cargarSismos() {
     const lista = document.getElementById("sismosLista");
     if (!lista) return;
 
     try {
-        // Feed global oficial de USGS de sismos m >= 4.0 significativos recientes
-        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=4.0&limit=20&_nocache=${Date.now()}`;
+        const urlUSGS = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson";
         
         const res = await fetch(urlUSGS);
         if (!res.ok) throw new Error("Error HTTP " + res.status);
@@ -711,9 +710,17 @@ async function cargarSismos() {
 
         if (data && data.features && data.features.length > 0) {
             lista.innerHTML = "";
-            data.features.forEach(sismo => {
+            data.features.slice(0, 15).forEach(sismo => {
                 const props = sismo.properties;
-                const fecha = new Date(props.time).toLocaleString("es-AR");
+                const fecha = new Date(props.time).toLocaleString("es-AR", {
+                    day: 'numeric',
+                    month: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
                 const mag = props.mag ? props.mag.toFixed(1) : "--";
                 const lugar = props.place || "Ubicación desconocida";
 
@@ -732,7 +739,7 @@ async function cargarSismos() {
         }
     } catch (err) {
         console.error("Error al cargar sismos USGS:", err);
-        lista.innerHTML = `<tr><td colspan="3" style="color:var(--text-muted)">Conectando con servicio global USGS...</td></tr>`;
+        lista.innerHTML = `<tr><td colspan="3" style="color:var(--text-muted)">Error al conectar con la red sísmica</td></tr>`;
     }
 }
 
