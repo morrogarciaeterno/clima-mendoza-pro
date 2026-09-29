@@ -179,14 +179,14 @@ header {
     color: var(--text-muted);
 }
 
-/* GRILLAS DE RESUMEN DIARIO Y DATOS AGRÍCOLAS */
+/* GRILLA INTEGRADA DE RESUMEN DIARIO, AGRÍCOLA, ZONDA Y PASO */
 .resumen-diario-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 16px 12px;
     margin-top: 15px;
     background: var(--card-inner);
-    padding: 14px;
+    padding: 16px;
     border-radius: 12px;
     border: 1px solid var(--border);
 }
@@ -416,34 +416,6 @@ header {
     object-fit: cover;
 }
 
-/* CONTENEDOR RIESGO ZONDA + PASO CENTRADO Y ALINEADO */
-.info-banner-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background: var(--card-inner);
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    margin-top: 15px;
-    width: 100%;
-}
-
-.info-banner-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.info-banner-divider {
-    width: 1px;
-    height: 45px;
-    background: var(--border);
-}
-
 @media (max-width: 768px) {
     .container {
         padding: 0 10px 120px 10px !important;
@@ -668,7 +640,7 @@ header {
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- RESUMEN DIARIO DE LLUVIAS / CLIMA -->
+            <!-- TABLA DE RESUMEN CLIMÁTICO, AGRÍCOLA Y PASO INTEGRADOS -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
                     <span class="resumen-icon">🌧️</span>
@@ -701,10 +673,7 @@ header {
                         <strong id="rafagasMax">-- km/h</strong>
                     </div>
                 </div>
-            </div>
 
-            <!-- BLOQUE AGROMETEOROLÓGICO / CAMPO ABAJO DE LLUVIAS -->
-            <div class="resumen-diario-grid" style="margin-top: 10px;">
                 <div class="resumen-item">
                     <span class="resumen-icon">🌱</span>
                     <div>
@@ -736,24 +705,22 @@ header {
                         <strong id="visibilidadKm">-- km</strong>
                     </div>
                 </div>
-            </div>
 
-            <!-- MÓDULO RIESGO ZONDA Y PASO TOTALMENTE CENTRADO Y ALINEADO -->
-            <div class="info-banner-container">
-                <div class="info-banner-col">
-                    <small style="color: var(--text-muted); font-size: 0.75rem; text-align: center;">🌬️ Riesgo Zonda</small>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;">
-                        <span id="zondaIcono" style="font-size: 1.2rem;">🟢</span>
-                        <div id="zondaEstado" style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">Bajo</div>
+                <div class="resumen-item">
+                    <span class="resumen-icon" id="zondaIcono">🟢</span>
+                    <div>
+                        <small>Riesgo Zonda</small>
+                        <strong id="zondaEstado" style="color:var(--accent);">Bajo</strong>
                     </div>
                 </div>
 
-                <div class="info-banner-divider"></div>
-
-                <div class="info-banner-col">
-                    <small style="color: var(--text-muted); font-size: 0.75rem; text-align: center;">🏔️ Paso Cristo Redentor</small>
-                    <div id="pasoEstado" style="font-size: 1rem; font-weight: bold; color: #22c55e; margin-top: 4px; text-align: center;">Conectando...</div>
-                    <small id="montanaTemp" style="color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-top: 2px;">--°C en Las Cuevas</small>
+                <div class="resumen-item">
+                    <span class="resumen-icon">🏔️</span>
+                    <div>
+                        <small>Paso Cristo Redentor</small>
+                        <strong id="pasoEstado" style="color:#22c55e;">Conectando...</strong>
+                        <div id="montanaTemp" style="font-size:0.75rem; color:var(--text-muted); margin-top:1px;">--°C en Las Cuevas</div>
+                    </div>
                 </div>
             </div>
         </div>
