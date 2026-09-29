@@ -126,6 +126,15 @@ header {
     margin-top: 6px;
 }
 
+/* Estilo destacado para la temperatura principal */
+.card-temp-main .metric {
+    font-size: 3.2rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    line-height: 1;
+    margin-top: 4px;
+}
+
 .temp-box {
     display: flex;
     justify-content: space-between;
@@ -133,8 +142,8 @@ header {
 }
 
 #weatherIcon {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
 }
 
 .forecast-cards {
@@ -357,6 +366,10 @@ header {
         margin-top: 2px !important;
     }
 
+    .card-temp-main .metric {
+        font-size: 2.2rem !important;
+    }
+
     .dashboard-row, .dual-section {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
@@ -417,13 +430,16 @@ header {
 <div class="container">
 
     <div class="grid">
-        <div class="card">
+        <div class="card card-temp-main">
             <h3>Temperatura</h3>
             <div class="temp-box">
                 <div class="metric" id="temp">--</div>
                 <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="clima">
             </div>
-            <small id="tempDesc" style="color:var(--text-muted)">Cargando...</small>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                <small id="tempDesc" style="color:var(--text-muted)">Cargando...</small>
+                <small id="stTemp" style="color:var(--accent); font-weight: 700;">ST: --°C</small>
+            </div>
         </div>
 
         <div class="card">
@@ -684,7 +700,6 @@ async function cargarSismos() {
     if (!lista) return;
 
     try {
-        // Se añade un timestamp aleatorio (&_nocache) y cache: "no-store" para forzar la actualización en tiempo real sin usar memoria caché previa
         const timestamp = Date.now();
         const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0&limit=15&_nocache=${timestamp}`;
         
@@ -772,7 +787,8 @@ async function actualizarAltaMontana() {
 
 async function cargarClima() {
     try {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=America%2FArgentina%2FMendoza";
+        // Consulta extendida a Open-Meteo incluyendo Sensación Térmica (apparent_temperature)
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=America%2FArgentina%2FMendoza";
         const res = await fetch(url);
         const data = await res.json();
 
@@ -780,18 +796,21 @@ async function cargarClima() {
 
         const temp = data.current.temperature_2m ?? 0;
         const tempFormateada = Math.round(temp) + "°C";
+        const st = Math.round(data.current.apparent_temperature ?? temp);
         const humedad = data.current.relative_humidity_2m ?? 0;
         const viento = data.current.wind_speed_10m ?? 0;
         const uv = data.current.uv_index ?? 0;
         const code = data.current.weather_code ?? 0;
 
         const elTemp = document.getElementById("temp");
+        const elSt = document.getElementById("stTemp");
         const elHeaderTemp = document.getElementById("headerTemp");
         const elHum = document.getElementById("humedad");
         const elViento = document.getElementById("viento");
         const elPresion = document.getElementById("presion");
 
         if (elTemp) elTemp.innerText = tempFormateada;
+        if (elSt) elSt.innerText = "ST: " + st + "°C";
         if (elHeaderTemp) elHeaderTemp.textContent = tempFormateada;
         if (elHum) elHum.innerText = humedad + "%";
         if (elViento) elViento.innerText = Math.round(viento) + " km/h";
