@@ -179,7 +179,7 @@ header {
     color: var(--text-muted);
 }
 
-/* RESUMEN DIARIO MÓVIL EN 2 COLUMNAS */
+/* GRILLAS DE RESUMEN DIARIO Y DATOS AGRÍCOLAS */
 .resumen-diario-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -416,34 +416,39 @@ header {
     object-fit: cover;
 }
 
-/* MODULO RIESGO ZONDA Y PASO */
+/* CONTENEDOR CENTRADO Y PROLIJO RIESGO ZONDA + PASO */
 .info-banner-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
     background: var(--card-inner);
-    padding: 15px;
+    padding: 16px;
     border-radius: 12px;
     border: 1px solid var(--border);
     margin-top: 15px;
+    width: 100%;
 }
 
 .info-banner-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     width: 100%;
 }
 
 .info-banner-col {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
 }
 
 .info-banner-divider {
     width: 1px;
-    height: 45px;
+    height: 40px;
     background: var(--border);
 }
 
@@ -459,7 +464,7 @@ header {
     font-size: 0.85rem;
     width: auto;
     max-width: 80%;
-    margin-top: 5px;
+    margin-top: 4px;
     display: inline-block;
 }
 
@@ -757,12 +762,12 @@ header {
                 </div>
             </div>
 
-            <!-- MÓDULO RIESGO ZONDA Y PASO -->
+            <!-- MÓDULO ALINEADO RIESGO ZONDA Y PASO -->
             <div class="info-banner-container">
                 <div class="info-banner-row">
                     <div class="info-banner-col">
                         <small style="color: var(--text-muted); font-size: 0.75rem;">🌬️ Riesgo Zonda</small>
-                        <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:2px;">
+                        <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;">
                             <span id="zondaIcono" style="font-size:1.2rem;">🟢</span>
                             <div id="zondaEstado" style="font-size:1.2rem; font-weight:bold; color:var(--accent);">Bajo</div>
                         </div>
@@ -772,8 +777,8 @@ header {
 
                     <div class="info-banner-col">
                         <small style="color: var(--text-muted); font-size: 0.75rem;">🏔️ Paso Cristo Redentor</small>
-                        <div id="pasoEstado" style="font-size:1rem; font-weight:bold; color:#22c55e; margin-top:2px;">Conectando...</div>
-                        <small id="montanaTemp" style="color:var(--text-muted); font-size:0.75rem;">--°C en Las Cuevas</small>
+                        <div id="pasoEstado" style="font-size:1rem; font-weight:bold; color:#22c55e; margin-top:4px;">Conectando...</div>
+                        <small id="montanaTemp" style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:2px;">--°C en Las Cuevas</small>
                     </div>
                 </div>
 
