@@ -126,7 +126,7 @@ header {
     margin-top: 6px;
 }
 
-/* Temperatura principal súper destacada */
+/* Temperatura principal súper destacada y brillante */
 .card-temp-main .metric {
     font-size: 4rem !important;
     font-weight: 900 !important;
@@ -701,41 +701,41 @@ async function cargarSismos() {
     if (!lista) return;
 
     try {
+        // Consulta directa en vivo a USGS sin datos estáticos fijos
         const timestamp = Date.now();
         const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0&limit=15&_nocache=${timestamp}`;
-        const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(urlUSGS);
         
-        const res = await fetch(proxyUrl);
-        if (res.ok) {
-            const data = await res.json();
-            if (data && data.features && data.features.length > 0) {
-                const listaSismos = data.features.map(sismo => {
-                    const props = sismo.properties;
-                    const coords = sismo.geometry.coordinates;
-                    const fechaObj = new Date(props.time);
-                    const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-                    const prof = Math.round(coords[2]) + " Km";
-                    const mag = props.mag ? props.mag.toFixed(1) : "--";
-                    let lugar = props.place || "Mendoza, Argentina";
-                    if (lugar.includes("of ")) lugar = lugar.split("of ")[1];
-                    return { dia, prof, mag, lugar: lugar.trim() };
-                });
-                renderizarTablaSismos(listaSismos);
-                return;
-            }
-        }
-    } catch (e) {
-        console.warn("Error consultando API remota de sismos:", e);
-    }
+        const res = await fetch(urlUSGS);
+        if (!res.ok) throw new Error("Error HTTP " + res.status);
 
-    const sismosRespaldo = [
-        { dia: "28/09", prof: "10 Km", mag: "3.0", lugar: "SALTA" },
-        { dia: "28/09", prof: "140 Km", mag: "3.0", lugar: "LA RIOJA" },
-        { dia: "28/09", prof: "104 Km", mag: "2.6", lugar: "SAN JUAN" },
-        { dia: "27/09", prof: "12 Km", mag: "2.8", lugar: "MENDOZA" },
-        { dia: "27/09", prof: "115 Km", mag: "3.1", lugar: "SAN JUAN" }
-    ];
-    renderizarTablaSismos(sismosRespaldo);
+        const data = await res.json();
+        
+        if (data && data.features && data.features.length > 0) {
+            const listaSismos = data.features.map(sismo => {
+                const props = sismo.properties;
+                const coords = sismo.geometry.coordinates;
+                const fechaObj = new Date(props.time);
+                
+                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                const prof = Math.round(coords[2]) + " Km";
+                const mag = props.mag ? props.mag.toFixed(1) : "--";
+                
+                let lugar = props.place || "Mendoza, Argentina";
+                if (lugar.includes("of ")) {
+                    lugar = lugar.split("of ")[1];
+                }
+
+                return { dia, prof, mag, lugar: lugar.trim() };
+            });
+
+            renderizarTablaSismos(listaSismos);
+        } else {
+            lista.innerHTML = `<tr><td colspan="4">Sin sismos registrados hoy en la zona</td></tr>`;
+        }
+    } catch (err) {
+        console.error("Error cargando sismos reales:", err);
+        lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Conectando con red sísmica...</td></tr>`;
+    }
 }
 
 function renderizarTablaSismos(sismos) {
