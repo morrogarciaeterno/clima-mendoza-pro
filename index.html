@@ -126,7 +126,7 @@ header {
     margin-top: 6px;
 }
 
-/* Temperatura principal súper destacada y brillante */
+/* Temperatura principal súper destacada */
 .card-temp-main .metric {
     font-size: 4rem !important;
     font-weight: 900 !important;
@@ -701,40 +701,37 @@ async function cargarSismos() {
     if (!lista) return;
 
     try {
-        // Consulta directa en vivo a USGS sin datos estáticos fijos
-        const timestamp = Date.now();
-        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0&limit=15&_nocache=${timestamp}`;
+        // Petición directa al feed JSON real del INPRES sin datos fijos
+        const urlINPRES = "https://www.inpres.gob.ar/desktop/sismos.php?x=1&_nocache=" + Date.now();
         
-        const res = await fetch(urlUSGS);
+        const res = await fetch(urlINPRES, { cache: "no-store" });
         if (!res.ok) throw new Error("Error HTTP " + res.status);
 
         const data = await res.json();
-        
-        if (data && data.features && data.features.length > 0) {
-            const listaSismos = data.features.map(sismo => {
-                const props = sismo.properties;
-                const coords = sismo.geometry.coordinates;
-                const fechaObj = new Date(props.time);
-                
-                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-                const prof = Math.round(coords[2]) + " Km";
-                const mag = props.mag ? props.mag.toFixed(1) : "--";
-                
-                let lugar = props.place || "Mendoza, Argentina";
-                if (lugar.includes("of ")) {
-                    lugar = lugar.split("of ")[1];
+
+        if (Array.isArray(data) && data.length > 0) {
+            const listaSismos = data.slice(0, 10).map(s => {
+                let dia = "--/--";
+                if (s.fecha) {
+                    const partes = s.fecha.split("-");
+                    if (partes.length >= 3) dia = `${partes[2]}/${partes[1]}`;
                 }
 
-                return { dia, prof, mag, lugar: lugar.trim() };
+                const prof = s.profundidad ? Math.round(parseFloat(s.profundidad)) + " Km" : "--";
+                const mag = s.magnitud ? parseFloat(s.magnitud).toFixed(1) : "--";
+                const lugar = (s.provincia || s.referencia || "Argentina").toUpperCase().trim();
+
+                return { dia, prof, mag, lugar };
             });
 
             renderizarTablaSismos(listaSismos);
         } else {
-            lista.innerHTML = `<tr><td colspan="4">Sin sismos registrados hoy en la zona</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="4">Sin sismos reportados en INPRES</td></tr>`;
         }
     } catch (err) {
-        console.error("Error cargando sismos reales:", err);
-        lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Conectando con red sísmica...</td></tr>`;
+        console.error("Error al conectar con INPRES:", err);
+        // Muestra estado real de error si el navegador bloquea la consulta por CORS
+        lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Error de conexión con servidor INPRES</td></tr>`;
     }
 }
 
