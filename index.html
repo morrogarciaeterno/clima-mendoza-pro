@@ -126,7 +126,6 @@ header {
     margin-top: 6px;
 }
 
-/* Temperatura principal súper destacada */
 .card-temp-main .metric {
     font-size: 4rem !important;
     font-weight: 900 !important;
@@ -315,16 +314,85 @@ header {
     margin-top: 2px;
 }
 
+.polen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.polen-card {
+    background: var(--card-inner);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.polen-icon {
+    font-size: 2.2rem;
+    margin-bottom: 6px;
+}
+
+.polen-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+.polen-dias {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.82rem;
+    text-align: left;
+}
+
+.polen-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot-nivel {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-ninguno { background-color: #9ca3af; }
+.dot-bajo { background-color: #22c55e; }
+.dot-medio { background-color: #facc15; }
+.dot-alto { background-color: #fb923c; }
+.dot-muyalto { background-color: #ef4444; }
+
 .dual-section {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 15px;
+    align-items: stretch;
 }
 
 .radar-img {
     width: 100%;
+    height: auto;
     border-radius: 12px;
     margin-top: 10px;
+    object-fit: cover;
+}
+
+.info-banner-container {
+    display: flex;
+    gap: 15px;
+    background: var(--card-inner);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    align-items: center;
+    flex-wrap: wrap;
+    border: 1px solid var(--border);
 }
 
 .btn-notif {
@@ -371,7 +439,7 @@ header {
         font-size: 2.8rem !important;
     }
 
-    .dashboard-row, .dual-section {
+    .dashboard-row, .dual-section, .polen-grid {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
     }
@@ -389,21 +457,8 @@ header {
         font-size: 0.75rem !important;
     }
 
-    .forecast-card .icon {
-        font-size: 1.1rem !important;
-        margin: 2px 0 !important;
-    }
-
     .sismos-table-wrapper {
         max-height: 140px !important;
-    }
-
-    .tabla-sismos {
-        font-size: 0.75rem !important;
-    }
-
-    .tabla-sismos th, .tabla-sismos td {
-        padding: 4px 2px !important;
     }
 }
 </style>
@@ -499,6 +554,36 @@ header {
 
     <br>
 
+    <!-- BLOQUE DE POLEN Y ALÉRGENOS -->
+    <div class="card">
+        <h3>🌱 Desglose de Polen</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; margin-bottom: 12px;">
+            ¿Sabés qué tipos de polen te agravan los síntomas? Previsión de los próximos 3 días para los peores alérgenos.
+        </p>
+
+        <div class="polen-grid">
+            <div class="polen-card">
+                <div class="polen-icon">🌳</div>
+                <div class="polen-title">Polen de los árboles</div>
+                <div id="polenArboles" class="polen-dias">Cargando...</div>
+            </div>
+
+            <div class="polen-card">
+                <div class="polen-icon">🌾</div>
+                <div class="polen-title">Polen del césped</div>
+                <div id="polenCesped" class="polen-dias">Cargando...</div>
+            </div>
+
+            <div class="polen-card">
+                <div class="polen-icon">🌿</div>
+                <div class="polen-title">Polen de la maleza</div>
+                <div id="polenMaleza" class="polen-dias">Cargando...</div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
     <div class="card">
         <div class="dashboard-row">
             <div class="sismos-container-block">
@@ -523,7 +608,7 @@ header {
                 <h3 style="width:100%; text-align:center;">🌅 Ciclo Solar</h3>
                 <div class="solar-arc">
                     <div class="sun-pivot" id="sunPivot">
-                        <div class="sun-icon" id="sunIcon">☀️</div>
+                        <div class="sun-icon" id="sunIcon">☀️️</div>
                     </div>
                 </div>
                 <div class="solar-times">
@@ -544,12 +629,13 @@ header {
     <br>
 
     <div class="dual-section">
-        <div class="card">
-            <h3>📅 Pronóstico 7 días</h3>
-            <div id="forecast" class="forecast-cards"></div>
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h3>📅 Pronóstico 7 días</h3>
+                <div id="forecast" class="forecast-cards"></div>
+            </div>
 
-            <br>
-            <div style="display:flex; gap:15px; background:var(--card-inner); padding:15px; border-radius:12px; text-align:center; align-items:center; flex-wrap:wrap;">
+            <div class="info-banner-container" style="margin-top: 15px;">
                 <div style="flex:1; min-width: 140px;">
                     <h3>🌬️ Riesgo Zonda</h3>
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px;">
@@ -558,7 +644,7 @@ header {
                     </div>
                     <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
                 </div>
-                <div style="flex:1; min-width: 140px;">
+                <div style="flex:1; min-width: 140px; border-left: 1px solid var(--border); padding-left: 10px;">
                     <h3>🏔️ Paso Cristo Redentor</h3>
                     <div id="pasoEstado" style="font-size:1.1rem; font-weight:bold; color:#22c55e; margin-top:5px;">Conectando...</div>
                     <small id="montanaTemp" style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">--°C</small>
@@ -566,7 +652,7 @@ header {
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" style="display: flex; flex-direction: column;">
             <h3>🛰 Radar Meteorológico</h3>
             <img class="radar-img" src="https://www2.contingencias.mendoza.gov.ar/radar/animacion.gif" alt="Radar Mendoza">
         </div>
@@ -589,7 +675,7 @@ function actualizarFechaYHoraDigital() {
 function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
-    if (codigo === 3) return "☁️️";
+    if (codigo === 3) return "☁";
     if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
@@ -695,7 +781,49 @@ async function cargarCalidadAire() {
     } catch (error) { console.error("Error Calidad Aire:", error); }
 }
 
-// Feed estático ligero de alta disponibilidad del USGS (Sismos M4.5+ globales)
+async function cargarPolen() {
+    try {
+        const url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-32.89&longitude=-68.84&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen&timezone=America%2FArgentina%2FMendoza";
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data || !data.hourly) return;
+
+        function evaluarNivel(valor) {
+            if (valor <= 0) return { texto: "Ninguno", clase: "dot-ninguno" };
+            if (valor <= 10) return { texto: "Bajo", clase: "dot-bajo" };
+            if (valor <= 30) return { texto: "Medio", clase: "dot-medio" };
+            if (valor <= 80) return { texto: "Alto", clase: "dot-alto" };
+            return { texto: "Muy alto", clase: "dot-muyalto" };
+        }
+
+        const indices = [12, 36, 60];
+        let htmlArboles = "", htmlCesped = "", htmlMaleza = "";
+
+        indices.forEach((idx, i) => {
+            const fechaObj = new Date(Date.now() + i * 86400000);
+            const dNombre = i === 0 ? "Hoy" : (i === 1 ? "Mañana" : fechaObj.toLocaleDateString("es-AR", { weekday: "long" }));
+
+            const valArbol = (data.hourly.alder_pollen[idx] || 0) + (data.hourly.birch_pollen[idx] || 0);
+            const valCesped = data.hourly.grass_pollen[idx] || 0;
+            const valMaleza = (data.hourly.mugwort_pollen[idx] || 0) + (data.hourly.ragweed_pollen[idx] || 0);
+
+            const nArbol = evaluarNivel(valArbol);
+            const nCesped = evaluarNivel(valCesped);
+            const nMaleza = evaluarNivel(valMaleza);
+
+            htmlArboles += `<div class="polen-item"><span class="dot-nivel ${nArbol.clase}"></span> <span style="text-transform:capitalize">${dNombre}:</span> <strong>${nArbol.texto}</strong></div>`;
+            htmlCesped += `<div class="polen-item"><span class="dot-nivel ${nCesped.clase}"></span> <span style="text-transform:capitalize">${dNombre}:</span> <strong>${nCesped.texto}</strong></div>`;
+            htmlMaleza += `<div class="polen-item"><span class="dot-nivel ${nMaleza.clase}"></span> <span style="text-transform:capitalize">${dNombre}:</span> <strong>${nMaleza.texto}</strong></div>`;
+        });
+
+        document.getElementById("polenArboles").innerHTML = htmlArboles;
+        document.getElementById("polenCesped").innerHTML = htmlCesped;
+        document.getElementById("polenMaleza").innerHTML = htmlMaleza;
+
+    } catch (e) { console.error("Error Polen:", e); }
+}
+
 async function cargarSismos() {
     const lista = document.getElementById("sismosLista");
     if (!lista) return;
@@ -926,12 +1054,14 @@ calcularFaseLunar();
 
 cargarClima();
 cargarCalidadAire();
+cargarPolen();
 cargarSismos();
 actualizarAltaMontana();
 
 setInterval(actualizarFechaYHoraDigital, 1000);
 setInterval(cargarClima, 300000);
 setInterval(cargarCalidadAire, 300000);
+setInterval(cargarPolen, 3600000);
 setInterval(cargarSismos, 300000);
 setInterval(actualizarAltaMontana, 300000);
 </script>
