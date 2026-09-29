@@ -179,13 +179,14 @@ header {
     color: var(--text-muted);
 }
 
+/* RESUMEN DIARIO EN FORMATO GRID DE 2 COLUMNAS PARA MÓVIL */
 .resumen-diario-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     margin: 15px 0;
     background: var(--card-inner);
-    padding: 12px;
+    padding: 14px;
     border-radius: 12px;
     border: 1px solid var(--border);
 }
@@ -415,36 +416,51 @@ header {
     object-fit: cover;
 }
 
+/* MODULO ESTETICO Y PROLIJO RIESGO ZONDA + PASO CRISTO REDENTOR */
 .info-banner-container {
     display: flex;
-    gap: 15px;
+    flex-direction: column;
+    gap: 12px;
     background: var(--card-inner);
     padding: 15px;
     border-radius: 12px;
-    text-align: center;
-    align-items: center;
-    flex-wrap: wrap;
     border: 1px solid var(--border);
+    margin-top: 10px;
+}
+
+.info-banner-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.info-banner-col {
+    flex: 1;
+    text-align: center;
+}
+
+.info-banner-divider {
+    width: 1px;
+    height: 45px;
+    background: var(--border);
 }
 
 .btn-notif {
     background: var(--accent);
     color: #000;
     border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 0.8rem;
-    margin-top: 10px;
+    font-size: 0.85rem;
+    width: 100%;
+    margin-top: 5px;
 }
 
 @media (max-width: 768px) {
     .container {
-        transform: scale(0.85);
-        transform-origin: top center;
-        width: 117.6% !important;
-        margin-left: -8.8% !important;
         padding: 0 10px 120px 10px !important;
     }
 
@@ -454,8 +470,8 @@ header {
     }
 
     .card {
-        padding: 10px 12px !important;
-        border-radius: 12px !important;
+        padding: 12px !important;
+        border-radius: 14px !important;
     }
 
     .card h3 {
@@ -471,7 +487,7 @@ header {
         font-size: 2.8rem !important;
     }
 
-    .dashboard-row, .dual-section, .polen-grid, .resumen-diario-grid {
+    .dashboard-row, .dual-section, .polen-grid {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
     }
@@ -667,7 +683,7 @@ header {
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- RESUMEN DIARIO DE OPEN-METEO -->
+            <!-- RESUMEN DIARIO MÓVIL EN 2 COLUMNAS -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
                     <span class="resumen-icon">🌧️</span>
@@ -702,20 +718,27 @@ header {
                 </div>
             </div>
 
+            <!-- MODULO PROLIJO MÓVIL ZONDA Y PASO -->
             <div class="info-banner-container">
-                <div style="flex:1; min-width: 140px;">
-                    <h3>🌬️ Riesgo Zonda</h3>
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px;">
-                        <span id="zondaIcono" style="font-size:1.5rem;">🟢</span>
-                        <div id="zondaEstado" style="font-size:1.4rem; font-weight:bold; color:var(--accent);">Bajo</div>
+                <div class="info-banner-row">
+                    <div class="info-banner-col">
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">🌬️ Riesgo Zonda</small>
+                        <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:2px;">
+                            <span id="zondaIcono" style="font-size:1.2rem;">🟢</span>
+                            <div id="zondaEstado" style="font-size:1.2rem; font-weight:bold; color:var(--accent);">Bajo</div>
+                        </div>
                     </div>
-                    <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
+
+                    <div class="info-banner-divider"></div>
+
+                    <div class="info-banner-col">
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">🏔️ Paso Cristo Redentor</small>
+                        <div id="pasoEstado" style="font-size:1rem; font-weight:bold; color:#22c55e; margin-top:2px;">Conectando...</div>
+                        <small id="montanaTemp" style="color:var(--text-muted); font-size:0.75rem;">--°C en Las Cuevas</small>
+                    </div>
                 </div>
-                <div style="flex:1; min-width: 140px; border-left: 1px solid var(--border); padding-left: 10px;">
-                    <h3>🏔️ Paso Cristo Redentor</h3>
-                    <div id="pasoEstado" style="font-size:1.1rem; font-weight:bold; color:#22c55e; margin-top:5px;">Conectando...</div>
-                    <small id="montanaTemp" style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">--°C</small>
-                </div>
+
+                <button id="btnNotif" class="btn-notif" onclick="solicitarPermisoNotificacion()">🔔 Activar Alertas</button>
             </div>
         </div>
 
