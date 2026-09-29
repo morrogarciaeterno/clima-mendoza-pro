@@ -684,9 +684,11 @@ async function cargarSismos() {
     if (!lista) return;
 
     try {
-        // Petición directa a la API GeoJSON oficial de USGS (Sin proxies caídos)
-        const urlUSGS = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0&limit=15";
-        const res = await fetch(urlUSGS);
+        // Se añade un timestamp aleatorio (&_nocache) y cache: "no-store" para forzar la actualización en tiempo real sin usar memoria caché previa
+        const timestamp = Date.now();
+        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0&limit=15&_nocache=${timestamp}`;
+        
+        const res = await fetch(urlUSGS, { cache: "no-store" });
         if (!res.ok) throw new Error("Error HTTP " + res.status);
 
         const data = await res.json();
