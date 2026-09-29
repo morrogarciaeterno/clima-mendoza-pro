@@ -179,6 +179,38 @@ header {
     color: var(--text-muted);
 }
 
+.resumen-diario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+    background: var(--card-inner);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.resumen-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.resumen-icon {
+    font-size: 1.5rem;
+}
+
+.resumen-item small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.resumen-item strong {
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
 .dashboard-row {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -439,7 +471,7 @@ header {
         font-size: 2.8rem !important;
     }
 
-    .dashboard-row, .dual-section, .polen-grid {
+    .dashboard-row, .dual-section, .polen-grid, .resumen-diario-grid {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
     }
@@ -608,7 +640,7 @@ header {
                 <h3 style="width:100%; text-align:center;">🌅 Ciclo Solar</h3>
                 <div class="solar-arc">
                     <div class="sun-pivot" id="sunPivot">
-                        <div class="sun-icon" id="sunIcon">☀️️</div>
+                        <div class="sun-icon" id="sunIcon">☀️</div>
                     </div>
                 </div>
                 <div class="solar-times">
@@ -635,7 +667,42 @@ header {
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <div class="info-banner-container" style="margin-top: 15px;">
+            <!-- RESUMEN DIARIO DE OPEN-METEO -->
+            <div class="resumen-diario-grid">
+                <div class="resumen-item">
+                    <span class="resumen-icon">🌧️</span>
+                    <div>
+                        <small>Prob. Lluvia</small>
+                        <strong id="probLluvia">--%</strong>
+                    </div>
+                </div>
+
+                <div class="resumen-item">
+                    <span class="resumen-icon">💧</span>
+                    <div>
+                        <small>Lluvia Total</small>
+                        <strong id="lluviaAcum">-- mm</strong>
+                    </div>
+                </div>
+
+                <div class="resumen-item">
+                    <span class="resumen-icon">☀️</span>
+                    <div>
+                        <small>Horas de Sol</small>
+                        <strong id="horasSol">-- hs</strong>
+                    </div>
+                </div>
+
+                <div class="resumen-item">
+                    <span class="resumen-icon">💨</span>
+                    <div>
+                        <small>Ráfagas Máx.</small>
+                        <strong id="rafagasMax">-- km/h</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-banner-container">
                 <div style="flex:1; min-width: 140px;">
                     <h3>🌬️ Riesgo Zonda</h3>
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:5px;">
@@ -675,7 +742,7 @@ function actualizarFechaYHoraDigital() {
 function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
-    if (codigo === 3) return "☁";
+    if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
@@ -896,7 +963,7 @@ async function actualizarAltaMontana() {
 
 async function cargarClima() {
     try {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=America%2FArgentina%2FMendoza";
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max&timezone=America%2FArgentina%2FMendoza";
         const res = await fetch(url);
         const data = await res.json();
 
@@ -978,6 +1045,22 @@ async function cargarClima() {
         if (elZondaEstado) elZondaEstado.innerText = zonda;
 
         if (data.daily) {
+            const prob = data.daily.precipitation_probability_max[0] ?? 0;
+            const lluvia = data.daily.precipitation_sum[0] ?? 0;
+            const solSegundos = data.daily.sunshine_duration[0] ?? 0;
+            const horasSol = (solSegundos / 3600).toFixed(1);
+            const rafagas = Math.round(data.daily.wind_gusts_10m_max[0] ?? 0);
+
+            const elProb = document.getElementById("probLluvia");
+            const elLluvia = document.getElementById("lluviaAcum");
+            const elSol = document.getElementById("horasSol");
+            const elRafagas = document.getElementById("rafagasMax");
+
+            if (elProb) elProb.innerText = prob + "%";
+            if (elLluvia) elLluvia.innerText = lluvia + " mm";
+            if (elSol) elSol.innerText = horasSol + " hs";
+            if (elRafagas) elRafagas.innerText = rafagas + " km/h";
+
             const ahora = new Date();
             const amanecer = new Date(data.daily.sunrise[0]);
             const atardecer = new Date(data.daily.sunset[0]);
