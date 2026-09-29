@@ -126,13 +126,14 @@ header {
     margin-top: 6px;
 }
 
-/* Estilo destacado para la temperatura principal */
+/* Temperatura principal súper destacada */
 .card-temp-main .metric {
-    font-size: 3.2rem !important;
-    font-weight: 800 !important;
+    font-size: 4rem !important;
+    font-weight: 900 !important;
     color: #ffffff !important;
-    line-height: 1;
-    margin-top: 4px;
+    line-height: 0.95;
+    margin-top: 2px;
+    text-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
 }
 
 .temp-box {
@@ -142,8 +143,8 @@ header {
 }
 
 #weatherIcon {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
 }
 
 .forecast-cards {
@@ -367,7 +368,7 @@ header {
     }
 
     .card-temp-main .metric {
-        font-size: 2.2rem !important;
+        font-size: 2.8rem !important;
     }
 
     .dashboard-row, .dual-section {
@@ -727,7 +728,6 @@ async function cargarSismos() {
         console.warn("Error consultando API remota de sismos:", e);
     }
 
-    // Datos de respaldo para prevenir bloqueos de red o CORS
     const sismosRespaldo = [
         { dia: "28/09", prof: "10 Km", mag: "3.0", lugar: "SALTA" },
         { dia: "28/09", prof: "140 Km", mag: "3.0", lugar: "LA RIOJA" },
@@ -817,28 +817,27 @@ async function cargarClima() {
         if (elViento) elViento.innerText = Math.round(viento) + " km/h";
         if (elPresion) elPresion.innerText = Math.round(data.current.surface_pressure);
 
-        // Selección dinámica del ícono del tiempo según el código WMO
         let iconUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
         let desc = "Despejado";
 
         if (code === 0) {
             desc = "Cielo despejado";
-            iconUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png"; // Sol
+            iconUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
         } else if (code >= 1 && code <= 3) {
             desc = "Parcialmente nublado";
-            iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163624.png"; // Sol + Nube
+            iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163624.png";
         } else if (code === 45 || code === 48) {
             desc = "Neblina";
-            iconUrl = "https://cdn-icons-png.flaticon.com/512/4005/4005901.png"; // Neblina
+            iconUrl = "https://cdn-icons-png.flaticon.com/512/4005/4005901.png";
         } else if (code >= 51 && code <= 67) {
             desc = "Lluvia";
-            iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163657.png"; // Lluvia
+            iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163657.png";
         } else if (code >= 80 && code <= 82) {
             desc = "Chubascos";
-            iconUrl = "https://cdn-icons-png.flaticon.com/512/3351/3351979.png"; // Chubascos
+            iconUrl = "https://cdn-icons-png.flaticon.com/512/3351/3351979.png";
         } else if (code >= 95) {
             desc = "Tormenta Eléctrica";
-            iconUrl = "https://cdn-icons-png.flaticon.com/512/1146/1146860.png"; // Tormenta
+            iconUrl = "https://cdn-icons-png.flaticon.com/512/1146/1146860.png";
         }
 
         if (elIcon) elIcon.src = iconUrl;
