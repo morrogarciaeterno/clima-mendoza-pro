@@ -719,9 +719,46 @@ header {
             </div>
         </div>
 
-        <div class="card" style="display: flex; flex-direction: column;">
-            <h3>🛰 Radar Meteorológico</h3>
-            <img class="radar-img" src="https://www2.contingencias.mendoza.gov.ar/radar/animacion.gif" alt="Radar Mendoza">
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h3>🛰 Radar Meteorológico</h3>
+                <img class="radar-img" src="https://www2.contingencias.mendoza.gov.ar/radar/animacion.gif" alt="Radar Mendoza">
+            </div>
+
+            <!-- BLOQUE AGROMETEOROLÓGICO / CAMPO -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; background: var(--card-inner); padding: 12px; border-radius: 12px; border: 1px solid var(--border);">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.4rem;">🌱</span>
+                    <div>
+                        <small style="color: var(--text-muted); font-size: 0.72rem; display: block;">Humedad Suelo</small>
+                        <strong id="humSuelo" style="font-size: 0.88rem; color: var(--text-main);">-- %</strong>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.4rem;">❄️</span>
+                    <div>
+                        <small style="color: var(--text-muted); font-size: 0.72rem; display: block;">Riesgo Helada</small>
+                        <strong id="riesgoHelada" style="font-size: 0.88rem; color: #22c55e;">Bajo</strong>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.4rem;">💧</span>
+                    <div>
+                        <small style="color: var(--text-muted); font-size: 0.72rem; display: block;">Evapotranspiración</small>
+                        <strong id="etoDiario" style="font-size: 0.88rem; color: var(--text-main);">-- mm</strong>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.4rem;">👁️</span>
+                    <div>
+                        <small style="color: var(--text-muted); font-size: 0.72rem; display: block;">Visibilidad</small>
+                        <strong id="visibilidadKm" style="font-size: 0.88rem; color: var(--text-main);">-- km</strong>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -963,7 +1000,7 @@ async function actualizarAltaMontana() {
 
 async function cargarClima() {
     try {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,surface_pressure,weather_code,uv_index&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max&timezone=America%2FArgentina%2FMendoza";
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.89&longitude=-68.84&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,surface_pressure,weather_code,uv_index,visibility&hourly=temperature_2m,weather_code,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza";
         const res = await fetch(url);
         const data = await res.json();
 
@@ -991,6 +1028,17 @@ async function cargarClima() {
         if (elHum) elHum.innerText = humedad + "%";
         if (elViento) elViento.innerText = Math.round(viento) + " km/h";
         if (elPresion) elPresion.innerText = Math.round(data.current.surface_pressure);
+
+        const vis = ((data.current.visibility ?? 10000) / 1000).toFixed(0);
+        const elVis = document.getElementById("visibilidadKm");
+        if (elVis) elVis.innerText = vis + " km";
+
+        if (data.hourly && data.hourly.soil_moisture_0_to_1cm) {
+            const h = new Date().getHours();
+            const humSueloPct = Math.round((data.hourly.soil_moisture_0_to_1cm[h] ?? 0) * 100);
+            const elHumS = document.getElementById("humSuelo");
+            if (elHumS) elHumS.innerText = humSueloPct + "%";
+        }
 
         let iconUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
         let desc = "Despejado";
@@ -1050,16 +1098,27 @@ async function cargarClima() {
             const solSegundos = data.daily.sunshine_duration[0] ?? 0;
             const horasSol = (solSegundos / 3600).toFixed(1);
             const rafagas = Math.round(data.daily.wind_gusts_10m_max[0] ?? 0);
+            const eto = (data.daily.et0_fao_evapotranspiration[0] ?? 0).toFixed(1);
+            const minTemp = data.daily.temperature_2m_min[0] ?? 5;
 
             const elProb = document.getElementById("probLluvia");
             const elLluvia = document.getElementById("lluviaAcum");
             const elSol = document.getElementById("horasSol");
             const elRafagas = document.getElementById("rafagasMax");
+            const elEto = document.getElementById("etoDiario");
+            const elHelada = document.getElementById("riesgoHelada");
 
             if (elProb) elProb.innerText = prob + "%";
             if (elLluvia) elLluvia.innerText = lluvia + " mm";
             if (elSol) elSol.innerText = horasSol + " hs";
             if (elRafagas) elRafagas.innerText = rafagas + " km/h";
+            if (elEto) elEto.innerText = eto + " mm";
+
+            if (elHelada) {
+                if (minTemp <= 0) { elHelada.innerText = "Alto (≤0°)"; elHelada.style.color = "#ef4444"; }
+                else if (minTemp <= 3) { elHelada.innerText = "Moderado"; elHelada.style.color = "#facc15"; }
+                else { elHelada.innerText = "Sin Riesgo"; elHelada.style.color = "#22c55e"; }
+            }
 
             const ahora = new Date();
             const amanecer = new Date(data.daily.sunrise[0]);
