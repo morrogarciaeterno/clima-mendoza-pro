@@ -195,7 +195,7 @@ header {
 
 .sismos-table-wrapper {
     width: 100%;
-    max-height: 170px;
+    max-height: 200px;
     overflow-y: auto;
     touch-action: pan-y;
     margin-top: 8px;
@@ -502,19 +502,18 @@ header {
     <div class="card">
         <div class="dashboard-row">
             <div class="sismos-container-block">
-                <h3>🌋 Últimos Sismos</h3>
+                <h3>🌋 Últimos Sismos (USGS Global)</h3>
                 <div class="sismos-table-wrapper">
                     <table class="tabla-sismos">
                         <thead>
                             <tr>
-                                <th>Día</th>
-                                <th>Prof</th>
+                                <th>Fecha u Hora</th>
                                 <th>Mag</th>
-                                <th>Lugar</th>
+                                <th>Ubicación</th>
                             </tr>
                         </thead>
                         <tbody id="sismosLista">
-                            <tr><td colspan="4">Cargando sismos en vivo...</td></tr>
+                            <tr><td colspan="3">Cargando sismos en vivo...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -590,7 +589,7 @@ function actualizarFechaYHoraDigital() {
 function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
-    if (codigo === 3) return "☁️";
+    if (codigo === 3) return "☁️️";
     if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
@@ -696,15 +695,14 @@ async function cargarCalidadAire() {
     } catch (error) { console.error("Error Calidad Aire:", error); }
 }
 
-// Lógica de sismos adaptable desde la API GeoJSON de USGS (Dinamica y Regional)
+// Lógica idéntica al feed global en tiempo real de USGS (como figura en la imagen)
 async function cargarSismos() {
     const lista = document.getElementById("sismosLista");
     if (!lista) return;
 
     try {
-        const timestamp = Date.now();
-        // Consulta a USGS con latitud/longitud de Mendoza y un radio de 600 km
-        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=-32.89&longitude=-68.84&maxradiuskm=600&minmagnitude=2.0&limit=10&_nocache=${timestamp}`;
+        // Feed global oficial de USGS de sismos m >= 4.0 significativos recientes
+        const urlUSGS = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=4.0&limit=20&_nocache=${Date.now()}`;
         
         const res = await fetch(urlUSGS);
         if (!res.ok) throw new Error("Error HTTP " + res.status);
@@ -712,56 +710,30 @@ async function cargarSismos() {
         const data = await res.json();
 
         if (data && data.features && data.features.length > 0) {
-            const listaSismos = data.features.map(sismo => {
+            lista.innerHTML = "";
+            data.features.forEach(sismo => {
                 const props = sismo.properties;
-                const coords = sismo.geometry.coordinates;
-
-                const fechaObj = new Date(props.time);
-                const dia = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-                const prof = Math.round(coords[2]) + " Km";
+                const fecha = new Date(props.time).toLocaleString("es-AR");
                 const mag = props.mag ? props.mag.toFixed(1) : "--";
+                const lugar = props.place || "Ubicación desconocida";
 
-                let lugar = props.place || "Mendoza, Argentina";
-                if (lugar.includes("of ")) {
-                    lugar = lugar.split("of ")[1];
-                }
+                const esMendoza = lugar.toUpperCase().includes("MENDOZA") || lugar.toUpperCase().includes("ARGENTINA");
+                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
 
-                return { dia, prof, mag, lugar: lugar.trim() };
+                lista.innerHTML += `
+                    <tr>
+                        <td style="font-size:0.75rem">${fecha}</td>
+                        <td class="${claseColor}">${mag}</td>
+                        <td style="text-align:left; padding-left:8px;" class="${claseColor}">${lugar}</td>
+                    </tr>`;
             });
-
-            renderizarTablaSismos(listaSismos);
         } else {
-            lista.innerHTML = `<tr><td colspan="4">Sin sismos registrados hoy en la zona</td></tr>`;
+            lista.innerHTML = `<tr><td colspan="3">Sin sismos recientes registrados</td></tr>`;
         }
     } catch (err) {
         console.error("Error al cargar sismos USGS:", err);
-        lista.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">Conectando con red sísmica...</td></tr>`;
+        lista.innerHTML = `<tr><td colspan="3" style="color:var(--text-muted)">Conectando con servicio global USGS...</td></tr>`;
     }
-}
-
-function renderizarTablaSismos(sismos) {
-    const lista = document.getElementById("sismosLista");
-    if (!lista) return;
-
-    lista.innerHTML = "";
-    let contador = 0;
-
-    sismos.forEach(s => {
-        if (contador >= 10) return;
-
-        const esMendoza = s.lugar.toUpperCase().includes("MENDOZA");
-        const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
-
-        lista.innerHTML += `
-            <tr>
-                <td>${s.dia}</td>
-                <td>${s.prof}</td>
-                <td class="${claseColor}">${s.mag}</td>
-                <td class="${claseColor}">${s.lugar}</td>
-            </tr>`;
-
-        contador++;
-    });
 }
 
 async function actualizarAltaMontana() {
