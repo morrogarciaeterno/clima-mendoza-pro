@@ -885,12 +885,12 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL CON CAPAS DE RADAR Y FOCOS DE INCENDIO -->
+        <!-- MAPA FEDERAL CON CAPAS DE RADAR Y NUBOSIDAD ATMOSFÉRICA -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia / Radar</button>
-                <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Focos de Incendio</button>
+                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubosidad en Vivo</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 Mi GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
@@ -906,7 +906,7 @@ let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
 let capaActivaRadar = null;
-let capaActivaFuego = null;
+let capaActivaNubes = null;
 
 async function inicializarMapaArgentina(lat, lon) {
     try {
@@ -935,11 +935,11 @@ async function inicializarMapaArgentina(lat, lon) {
                 console.warn("No se pudo cargar la capa de radar:", err);
             }
 
-            // Capa de Focos de Incendio / Anomalías Térmicas (NASA FIRMS / MODIS TrueColor de fondo con alertas de calor)
-            capaActivaFuego = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Thermal_Anomalies_Day/default/california-fire/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png', {
+            // Capa de Nubosidad Infrarroja estable y en tiempo real
+            capaActivaNubes = L.tileLayer('https://tile.rainviewer.com/sat/{z}/{x}/{y}/0/1_1.png', {
                 opacity: 0.6,
-                maxZoom: 9,
-                attribution: '&copy; NASA FIRMS'
+                maxZoom: 10,
+                attribution: '&copy; RainViewer Satellite'
             });
         }
 
@@ -958,29 +958,29 @@ async function inicializarMapaArgentina(lat, lon) {
 
 function cambiarCapaMapa(tipo) {
     const btnLluvia = document.getElementById("btnLluvia");
-    const btnFuego = document.getElementById("btnFuego");
+    const btnNubes = document.getElementById("btnNubes");
     const mapTitle = document.getElementById("mapTitle");
 
     if (!mapInstance) return;
 
     if (tipo === 'lluvia') {
-        if (mapInstance.hasLayer(capaActivaFuego)) mapInstance.removeLayer(capaActivaFuego);
+        if (mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
         if (capaActivaRadar && !mapInstance.hasLayer(capaActivaRadar)) capaActivaRadar.addTo(mapInstance);
         
         btnLluvia.classList.add("active");
-        btnFuego.classList.remove("active");
+        btnNubes.classList.remove("active");
         mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
-    } else if (tipo === 'fuego') {
+    } else if (tipo === 'nubes') {
         mapInstance.eachLayer((layer) => {
             if (layer._url && layer._url.includes('rainviewer')) {
                 mapInstance.removeLayer(layer);
             }
         });
-        if (capaActivaFuego && !mapInstance.hasLayer(capaActivaFuego)) capaActivaFuego.addTo(mapInstance);
+        if (capaActivaNubes && !mapInstance.hasLayer(capaActivaNubes)) capaActivaNubes.addTo(mapInstance);
 
-        btnFuego.classList.add("active");
+        btnNubes.classList.add("active");
         btnLluvia.classList.remove("active");
-        mapTitle.innerText = "🔥 Mapa de Focos de Incendio en Vivo";
+        mapTitle.innerText = "☁ Nubosidad Atmosférica en Vivo";
     }
 }
 
@@ -1019,7 +1019,7 @@ function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️️";
+    if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
@@ -1084,7 +1084,7 @@ function gestionarAlertaSMN(code) {
         if (code === 96 || code === 99) {
             card.style.borderLeftColor = "#ef4444";
             if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
-            if (icono) icono.innerText = "🧊⛈️";
+            if (icono) icono.innerText = "🧊⛈️️";
             if (titulo) titulo.innerText = "¡Alerta Severa por Caída de Granizo!";
             if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas con probable caída de granizo y ráfagas intensas.";
         } else {
