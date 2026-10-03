@@ -995,9 +995,9 @@ function inicializarMapaArgentina(lat, lon) {
             capaActual = capasBase.base;
             capaActual.addTo(mapInstance);
 
-            // Inicializar la capa WMS oficial de NASA FIRMS usando tu MAP_KEY
+            // Capa WMS oficial corregida con fires_viirs_24 usando tu MAP_KEY
             capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
-                layers: 'fires_24',
+                layers: 'fires_viirs_24',
                 format: 'image/png',
                 transparent: true,
                 version: '1.3.0',
@@ -1037,7 +1037,6 @@ function cambiarCapaMapa(tipo) {
     btnFuego.classList.remove("active");
 
     if (tipo === 'fuego') {
-        // Mantiene la capa base actual y sobrepone la capa WMS de incendios de NASA FIRMS
         if (!mapInstance.hasLayer(capaFuegosFIRMS)) {
             capaFuegosFIRMS.addTo(mapInstance);
         }
@@ -1045,7 +1044,6 @@ function cambiarCapaMapa(tipo) {
         mapTitle.innerText = "🔥 Monitoreo de Incendios en Vivo (NASA FIRMS)";
         actualizarIndicadorMapa("Capa de Incendios Activa (Últimas 24hs)", "#f59e0b");
     } else {
-        // Si cambia a base o topo, quitamos la capa de fuegos si está activa
         if (mapInstance.hasLayer(capaFuegosFIRMS)) {
             mapInstance.removeLayer(capaFuegosFIRMS);
         }
