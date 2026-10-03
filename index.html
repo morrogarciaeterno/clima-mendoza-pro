@@ -414,7 +414,7 @@ header {
 
 #mapaArgentina {
     width: 100%;
-    height: 520px; /* ¡Mapa grande y aprovechado! */
+    height: 520px;
     border-radius: 12px;
     margin-top: 10px;
     z-index: 1;
@@ -422,6 +422,7 @@ header {
 
 .map-controls {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 8px;
 }
@@ -440,6 +441,12 @@ header {
 
 .map-btn:hover {
     background: #374151;
+    border-color: var(--accent);
+}
+
+.map-btn.active {
+    background: var(--accent);
+    color: #000;
     border-color: var(--accent);
 }
 
@@ -766,12 +773,14 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL GRANDE CON CONTROLES INTERACTIVOS -->
+        <!-- MAPA FEDERAL GRANDE CON CAPAS INTERACTIVAS (LLUVIA / VIENTO) -->
         <div class="card" style="display: flex; flex-direction: column;">
-            <h3>🛰️ Radar de Lluvias en Vivo (Argentina)</h3>
+            <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
-                <button class="map-btn" onclick="centrarUbicacion()">📍 Centrar en mi GPS</button>
-                <button class="map-btn" onclick="verVistaPais()">🇦🇷 Ver Todo el País</button>
+                <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia / Radar</button>
+                <button class="map-btn" id="btnViento" onclick="cambiarCapaMapa('viento')">💨 Vientos</button>
+                <button class="map-btn" onclick="centrarUbicacion()">📍 Mi GPS</button>
+                <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
             <div id="mapaArgentina"></div>
         </div>
@@ -784,6 +793,8 @@ let currentLat = -32.89;
 let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
+let capaActivaRadar = null;
+let capaActivaViento = null;
 
 async function inicializarMapaArgentina(lat, lon) {
     try {
@@ -797,21 +808,28 @@ async function inicializarMapaArgentina(lat, lon) {
                 attribution: '&copy; OpenStreetMap'
             }).addTo(mapInstance);
 
-            // Capa de Radar / Precipitaciones en tiempo real (RainViewer API pública)
+            // Cargar capa de Lluvia por defecto (RainViewer)
             try {
                 const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
                 const data = await res.json();
                 if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
                     const latestRadar = data.radar.past[data.radar.past.length - 1].path;
-                    L.tileLayer(`https://tile.rainviewer.com${latestRadar}/256/{z}/{x}/{y}/2/1_1.png`, {
+                    capaActivaRadar = L.tileLayer(`https://tile.rainviewer.com${latestRadar}/256/{z}/{x}/{y}/2/1_1.png`, {
                         opacity: 0.65,
                         maxZoom: 10,
                         attribution: '&copy; RainViewer'
                     }).addTo(mapInstance);
                 }
             } catch (err) {
-                console.warn("No se pudo cargar la capa de radar en vivo:", err);
+                console.warn("No se pudo cargar la capa de radar:", err);
             }
+
+            // Crear capa de Viento (OpenWeatherMap tiles o similar capa libre)
+            capaActivaViento = L.tileLayer('https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=b1b15e88fa797225412429c1c50c122a1', {
+                opacity: 0.6,
+                maxZoom: 10,
+                attribution: '&copy; OpenWeatherMap'
+            });
         }
 
         if (markerInstance) {
@@ -827,6 +845,30 @@ async function inicializarMapaArgentina(lat, lon) {
     }
 }
 
+function cambiarCapaMapa(tipo) {
+    const btnLluvia = document.getElementById("btnLluvia");
+    const btnViento = document.getElementById("btnViento");
+    const mapTitle = document.getElementById("mapTitle");
+
+    if (!mapInstance) return;
+
+    if (tipo === 'lluvia') {
+        if (mapInstance.hasLayer(capaActivaViento)) mapInstance.removeLayer(capaActivaViento);
+        if (capaActivaRadar && !mapInstance.hasLayer(capaActivaRadar)) capaActivaRadar.addTo(mapInstance);
+        
+        btnLluvia.classList.add("active");
+        btnViento.classList.remove("active");
+        mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
+    } else if (tipo === 'viento') {
+        if (capaActivaRadar && mapInstance.hasLayer(capaActivaRadar)) mapInstance.removeLayer(capaActivaRadar);
+        if (capaActivaViento && !mapInstance.hasLayer(capaActivaViento)) capaActivaViento.addTo(mapInstance);
+
+        btnViento.classList.add("active");
+        btnLluvia.classList.remove("active");
+        mapTitle.innerText = "💨 Mapa de Corrientes de Viento en Vivo";
+    }
+}
+
 function centrarUbicacion() {
     if (mapInstance) {
         mapInstance.setView([currentLat, currentLon], 10);
@@ -836,7 +878,7 @@ function centrarUbicacion() {
 
 function verVistaPais() {
     if (mapInstance) {
-        mapInstance.setView([-38.4161, -63.6167], 5); // Centro geográfico de Argentina
+        mapInstance.setView([-38.4161, -63.6167], 5);
     }
 }
 
@@ -852,7 +894,7 @@ function actualizarFechaYHoraDigital() {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️️";
+    if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
