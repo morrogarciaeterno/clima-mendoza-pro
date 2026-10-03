@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Argentina Clima & Alertas</title>
+<title>Argentina Clima & Alertas Federal</title>
 <style>
 :root {
     --bg: #090d16;
@@ -177,9 +177,62 @@ header {
     color: var(--text-muted);
 }
 
+/* SECCIÓN DE ACCESO UNIVERSAL A RADAR Y SATÉLITE NACIONAL */
+.radar-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.radar-link-card {
+    background: var(--card-inner);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-decoration: none;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.radar-link-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    background: #263345;
+}
+
+.radar-link-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radar-link-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    margin-bottom: 12px;
+}
+
+.radar-action-btn {
+    align-self: flex-start;
+    background: var(--accent);
+    color: #000;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+}
+
 .dual-section {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
     align-items: stretch;
 }
@@ -214,75 +267,6 @@ header {
 .resumen-item strong {
     color: var(--text-main);
     font-size: 0.95rem;
-}
-
-/* PANEL DE MONITOREO LOCAL NATIVO (SIN TERCEROS) */
-.monitor-nacional-box {
-    background: var(--card-inner);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 15px;
-    margin-top: 10px;
-}
-
-.monitor-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.monitor-status-pill {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.pulse-dot {
-    width: 6px;
-    height: 6px;
-    background-color: #22c55e;
-    border-radius: 50%;
-    animation: pulseGlow 1.5s infinite;
-}
-
-@keyframes pulseGlow {
-    0% { transform: scale(0.95); opacity: 0.8; }
-    50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 8px #22c55e; }
-    100% { transform: scale(0.95); opacity: 0.8; }
-}
-
-.ciudades-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-}
-
-.ciudad-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px;
-    text-align: center;
-}
-
-.ciudad-card .nombre {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.ciudad-card .temp {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--accent);
-    margin-top: 4px;
 }
 
 @media (max-width: 768px) {
@@ -366,24 +350,37 @@ header {
 
     <br>
 
-    <!-- PANEL DE MONITOREO NACIONAL NATIVO -->
+    <!-- HUB FEDERAL DE ACCESO UNIVERSAL A RADAR Y SATÉLITE -->
     <div class="card">
-        <h3>🛰️ Estado Meteorológico Federal en Vivo (Red Nacional)</h3>
-        <div class="monitor-nacional-box">
-            <div class="monitor-header">
-                <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 600;">Lectura sincrónica de principales ciudades del país</span>
-                <div class="monitor-status-pill">
-                    <span class="pulse-dot"></span> Sistema Activo
+        <h3>🛰️ Centro Federal de Radares y Satélites en Vivo</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; margin-bottom: 8px;">
+            Acceso directo y universal a las fuentes oficiales de observación meteorológica del país (funcionan siempre en cualquier navegador y dispositivo).
+        </p>
+
+        <div class="radar-hub-grid">
+            <a href="https://www.smn.gob.ar/radar" target="_blank" class="radar-link-card">
+                <div>
+                    <div class="radar-link-title">📡 Red de Radares SMN</div>
+                    <div class="radar-link-desc">Visualizá el movimiento de precipitaciones y tormentas en tiempo real en todo el territorio nacional.</div>
                 </div>
-            </div>
-            <div class="ciudades-grid" id="ciudadesContainer">
-                <div class="ciudad-card"><div class="nombre">Mendoza</div><div class="temp" id="mendozaTemp">--°C</div></div>
-                <div class="ciudad-card"><div class="nombre">Buenos Aires</div><div class="temp" id="baTemp">--°C</div></div>
-                <div class="ciudad-card"><div class="nombre">Córdoba</div><div class="temp" id="cbaTemp">--°C</div></div>
-                <div class="ciudad-card"><div class="nombre">Rosario</div><div class="temp" id="rosTemp">--°C</div></div>
-                <div class="ciudad-card"><div class="nombre">Neuquén</div><div class="temp" id="neuTemp">--°C</div></div>
-                <div class="ciudad-card"><div class="nombre">Salta</div><div class="temp" id="salTemp">--°C</div></div>
-            </div>
+                <div class="radar-action-btn">Abrir Radar Oficial ↗</div>
+            </a>
+
+            <a href="https://www.smn.gob.ar/alertas" target="_blank" class="radar-link-card">
+                <div>
+                    <div class="radar-link-title">⚠️ Sistema de Alertas Tempranas</div>
+                    <div class="radar-link-desc">Consulta oficial de avisos meteorológicos a corto plazo, alertas amarillas, naranjas y rojas por región.</div>
+                </div>
+                <div class="radar-action-btn">Ver Alertas SMN ↗</div>
+            </a>
+
+            <a href="https://www.windy.com/?-32.89,-68.84,6" target="_blank" class="radar-link-card">
+                <div>
+                    <div class="radar-link-title">🌍 Mapa Global Interactivo (Windy)</div>
+                    <div class="radar-link-desc">Exploración avanzada de viento, nubes, temperatura y presión en alta resolución en todo el continente.</div>
+                </div>
+                <div class="radar-action-btn">Abrir Mapa Global ↗</div>
+            </a>
         </div>
     </div>
 
@@ -485,7 +482,7 @@ function iconoClima(codigo) {
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
-    if (codigo >= 95) return "⛈️";
+    if (codigo >= 95) return "⛈️️";
     return "⛈️";
 }
 
@@ -505,31 +502,6 @@ async function obtenerNombreUbicacion(lat, lon) {
     } catch (e) {
         const elUbi = document.getElementById("ubicacionTexto");
         if (elUbi) elUbi.innerText = "Godoy Cruz, Mendoza";
-    }
-}
-
-async function cargarTemperaturasPais() {
-    const coords = {
-        mendoza: [-32.89, -68.84, "mendozaTemp"],
-        ba: [-34.60, -58.38, "baTemp"],
-        cba: [-31.42, -64.18, "cbaTemp"],
-        ros: [-32.94, -60.63, "rosTemp"],
-        neu: [-38.95, -68.05, "neuTemp"],
-        sal: [-24.78, -65.41, "salTemp"]
-    };
-
-    for (let key in coords) {
-        try {
-            const [lat, lon, elementId] = coords[key];
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m`);
-            const data = await res.json();
-            if (data && data.current) {
-                const el = document.getElementById(elementId);
-                if (el) el.innerText = Math.round(data.current.temperature_2m) + "°C";
-            }
-        } catch (e) {
-            console.warn("Error cargando ciudad nacional:", key);
-        }
     }
 }
 
@@ -637,28 +609,25 @@ function iniciarApp() {
                 currentLon = pos.coords.longitude;
                 obtenerNombreUbicacion(currentLat, currentLon);
                 cargarClima();
-                cargarTemperaturasPais();
             },
             () => {
                 document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
                 cargarClima();
-                cargarTemperaturasPais();
             },
             { timeout: 8000 }
         );
     } else {
         document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
         cargarClima();
-        cargarTemperaturasPais();
     }
 }
 
 iniciarApp();
 setInterval(actualizarFechaYHoraDigital, 1000);
 setInterval(cargarClima, 300000);
-setInterval(cargarTemperaturasPais, 300000);
 </script>
 
+<!-- Protección básica -->
 <script>
     document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
