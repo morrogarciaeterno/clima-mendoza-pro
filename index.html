@@ -712,7 +712,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">👁️️</span>
+                    <span class="resumen-icon">👁</span>
                     <div>
                         <small>Visibilidad</small>
                         <strong id="visibilidadKm">-- km</strong>
@@ -755,19 +755,18 @@ let mapInstance = null;
 function inicializarMapaArgentina(lat, lon) {
     try {
         if (!mapInstance) {
-            // Centro de Argentina por defecto con zoom federal
             mapInstance = L.map('mapaArgentina').setView([lat, lon], 6);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            // Capa pública y gratuita de OpenStreetMap (Sin API Key requerida)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 10,
                 minZoom: 4,
-                attribution: '&copy; OpenStreetMap & CartoDB'
+                attribution: '&copy; OpenStreetMap'
             }).addTo(mapInstance);
         } else {
             mapInstance.setView([lat, lon], 6);
         }
 
-        // Limpiar marcadores anteriores si los hubiera e insertar el nuevo pin de ubicación
         mapInstance.eachLayer((layer) => {
             if (layer instanceof L.Marker) {
                 mapInstance.removeLayer(layer);
@@ -795,8 +794,8 @@ function actualizarFechaYHoraDigital() {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️";
-    if (codigo <= 2) return "🌤️️";
+    if (codigo === 0) return "☀️️";
+    if (codigo <= 2) return "🌤";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
@@ -1173,7 +1172,7 @@ async function cargarClima() {
             if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
             if (elSunIcon) {
                 elSunIcon.style.transform = `rotate(-${angulo}deg)`;
-                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️️";
+                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
             }
         }
 
