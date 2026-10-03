@@ -2,46 +2,179 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Clima Mendoza Pro</title>
-    <!-- Tus estilos y librerías (Leaflet, etc.) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argentina Clima & Alertas</title>
+    <!-- Leaflet CSS para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 12px;
+        }
+        .header {
+            margin-bottom: 16px;
+        }
+        .header h1 {
+            font-size: 1.25rem;
+            margin: 0 0 4px 0;
+        }
+        .header p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin: 0;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .card {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .card-full {
+            grid-column: span 2;
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .card h3 {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+        }
+        .temp-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        #map {
+            height: 250px;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Tus elementos visuales -->
-        <h1 id="nombre-lugar">Cargando ubicación...</h1>
+
+    <div class="header">
+        <h1>🇦🇷 Argentina Clima & Alertas</h1>
+        <p id="ubicacion-texto">Detectando ubicación...</p>
     </div>
 
+    <div class="card-grid">
+        <div class="card">
+            <h3>Temperatura</h3>
+            <p class="temp-value" id="temp-val">--°C</p>
+            <p id="condicion-val" style="font-size: 0.9rem; color: #cbd5e1; margin: 4px 0 0 0;">Cargando...</p>
+        </div>
+        <div class="card">
+            <h3>Humedad</h3>
+            <p class="temp-value" id="humedad-val" style="font-size: 1.8rem;">--%</p>
+        </div>
+    </div>
+
+    <div class="card-full">
+        <h3>Radar & Mapa Interactivo</h3>
+        <div id="map"></div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Función de ejemplo donde obtenés o actualizás la ubicación en la web
-        function actualizarUbicacion(lat, lon, nombreCiudad) {
-            // 1. Actualizar el texto en tu interfaz web de GitHub Pages
-            const elementoLugar = document.getElementById("nombre-lugar");
-            if (elementoLugar) {
-                elementoLugar.innerText = nombreCiudad;
-            }
+        // Inicializar Mapa
+        const map = L.map('map').setView([-32.89, -68.84], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
 
-            // 2. ENVIAR LA UBICACIÓN AL SERVICIO NATIVO DE ANDROID
-            // Esto comprueba si la app abrió la web dentro del WebView y ejecuta el puente
-            if (window.Android && typeof window.Android.guardarUbicacion === "function") {
-                window.Android.guardarUbicacion(lat, lon, nombreCiudad);
-                console.log("Ubicación enviada a Android: " + nombreCiudad + " (" + lat + ", " + lon + ")");
+        let marker = L.marker([-32.89, -68.84]).addTo(map);
+
+        // Función para obtener ubicación y datos del clima
+        function iniciarClima() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    // Centrar mapa
+                    map.setView([lat, lon], 13);
+                    marker.setLatLng([lat, lon]);
+
+                    // Obtener nombre de la localidad usando Nominatim (Reverse Geocoding)
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                        const data = await response.json();
+                        
+                        const ciudad = data.address.city || data.address.town || data.address.village || data.address.county || "Mendoza";
+                        const estado = data.address.state || "";
+                        const nombreLugar = `Departamento ${ciudad}, ${estado}`;
+
+                        // Mostrar en la web
+                        document.getElementById("ubicacion-texto").innerText = nombreLugar;
+
+                        // ==========================================
+                        // PUENTE CON LA APP NATIVA DE ANDROID
+                        // ==========================================
+                        if (window.Android && typeof window.Android.guardarUbicacion === "function") {
+                            window.Android.guardarUbicacion(lat, lon, ciudad);
+                        }
+
+                        // Consultar Clima en Open-Meteo
+                        obtenerClimaOpenMeteo(lat, lon);
+
+                    } catch (e) {
+                        console.error("Error obteniendo nombre de ubicación", e);
+                    }
+                }, error => {
+                    console.error("Error de GPS:", error);
+                    document.getElementById("ubicacion-texto").innerText = "Mendoza (Ubicación por defecto)";
+                    obtenerClimaOpenMeteo(-32.89, -68.84);
+                });
+            } else {
+                obtenerClimaOpenMeteo(-32.89, -68.84);
             }
         }
 
-        // Ejemplo de uso con la geolocalización estándar del navegador
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+        async function obtenerClimaOpenMeteo(lat, lon) {
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=America%2FArgentina%2FMendoza`);
+                const data = await res.json();
+                
+                const temp = Math.round(data.current.temperature_2m);
+                const humedad = data.current.relative_humidity_2m;
+                const code = data.current.weather_code;
 
-                // Aquí hacés tu consulta a Nominatim o Open-Meteo para obtener el nombre del lugar (ej: "Guaymallén")
-                // Y luego llamás a la función pasando los datos reales:
-                // actualizarUbicacion(lat, lon, "Guaymallén, Mendoza");
-
-            }, function(error) {
-                console.error("Error obteniendo geolocalización: ", error);
-            });
+                document.getElementById("temp-val").innerText = temp + "°C";
+                document.getElementById("humedad-val").innerText = humedad + "%";
+                document.getElementById("condicion-val").innerText = obtenerTextoCondicion(code);
+            } catch (e) {
+                console.error("Error al consultar API del clima", e);
+            }
         }
+
+        function obtenerTextoCondicion(code) {
+            switch (code) {
+                case 0: return "Cielo despejado ☀️";
+                case 1: case 2: case 3: return "Parcialmente nublado 🌤️";
+                case 45: case 48: return "Neblina 🌫️";
+                default: if (code >= 51 && code <= 67) return "Lluvia 🌧️";
+                return "Condiciones estables";
+            }
+        }
+
+        // Ejecutar al cargar la página
+        iniciarClima();
     </script>
 </body>
 </html>
