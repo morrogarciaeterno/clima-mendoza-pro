@@ -928,13 +928,13 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL INTERACTIVO CON CAPA DE NUBES CORREGIDA -->
+        <!-- MAPA MULTICAPA CON NASA FIRMS INTEGRADO -->
         <div class="card" style="display: flex; flex-direction: column;">
-            <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
+            <h3 id="mapTitle">🗺️ Visor Geográfico & Incendios (NASA FIRMS)</h3>
             <div class="map-controls">
-                <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
-                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubes</button>
-                <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Incendios</button>
+                <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
+                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topográfico</button>
+                <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Incendios (FIRMS)</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
@@ -942,7 +942,7 @@ header {
             <div class="map-wrapper-container">
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <span class="pulse-dot"></span>
-                    <span id="mapStatusText">Mapa interactivo listo (Arrastrá para explorar)</span>
+                    <span id="mapStatusText">Visor listo (Conectado a NASA FIRMS)</span>
                 </div>
                 <div id="mapaArgentina"></div>
             </div>
@@ -956,9 +956,23 @@ let currentLat = -32.89;
 let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
-let capaActivaRadar = null;
-let capaActivaNubes = null;
-let capaActivaFuego = null;
+let capaActual = null;
+let capaFuegosFIRMS = null;
+
+const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
+
+const capasBase = {
+    base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        minZoom: 4,
+        attribution: '&copy; OpenStreetMap'
+    }),
+    topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        minZoom: 4,
+        attribution: '&copy; OpenTopoMap'
+    })
+};
 
 function actualizarIndicadorMapa(texto, colorDot = "#22c55e") {
     const textEl = document.getElementById("mapStatusText");
@@ -967,61 +981,33 @@ function actualizarIndicadorMapa(texto, colorDot = "#22c55e") {
     if (dotEl) dotEl.style.backgroundColor = colorDot;
 }
 
-async function inicializarMapaArgentina(lat, lon) {
+function inicializarMapaArgentina(lat, lon) {
     try {
         if (!mapInstance) {
-            actualizarIndicadorMapa("Cargando cartografía y capas...", "#facc15");
+            actualizarIndicadorMapa("Cargando cartografía satelital...", "#facc15");
             mapInstance = L.map('mapaArgentina', {
                 zoomControl: true,
                 dragging: true,
                 tap: true
             }).setView([lat, lon], 6);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 10,
-                minZoom: 4,
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(mapInstance);
+            // Capa base inicial
+            capaActual = capasBase.base;
+            capaActual.addTo(mapInstance);
+
+            // Inicializar la capa WMS oficial de NASA FIRMS usando tu MAP_KEY
+            capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
+                layers: 'fires_24',
+                format: 'image/png',
+                transparent: true,
+                version: '1.3.0',
+                attribution: '&copy; NASA LANCE FIRMS'
+            });
 
             mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
-            mapInstance.on('moveend', () => { actualizarIndicadorMapa("Mapa interactivo activo (Arrastrá/Zoom)", "#22c55e"); });
+            mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor interactivo activo", "#22c55e"); });
 
-            // 1. Capa RainViewer (Lluvia)
-            try {
-                const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-                const data = await res.json();
-                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-                    const latestRadar = data.radar.past[data.radar.past.length - 1].path;
-                    capaActivaRadar = L.tileLayer(`https://tile.rainviewer.com${latestRadar}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: 0.65,
-                        maxZoom: 10,
-                        attribution: '&copy; RainViewer'
-                    });
-                }
-            } catch (err) {
-                console.warn("No se pudo cargar la capa de radar:", err);
-            }
-
-            // 2. Capa de Nubosidad Infrarroja Global Garantizada (Feed Satelital Abierto)
-            capaActivaNubes = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/CorrectedReflectance_TrueColor/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
-                opacity: 0.70,
-                maxZoom: 9,
-                attribution: '&copy; NASA GIBS True Color'
-            });
-
-            // 3. Capa de Focos de Incendio (FIRMS)
-            capaActivaFuego = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Thermal_Anomalies_All/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png', {
-                opacity: 0.7,
-                maxZoom: 9,
-                attribution: '&copy; NASA FIRMS Thermal Anomalies'
-            });
-
-            // Por defecto arrancamos mostrando Lluvia
-            if (capaActivaRadar) {
-                capaActivaRadar.addTo(mapInstance);
-            }
-
-            actualizarIndicadorMapa("Mapa interactivo listo (Arrastrá/Zoom)", "#22c55e");
+            actualizarIndicadorMapa("Visor listo y operativo", "#22c55e");
         }
 
         if (markerInstance) {
@@ -1034,43 +1020,52 @@ async function inicializarMapaArgentina(lat, lon) {
 
     } catch (e) {
         console.error("Error al inicializar el mapa:", e);
-        actualizarIndicadorMapa("Error al cargar capas del mapa", "#ef4444");
+        actualizarIndicadorMapa("Error al cargar visor cartográfico", "#ef4444");
     }
 }
 
 function cambiarCapaMapa(tipo) {
-    const btnLluvia = document.getElementById("btnLluvia");
-    const btnNubes = document.getElementById("btnNubes");
+    const btnBase = document.getElementById("btnBase");
+    const btnTopo = document.getElementById("btnTopo");
     const btnFuego = document.getElementById("btnFuego");
     const mapTitle = document.getElementById("mapTitle");
 
     if (!mapInstance) return;
 
-    // Eliminar capas anteriores de forma segura
-    if (capaActivaRadar && mapInstance.hasLayer(capaActivaRadar)) mapInstance.removeLayer(capaActivaRadar);
-    if (capaActivaNubes && mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
-    if (capaActivaFuego && mapInstance.hasLayer(capaActivaFuego)) mapInstance.removeLayer(capaActivaFuego);
-
-    btnLluvia.classList.remove("active");
-    btnNubes.classList.remove("active");
+    btnBase.classList.remove("active");
+    btnTopo.classList.remove("active");
     btnFuego.classList.remove("active");
 
-    // Activar la seleccionada
-    if (tipo === 'lluvia') {
-        if (capaActivaRadar) capaActivaRadar.addTo(mapInstance);
-        btnLluvia.classList.add("active");
-        mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
-        actualizarIndicadorMapa("Capa de Lluvia activa", "#38bdf8");
-    } else if (tipo === 'nubes') {
-        if (capaActivaNubes) capaActivaNubes.addTo(mapInstance);
-        btnNubes.classList.add("active");
-        mapTitle.innerText = "☁️ Nubosidad Atmosférica en Vivo";
-        actualizarIndicadorMapa("Capa de Nubes activa", "#38bdf8");
-    } else if (tipo === 'fuego') {
-        if (capaActivaFuego) capaActivaFuego.addTo(mapInstance);
+    if (tipo === 'fuego') {
+        // Mantiene la capa base actual y sobrepone la capa WMS de incendios de NASA FIRMS
+        if (!mapInstance.hasLayer(capaFuegosFIRMS)) {
+            capaFuegosFIRMS.addTo(mapInstance);
+        }
         btnFuego.classList.add("active");
-        mapTitle.innerText = "🔥 Mapa de Focos de Incendio (NASA FIRMS)";
-        actualizarIndicadorMapa("Capa de Incendios activa", "#f59e0b");
+        mapTitle.innerText = "🔥 Monitoreo de Incendios en Vivo (NASA FIRMS)";
+        actualizarIndicadorMapa("Capa de Incendios Activa (Últimas 24hs)", "#f59e0b");
+    } else {
+        // Si cambia a base o topo, quitamos la capa de fuegos si está activa
+        if (mapInstance.hasLayer(capaFuegosFIRMS)) {
+            mapInstance.removeLayer(capaFuegosFIRMS);
+        }
+
+        if (capaActual) {
+            mapInstance.removeLayer(capaActual);
+        }
+
+        capaActual = capasBase[tipo];
+        capaActual.addTo(mapInstance);
+
+        if (tipo === 'base') {
+            btnBase.classList.add("active");
+            mapTitle.innerText = "🗺️ Visor Geográfico & Incendios (NASA FIRMS)";
+            actualizarIndicadorMapa("Capa Estándar activa", "#38bdf8");
+        } else if (tipo === 'topo') {
+            btnTopo.classList.add("active");
+            mapTitle.innerText = "⛰️ Visor Topográfico Cordillerano";
+            actualizarIndicadorMapa("Capa Topográfica activa", "#38bdf8");
+        }
     }
 }
 
@@ -1596,7 +1591,7 @@ setInterval(cargarSismos, 300000);
 setInterval(actualizarAltaMontana, 300000);
 </script>
 
-<!-- SCRIPT DE PROTECCIÓN CONTRA INSPECCIÓN (F12, Clic derecho y atajos) -->
+<!-- SCRIPT DE PROTECCIÓN CONTRA INSPECCIÓN -->
 <script>
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
