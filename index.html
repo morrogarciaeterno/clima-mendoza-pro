@@ -460,7 +460,6 @@ header {
     100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* GRILLA EXACTA DE 4 COLUMNAS PARA QUE NUNCA SE DESBORDE */
 .map-controls {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -910,7 +909,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">❄️</span>
+                    <span class="resumen-icon">❄️️</span>
                     <div>
                         <small>Riesgo Helada</small>
                         <strong id="riesgoHelada" style="color:#22c55e;">Sin Riesgo</strong>
@@ -969,7 +968,7 @@ header {
 </div>
 
 <script>
-let currentLat = -32.89;
+let currentLat = -32.92;
 let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
@@ -1012,7 +1011,7 @@ function inicializarMapaArgentina(lat, lon) {
                 zoomControl: true,
                 dragging: true,
                 tap: true
-            }).setView([lat, lon], 6);
+            }).setView([lat, lon], 11);
 
             capaActual = capasBase.base;
             capaActual.addTo(mapInstance);
@@ -1043,8 +1042,10 @@ function inicializarMapaArgentina(lat, lon) {
         }
 
         markerInstance = L.marker([lat, lon]).addTo(mapInstance)
-            .bindPopup("<b>Ubicación Actual (GPS)</b><br>Hacé clic o arrastrá el mapa libremente.")
+            .bindPopup("<b>Ubicación Actual</b><br>Godoy Cruz, Mendoza")
             .openPopup();
+
+        mapInstance.setView([lat, lon], 12);
 
     } catch (e) {
         console.error("Error al inicializar el mapa:", e);
@@ -1104,9 +1105,9 @@ function cambiarCapaMapa(tipo) {
 
 function centrarUbicacion() {
     if (mapInstance) {
-        mapInstance.setView([currentLat, currentLon], 10, { animate: true });
+        mapInstance.setView([currentLat, currentLon], 12, { animate: true });
         if (markerInstance) markerInstance.openPopup();
-        actualizarIndicadorMapa("Centrado en GPS actual", "#22c55e");
+        actualizarIndicadorMapa("Centrado en ubicación actual", "#22c55e");
     }
 }
 
@@ -1174,7 +1175,7 @@ async function verificarProximidadIncendios(lat, lon) {
             card.style.display = "block";
             espaciador.style.display = "block";
             card.classList.add("alerta-activa-animacion");
-            titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
+            titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu ubicación!`;
             desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
         } else {
             card.style.display = "none";
@@ -1205,10 +1206,10 @@ function obtenerDireccionViento(grados) {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️";
+    if (codigo === 0) return "☀️️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️️";
+    if (codigo <= 67) return "🌧";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
@@ -1296,16 +1297,28 @@ async function obtenerNombreUbicacion(lat, lon) {
         const data = await revRes.json();
         
         const elUbi = document.getElementById("ubicacionTexto");
+        let nombreLugar = "Godoy Cruz, Mendoza";
+
         if (data && data.address) {
             const ciudad = data.address.city || data.address.town || data.address.village || data.address.county || "Godoy Cruz";
             const estado = data.address.state || "Mendoza";
-            if (elUbi) elUbi.innerText = `${ciudad}, ${estado}`;
+            nombreLugar = `${ciudad}, ${estado}`;
+            if (elUbi) elUbi.innerText = nombreLugar;
         } else {
-            if (elUbi) elUbi.innerText = "Godoy Cruz, Mendoza";
+            if (elUbi) elUbi.innerText = nombreLugar;
         }
+
+        // ENVIAR AL PUENTE DE ANDROID NATIVO
+        if (window.Android && typeof window.Android.guardarUbicacion === "function") {
+            window.Android.guardarUbicacion(lat, lon, nombreLugar);
+        }
+
     } catch (e) {
         const elUbi = document.getElementById("ubicacionTexto");
         if (elUbi) elUbi.innerText = "Godoy Cruz, Mendoza";
+        if (window.Android && typeof window.Android.guardarUbicacion === "function") {
+            window.Android.guardarUbicacion(lat, lon, "Godoy Cruz, Mendoza");
+        }
     }
 }
 
@@ -1418,34 +1431,6 @@ async function cargarSismos() {
         console.error("Error al cargar sismos USGS:", err);
         lista.innerHTML = `<tr><td colspan="3" style="color:var(--text-muted)">Error al conectar con la red sísmica</td></tr>`;
     }
-}
-
-async function actualizarAltaMontana() {
-    try {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.81&longitude=-69.80&current=temperature_2m,snowfall&timezone=auto";
-        const res = await fetch(url);
-        const data = await res.json();
-        if (!data || !data.current) return;
-
-        const temp = Math.round(data.current.temperature_2m);
-        const nieve = data.current.snowfall || 0;
-
-        const elTemp = document.getElementById("montanaTemp");
-        const elPaso = document.getElementById("pasoEstado");
-        const elTempCristo = document.getElementById("tempCristo");
-        const elCristo = document.getElementById("pasoCristo");
-
-        if (elTemp) elTemp.textContent = temp + "°C en Las Cuevas";
-        if (elTempCristo) elTempCristo.textContent = "Las Cuevas: " + temp + "°C";
-
-        if (temp <= -5 || nieve > 0) {
-            if (elPaso) { elPaso.textContent = "Cerrado / Precaución"; elPaso.style.color = "#ef4444"; }
-            if (elCristo) { elCristo.textContent = "Precaución"; elCristo.className = "paso-estado estado-precaucion"; }
-        } else {
-            if (elPaso) { elPaso.textContent = "Habilitado"; elPaso.style.color = "#22c55e"; }
-            if (elCristo) { elCristo.textContent = "Habilitado"; elCristo.className = "paso-estado estado-abierto"; }
-        }
-    } catch (e) { console.error("Error Alta Montaña:", e); }
 }
 
 async function cargarClima() {
@@ -1652,17 +1637,22 @@ function dispararCargaDeDatos() {
     cargarCalidadAire();
     cargarPolen();
     cargarSismos();
-    actualizarAltaMontana();
     verificarProximidadIncendios(currentLat, currentLon);
 }
 
+// ==========================================
+// INICIO INTELIGENTE CON RESPALDO DE ANDROID
+// ==========================================
 function iniciarApp() {
     actualizarFechaYHoraDigital();
     calcularFaseLunar();
 
+    let gpsRespondio = false;
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
+                gpsRespondio = true;
                 currentLat = position.coords.latitude;
                 currentLon = position.coords.longitude;
                 obtenerNombreUbicacion(currentLat, currentLon);
@@ -1670,14 +1660,36 @@ function iniciarApp() {
                 dispararCargaDeDatos();
             },
             (error) => {
-                console.warn("GPS denegado o no disponible, usando coordenadas por defecto.");
-                document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
-                inicializarMapaArgentina(currentLat, currentLon);
-                dispararCargaDeDatos();
+                console.warn("GPS del navegador con fallo o denegado. Rescatando desde Android...");
+                intentarRecuperarDesdeAndroid();
             },
-            { timeout: 8000, maximumAge: 60000, enableHighAccuracy: true }
+            { timeout: 4000, maximumAge: 60000, enableHighAccuracy: true }
         );
+    }
+
+    // Fallback: Si en 3.5 segundos el GPS no responde, toma los datos cacheados de Android
+    setTimeout(() => {
+        if (!gpsRespondio) {
+            intentarRecuperarDesdeAndroid();
+        }
+    }, 3500);
+}
+
+function intentarRecuperarDesdeAndroid() {
+    if (window.Android && typeof window.Android.obtenerLatitudGuardada === "function") {
+        currentLat = window.Android.obtenerLatitudGuardada();
+        currentLon = window.Android.obtenerLongitudGuardada();
+        const nombreAndroid = window.Android.obtenerNombreGuardado();
+
+        const elUbi = document.getElementById("ubicacionTexto");
+        if (elUbi) elUbi.innerText = nombreAndroid;
+
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
+        console.log("Ubicación restaurada exitosamente desde el puente nativo.");
     } else {
+        currentLat = -32.92;
+        currentLon = -68.84;
         document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
         inicializarMapaArgentina(currentLat, currentLon);
         dispararCargaDeDatos();
@@ -1691,7 +1703,6 @@ setInterval(dispararCargaDeDatos, 300000);
 setInterval(cargarCalidadAire, 300000);
 setInterval(cargarPolen, 3600000);
 setInterval(cargarSismos, 300000);
-setInterval(actualizarAltaMontana, 300000);
 </script>
 
 <!-- SCRIPT DE PROTECCIÓN CONTRA INSPECCIÓN -->
