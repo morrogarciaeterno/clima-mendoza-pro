@@ -614,9 +614,9 @@ header {
         </div>
 
         <div class="card">
-            <h3>Presión</h3>
+            <h3>Presión Atmosférica</h3>
             <div class="metric" id="presion">--</div>
-            <small style="color:var(--text-muted)">hPa</small>
+            <small id="presionTendencia" style="color:var(--accent); font-weight:700;">Tendencia: Analizando...</small>
         </div>
 
         <div class="card">
@@ -885,12 +885,12 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL CON CAPAS DE RADAR Y NUBOSIDAD ATMOSFÉRICA -->
+        <!-- MAPA FEDERAL CON CAPAS DE RADAR Y FOCOS DE INCENDIO -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia / Radar</button>
-                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubosidad en Vivo</button>
+                <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Focos de Incendio</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 Mi GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
@@ -906,7 +906,7 @@ let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
 let capaActivaRadar = null;
-let capaActivaNubes = null;
+let capaActivaFuego = null;
 
 async function inicializarMapaArgentina(lat, lon) {
     try {
@@ -935,11 +935,11 @@ async function inicializarMapaArgentina(lat, lon) {
                 console.warn("No se pudo cargar la capa de radar:", err);
             }
 
-            // Capa de Nubosidad / Atmósfera (NASA GIBS Corrected Reflectance o equivalente público estable)
-            capaActivaNubes = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2026-01-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
-                opacity: 0.5,
+            // Capa de Focos de Incendio / Anomalías Térmicas (NASA FIRMS / MODIS TrueColor de fondo con alertas de calor)
+            capaActivaFuego = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Thermal_Anomalies_Day/default/california-fire/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png', {
+                opacity: 0.6,
                 maxZoom: 9,
-                attribution: '&copy; NASA GIBS'
+                attribution: '&copy; NASA FIRMS'
             });
         }
 
@@ -958,29 +958,29 @@ async function inicializarMapaArgentina(lat, lon) {
 
 function cambiarCapaMapa(tipo) {
     const btnLluvia = document.getElementById("btnLluvia");
-    const btnNubes = document.getElementById("btnNubes");
+    const btnFuego = document.getElementById("btnFuego");
     const mapTitle = document.getElementById("mapTitle");
 
     if (!mapInstance) return;
 
     if (tipo === 'lluvia') {
-        if (mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
+        if (mapInstance.hasLayer(capaActivaFuego)) mapInstance.removeLayer(capaActivaFuego);
         if (capaActivaRadar && !mapInstance.hasLayer(capaActivaRadar)) capaActivaRadar.addTo(mapInstance);
         
         btnLluvia.classList.add("active");
-        btnNubes.classList.remove("active");
+        btnFuego.classList.remove("active");
         mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
-    } else if (tipo === 'nubes') {
+    } else if (tipo === 'fuego') {
         mapInstance.eachLayer((layer) => {
             if (layer._url && layer._url.includes('rainviewer')) {
                 mapInstance.removeLayer(layer);
             }
         });
-        if (capaActivaNubes && !mapInstance.hasLayer(capaActivaNubes)) capaActivaNubes.addTo(mapInstance);
+        if (capaActivaFuego && !mapInstance.hasLayer(capaActivaFuego)) capaActivaFuego.addTo(mapInstance);
 
-        btnNubes.classList.add("active");
+        btnFuego.classList.add("active");
         btnLluvia.classList.remove("active");
-        mapTitle.innerText = "☁️️ Nubosidad Atmosférica en Vivo";
+        mapTitle.innerText = "🔥 Mapa de Focos de Incendio en Vivo";
     }
 }
 
@@ -1019,8 +1019,8 @@ function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️";
-    if (codigo >= 95) return "⛈️️";
+    if (codigo <= 67) return "🌧️️";
+    if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
 
@@ -1261,7 +1261,7 @@ async function actualizarAltaMontana() {
 
 async function cargarClima() {
     try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,visibility&hourly=temperature_2m,weather_code,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,visibility&hourly=temperature_2m,surface_pressure,weather_code,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza`;
         const res = await fetch(url);
         const data = await res.json();
 
@@ -1273,6 +1273,7 @@ async function cargarClima() {
         const humedad = data.current.relative_humidity_2m ?? 0;
         const viento = data.current.wind_speed_10m ?? 0;
         const dirVientoGrados = data.current.wind_direction_10m ?? 0;
+        const presionActual = data.current.surface_pressure ?? 1013;
         const uv = data.current.uv_index ?? 0;
         const code = data.current.weather_code ?? 0;
 
@@ -1283,6 +1284,7 @@ async function cargarClima() {
         const elViento = document.getElementById("viento");
         const elVientoDir = document.getElementById("vientoDir");
         const elPresion = document.getElementById("presion");
+        const elPresionTendencia = document.getElementById("presionTendencia");
         const elIcon = document.getElementById("weatherIcon");
 
         if (elTemp) elTemp.innerText = tempFormateada;
@@ -1291,7 +1293,23 @@ async function cargarClima() {
         if (elHum) elHum.innerText = humedad + "%";
         if (elViento) elViento.innerText = Math.round(viento) + " km/h";
         if (elVientoDir) elVientoDir.innerText = `Dir: ${obtenerDireccionViento(dirVientoGrados)} (${dirVientoGrados}°)`;
-        if (elPresion) elPresion.innerText = Math.round(data.current.surface_pressure);
+        if (elPresion) elPresion.innerText = Math.round(presionActual);
+
+        if (data.hourly && data.hourly.surface_pressure) {
+            const h = new Date().getHours();
+            const presionPasada = data.hourly.surface_pressure[Math.max(0, h - 3)] ?? presionActual;
+            const diffPresion = presionActual - presionPasada;
+
+            if (diffPresion < -2.5) {
+                if (elPresionTendencia) { elPresionTendencia.innerText = "⚠️ Caída brusca (Alerta Zonda/Frente)"; elPresionTendencia.style.color = "#ef4444"; }
+            } else if (diffPresion < -1) {
+                if (elPresionTendencia) { elPresionTendencia.innerText = "📉 En descenso"; elPresionTendencia.style.color = "#facc15"; }
+            } else if (diffPresion > 1) {
+                if (elPresionTendencia) { elPresionTendencia.innerText = "📈 En ascenso (Estable)"; elPresionTendencia.style.color = "#22c55e"; }
+            } else {
+                if (elPresionTendencia) { elPresionTendencia.innerText = "➡ Estable"; elPresionTendencia.style.color = "var(--accent)"; }
+            }
+        }
 
         const vis = ((data.current.visibility ?? 10000) / 1000).toFixed(0);
         const elVis = document.getElementById("visibilidadKm");
