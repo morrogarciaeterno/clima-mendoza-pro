@@ -885,12 +885,12 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL GRANDE CON RADAR DE LLUVIAS Y VISTA SATELITAL -->
+        <!-- MAPA FEDERAL CON CAPAS DE RADAR Y NUBOSIDAD ATMOSFÉRICA -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia / Radar</button>
-                <button class="map-btn" id="btnSatelite" onclick="cambiarCapaMapa('satelite')">🌍 Vista Satelital</button>
+                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubosidad en Vivo</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 Mi GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
@@ -906,7 +906,7 @@ let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
 let capaActivaRadar = null;
-let capaActivaSatelite = null;
+let capaActivaNubes = null;
 
 async function inicializarMapaArgentina(lat, lon) {
     try {
@@ -935,11 +935,11 @@ async function inicializarMapaArgentina(lat, lon) {
                 console.warn("No se pudo cargar la capa de radar:", err);
             }
 
-            // Capa de Esri World Imagery (Satelite base mundial gratuita)
-            capaActivaSatelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                opacity: 0.85,
-                maxZoom: 10,
-                attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+            // Capa de Nubosidad / Atmósfera (NASA GIBS Corrected Reflectance o equivalente público estable)
+            capaActivaNubes = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2026-01-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
+                opacity: 0.5,
+                maxZoom: 9,
+                attribution: '&copy; NASA GIBS'
             });
         }
 
@@ -958,31 +958,29 @@ async function inicializarMapaArgentina(lat, lon) {
 
 function cambiarCapaMapa(tipo) {
     const btnLluvia = document.getElementById("btnLluvia");
-    const btnSatelite = document.getElementById("btnSatelite");
+    const btnNubes = document.getElementById("btnNubes");
     const mapTitle = document.getElementById("mapTitle");
 
     if (!mapInstance) return;
 
     if (tipo === 'lluvia') {
-        if (mapInstance.hasLayer(capaActivaSatelite)) mapInstance.removeLayer(capaActivaSatelite);
+        if (mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
         if (capaActivaRadar && !mapInstance.hasLayer(capaActivaRadar)) capaActivaRadar.addTo(mapInstance);
         
         btnLluvia.classList.add("active");
-        btnSatelite.classList.remove("active");
+        btnNubes.classList.remove("active");
         mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
-    } else if (tipo === 'satelite') {
-        if (capaActivaRadar && mapInstance.hasLayer(capaActivaRadar)) mapInstance.removeLayer(mapInstance.hasLayer(capaActivaRadar) ? capaActivaRadar : null);
-        // Quitar radar de forma segura
+    } else if (tipo === 'nubes') {
         mapInstance.eachLayer((layer) => {
             if (layer._url && layer._url.includes('rainviewer')) {
                 mapInstance.removeLayer(layer);
             }
         });
-        if (capaActivaSatelite && !mapInstance.hasLayer(capaActivaSatelite)) capaActivaSatelite.addTo(mapInstance);
+        if (capaActivaNubes && !mapInstance.hasLayer(capaActivaNubes)) capaActivaNubes.addTo(mapInstance);
 
-        btnSatelite.classList.add("active");
+        btnNubes.classList.add("active");
         btnLluvia.classList.remove("active");
-        mapTitle.innerText = "🌍 Vista Satelital de la Región";
+        mapTitle.innerText = "☁️️ Nubosidad Atmosférica en Vivo";
     }
 }
 
@@ -1022,7 +1020,7 @@ function iconoClima(codigo) {
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
-    if (codigo >= 95) return "⛈️";
+    if (codigo >= 95) return "⛈️️";
     return "⛈️";
 }
 
@@ -1404,7 +1402,7 @@ async function cargarClima() {
             if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
             if (elSunIcon) {
                 elSunIcon.style.transform = `rotate(-${angulo}deg)`;
-                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️️";
+                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
             }
         }
 
