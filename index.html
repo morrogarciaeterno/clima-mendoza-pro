@@ -411,12 +411,54 @@ header {
     align-items: stretch;
 }
 
+.map-wrapper-container {
+    position: relative;
+    width: 100%;
+}
+
 #mapaArgentina {
     width: 100%;
     height: 520px;
     border-radius: 12px;
     margin-top: 10px;
     z-index: 1;
+    border: 2px solid var(--border);
+}
+
+/* Indicador flotante interactivo sobre el mapa */
+.map-status-pill {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid var(--accent);
+    color: var(--text-main);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #22c55e;
+    animation: pulseGlow 1.5s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px #22c55e; }
+    100% { transform: scale(0.95); opacity: 0.8; }
 }
 
 .map-controls {
@@ -435,18 +477,24 @@ header {
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .map-btn:hover {
     background: #374151;
     border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.map-btn:active {
+    transform: translateY(1px);
 }
 
 .map-btn.active {
     background: var(--accent);
     color: #000;
     border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
 
 .pasos-grid {
@@ -875,7 +923,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">🏔️️</span>
+                    <span class="resumen-icon">🏔️</span>
                     <div>
                         <small>Paso Cristo Redentor</small>
                         <strong id="pasoEstado" style="color:#22c55e;">Conectando...</strong>
@@ -885,7 +933,7 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL CON TRES OPCIONES: LLUVIA, NUBES Y FUEGO -->
+        <!-- MAPA FEDERAL INTERACTIVO CON INDICADOR DE ESTADO FLOTANTE -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
@@ -895,7 +943,14 @@ header {
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
-            <div id="mapaArgentina"></div>
+            
+            <div class="map-wrapper-container">
+                <div class="map-status-pill" id="mapStatusIndicator">
+                    <span class="pulse-dot"></span>
+                    <span id="mapStatusText">Mapa interactivo listo (Arrastrá para explorar)</span>
+                </div>
+                <div id="mapaArgentina"></div>
+            </div>
         </div>
     </div>
 
@@ -910,16 +965,32 @@ let capaActivaRadar = null;
 let capaActivaNubes = null;
 let capaActivaFuego = null;
 
+function actualizarIndicadorMapa(texto, colorDot = "#22c55e") {
+    const textEl = document.getElementById("mapStatusText");
+    const dotEl = document.querySelector(".pulse-dot");
+    if (textEl) textEl.textContent = texto;
+    if (dotEl) dotEl.style.backgroundColor = colorDot;
+}
+
 async function inicializarMapaArgentina(lat, lon) {
     try {
         if (!mapInstance) {
-            mapInstance = L.map('mapaArgentina').setView([lat, lon], 6);
+            actualizarIndicadorMapa("Cargando cartografía y capas...", "#facc15");
+            mapInstance = L.map('mapaArgentina', {
+                zoomControl: true,
+                dragging: true,
+                tap: true
+            }).setView([lat, lon], 6);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 10,
                 minZoom: 4,
                 attribution: '&copy; OpenStreetMap'
             }).addTo(mapInstance);
+
+            // Eventos táctiles y de movimiento para evidenciar que es interactivo
+            mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
+            mapInstance.on('moveend', () => { actualizarIndicadorMapa("Mapa interactivo activo (Arrastrá/Zoom)", "#22c55e"); });
 
             // Capa RainViewer (Lluvia)
             try {
@@ -944,12 +1015,14 @@ async function inicializarMapaArgentina(lat, lon) {
                 attribution: '&copy; RainViewer Satellite'
             });
 
-            // Capa de Focos de Incendio (Utilizando servicio global abierto de detección térmica FIRMS vía teselas públicas WMTS estándar)
+            // Capa de Focos de Incendio (FIRMS)
             capaActivaFuego = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Thermal_Anomalies_All/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png', {
                 opacity: 0.7,
                 maxZoom: 9,
                 attribution: '&copy; NASA FIRMS Thermal Anomalies'
             });
+
+            actualizarIndicadorMapa("Mapa interactivo listo (Arrastrá/Zoom)", "#22c55e");
         }
 
         if (markerInstance) {
@@ -957,11 +1030,12 @@ async function inicializarMapaArgentina(lat, lon) {
         }
 
         markerInstance = L.marker([lat, lon]).addTo(mapInstance)
-            .bindPopup("<b>Ubicación Actual (GPS)</b>")
+            .bindPopup("<b>Ubicación Actual (GPS)</b><br>Hacé clic o arrastrá el mapa libremente.")
             .openPopup();
 
     } catch (e) {
         console.error("Error al inicializar el mapa:", e);
+        actualizarIndicadorMapa("Error al cargar capas del mapa", "#ef4444");
     }
 }
 
@@ -973,7 +1047,6 @@ function cambiarCapaMapa(tipo) {
 
     if (!mapInstance) return;
 
-    // Limpiar capas activas del mapa
     if (capaActivaRadar && mapInstance.hasLayer(capaActivaRadar)) mapInstance.removeLayer(capaActivaRadar);
     if (capaActivaNubes && mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
     if (capaActivaFuego && mapInstance.hasLayer(capaActivaFuego)) mapInstance.removeLayer(capaActivaFuego);
@@ -986,27 +1059,32 @@ function cambiarCapaMapa(tipo) {
         if (capaActivaRadar) capaActivaRadar.addTo(mapInstance);
         btnLluvia.classList.add("active");
         mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
+        actualizarIndicadorMapa("Capa de Lluvia activa", "#38bdf8");
     } else if (tipo === 'nubes') {
         if (capaActivaNubes) capaActivaNubes.addTo(mapInstance);
         btnNubes.classList.add("active");
         mapTitle.innerText = "☁ Nubosidad Atmosférica en Vivo";
+        actualizarIndicadorMapa("Capa de Nubes activa", "#38bdf8");
     } else if (tipo === 'fuego') {
         if (capaActivaFuego) capaActivaFuego.addTo(mapInstance);
         btnFuego.classList.add("active");
         mapTitle.innerText = "🔥 Mapa de Focos de Incendio (NASA FIRMS)";
+        actualizarIndicadorMapa("Capa de Incendios activa", "#f59e0b");
     }
 }
 
 function centrarUbicacion() {
     if (mapInstance) {
-        mapInstance.setView([currentLat, currentLon], 10);
+        mapInstance.setView([currentLat, currentLon], 10, { animate: true });
         if (markerInstance) markerInstance.openPopup();
+        actualizarIndicadorMapa("Centrado en GPS actual", "#22c55e");
     }
 }
 
 function verVistaPais() {
     if (mapInstance) {
-        mapInstance.setView([-38.4161, -63.6167], 5);
+        mapInstance.setView([-38.4161, -63.6167], 5, { animate: true });
+        actualizarIndicadorMapa("Vista general de Argentina", "#22c55e");
     }
 }
 
@@ -1033,7 +1111,7 @@ function iconoClima(codigo) {
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
-    if (codigo >= 95) return "⛈️";
+    if (codigo >= 95) return "⛈️️";
     return "⛈️";
 }
 
