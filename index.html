@@ -843,7 +843,7 @@ header {
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- TABLA DE RESUMEN CLIMÁTICO, AGRÍCOLA Y PASO INTEGRADOS -->
+            <!-- TABLA DE RESUMEN CLIMÁTICO Y AGRÍCOLA (SIN DUPLICADOS) -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
                     <span class="resumen-icon">🌧</span>
@@ -916,24 +916,16 @@ header {
                         <strong id="zondaEstado" style="color:var(--accent);">Bajo</strong>
                     </div>
                 </div>
-
-                <div class="resumen-item">
-                    <span class="resumen-icon">🏔️</span>
-                    <div>
-                        <small>Paso Cristo Redentor</small>
-                        <strong id="pasoEstado" style="color:#22c55e;">Conectando...</strong>
-                        <div id="montanaTemp" style="font-size:0.75rem; color:var(--text-muted); margin-top:1px;">--°C en Las Cuevas</div>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- MAPA MULTICAPA CON NASA FIRMS INTEGRADO -->
+        <!-- MAPA MULTICAPA CON RADAR DE LLUVIA Y NASA FIRMS -->
         <div class="card" style="display: flex; flex-direction: column;">
-            <h3 id="mapTitle">🗺️ Visor Geográfico & Incendios (NASA FIRMS)</h3>
+            <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
                 <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topográfico</button>
+                <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia (Radar)</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Incendios (FIRMS)</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
@@ -942,7 +934,7 @@ header {
             <div class="map-wrapper-container">
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <span class="pulse-dot"></span>
-                    <span id="mapStatusText">Visor listo (Conectado a NASA FIRMS)</span>
+                    <span id="mapStatusText">Visor listo (Operativo)</span>
                 </div>
                 <div id="mapaArgentina"></div>
             </div>
@@ -957,6 +949,7 @@ let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
 let capaActual = null;
+let capaLluviaRadar = null;
 let capaFuegosFIRMS = null;
 
 const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
@@ -984,7 +977,7 @@ function actualizarIndicadorMapa(texto, colorDot = "#22c55e") {
 function inicializarMapaArgentina(lat, lon) {
     try {
         if (!mapInstance) {
-            actualizarIndicadorMapa("Cargando cartografía satelital...", "#facc15");
+            actualizarIndicadorMapa("Cargando cartografía...", "#facc15");
             mapInstance = L.map('mapaArgentina', {
                 zoomControl: true,
                 dragging: true,
@@ -995,7 +988,15 @@ function inicializarMapaArgentina(lat, lon) {
             capaActual = capasBase.base;
             capaActual.addTo(mapInstance);
 
-            // Capa WMS oficial corregida con fires_viirs_24 usando tu MAP_KEY
+            // Capa de radar de lluvia (RainViewer)
+            capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/weather-maps/0/{z}/{x}/{y}/256/2_1.png', {
+                tileSize: 256,
+                opacity: 0.65,
+                maxZoom: 18,
+                attribution: '&copy; RainViewer'
+            });
+
+            // Capa WMS oficial de incendios NASA FIRMS
             capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
                 layers: 'fires_viirs_24',
                 format: 'image/png',
@@ -1027,6 +1028,7 @@ function inicializarMapaArgentina(lat, lon) {
 function cambiarCapaMapa(tipo) {
     const btnBase = document.getElementById("btnBase");
     const btnTopo = document.getElementById("btnTopo");
+    const btnLluvia = document.getElementById("btnLluvia");
     const btnFuego = document.getElementById("btnFuego");
     const mapTitle = document.getElementById("mapTitle");
 
@@ -1034,35 +1036,36 @@ function cambiarCapaMapa(tipo) {
 
     btnBase.classList.remove("active");
     btnTopo.classList.remove("active");
+    btnLluvia.classList.remove("active");
     btnFuego.classList.remove("active");
 
-    if (tipo === 'fuego') {
-        if (!mapInstance.hasLayer(capaFuegosFIRMS)) {
-            capaFuegosFIRMS.addTo(mapInstance);
-        }
+    // Limpiamos capas superpuestas especiales
+    if (mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
+    if (mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
+
+    if (tipo === 'lluvia') {
+        if (!mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
+        btnLluvia.classList.add("active");
+        mapTitle.innerText = "🌧️ Radar de Precipitaciones en Vivo";
+        actualizarIndicadorMapa("Capa de Lluvia Activa", "#38bdf8");
+    } else if (tipo === 'fuego') {
+        if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
         btnFuego.classList.add("active");
         mapTitle.innerText = "🔥 Monitoreo de Incendios en Vivo (NASA FIRMS)";
         actualizarIndicadorMapa("Capa de Incendios Activa (Últimas 24hs)", "#f59e0b");
     } else {
-        if (mapInstance.hasLayer(capaFuegosFIRMS)) {
-            mapInstance.removeLayer(capaFuegosFIRMS);
-        }
-
-        if (capaActual) {
-            mapInstance.removeLayer(capaActual);
-        }
-
+        if (capaActual) mapInstance.removeLayer(capaActual);
         capaActual = capasBase[tipo];
         capaActual.addTo(mapInstance);
 
         if (tipo === 'base') {
             btnBase.classList.add("active");
-            mapTitle.innerText = "🗺️ Visor Geográfico & Incendios (NASA FIRMS)";
-            actualizarIndicadorMapa("Capa Estándar activa", "#38bdf8");
+            mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+            actualizarIndicadorMapa("Capa Estándar activa", "#22c55e");
         } else if (tipo === 'topo') {
             btnTopo.classList.add("active");
             mapTitle.innerText = "⛰️ Visor Topográfico Cordillerano";
-            actualizarIndicadorMapa("Capa Topográfica activa", "#38bdf8");
+            actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
         }
     }
 }
@@ -1104,7 +1107,7 @@ function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️";
+    if (codigo <= 67) return "🌧️️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
