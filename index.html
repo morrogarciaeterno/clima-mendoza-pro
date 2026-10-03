@@ -671,6 +671,25 @@ header {
 
     <br>
 
+    <!-- ALERTA DE INCENDIOS POR PROXIMIDAD (NUEVO) -->
+    <div class="card" id="fuegoAlertaCard" style="display: none; border-left: 8px solid #ef4444;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="font-size: 2.5rem;">🔥</span>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; text-transform: uppercase;">Alerta de Fuego</span>
+                        <small style="color: var(--text-muted);">NASA FIRMS (Radio &lt; 100km)</small>
+                    </div>
+                    <h3 id="fuegoAlertaTitulo" style="color: var(--text-main); font-size: 1.1rem; margin-top: 4px; font-weight: 700;">¡Foco de Incendio Detectado Cerca!</h3>
+                    <p id="fuegoAlertaDesc" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2px;">Analizando proximidad satelital...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br id="fuegoEspaciador" style="display: none;">
+
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -843,7 +862,7 @@ header {
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- TABLA DE RESUMEN CLIMÁTICO Y AGRÍCOLA (SIN DUPLICADOS) -->
+            <!-- TABLA DE RESUMEN CLIMÁTICO Y AGRÍCOLA (LIMPIA) -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
                     <span class="resumen-icon">🌧</span>
@@ -919,7 +938,7 @@ header {
             </div>
         </div>
 
-        <!-- MAPA MULTICAPA CON RADAR DE LLUVIA Y NASA FIRMS -->
+        <!-- MAPA MULTICAPA CON RADAR Y FIRMS -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
             <div class="map-controls">
@@ -984,11 +1003,9 @@ function inicializarMapaArgentina(lat, lon) {
                 tap: true
             }).setView([lat, lon], 6);
 
-            // Capa base inicial
             capaActual = capasBase.base;
             capaActual.addTo(mapInstance);
 
-            // Capa de radar de lluvia (RainViewer)
             capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/weather-maps/0/{z}/{x}/{y}/256/2_1.png', {
                 tileSize: 256,
                 opacity: 0.65,
@@ -996,7 +1013,6 @@ function inicializarMapaArgentina(lat, lon) {
                 attribution: '&copy; RainViewer'
             });
 
-            // Capa WMS oficial de incendios NASA FIRMS
             capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
                 layers: 'fires_viirs_24',
                 format: 'image/png',
@@ -1039,7 +1055,6 @@ function cambiarCapaMapa(tipo) {
     btnLluvia.classList.remove("active");
     btnFuego.classList.remove("active");
 
-    // Limpiamos capas superpuestas especiales
     if (mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
     if (mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
 
@@ -1085,6 +1100,77 @@ function verVistaPais() {
     }
 }
 
+function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radio de la tierra en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+async function verificarProximidadIncendios(lat, lon) {
+    const card = document.getElementById("fuegoAlertaCard");
+    const espaciador = document.getElementById("fuegoEspaciador");
+    const desc = document.getElementById("fuegoAlertaDesc");
+    const titulo = document.getElementById("fuegoAlertaTitulo");
+
+    if (!card || !espaciador) return;
+
+    try {
+        // Consultar API CSV de la NASA FIRMS para Sudamérica (VIIRS 24hs)
+        const urlFirmsCSV = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${MAP_KEY_FIRMS}/VIIRS_SNPP_NRT/south-america/1`;
+        const res = await fetch(urlFirmsCSV);
+        if (!res.ok) return;
+        const text = await res.text();
+        const lineas = text.split("\n");
+
+        if (lineas.length <= 1) return;
+
+        // Cabecera típica: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
+        let cabecera = lineas[0].split(",");
+        let idxLat = cabecera.indexOf("latitude");
+        let idxLon = cabecera.indexOf("longitude");
+
+        if (idxLat === -1 || idxLon === -1) {
+            idxLat = 0; idxLon = 1; // Fallback por defecto
+        }
+
+        let fuegoCercanoKm = 9999;
+
+        for (let i = 1; i < lineas.length; i++) {
+            let cols = lineas[i].split(",");
+            if (cols.length > Math.max(idxLat, idxLon)) {
+                let fLat = parseFloat(cols[idxLat]);
+                let fLon = parseFloat(cols[idxLon]);
+                if (!isNaN(fLat) && !isNaN(fLon)) {
+                    let distancia = calcularDistanciaKm(lat, lon, fLat, fLon);
+                    if (distancia < fuegoCercanoKm) {
+                        fuegoCercanoKm = distancia;
+                    }
+                }
+            }
+        }
+
+        if (fuegoCercanoKm <= 100) {
+            card.style.display = "block";
+            espaciador.style.display = "block";
+            card.classList.add("alerta-activa-animacion");
+            titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
+            desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
+        } else {
+            card.style.display = "none";
+            espaciador.style.display = "none";
+            card.classList.remove("alerta-activa-animacion");
+        }
+    } catch (e) {
+        console.warn("No se pudo verificar la proximidad de incendios:", e);
+    }
+}
+
 function actualizarFechaYHoraDigital() {
     try {
         const ahora = new Date();
@@ -1107,7 +1193,7 @@ function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️️";
+    if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
@@ -1552,6 +1638,7 @@ function dispararCargaDeDatos() {
     cargarPolen();
     cargarSismos();
     actualizarAltaMontana();
+    verificarProximidadIncendios(currentLat, currentLon);
 }
 
 function iniciarApp() {
