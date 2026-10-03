@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Clima Mendoza Pro</title>
+<title>Argentina Clima & Alertas</title>
 <style>
 :root {
     --bg: #090d16;
@@ -484,7 +484,7 @@ header {
 <header>
     <div class="header-content">
         <div class="brand">
-            <h1>🌦 Clima Mendoza Pro</h1>
+            <h1>🇦🇷 Argentina Clima & Alertas</h1>
             <p id="ubicacionTexto">Obteniendo ubicación GPS...</p>
         </div>
 
@@ -693,7 +693,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">❄️</span>
+                    <span class="resumen-icon">❄️️</span>
                     <div>
                         <small>Riesgo Helada</small>
                         <strong id="riesgoHelada" style="color:#22c55e;">Sin Riesgo</strong>
@@ -759,7 +759,7 @@ function actualizarFechaYHoraDigital() {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️️";
+    if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
