@@ -727,7 +727,7 @@ header {
 
     <br>
 
-    <!-- NUEVA SECCIÓN: ESTADO DE PASOS FRONTERIZOS FEDERALES -->
+    <!-- ESTADO DE PASOS FRONTERIZOS FEDERALES -->
     <div class="card">
         <h3>🏔️ Estado de Pasos Fronterizos Federales</h3>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
@@ -885,12 +885,12 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL GRANDE CON CAPAS INTERACTIVAS (LLUVIA / VIENTO) -->
+        <!-- MAPA FEDERAL GRANDE CON CAPAS INTERACTIVAS (RADAR LLUVIA / NUBES Y PRESIÓN) -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia / Radar</button>
-                <button class="map-btn" id="btnViento" onclick="cambiarCapaMapa('viento')">💨 Vientos</button>
+                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubosidad y Presión</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 Mi GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
@@ -906,7 +906,7 @@ let currentLon = -68.84;
 let mapInstance = null;
 let markerInstance = null;
 let capaActivaRadar = null;
-let capaActivaViento = null;
+let capaActivaNubes = null;
 
 async function inicializarMapaArgentina(lat, lon) {
     try {
@@ -919,6 +919,7 @@ async function inicializarMapaArgentina(lat, lon) {
                 attribution: '&copy; OpenStreetMap'
             }).addTo(mapInstance);
 
+            // Capa RainViewer (Lluvia)
             try {
                 const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
                 const data = await res.json();
@@ -934,10 +935,11 @@ async function inicializarMapaArgentina(lat, lon) {
                 console.warn("No se pudo cargar la capa de radar:", err);
             }
 
-            capaActivaViento = L.tileLayer('https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=b1b15e88fa797225412429c1c50c122a1', {
-                opacity: 0.6,
-                maxZoom: 10,
-                attribution: '&copy; OpenWeatherMap'
+            // Capa alternativa estable de nubosidad/atmósfera basada en satélite libre (NASA GIBS / WMTS)
+            capaActivaNubes = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2025-01-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
+                opacity: 0.5,
+                maxZoom: 9,
+                attribution: '&copy; NASA GIBS'
             });
         }
 
@@ -956,25 +958,25 @@ async function inicializarMapaArgentina(lat, lon) {
 
 function cambiarCapaMapa(tipo) {
     const btnLluvia = document.getElementById("btnLluvia");
-    const btnViento = document.getElementById("btnViento");
+    const btnNubes = document.getElementById("btnNubes");
     const mapTitle = document.getElementById("mapTitle");
 
     if (!mapInstance) return;
 
     if (tipo === 'lluvia') {
-        if (mapInstance.hasLayer(capaActivaViento)) mapInstance.removeLayer(capaActivaViento);
+        if (mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
         if (capaActivaRadar && !mapInstance.hasLayer(capaActivaRadar)) capaActivaRadar.addTo(mapInstance);
         
         btnLluvia.classList.add("active");
-        btnViento.classList.remove("active");
+        btnNubes.classList.remove("active");
         mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
-    } else if (tipo === 'viento') {
+    } else if (tipo === 'nubes') {
         if (capaActivaRadar && mapInstance.hasLayer(capaActivaRadar)) mapInstance.removeLayer(capaActivaRadar);
-        if (capaActivaViento && !mapInstance.hasLayer(capaActivaViento)) capaActivaViento.addTo(mapInstance);
+        if (capaActivaNubes && !mapInstance.hasLayer(capaActivaNubes)) capaActivaNubes.addTo(mapInstance);
 
-        btnViento.classList.add("active");
+        btnNubes.classList.add("active");
         btnLluvia.classList.remove("active");
-        mapTitle.innerText = "💨 Mapa de Corrientes de Viento en Vivo";
+        mapTitle.innerText = "☁️ Vista Satelital de Nubosidad";
     }
 }
 
@@ -1007,7 +1009,7 @@ function iconoClima(codigo) {
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
-    if (codigo >= 95) return "⛈️️";
+    if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
 
