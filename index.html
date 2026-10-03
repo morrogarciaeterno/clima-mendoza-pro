@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Argentina Clima & Alertas</title>
+<!-- Librería Leaflet para Mapa Interactivo Federal -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
     --bg: #090d16;
@@ -408,12 +411,12 @@ header {
     align-items: stretch;
 }
 
-.radar-img {
+#mapaArgentina {
     width: 100%;
-    height: auto;
+    height: 310px;
     border-radius: 12px;
     margin-top: 10px;
-    object-fit: cover;
+    z-index: 1;
 }
 
 @keyframes alertaParpadeo {
@@ -693,7 +696,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">❄️️</span>
+                    <span class="resumen-icon">❄️</span>
                     <div>
                         <small>Riesgo Helada</small>
                         <strong id="riesgoHelada" style="color:#22c55e;">Sin Riesgo</strong>
@@ -709,7 +712,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">👁️</span>
+                    <span class="resumen-icon">👁️️</span>
                     <div>
                         <small>Visibilidad</small>
                         <strong id="visibilidadKm">-- km</strong>
@@ -735,9 +738,10 @@ header {
             </div>
         </div>
 
+        <!-- MAPA FEDERAL INTERACTIVO DE ARGENTINA -->
         <div class="card" style="display: flex; flex-direction: column;">
-            <h3>🛰 Radar Meteorológico</h3>
-            <img class="radar-img" src="https://www2.contingencias.mendoza.gov.ar/radar/animacion.gif" alt="Radar Mendoza">
+            <h3>🇦🇷 Mapa Federal de Argentina</h3>
+            <div id="mapaArgentina"></div>
         </div>
     </div>
 
@@ -746,6 +750,38 @@ header {
 <script>
 let currentLat = -32.89;
 let currentLon = -68.84;
+let mapInstance = null;
+
+function inicializarMapaArgentina(lat, lon) {
+    try {
+        if (!mapInstance) {
+            // Centro de Argentina por defecto con zoom federal
+            mapInstance = L.map('mapaArgentina').setView([lat, lon], 6);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 10,
+                minZoom: 4,
+                attribution: '&copy; OpenStreetMap & CartoDB'
+            }).addTo(mapInstance);
+        } else {
+            mapInstance.setView([lat, lon], 6);
+        }
+
+        // Limpiar marcadores anteriores si los hubiera e insertar el nuevo pin de ubicación
+        mapInstance.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+                mapInstance.removeLayer(layer);
+            }
+        });
+
+        L.marker([lat, lon]).addTo(mapInstance)
+            .bindPopup("<b>Ubicación Actual (GPS)</b>")
+            .openPopup();
+
+    } catch (e) {
+        console.error("Error al inicializar el mapa:", e);
+    }
+}
 
 function actualizarFechaYHoraDigital() {
     try {
@@ -760,7 +796,7 @@ function actualizarFechaYHoraDigital() {
 
 function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
-    if (codigo <= 2) return "🌤️";
+    if (codigo <= 2) return "🌤️️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
@@ -955,8 +991,8 @@ async function cargarSismos() {
                 const mag = props.mag ? props.mag.toFixed(1) : "--";
                 const lugar = props.place || "Ubicación desconocida";
 
-                const esMendoza = lugar.toUpperCase().includes("MENDOZA") || lugar.toUpperCase().includes("ARGENTINA");
-                const claseColor = esMendoza ? "sismo-mendoza" : "sismo-normal";
+                const esArgentina = lugar.toUpperCase().includes("ARGENTINA") || lugar.toUpperCase().includes("MENDOZA") || lugar.toUpperCase().includes("SAN JUAN") || lugar.toUpperCase().includes("SALTA") || lugar.toUpperCase().includes("JUJUY");
+                const claseColor = esArgentina ? "sismo-mendoza" : "sismo-normal";
 
                 lista.innerHTML += `
                     <tr>
@@ -1137,7 +1173,7 @@ async function cargarClima() {
             if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
             if (elSunIcon) {
                 elSunIcon.style.transform = `rotate(-${angulo}deg)`;
-                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
+                elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️️";
             }
         }
 
@@ -1193,17 +1229,20 @@ function iniciarApp() {
                 currentLat = position.coords.latitude;
                 currentLon = position.coords.longitude;
                 obtenerNombreUbicacion(currentLat, currentLon);
+                inicializarMapaArgentina(currentLat, currentLon);
                 dispararCargaDeDatos();
             },
             (error) => {
-                console.warn("GPS denegado o no disponible, usando Godoy Cruz por defecto.");
+                console.warn("GPS denegado o no disponible, usando coordenadas por defecto.");
                 document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+                inicializarMapaArgentina(currentLat, currentLon);
                 dispararCargaDeDatos();
             },
             { timeout: 8000, maximumAge: 60000, enableHighAccuracy: true }
         );
     } else {
         document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+        inicializarMapaArgentina(currentLat, currentLon);
         dispararCargaDeDatos();
     }
 }
