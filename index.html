@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Argentina Clima & Alertas</title>
-    <!-- Leaflet CSS para el mapa -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body {
@@ -93,7 +93,6 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicializar Mapa de Leaflet centrado en Mendoza por defecto
         const map = L.map('map').setView([-32.89, -68.84], 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -108,7 +107,6 @@
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
 
-                    // Centrar mapa en la posición real del GPS
                     map.setView([lat, lon], 12);
                     marker.setLatLng([lat, lon]);
 
@@ -116,19 +114,10 @@
                         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
                         const data = await response.json();
                         
-                        const ciudadRaw = data.address.city || data.address.town || data.address.village || data.address.county || "Mendoza";
+                        const ciudad = data.address.city || data.address.town || data.address.village || data.address.county || "Mendoza";
                         const estado = data.address.state || "";
                         
-                        // Limpieza para evitar que se repita la palabra "Departamento"
-                        const ciudadLimpia = ciudadRaw.replace(/departamento/gi, '').trim();
-                        const nombreLugar = `Departamento ${ciudadLimpia}, ${estado}`;
-
-                        document.getElementById("lbl-ubicacion").innerText = `📍 ${nombreLugar}`;
-
-                        // Puente con Android nativo
-                        if (window.Android && typeof window.Android.guardarUbicacion === "function") {
-                            window.Android.guardarUbicacion(lat, lon, ciudadLimpia);
-                        }
+                        document.getElementById("lbl-ubicacion").innerText = `📍 Departamento ${ciudad}, ${estado}`;
 
                         obtenerClimaOpenMeteo(lat, lon);
 
@@ -168,11 +157,11 @@
 
         function obtenerTextoCondicion(code) {
             switch (code) {
-                case 0: return "Cielo despejado ☀️";
+                case 0: return "Cielo despejado ☀️️";
                 case 1: case 2: case 3: return "Parcialmente nublado 🌤️";
                 case 45: case 48: return "Neblina 🌫️";
                 default: 
-                    if (code >= 51 && code <= 67) return "Lluvia 🌧️";
+                    if (code >= 51 && code <= 67) return "Lluvia 🌧️️";
                     return "Condiciones estables";
             }
         }
