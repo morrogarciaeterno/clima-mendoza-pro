@@ -875,7 +875,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">🏔️</span>
+                    <span class="resumen-icon">🏔️️</span>
                     <div>
                         <small>Paso Cristo Redentor</small>
                         <strong id="pasoEstado" style="color:#22c55e;">Conectando...</strong>
@@ -885,13 +885,14 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL CON CAPAS DE RADAR Y NUBOSIDAD ATMOSFÉRICA -->
+        <!-- MAPA FEDERAL CON TRES OPCIONES: LLUVIA, NUBES Y FUEGO -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
-                <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia / Radar</button>
-                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubosidad en Vivo</button>
-                <button class="map-btn" onclick="centrarUbicacion()">📍 Mi GPS</button>
+                <button class="map-btn active" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
+                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubes</button>
+                <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Incendios</button>
+                <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
             <div id="mapaArgentina"></div>
@@ -907,6 +908,7 @@ let mapInstance = null;
 let markerInstance = null;
 let capaActivaRadar = null;
 let capaActivaNubes = null;
+let capaActivaFuego = null;
 
 async function inicializarMapaArgentina(lat, lon) {
     try {
@@ -935,11 +937,18 @@ async function inicializarMapaArgentina(lat, lon) {
                 console.warn("No se pudo cargar la capa de radar:", err);
             }
 
-            // Capa de Nubosidad Infrarroja estable y en tiempo real
+            // Capa de Nubosidad Infrarroja
             capaActivaNubes = L.tileLayer('https://tile.rainviewer.com/sat/{z}/{x}/{y}/0/1_1.png', {
                 opacity: 0.6,
                 maxZoom: 10,
                 attribution: '&copy; RainViewer Satellite'
+            });
+
+            // Capa de Focos de Incendio (Utilizando servicio global abierto de detección térmica FIRMS vía teselas públicas WMTS estándar)
+            capaActivaFuego = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Thermal_Anomalies_All/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png', {
+                opacity: 0.7,
+                maxZoom: 9,
+                attribution: '&copy; NASA FIRMS Thermal Anomalies'
             });
         }
 
@@ -959,28 +968,32 @@ async function inicializarMapaArgentina(lat, lon) {
 function cambiarCapaMapa(tipo) {
     const btnLluvia = document.getElementById("btnLluvia");
     const btnNubes = document.getElementById("btnNubes");
+    const btnFuego = document.getElementById("btnFuego");
     const mapTitle = document.getElementById("mapTitle");
 
     if (!mapInstance) return;
 
+    // Limpiar capas activas del mapa
+    if (capaActivaRadar && mapInstance.hasLayer(capaActivaRadar)) mapInstance.removeLayer(capaActivaRadar);
+    if (capaActivaNubes && mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
+    if (capaActivaFuego && mapInstance.hasLayer(capaActivaFuego)) mapInstance.removeLayer(capaActivaFuego);
+
+    btnLluvia.classList.remove("active");
+    btnNubes.classList.remove("active");
+    btnFuego.classList.remove("active");
+
     if (tipo === 'lluvia') {
-        if (mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
-        if (capaActivaRadar && !mapInstance.hasLayer(capaActivaRadar)) capaActivaRadar.addTo(mapInstance);
-        
+        if (capaActivaRadar) capaActivaRadar.addTo(mapInstance);
         btnLluvia.classList.add("active");
-        btnNubes.classList.remove("active");
         mapTitle.innerText = "🛰️ Radar de Lluvias en Vivo";
     } else if (tipo === 'nubes') {
-        mapInstance.eachLayer((layer) => {
-            if (layer._url && layer._url.includes('rainviewer')) {
-                mapInstance.removeLayer(layer);
-            }
-        });
-        if (capaActivaNubes && !mapInstance.hasLayer(capaActivaNubes)) capaActivaNubes.addTo(mapInstance);
-
+        if (capaActivaNubes) capaActivaNubes.addTo(mapInstance);
         btnNubes.classList.add("active");
-        btnLluvia.classList.remove("active");
         mapTitle.innerText = "☁ Nubosidad Atmosférica en Vivo";
+    } else if (tipo === 'fuego') {
+        if (capaActivaFuego) capaActivaFuego.addTo(mapInstance);
+        btnFuego.classList.add("active");
+        mapTitle.innerText = "🔥 Mapa de Focos de Incendio (NASA FIRMS)";
     }
 }
 
@@ -1084,7 +1097,7 @@ function gestionarAlertaSMN(code) {
         if (code === 96 || code === 99) {
             card.style.borderLeftColor = "#ef4444";
             if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
-            if (icono) icono.innerText = "🧊⛈️️";
+            if (icono) icono.innerText = "🧊⛈️";
             if (titulo) titulo.innerText = "¡Alerta Severa por Caída de Granizo!";
             if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas con probable caída de granizo y ráfagas intensas.";
         } else {
