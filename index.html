@@ -460,11 +460,11 @@ header {
     100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* GRILLA DE 3 COLUMNAS PARA QUE LOS BOTONES NO SE DESBORDEN */
+/* GRILLA EXACTA DE 4 COLUMNAS PARA QUE NUNCA SE DESBORDE */
 .map-controls {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
     margin-top: 8px;
 }
 
@@ -472,10 +472,10 @@ header {
     background: var(--card-inner);
     color: var(--text-main);
     border: 1px solid var(--border);
-    padding: 8px 4px;
-    border-radius: 8px;
-    font-size: 0.72rem;
-    font-weight: 600;
+    padding: 8px 2px;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
     cursor: pointer;
     text-align: center;
     white-space: nowrap;
@@ -948,11 +948,11 @@ header {
             <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
-                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topográfico</button>
+                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
+                <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
-                <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
             
@@ -1205,10 +1205,10 @@ function obtenerDireccionViento(grados) {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️️";
+    if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️";
+    if (codigo <= 67) return "🌧️️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
