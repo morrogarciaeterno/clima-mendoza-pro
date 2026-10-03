@@ -615,7 +615,7 @@ header {
     <div class="header-content">
         <div class="brand">
             <h1>🇦🇷 Argentina Clima & Alertas</h1>
-            <p id="ubicacionTexto">Obteniendo ubicación GPS...</p>
+            <p id="ubicacionTexto">Godoy Cruz, Mendoza</p>
         </div>
 
         <div class="date-display">
@@ -1093,7 +1093,7 @@ function cambiarCapaMapa(tipo) {
             actualizarIndicadorMapa("Capa Estándar activa", "#22c55e");
         } else if (tipo === 'topo') {
             btnTopo.classList.add("active");
-            mapTitle.innerText = "⛰️ Visor Topográfico Cordillerano";
+            mapTitle.innerText = "⛰️️ Visor Topográfico Cordillerano";
             actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
         } else if (tipo === 'calles') {
             if (btnCalles) btnCalles.classList.add("active");
@@ -1208,7 +1208,7 @@ function obtenerDireccionViento(grados) {
 function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
-    if (codigo === 3) return "☁️️";
+    if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
@@ -1288,36 +1288,6 @@ function gestionarAlertaSMN(code) {
         card.style.display = "none";
         espaciador.style.display = "none";
         card.classList.remove("alerta-activa-animacion");
-    }
-}
-
-async function obtenerNombreUbicacion(lat, lon) {
-    try {
-        const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=es`);
-        const data = await revRes.json();
-        
-        const elUbi = document.getElementById("ubicacionTexto");
-        let nombreLugar = "Godoy Cruz, Mendoza";
-
-        if (data && data.address) {
-            const ciudad = data.address.city || data.address.town || data.address.village || data.address.county || "Godoy Cruz";
-            const estado = data.address.state || "Mendoza";
-            nombreLugar = `${ciudad}, ${estado}`;
-            if (elUbi) elUbi.innerText = nombreLugar;
-        } else {
-            if (elUbi) elUbi.innerText = nombreLugar;
-        }
-
-        if (window.Android && typeof window.Android.guardarUbicacion === "function") {
-            window.Android.guardarUbicacion(lat, lon, nombreLugar);
-        }
-
-    } catch (e) {
-        const elUbi = document.getElementById("ubicacionTexto");
-        if (elUbi) elUbi.innerText = "Godoy Cruz, Mendoza";
-        if (window.Android && typeof window.Android.guardarUbicacion === "function") {
-            window.Android.guardarUbicacion(lat, lon, "Godoy Cruz, Mendoza");
-        }
     }
 }
 
@@ -1664,65 +1634,37 @@ function dispararCargaDeDatos() {
 }
 
 // ==========================================
-// INICIO INTELIGENTE (ANDROIDE NATIVO + WEB)
+// INICIO SEGURO (ESPERA ORDEN DE ANDROID O USA DEFAULT)
 // ==========================================
 function iniciarApp() {
     actualizarFechaYHoraDigital();
     calcularFaseLunar();
 
-    // 1. Intentar recuperar ubicación inyectada de Android Nativo al instante
-    if (window.Android && typeof window.Android.obtenerLatitudGuardada === "function") {
-        currentLat = window.Android.obtenerLatitudGuardada();
-        currentLon = window.Android.obtenerLongitudGuardada();
-        const nombreAndroid = window.Android.obtenerNombreGuardado();
-
-        const elUbi = document.getElementById("ubicacionTexto");
-        if (elUbi && nombreAndroid) elUbi.innerText = nombreAndroid;
-
-        inicializarMapaArgentina(currentLat, currentLon);
-        dispararCargaDeDatos();
-        return;
-    }
-
-    // 2. Si corre en navegador web normal, usa geolocalización con timeout rápido de 3s
-    let gpsRespondio = false;
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                gpsRespondio = true;
-                procesarUbicacionGPS(position);
-            },
-            (error) => {
-                intentarRecuperarDesdeAndroid();
-            },
-            { timeout: 3000, maximumAge: 0, enableHighAccuracy: true }
-        );
-    }
-
-    setTimeout(() => {
-        if (!gpsRespondio) {
-            intentarRecuperarDesdeAndroid();
+    // Si se abre en un navegador normal (fuera de la app), carga por defecto o usa su GPS
+    if (!window.Android) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    currentLat = position.coords.latitude;
+                    currentLon = position.coords.longitude;
+                    inicializarMapaArgentina(currentLat, currentLon);
+                    dispararCargaDeDatos();
+                },
+                (error) => {
+                    inicializarMapaArgentina(currentLat, currentLon);
+                    dispararCargaDeDatos();
+                },
+                { timeout: 2000 }
+            );
+        } else {
+            inicializarMapaArgentina(currentLat, currentLon);
+            dispararCargaDeDatos();
         }
-    }, 3500);
+    }
+    // Si corre dentro de la app Android, la función "actualizarUbicacionExterna" inyectada por MainActivity tomará el control al cargar.
 }
 
-function procesarUbicacionGPS(position) {
-    currentLat = position.coords.latitude;
-    currentLon = position.coords.longitude;
-    obtenerNombreUbicacion(currentLat, currentLon);
-    inicializarMapaArgentina(currentLat, currentLon);
-    dispararCargaDeDatos();
-}
-
-function intentarRecuperarDesdeAndroid() {
-    currentLat = -32.92;
-    currentLon = -68.84;
-    document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
-    inicializarMapaArgentina(currentLat, currentLon);
-    dispararCargaDeDatos();
-}
-
-// Función que llama Android Nativo al abrir para forzar coordenadas directas
+// Función receptora obligatoria para Android Nativo
 function actualizarUbicacionExterna(lat, lon, nombre) {
     if (lat && lon) {
         currentLat = lat;
