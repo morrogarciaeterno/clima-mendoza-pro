@@ -416,6 +416,16 @@ header {
     object-fit: cover;
 }
 
+@keyframes alertaParpadeo {
+    0% { border-color: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
+    50% { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); }
+    100% { border-color: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
+}
+
+.alerta-activa-animacion {
+    animation: alertaParpadeo 1.5s infinite ease-in-out;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 0 10px 120px 10px !important;
@@ -643,7 +653,7 @@ header {
             <!-- TABLA DE RESUMEN CLIMÁTICO, AGRÍCOLA Y PASO INTEGRADOS -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
-                    <span class="resumen-icon">🌧️️</span>
+                    <span class="resumen-icon">🌧</span>
                     <div>
                         <small>Prob. Lluvia</small>
                         <strong id="probLluvia">--%</strong>
@@ -659,7 +669,7 @@ header {
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">☀️️</span>
+                    <span class="resumen-icon">☀</span>
                     <div>
                         <small>Horas de Sol</small>
                         <strong id="horasSol">-- hs</strong>
@@ -734,7 +744,6 @@ header {
 </div>
 
 <script>
-// Coordenadas base por defecto (Godoy Cruz / Mendoza)
 let currentLat = -32.89;
 let currentLon = -68.84;
 
@@ -813,35 +822,36 @@ function gestionarAlertaSMN(code) {
     if (code >= 95) {
         card.style.display = "block";
         espaciador.style.display = "block";
+        card.classList.add("alerta-activa-animacion");
+
         if (code === 96 || code === 99) {
             card.style.borderLeftColor = "#ef4444";
             if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
             if (icono) icono.innerText = "🧊⛈️";
-            if (titulo) titulo.innerText = "Alerta Severa por Caída de Granizo";
-            if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas acompañadas de probable caída de granizo y ráfagas muy intensas.";
+            if (titulo) titulo.innerText = "¡Alerta Severa por Caída de Granizo!";
+            if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas con probable caída de granizo y ráfagas intensas.";
         } else {
             card.style.borderLeftColor = "#f59e0b";
             if (badge) { badge.style.background = "#f59e0b"; badge.innerText = "Alerta Amarilla - Tormentas"; }
             if (icono) icono.innerText = "⚡⛈️";
-            if (titulo) titulo.innerText = "Alerta por Tormentas Fuertes";
-            if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua en cortos períodos y ráfagas.";
+            if (titulo) titulo.innerText = "¡Atención: Tormentas Fuertes!";
+            if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua y actividad eléctrica.";
         }
     } else {
         card.style.display = "none";
         espaciador.style.display = "none";
+        card.classList.remove("alerta-activa-animacion");
     }
 }
 
 async function obtenerNombreUbicacion(lat, lon) {
     try {
-        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=Mendoza&count=1&language=es&format=json`);
-        // Usamos Nominatim de OpenStreetMap para geolocalización inversa exacta por coordenadas del GPS
         const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=es`);
         const data = await revRes.json();
         
         const elUbi = document.getElementById("ubicacionTexto");
         if (data && data.address) {
-            const ciudad = data.address.city || data.address.town || data.address.village || data.address.county || "Mendoza";
+            const ciudad = data.address.city || data.address.town || data.address.village || data.address.county || "Godoy Cruz";
             const estado = data.address.state || "Mendoza";
             if (elUbi) elUbi.innerText = `${ciudad}, ${estado}`;
         } else {
@@ -1173,7 +1183,6 @@ function dispararCargaDeDatos() {
     actualizarAltaMontana();
 }
 
-// Inicialización de GPS y componentes al arrancar
 function iniciarApp() {
     actualizarFechaYHoraDigital();
     calcularFaseLunar();
