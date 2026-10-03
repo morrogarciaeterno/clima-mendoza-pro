@@ -928,7 +928,7 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL INTERACTIVO CON CAPA DE NUBES GARANTIZADA -->
+        <!-- MAPA FEDERAL INTERACTIVO CON LIMPIEZA DE CAPAS CORREGIDA -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3 id="mapTitle">🛰️ Radar de Lluvias en Vivo</h3>
             <div class="map-controls">
@@ -986,7 +986,7 @@ async function inicializarMapaArgentina(lat, lon) {
             mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
             mapInstance.on('moveend', () => { actualizarIndicadorMapa("Mapa interactivo activo (Arrastrá/Zoom)", "#22c55e"); });
 
-            // Capa RainViewer (Lluvia)
+            // 1. Crear Capa RainViewer (Lluvia)
             try {
                 const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
                 const data = await res.json();
@@ -996,25 +996,30 @@ async function inicializarMapaArgentina(lat, lon) {
                         opacity: 0.65,
                         maxZoom: 10,
                         attribution: '&copy; RainViewer'
-                    }).addTo(mapInstance);
+                    });
                 }
             } catch (err) {
                 console.warn("No se pudo cargar la capa de radar:", err);
             }
 
-            // Capa de Nubosidad Real Global (Servicio público estándar de cobertura nubosa visible)
-            capaActivaNubes = L.tileLayer('https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=b8387258079d8c47b59ebec708769352', {
+            // 2. Crear Capa de Nubes Infrarrojas Globales
+            capaActivaNubes = L.tileLayer('https://tile.rainviewer.com/sat/{z}/{x}/{y}/0/1_1.png', {
                 opacity: 0.75,
                 maxZoom: 10,
-                attribution: '&copy; OpenWeatherMap'
+                attribution: '&copy; RainViewer Satellite'
             });
 
-            // Capa de Focos de Incendio (FIRMS)
+            // 3. Crear Capa de Focos de Incendio (FIRMS)
             capaActivaFuego = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Thermal_Anomalies_All/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png', {
                 opacity: 0.7,
                 maxZoom: 9,
                 attribution: '&copy; NASA FIRMS Thermal Anomalies'
             });
+
+            // Por defecto arrancamos mostrando la capa de Lluvia
+            if (capaActivaRadar) {
+                capaActivaRadar.addTo(mapInstance);
+            }
 
             actualizarIndicadorMapa("Mapa interactivo listo (Arrastrá/Zoom)", "#22c55e");
         }
@@ -1041,6 +1046,7 @@ function cambiarCapaMapa(tipo) {
 
     if (!mapInstance) return;
 
+    // ELIMINAR COMPLETAMENTE todas las capas meteorológicas anteriores del mapa
     if (capaActivaRadar && mapInstance.hasLayer(capaActivaRadar)) mapInstance.removeLayer(capaActivaRadar);
     if (capaActivaNubes && mapInstance.hasLayer(capaActivaNubes)) mapInstance.removeLayer(capaActivaNubes);
     if (capaActivaFuego && mapInstance.hasLayer(capaActivaFuego)) mapInstance.removeLayer(capaActivaFuego);
@@ -1049,6 +1055,7 @@ function cambiarCapaMapa(tipo) {
     btnNubes.classList.remove("active");
     btnFuego.classList.remove("active");
 
+    // Activar únicamente la capa seleccionada
     if (tipo === 'lluvia') {
         if (capaActivaRadar) capaActivaRadar.addTo(mapInstance);
         btnLluvia.classList.add("active");
@@ -1104,7 +1111,7 @@ function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
-    if (codigo <= 67) return "🌧️️";
+    if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
 }
