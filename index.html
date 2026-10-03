@@ -414,10 +414,33 @@ header {
 
 #mapaArgentina {
     width: 100%;
-    height: 310px;
+    height: 520px; /* ¡Mapa grande y aprovechado! */
     border-radius: 12px;
     margin-top: 10px;
     z-index: 1;
+}
+
+.map-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.map-btn {
+    background: var(--card-inner);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.map-btn:hover {
+    background: #374151;
+    border-color: var(--accent);
 }
 
 @keyframes alertaParpadeo {
@@ -478,6 +501,10 @@ header {
 
     .sismos-table-wrapper {
         max-height: 140px !important;
+    }
+
+    #mapaArgentina {
+        height: 380px !important;
     }
 }
 </style>
@@ -739,9 +766,13 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL CON RADAR DE LLUVIA EN TIEMPO REAL -->
+        <!-- MAPA FEDERAL GRANDE CON CONTROLES INTERACTIVOS -->
         <div class="card" style="display: flex; flex-direction: column;">
             <h3>🛰️ Radar de Lluvias en Vivo (Argentina)</h3>
+            <div class="map-controls">
+                <button class="map-btn" onclick="centrarUbicacion()">📍 Centrar en mi GPS</button>
+                <button class="map-btn" onclick="verVistaPais()">🇦🇷 Ver Todo el País</button>
+            </div>
             <div id="mapaArgentina"></div>
         </div>
     </div>
@@ -752,6 +783,7 @@ header {
 let currentLat = -32.89;
 let currentLon = -68.84;
 let mapInstance = null;
+let markerInstance = null;
 
 async function inicializarMapaArgentina(lat, lon) {
     try {
@@ -780,23 +812,31 @@ async function inicializarMapaArgentina(lat, lon) {
             } catch (err) {
                 console.warn("No se pudo cargar la capa de radar en vivo:", err);
             }
-
-        } else {
-            mapInstance.setView([lat, lon], 6);
         }
 
-        mapInstance.eachLayer((layer) => {
-            if (layer instanceof L.Marker) {
-                mapInstance.removeLayer(layer);
-            }
-        });
+        if (markerInstance) {
+            mapInstance.removeLayer(markerInstance);
+        }
 
-        L.marker([lat, lon]).addTo(mapInstance)
+        markerInstance = L.marker([lat, lon]).addTo(mapInstance)
             .bindPopup("<b>Ubicación Actual (GPS)</b>")
             .openPopup();
 
     } catch (e) {
         console.error("Error al inicializar el mapa:", e);
+    }
+}
+
+function centrarUbicacion() {
+    if (mapInstance) {
+        mapInstance.setView([currentLat, currentLon], 10);
+        if (markerInstance) markerInstance.openPopup();
+    }
+}
+
+function verVistaPais() {
+    if (mapInstance) {
+        mapInstance.setView([-38.4161, -63.6167], 5); // Centro geográfico de Argentina
     }
 }
 
@@ -812,7 +852,7 @@ function actualizarFechaYHoraDigital() {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️";
+    if (codigo === 0) return "☀️️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
