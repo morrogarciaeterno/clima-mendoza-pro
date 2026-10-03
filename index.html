@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -738,9 +739,9 @@ header {
             </div>
         </div>
 
-        <!-- MAPA FEDERAL INTERACTIVO DE ARGENTINA -->
+        <!-- MAPA FEDERAL CON RADAR DE LLUVIA EN TIEMPO REAL -->
         <div class="card" style="display: flex; flex-direction: column;">
-            <h3>🇦🇷 Mapa Federal de Argentina</h3>
+            <h3>🛰️ Radar de Lluvias en Vivo (Argentina)</h3>
             <div id="mapaArgentina"></div>
         </div>
     </div>
@@ -752,17 +753,34 @@ let currentLat = -32.89;
 let currentLon = -68.84;
 let mapInstance = null;
 
-function inicializarMapaArgentina(lat, lon) {
+async function inicializarMapaArgentina(lat, lon) {
     try {
         if (!mapInstance) {
             mapInstance = L.map('mapaArgentina').setView([lat, lon], 6);
 
-            // Capa pública y gratuita de OpenStreetMap (Sin API Key requerida)
+            // Mapa base de calles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 10,
                 minZoom: 4,
                 attribution: '&copy; OpenStreetMap'
             }).addTo(mapInstance);
+
+            // Capa de Radar / Precipitaciones en tiempo real (RainViewer API pública)
+            try {
+                const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+                const data = await res.json();
+                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+                    const latestRadar = data.radar.past[data.radar.past.length - 1].path;
+                    L.tileLayer(`https://tile.rainviewer.com${latestRadar}/256/{z}/{x}/{y}/2/1_1.png`, {
+                        opacity: 0.65,
+                        maxZoom: 10,
+                        attribution: '&copy; RainViewer'
+                    }).addTo(mapInstance);
+                }
+            } catch (err) {
+                console.warn("No se pudo cargar la capa de radar en vivo:", err);
+            }
+
         } else {
             mapInstance.setView([lat, lon], 6);
         }
@@ -794,8 +812,8 @@ function actualizarFechaYHoraDigital() {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️️";
-    if (codigo <= 2) return "🌤";
+    if (codigo === 0) return "☀️";
+    if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
     if (codigo >= 95) return "⛈️";
