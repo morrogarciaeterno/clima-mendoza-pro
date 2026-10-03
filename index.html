@@ -671,7 +671,7 @@ header {
 
     <br>
 
-    <!-- ALERTA DE INCENDIOS POR PROXIMIDAD (NUEVO) -->
+    <!-- ALERTA DE INCENDIOS POR PROXIMIDAD -->
     <div class="card" id="fuegoAlertaCard" style="display: none; border-left: 8px solid #ef4444;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -970,6 +970,7 @@ let markerInstance = null;
 let capaActual = null;
 let capaLluviaRadar = null;
 let capaFuegosFIRMS = null;
+let ultimaNotificacionFuego = 0;
 
 const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
@@ -985,6 +986,26 @@ const capasBase = {
         attribution: '&copy; OpenTopoMap'
     })
 };
+
+function solicitarPermisoNotificaciones() {
+    if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+}
+
+function dispararNotificacionPush(titulo, cuerpo) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        // Evitar spam de notificaciones (máximo 1 cada 30 minutos)
+        const ahora = Date.now();
+        if (ahora - ultimaNotificacionFuego > 1800000) {
+            new Notification(titulo, {
+                body: cuerpo,
+                icon: "https://cdn-icons-png.flaticon.com/512/785/785116.png"
+            });
+            ultimaNotificacionFuego = ahora;
+        }
+    }
+}
 
 function actualizarIndicadorMapa(texto, colorDot = "#22c55e") {
     const textEl = document.getElementById("mapStatusText");
@@ -1061,7 +1082,7 @@ function cambiarCapaMapa(tipo) {
     if (tipo === 'lluvia') {
         if (!mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
         btnLluvia.classList.add("active");
-        mapTitle.innerText = "🌧️ Radar de Precipitaciones en Vivo";
+        mapTitle.innerText = "🌧️️ Radar de Precipitaciones en Vivo";
         actualizarIndicadorMapa("Capa de Lluvia Activa", "#38bdf8");
     } else if (tipo === 'fuego') {
         if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
@@ -1080,7 +1101,7 @@ function cambiarCapaMapa(tipo) {
         } else if (tipo === 'topo') {
             btnTopo.classList.add("active");
             mapTitle.innerText = "⛰️ Visor Topográfico Cordillerano";
-            actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
+            actualizarIndicadorMapa("Capa Topográfica activa", "#38bdf8");
         }
     }
 }
@@ -1101,7 +1122,7 @@ function verVistaPais() {
 }
 
 function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radio de la tierra en km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -1121,7 +1142,6 @@ async function verificarProximidadIncendios(lat, lon) {
     if (!card || !espaciador) return;
 
     try {
-        // Consultar API CSV de la NASA FIRMS para Sudamérica (VIIRS 24hs)
         const urlFirmsCSV = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${MAP_KEY_FIRMS}/VIIRS_SNPP_NRT/south-america/1`;
         const res = await fetch(urlFirmsCSV);
         if (!res.ok) return;
@@ -1130,13 +1150,12 @@ async function verificarProximidadIncendios(lat, lon) {
 
         if (lineas.length <= 1) return;
 
-        // Cabecera típica: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
         let cabecera = lineas[0].split(",");
         let idxLat = cabecera.indexOf("latitude");
         let idxLon = cabecera.indexOf("longitude");
 
         if (idxLat === -1 || idxLon === -1) {
-            idxLat = 0; idxLon = 1; // Fallback por defecto
+            idxLat = 0; idxLon = 1;
         }
 
         let fuegoCercanoKm = 9999;
@@ -1156,11 +1175,18 @@ async function verificarProximidadIncendios(lat, lon) {
         }
 
         if (fuegoCercanoKm <= 100) {
+            const distanciaRedondeada = Math.round(fuegoCercanoKm);
             card.style.display = "block";
             espaciador.style.display = "block";
             card.classList.add("alerta-activa-animacion");
-            titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
+            titulo.innerText = `¡Foco detectado a ${distanciaRedondeada} km de tu GPS!`;
             desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
+            
+            // Disparar notificación push a la cinta de notificaciones del celular/PC
+            dispararNotificacionPush(
+                "🔥 ¡Alerta de Incendio Cerca!", 
+                `Se detectó un foco activo a ${distanciaRedondeada} km de tu ubicación actual.`
+            );
         } else {
             card.style.display = "none";
             espaciador.style.display = "none";
@@ -1190,7 +1216,7 @@ function obtenerDireccionViento(grados) {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️";
+    if (codigo === 0) return "☀️️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
@@ -1268,6 +1294,9 @@ function gestionarAlertaSMN(code) {
             if (titulo) titulo.innerText = "¡Atención: Tormentas Fuertes!";
             if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua y actividad eléctrica.";
         }
+        
+        // Notificación push nativa para tormentas severas
+        dispararNotificacionPush("⚠️ Alerta Meteorológica SMN", "Se detectaron condiciones de tormenta severa para tu zona.");
     } else {
         card.style.display = "none";
         espaciador.style.display = "none";
@@ -1644,6 +1673,7 @@ function dispararCargaDeDatos() {
 function iniciarApp() {
     actualizarFechaYHoraDigital();
     calcularFaseLunar();
+    solicitarPermisoNotificaciones();
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
