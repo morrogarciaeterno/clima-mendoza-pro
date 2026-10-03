@@ -615,7 +615,7 @@ header {
     <div class="header-content">
         <div class="brand">
             <h1>🇦🇷 Argentina Clima & Alertas</h1>
-            <p id="ubicacionTexto">Godoy Cruz, Mendoza</p>
+            <p id="ubicacionTexto">Obteniendo ubicación GPS...</p>
         </div>
 
         <div class="date-display">
@@ -1093,7 +1093,7 @@ function cambiarCapaMapa(tipo) {
             actualizarIndicadorMapa("Capa Estándar activa", "#22c55e");
         } else if (tipo === 'topo') {
             btnTopo.classList.add("active");
-            mapTitle.innerText = "⛰️️ Visor Topográfico Cordillerano";
+            mapTitle.innerText = "⛰ Visor Topográfico Cordillerano";
             actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
         } else if (tipo === 'calles') {
             if (btnCalles) btnCalles.classList.add("active");
@@ -1634,37 +1634,40 @@ function dispararCargaDeDatos() {
 }
 
 // ==========================================
-// INICIO SEGURO (ESPERA ORDEN DE ANDROID O USA DEFAULT)
+// INICIO REAL POR GEOLOCALIZACIÓN HTML
 // ==========================================
 function iniciarApp() {
     actualizarFechaYHoraDigital();
     calcularFaseLunar();
 
-    // Si se abre en un navegador normal (fuera de la app), carga por defecto o usa su GPS
-    if (!window.Android) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    currentLat = position.coords.latitude;
-                    currentLon = position.coords.longitude;
-                    inicializarMapaArgentina(currentLat, currentLon);
-                    dispararCargaDeDatos();
-                },
-                (error) => {
-                    inicializarMapaArgentina(currentLat, currentLon);
-                    dispararCargaDeDatos();
-                },
-                { timeout: 2000 }
-            );
-        } else {
-            inicializarMapaArgentina(currentLat, currentLon);
-            dispararCargaDeDatos();
-        }
+    // Intenta obtener la posición GPS real del dispositivo (funciona tanto en Chrome como en Android WebView)
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                currentLat = position.coords.latitude;
+                currentLon = position.coords.longitude;
+                
+                const elUbi = document.getElementById("ubicacionTexto");
+                if (elUbi) elUbi.innerText = "GPS Actual Sincronizado";
+
+                inicializarMapaArgentina(currentLat, currentLon);
+                dispararCargaDeDatos();
+            },
+            (error) => {
+                console.warn("No se pudo obtener el GPS, usando respaldo:", error);
+                // Respaldo por si el usuario deniega o falla el GPS
+                inicializarMapaArgentina(currentLat, currentLon);
+                dispararCargaDeDatos();
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    } else {
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
     }
-    // Si corre dentro de la app Android, la función "actualizarUbicacionExterna" inyectada por MainActivity tomará el control al cargar.
 }
 
-// Función receptora obligatoria para Android Nativo
+// Función receptora por si el nativo quiere empujar datos también
 function actualizarUbicacionExterna(lat, lon, nombre) {
     if (lat && lon) {
         currentLat = lat;
