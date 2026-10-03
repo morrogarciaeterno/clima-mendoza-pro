@@ -759,7 +759,7 @@ function actualizarFechaYHoraDigital() {
 }
 
 function iconoClima(codigo) {
-    if (codigo === 0) return "☀️";
+    if (codigo === 0) return "☀️️";
     if (codigo <= 2) return "🌤️";
     if (codigo === 3) return "☁️";
     if (codigo <= 67) return "🌧️";
@@ -1217,5 +1217,28 @@ setInterval(cargarPolen, 3600000);
 setInterval(cargarSismos, 300000);
 setInterval(actualizarAltaMontana, 300000);
 </script>
+
+<!-- SCRIPT DE PROTECCIÓN CONTRA INSPECCIÓN (F12, Clic derecho y atajos) -->
+<script>
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && e.keyCode === 85) {
+            e.preventDefault();
+            return false;
+        }
+    });
+</script>
+
 </body>
 </html>
