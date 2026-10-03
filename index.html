@@ -1089,7 +1089,7 @@ function cambiarCapaMapa(tipo) {
 
         if (tipo === 'base') {
             btnBase.classList.add("active");
-            mapTitle.innerText = "🗺️️ Visor Geográfico & Radares";
+            mapTitle.innerText = "🗺 Visor Geográfico & Radares";
             actualizarIndicadorMapa("Capa Estándar activa", "#22c55e");
         } else if (tipo === 'topo') {
             btnTopo.classList.add("active");
@@ -1208,7 +1208,7 @@ function obtenerDireccionViento(grados) {
 function iconoClima(codigo) {
     if (codigo === 0) return "☀️";
     if (codigo <= 2) return "🌤️";
-    if (codigo === 3) return "☁️";
+    if (codigo === 3) return "☁️️";
     if (codigo <= 67) return "🌧";
     if (codigo >= 95) return "⛈️";
     return "⛈️";
@@ -1308,7 +1308,6 @@ async function obtenerNombreUbicacion(lat, lon) {
             if (elUbi) elUbi.innerText = nombreLugar;
         }
 
-        // ENVIAR AL PUENTE DE ANDROID NATIVO
         if (window.Android && typeof window.Android.guardarUbicacion === "function") {
             window.Android.guardarUbicacion(lat, lon, nombreLugar);
         }
@@ -1665,51 +1664,46 @@ function dispararCargaDeDatos() {
 }
 
 // ==========================================
-// INICIO CON GPS REAL DE ALTA PRECISIÓN (CERO CACHÉ)
+// INICIO INTELIGENTE (ANDROIDE NATIVO + WEB)
 // ==========================================
 function iniciarApp() {
     actualizarFechaYHoraDigital();
     calcularFaseLunar();
 
-    let gpsRespondio = false;
+    // 1. Intentar recuperar ubicación inyectada de Android Nativo al instante
+    if (window.Android && typeof window.Android.obtenerLatitudGuardada === "function") {
+        currentLat = window.Android.obtenerLatitudGuardada();
+        currentLon = window.Android.obtenerLongitudGuardada();
+        const nombreAndroid = window.Android.obtenerNombreGuardado();
 
+        const elUbi = document.getElementById("ubicacionTexto");
+        if (elUbi && nombreAndroid) elUbi.innerText = nombreAndroid;
+
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
+        return;
+    }
+
+    // 2. Si corre en navegador web normal, usa geolocalización con timeout rápido de 3s
+    let gpsRespondio = false;
     if (navigator.geolocation) {
-        // Intento 1: Exigir alta precisión real sin usar caché previa (maximumAge: 0)
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 gpsRespondio = true;
                 procesarUbicacionGPS(position);
             },
             (error) => {
-                console.warn("GPS inicial demorando, intentando con respaldo Android...");
                 intentarRecuperarDesdeAndroid();
             },
-            { 
-                timeout: 12000,          
-                maximumAge: 0,           
-                enableHighAccuracy: true 
-            }
-        );
-
-        // Intento 2: Refresco rápido por si el chip GPS tardó en despertar
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                if (position.coords.accuracy < 150) { 
-                    gpsRespondio = true;
-                    procesarUbicacionGPS(position);
-                }
-            },
-            null,
-            { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }
+            { timeout: 3000, maximumAge: 0, enableHighAccuracy: true }
         );
     }
 
-    // Margen de seguridad por si el GPS no responde
     setTimeout(() => {
         if (!gpsRespondio) {
             intentarRecuperarDesdeAndroid();
         }
-    }, 6000);
+    }, 3500);
 }
 
 function procesarUbicacionGPS(position) {
@@ -1721,20 +1715,20 @@ function procesarUbicacionGPS(position) {
 }
 
 function intentarRecuperarDesdeAndroid() {
-    if (window.Android && typeof window.Android.obtenerLatitudGuardada === "function") {
-        currentLat = window.Android.obtenerLatitudGuardada();
-        currentLon = window.Android.obtenerLongitudGuardada();
-        const nombreAndroid = window.Android.obtenerNombreGuardado();
+    currentLat = -32.92;
+    currentLon = -68.84;
+    document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+    inicializarMapaArgentina(currentLat, currentLon);
+    dispararCargaDeDatos();
+}
 
+// Función que llama Android Nativo al abrir para forzar coordenadas directas
+function actualizarUbicacionExterna(lat, lon, nombre) {
+    if (lat && lon) {
+        currentLat = lat;
+        currentLon = lon;
         const elUbi = document.getElementById("ubicacionTexto");
-        if (elUbi) elUbi.innerText = nombreAndroid;
-
-        inicializarMapaArgentina(currentLat, currentLon);
-        dispararCargaDeDatos();
-    } else {
-        currentLat = -32.92;
-        currentLon = -68.84;
-        document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+        if (elUbi && nombre) elUbi.innerText = nombre;
         inicializarMapaArgentina(currentLat, currentLon);
         dispararCargaDeDatos();
     }
