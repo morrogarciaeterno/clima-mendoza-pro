@@ -7,6 +7,8 @@
     <!-- Librería Leaflet para Mapa Interactivo Federal -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Librería PapaParse para leer el CSV de NDVI desde GitHub -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root {
             --bg: #090d16;
@@ -398,7 +400,6 @@
             text-align: center;
         }
 
-        /* GLOSARIO / LIBRITO DE AYUDA */
         .glosario-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -571,7 +572,6 @@
             animation: alertaParpadeo 1.5s infinite ease-in-out;
         }
 
-        /* ADAPTACIÓN MÓVIL (PANTALLAS MENORES A 768px) */
         @media (max-width: 768px) {
             .container {
                 padding: 0 6px 100px 6px !important;
@@ -644,7 +644,7 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <h1>🛰️ AgroTech Argentina</h1>
+            <h1>🛰️ Agrotech-Mendoza</h1>
             <p id="ubicacionTexto">Obteniendo ubicación GPS...</p>
         </div>
 
@@ -908,7 +908,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀️️</span>
+                        <span style="font-size: 1.2rem;">☀</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Radiación Solar</small>
                         <strong id="radiacionSolar" style="font-size: 0.88rem; color: var(--text-main);">-- W/m²</strong>
                     </div>
@@ -1023,7 +1023,7 @@
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">💧 VPD (Déficit de Presión de Vapor)</div>
-                            <div class="glosario-desc">Indica la "sed" del aire (en kPa). Valores altos (>1.5) estresan a las plantas y cierran estomas; valores bajos (&lt;0.4) frenan la transpiración.</div>
+                            <div class="glosario-desc">Indica la "sed" del aire (en kPa). Valores altos (>1.5) estresan a las plantas y cierran estomas; values bajos (&lt;0.4) frenan la transpiración.</div>
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">⚖️ Balance Hídrico</div>
@@ -1048,7 +1048,7 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA CON CALLES, RADAR Y FIRMS -->
+        <!-- MAPA MULTICAPA CON CALLES, RADAR, FIRMS Y PLAGAS MENDOZA -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
             <div class="map-controls">
@@ -1058,6 +1058,7 @@
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
+                <button class="map-btn" id="btnPlagas" onclick="toggleCapaPlagas()" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171;">🌱 Plagas</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
 
@@ -1078,6 +1079,7 @@
     let currentLon = -68.84;
     let mapInstance = null;
     let markerInstance = null;
+    let markerPlagas = null;
     let capaActual = null;
     let capaLluviaRadar = null;
     let capaFuegosFIRMS = null;
@@ -1098,7 +1100,7 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
             minZoom: 4,
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, and the GIS User Community'
+            attribution: 'Tiles &copy; Esri'
         })
     };
 
@@ -1203,10 +1205,96 @@
                 actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
             } else if (tipo === 'calles') {
                 if (btnCalles) btnCalles.classList.add("active");
-                mapTitle.innerText = "🛣️️ Red Vial & Localidades";
+                mapTitle.innerText = "🛣 Red Vial & Localidades";
                 actualizarIndicadorMapa("Capa de Calles activa", "#22c55e");
             }
         }
+    }
+
+    // NUEVA FUNCIÓN INTEGRADA PARA ACTIVAR/DESACTIVAR PLAGAS Y NDVI DESDE GITHUB
+    function toggleCapaPlagas() {
+        const btnPlagas = document.getElementById("btnPlagas");
+        const mapTitle = document.getElementById("mapTitle");
+
+        if (!mapInstance) return;
+
+        if (markerPlagas) {
+            mapInstance.removeLayer(markerPlagas);
+            markerPlagas = null;
+            btnPlagas.classList.remove("active");
+            mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+            actualizarIndicadorMapa("Capa de Plagas desactivada", "#22c55e");
+            return;
+        }
+
+        btnPlagas.classList.add("active");
+        mapTitle.innerText = "🌱 Monitoreo de Plagas & NDVI (Mendoza)";
+        actualizarIndicadorMapa("Cargando datos de plagas...", "#38bdf8");
+
+        let latLote = currentLat || -33.65;
+        let lonLote = currentLon || -69.20;
+
+        markerPlagas = L.marker([latLote, lonLote], {
+            draggable: true,
+            icon: L.divIcon({
+                className: 'custom-pin',
+                html: `<div style="background-color: #f39c12; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
+            })
+        }).addTo(mapInstance);
+
+        markerPlagas.bindPopup("<b>Analizando datos de la nube...</b>").openPopup();
+        mapInstance.setView([latLote, lonLote], 13, { animate: true });
+
+        const urlNDVI = "https://raw.githubusercontent.com/morrogarciaeterno/mapas-de-plagas-mza/refs/heads/main/NDVI_Mendoza.csv";
+
+        Papa.parse(urlNDVI, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                let ndviRow = results.data[0] || {};
+                let ndviValue = parseFloat(ndviRow.NDVI) || 0.070;
+
+                let riesgo = "Bajo (Saludable)";
+                let colorRiesgo = "#2ecc71";
+
+                if (ndviValue < 0.4) {
+                    riesgo = "Alto (Estrés / Suelo)";
+                    colorRiesgo = "#ef4444";
+                } else if (ndviValue < 0.6) {
+                    riesgo = "Moderado";
+                    colorRiesgo = "#f39c12";
+                }
+
+                markerPlagas.setIcon(L.divIcon({
+                    className: 'custom-pin',
+                    html: `<div style="background-color: ${colorRiesgo}; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
+                    iconSize: [26, 26],
+                    iconAnchor: [13, 13]
+                }));
+
+                let popupContent = `
+                    <b>📍 Lote Mendoza</b><br>
+                    <b>Riesgo:</b> ${riesgo}<br>
+                    <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}
+                `;
+
+                markerPlagas.setPopupContent(popupContent);
+                markerPlagas.openPopup();
+                actualizarIndicadorMapa("Capa de Plagas sincronizada", "#22c55e");
+            },
+            error: function(err) {
+                console.error("Error al leer el CSV de NDVI:", err);
+                markerPlagas.setPopupContent("<b>Lote Mendoza</b><br>Error al cargar datos remotos.");
+                actualizarIndicadorMapa("Error al cargar datos de plagas", "#ef4444");
+            }
+        });
+
+        markerPlagas.on('dragend', function() {
+            let pos = markerPlagas.getLatLng();
+            actualizarIndicadorMapa(`Lote reubicado: ${pos.lat.toFixed(3)}, ${pos.lng.toFixed(3)}`, "#38bdf8");
+        });
     }
 
     function centrarUbicacion() {
@@ -1316,7 +1404,7 @@
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
         if (codigo <= 67) return "🌧️";
-        if (codigo >= 95) return "⛈️️";
+        if (codigo >= 95) return "⛈";
         return "⛈️";
     }
 
@@ -1606,10 +1694,6 @@
                 }
             }
 
-            const vis = ((data.current.visibility ?? 10000) / 1000).toFixed(0);
-            const elVis = document.getElementById("visibilidadKm");
-            if (elVis) elVis.innerText = vis + " km";
-
             if (data.hourly) {
                 const h = new Date().getHours();
                 if (data.hourly.soil_moisture_0_to_1cm) {
@@ -1666,7 +1750,6 @@
             }
 
             if (elIcon) elIcon.src = iconUrl;
-
             const elTempDesc = document.getElementById("tempDesc");
             if (elTempDesc) elTempDesc.innerText = desc;
 
@@ -1861,17 +1944,6 @@
         }
     }
 
-    function actualizarUbicacionExterna(lat, lon, nombre) {
-        if (lat && lon) {
-            currentLat = lat;
-            currentLon = lon;
-            const elUbi = document.getElementById("ubicacionTexto");
-            if (elUbi && nombre) elUbi.innerText = nombre;
-            inicializarMapaArgentina(currentLat, currentLon);
-            dispararCargaDeDatos();
-        }
-    }
-
     iniciarApp();
 
     setInterval(actualizarFechaYHoraDigital, 1000);
@@ -1880,28 +1952,6 @@
     setInterval(cargarPolen, 3600000);
     setInterval(cargarSismos, 300000);
     setInterval(actualizarAltaMontana, 300000);
-</script>
-
-<!-- SCRIPT DE PROTECCIÓN CONTRA INSPECCIÓN -->
-<script>
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && e.keyCode === 85) {
-            e.preventDefault();
-            return false;
-        }
-    });
 </script>
 
 </body>
