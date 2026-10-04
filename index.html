@@ -670,7 +670,7 @@
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <span id="smnIcono" style="font-size: 2.5rem;">⛈️</span>
+                <span id="smnIcono" style="font-size: 2.5rem;">⚡⛈️</span>
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; text-transform: uppercase;">Alerta SMN</span>
@@ -865,7 +865,7 @@
                 </div>
             </div>
 
-            <!-- MÓDULO RESUMEN AGRÍCOLA & CONDICIONES LOCALES -->
+            <!-- MÓDULO RESUMEN AGRÍCOLA & CONDICIONES LOCALES (INCLUYE HELADAS Y GRANIZO SEPARADOS) -->
             <div class="card" style="margin-top: 15px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
                 <h3 style="color: var(--accent); margin-bottom: 12px;">🌾 Resumen Agrícola & Condiciones Locales</h3>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
@@ -901,21 +901,21 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.3rem;">❄️</span>
+                        <span style="font-size: 1.3rem;">❄️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Riesgo Helada</small>
                         <strong id="riesgoHelada" style="font-size: 0.95rem; color:#22c55e;">Sin Riesgo</strong>
+                    </div>
+
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">🧊</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Riesgo Granizo</small>
+                        <strong id="riesgoGranizo" style="font-size: 0.95rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
 
                     <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
                         <span style="font-size: 1.3rem;">💧</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Evapotranspiración</small>
                         <strong id="etoDiario" style="font-size: 0.95rem; color: var(--text-main);">-- mm</strong>
-                    </div>
-
-                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.3rem;">👁️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Visibilidad</small>
-                        <strong id="visibilidadKm" style="font-size: 0.95rem; color: var(--text-main);">-- km</strong>
                     </div>
 
                     <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
@@ -929,7 +929,7 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA CON CALLES, RADAR Y FIRMS (AGRIGANTADO Y AJUSTADO EN ALTURA) -->
+        <!-- MAPA MULTICAPA CON CALLES, RADAR Y FIRMS -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
             <div class="map-controls">
@@ -1260,10 +1260,10 @@
 
             if (code === 96 || code === 99) {
                 card.style.borderLeftColor = "#ef4444";
-                if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
-                if (icono) icono.innerText = "🧊⛈️";
-                if (titulo) titulo.innerText = "¡Alerta Severa por Caída de Granizo!";
-                if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas con probable caída de granizo y ráfagas intensas.";
+                if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Tormentas Severas"; }
+                if (icono) icono.innerText = "⚡🌪️️";
+                if (titulo) titulo.innerText = "¡Alerta Severa por Tormentas Fuertes!";
+                if (desc) desc.innerText = "Se pronostican tormentas intensas con ráfagas fuertes y abundante caída de agua.";
             } else {
                 card.style.borderLeftColor = "#f59e0b";
                 if (badge) { badge.style.background = "#f59e0b"; badge.innerText = "Alerta Amarilla - Tormentas"; }
@@ -1565,6 +1565,7 @@
                 const elRafagas = document.getElementById("rafagasMax");
                 const elEto = document.getElementById("etoDiario");
                 const elHelada = document.getElementById("riesgoHelada");
+                const elGranizo = document.getElementById("riesgoGranizo");
 
                 if (elProb) elProb.innerText = prob + "%";
                 if (elLluvia) elLluvia.innerText = lluvia + " mm";
@@ -1576,6 +1577,19 @@
                     if (minTemp <= 0) { elHelada.innerText = "Alto (≤0°)"; elHelada.style.color = "#ef4444"; }
                     else if (minTemp <= 3) { elHelada.innerText = "Moderado"; elHelada.style.color = "#facc15"; }
                     else { elHelada.innerText = "Sin Riesgo"; elHelada.style.color = "#22c55e"; }
+                }
+
+                if (elGranizo) {
+                    if (code >= 96) {
+                        elGranizo.innerText = "Alerta Severa";
+                        elGranizo.style.color = "#ef4444";
+                    } else if (code === 95 && prob >= 60) {
+                        elGranizo.innerText = "En Observación";
+                        elGranizo.style.color = "#facc15";
+                    } else {
+                        elGranizo.innerText = "Sin Riesgo";
+                        elGranizo.style.color = "#22c55e";
+                    }
                 }
 
                 const ahora = new Date();
