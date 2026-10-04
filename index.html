@@ -41,7 +41,7 @@
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
             padding: 16px 20px 12px 20px;
-            padding-top: max(32px, env(safe-area-inset-top)); /* Seguro para evitar la barra de estado del celular */
+            padding-top: max(32px, env(safe-area-inset-top));
             position: sticky;
             top: 0;
             z-index: 100;
@@ -796,7 +796,7 @@
 
     <!-- ESTADO DE PASOS FRONTERIZOS FEDERALES -->
     <div class="card">
-        <h3>🏔️ Estado de Pasos Fronterizos Federales</h3>
+        <h3>🏔️️ Estado de Pasos Fronterizos Federales</h3>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
             Monitoreo en tiempo real de los principales corredores bioceánicos de la Cordillera de los Andes.
         </p>
@@ -867,8 +867,8 @@
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- NUEVO MÓDULO INTERMEDIO: CONFORT TÉRMICO & RADIACIÓN SOLAR -->
-            <div class="card" style="margin-top: 15px; margin-bottom: 5px; background: var(--card-inner); border: 1px solid var(--border);">
+            <!-- MÓDULO DE CONFORT TÉRMICO & RADIACIÓN SOLAR (UBICADO CORRECTAMENTE) -->
+            <div class="card" style="margin-top: 15px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
                 <h3 style="color: var(--accent);">⚡ Confort Térmico & Radiación Solar</h3>
                 <div class="resumen-diario-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 10px; background: transparent; padding: 0; border: none;">
                     
@@ -942,7 +942,7 @@
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">❄️</span>
+                    <span class="resumen-icon">❄️️</span>
                     <div>
                         <small>Riesgo Helada</small>
                         <strong id="riesgoHelada" style="color:#22c55e;">Sin Riesgo</strong>
@@ -1307,7 +1307,7 @@
             if (code === 96 || code === 99) {
                 card.style.borderLeftColor = "#ef4444";
                 if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
-                if (icono) icono.innerText = "🧊⛈️️";
+                if (icono) icono.innerText = "🧊⛈️";
                 if (titulo) titulo.innerText = "¡Alerta Severa por Caída de Granizo!";
                 if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas con probable caída de granizo y ráfagas intensas.";
             } else {
@@ -1477,7 +1477,6 @@
             const code = data.current.weather_code ?? 0;
             const radiacion = data.current.shortwave_radiation ?? 0;
 
-            // Cálculo aproximado de Temperatura de Bulbo Húmedo (Stull formula simplificada)
             const tw = temp * Math.atan(0.151977 * Math.pow(humedad + 8.313659, 0.5)) + Math.atan(temp + humedad) - Math.atan(humedad - 1.676331) + 0.00391838 * Math.pow(humedad, 1.5) * Math.atan(0.023101 * humedad) - 4.686035;
 
             const elBulbo = document.getElementById("bulboHumedad");
@@ -1690,9 +1689,6 @@
         verificarProximidadIncendios(currentLat, currentLon);
     }
 
-    // ==========================================
-    // INICIO REAL POR GEOLOCALIZACIÓN HTML CON CIUDAD AUTOMÁTICA
-    // ==========================================
     function iniciarApp() {
         actualizarFechaYHoraDigital();
         calcularFaseLunar();
@@ -1741,7 +1737,6 @@
         }
     }
 
-    // Función receptora por si el nativo quiere empujar datos también
     function actualizarUbicacionExterna(lat, lon, nombre) {
         if (lat && lon) {
             currentLat = lat;
