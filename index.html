@@ -825,7 +825,7 @@
 
     <!-- ESTADO DE PASOS FRONTERIZOS FEDERALES -->
     <div class="card">
-        <h3>🏔️ Estado de Pasos Fronterizos Federales</h3>
+        <h3>🏔️️ Estado de Pasos Fronterizos Federales</h3>
         <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
             Monitoreo en tiempo real de los principales corredores bioceánicos cordilleranos.
         </p>
@@ -958,7 +958,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️</span>
+                        <span style="font-size: 1.2rem;">🌡️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Temp. Suelo</small>
                         <strong id="tempSuelo" style="font-size: 0.88rem; color: var(--text-main);">-- °C</strong>
                     </div>
@@ -1211,7 +1211,7 @@
         }
     }
 
-    // NUEVA FUNCIÓN INTEGRADA PARA ACTIVAR/DESACTIVAR PLAGAS Y NDVI DESDE GITHUB
+    // FUNCIÓN DE PLAGAS Y NDVI CON CLIMA ACTUALIZADO EN EL POPUP
     function toggleCapaPlagas() {
         const btnPlagas = document.getElementById("btnPlagas");
         const mapTitle = document.getElementById("mapTitle");
@@ -1229,7 +1229,7 @@
 
         btnPlagas.classList.add("active");
         mapTitle.innerText = "🌱 Monitoreo de Plagas & NDVI (Mendoza)";
-        actualizarIndicadorMapa("Cargando datos de plagas...", "#38bdf8");
+        actualizarIndicadorMapa("Cargando datos y clima...", "#38bdf8");
 
         let latLote = currentLat || -33.65;
         let lonLote = currentLon || -69.20;
@@ -1244,52 +1244,69 @@
             })
         }).addTo(mapInstance);
 
-        markerPlagas.bindPopup("<b>Analizando datos de la nube...</b>").openPopup();
+        markerPlagas.bindPopup("<b>Consultando clima y nube...</b>").openPopup();
         mapInstance.setView([latLote, lonLote], 13, { animate: true });
 
-        const urlNDVI = "https://raw.githubusercontent.com/morrogarciaeterno/mapas-de-plagas-mza/refs/heads/main/NDVI_Mendoza.csv";
+        // Consultar el clima en tiempo real de la ubicación
+        const urlClimaAPI = `https://api.open-meteo.com/v1/forecast?latitude=${latLote}&longitude=${lonLote}&current=temperature_2m,relative_humidity_2m`;
 
-        Papa.parse(urlNDVI, {
-            download: true,
-            header: true,
-            complete: function(results) {
-                let ndviRow = results.data[0] || {};
-                let ndviValue = parseFloat(ndviRow.NDVI) || 0.070;
+        fetch(urlClimaAPI)
+            .then(response => response.json())
+            .then(climaData => {
+                let tempActual = "--";
+                let humActual = "--";
 
-                let riesgo = "Bajo (Saludable)";
-                let colorRiesgo = "#2ecc71";
-
-                if (ndviValue < 0.4) {
-                    riesgo = "Alto (Estrés / Suelo)";
-                    colorRiesgo = "#ef4444";
-                } else if (ndviValue < 0.6) {
-                    riesgo = "Moderado";
-                    colorRiesgo = "#f39c12";
+                if (climaData && climaData.current) {
+                    tempActual = climaData.current.temperature_2m;
+                    humActual = climaData.current.relative_humidity_2m;
                 }
 
-                markerPlagas.setIcon(L.divIcon({
-                    className: 'custom-pin',
-                    html: `<div style="background-color: ${colorRiesgo}; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
-                    iconSize: [26, 26],
-                    iconAnchor: [13, 13]
-                }));
+                // Leer el CSV de NDVI de GitHub
+                const urlNDVI = "https://raw.githubusercontent.com/morrogarciaeterno/mapas-de-plagas-mza/refs/heads/main/NDVI_Mendoza.csv";
 
-                let popupContent = `
-                    <b>📍 Lote Mendoza</b><br>
-                    <b>Riesgo:</b> ${riesgo}<br>
-                    <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}
-                `;
+                Papa.parse(urlNDVI, {
+                    download: true,
+                    header: true,
+                    complete: function(results) {
+                        let ndviRow = results.data[0] || {};
+                        let ndviValue = parseFloat(ndviRow.NDVI) || 0.070;
 
-                markerPlagas.setPopupContent(popupContent);
-                markerPlagas.openPopup();
-                actualizarIndicadorMapa("Capa de Plagas sincronizada", "#22c55e");
-            },
-            error: function(err) {
-                console.error("Error al leer el CSV de NDVI:", err);
-                markerPlagas.setPopupContent("<b>Lote Mendoza</b><br>Error al cargar datos remotos.");
-                actualizarIndicadorMapa("Error al cargar datos de plagas", "#ef4444");
-            }
-        });
+                        let riesgo = "Bajo (Saludable)";
+                        let colorRiesgo = "#2ecc71";
+
+                        if (ndviValue < 0.4) {
+                            riesgo = "Alto (Estrés / Suelo)";
+                            colorRiesgo = "#ef4444";
+                        } else if (ndviValue < 0.6) {
+                            riesgo = "Moderado";
+                            colorRiesgo = "#f39c12";
+                        }
+
+                        markerPlagas.setIcon(L.divIcon({
+                            className: 'custom-pin',
+                            html: `<div style="background-color: ${colorRiesgo}; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
+                            iconSize: [26, 26],
+                            iconAnchor: [13, 13]
+                        }));
+
+                        let popupContent = `
+                            <b>📍 Coordenadas:</b> ${latLote.toFixed(3)}, ${lonLote.toFixed(3)}<br>
+                            <b>Riesgo:</b> ${riesgo}<br>
+                            <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
+                            <b>Temperatura:</b> ${tempActual} °C<br>
+                            <b>Humedad:</b> ${humActual} %
+                        `;
+
+                        markerPlagas.setPopupContent(popupContent);
+                        markerPlagas.openPopup();
+                        actualizarIndicadorMapa("Capa de Plagas y Clima sincronizada", "#22c55e");
+                    }
+                });
+            })
+            .catch(err => {
+                console.error("Error al obtener clima:", err);
+                actualizarIndicadorMapa("Error al conectar con la API de clima", "#ef4444");
+            });
 
         markerPlagas.on('dragend', function() {
             let pos = markerPlagas.getLatLng();
