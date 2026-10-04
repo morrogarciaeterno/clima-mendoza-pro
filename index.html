@@ -867,7 +867,33 @@
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- TABLA DE RESUMEN CLIMÁTICO, AGRÍCOLA Y CONFORT UNIFICADA -->
+            <!-- MÓDULO INDEPENDIENTE CON TÍTULO Y 3 COLUMNAS LIMPIAS -->
+            <div class="card" style="margin-top: 15px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 12px;">⚡ Confort Térmico & Radiación Solar</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                    
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">🌡️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Bulbo Húmedo</small>
+                        <strong id="bulboHumedad" style="font-size: 0.95rem; color: var(--text-main);">-- °C</strong>
+                    </div>
+
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">☀️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Radiación Solar</small>
+                        <strong id="radiacionSolar" style="font-size: 0.95rem; color: var(--text-main);">-- W/m²</strong>
+                    </div>
+
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">⚡</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Estrés Térmico</small>
+                        <strong id="estresTermico" style="font-size: 0.95rem; color: #22c55e;">Confortable</strong>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TABLA DE RESUMEN CLIMÁTICO Y AGRÍCOLA -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
                     <span class="resumen-icon">🌧</span>
@@ -933,36 +959,11 @@
                     </div>
                 </div>
 
-                <div class="resumen-item">
+                <div class="resumen-item" style="grid-column: span 2;">
                     <span class="resumen-icon" id="zondaIcono">🟢</span>
                     <div>
                         <small>Riesgo Zonda</small>
                         <strong id="zondaEstado" style="color:var(--accent);">Bajo</strong>
-                    </div>
-                </div>
-
-                <!-- NUEVAS MÉTRICAS UNIFICADAS EN EL MISMO DISEÑO -->
-                <div class="resumen-item">
-                    <span class="resumen-icon">🌡️</span>
-                    <div>
-                        <small>Bulbo Húmedo</small>
-                        <strong id="bulboHumedad">-- °C</strong>
-                    </div>
-                </div>
-
-                <div class="resumen-item">
-                    <span class="resumen-icon">☀️</span>
-                    <div>
-                        <small>Radiación Solar</small>
-                        <strong id="radiacionSolar">-- W/m²</strong>
-                    </div>
-                </div>
-
-                <div class="resumen-item" style="grid-column: span 2; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;">
-                    <span class="resumen-icon">⚡</span>
-                    <div>
-                        <small>Estrés Térmico / Confort</small>
-                        <strong id="estresTermico" style="color:#22c55e;">Confortable</strong>
                     </div>
                 </div>
             </div>
