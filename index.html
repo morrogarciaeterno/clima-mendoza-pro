@@ -796,7 +796,7 @@
 
     <!-- ESTADO DE PASOS FRONTERIZOS FEDERALES -->
     <div class="card">
-        <h3>🏔️️ Estado de Pasos Fronterizos Federales</h3>
+        <h3>🏔️ Estado de Pasos Fronterizos Federales</h3>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
             Monitoreo en tiempo real de los principales corredores bioceánicos de la Cordillera de los Andes.
         </p>
@@ -867,39 +867,7 @@
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- MÓDULO DE CONFORT TÉRMICO & RADIACIÓN SOLAR (UBICADO CORRECTAMENTE) -->
-            <div class="card" style="margin-top: 15px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent);">⚡ Confort Térmico & Radiación Solar</h3>
-                <div class="resumen-diario-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 10px; background: transparent; padding: 0; border: none;">
-                    
-                    <div class="resumen-item">
-                        <span class="resumen-icon">🌡️</span>
-                        <div>
-                            <small>Bulbo Húmedo</small>
-                            <strong id="bulboHumedad">-- °C</strong>
-                        </div>
-                    </div>
-
-                    <div class="resumen-item">
-                        <span class="resumen-icon">☀️</span>
-                        <div>
-                            <small>Radiación Solar</small>
-                            <strong id="radiacionSolar">-- W/m²</strong>
-                        </div>
-                    </div>
-
-                    <div class="resumen-item">
-                        <span class="resumen-icon">⚡</span>
-                        <div>
-                            <small>Estrés Térmico</small>
-                            <strong id="estresTermico" style="color:#22c55e;">Confortable</strong>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- TABLA DE RESUMEN CLIMÁTICO Y AGRÍCOLA -->
+            <!-- TABLA DE RESUMEN CLIMÁTICO, AGRÍCOLA Y CONFORT UNIFICADA -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
                     <span class="resumen-icon">🌧</span>
@@ -942,7 +910,7 @@
                 </div>
 
                 <div class="resumen-item">
-                    <span class="resumen-icon">❄️️</span>
+                    <span class="resumen-icon">❄️</span>
                     <div>
                         <small>Riesgo Helada</small>
                         <strong id="riesgoHelada" style="color:#22c55e;">Sin Riesgo</strong>
@@ -970,6 +938,31 @@
                     <div>
                         <small>Riesgo Zonda</small>
                         <strong id="zondaEstado" style="color:var(--accent);">Bajo</strong>
+                    </div>
+                </div>
+
+                <!-- NUEVAS MÉTRICAS UNIFICADAS EN EL MISMO DISEÑO -->
+                <div class="resumen-item">
+                    <span class="resumen-icon">🌡️</span>
+                    <div>
+                        <small>Bulbo Húmedo</small>
+                        <strong id="bulboHumedad">-- °C</strong>
+                    </div>
+                </div>
+
+                <div class="resumen-item">
+                    <span class="resumen-icon">☀️</span>
+                    <div>
+                        <small>Radiación Solar</small>
+                        <strong id="radiacionSolar">-- W/m²</strong>
+                    </div>
+                </div>
+
+                <div class="resumen-item" style="grid-column: span 2; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;">
+                    <span class="resumen-icon">⚡</span>
+                    <div>
+                        <small>Estrés Térmico / Confort</small>
+                        <strong id="estresTermico" style="color:#22c55e;">Confortable</strong>
                     </div>
                 </div>
             </div>
