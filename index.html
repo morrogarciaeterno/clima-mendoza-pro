@@ -184,38 +184,6 @@
             color: var(--text-muted);
         }
 
-        .resumen-diario-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px 12px;
-            margin-top: 15px;
-            background: var(--card-inner);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .resumen-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .resumen-icon {
-            font-size: 1.5rem;
-        }
-
-        .resumen-item small {
-            display: block;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-        }
-
-        .resumen-item strong {
-            color: var(--text-main);
-            font-size: 0.95rem;
-        }
-
         .dashboard-row {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr;
@@ -867,7 +835,7 @@
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <!-- MÓDULO INDEPENDIENTE CON TÍTULO Y 3 COLUMNAS LIMPIAS -->
+            <!-- MÓDULO DE CONFORT TÉRMICO & RADIACIÓN SOLAR -->
             <div class="card" style="margin-top: 15px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
                 <h3 style="color: var(--accent); margin-bottom: 12px;">⚡ Confort Térmico & Radiación Solar</h3>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
@@ -893,80 +861,68 @@
                 </div>
             </div>
 
-            <!-- TABLA DE RESUMEN CLIMÁTICO Y AGRÍCOLA -->
-            <div class="resumen-diario-grid">
-                <div class="resumen-item">
-                    <span class="resumen-icon">🌧</span>
-                    <div>
-                        <small>Prob. Lluvia</small>
-                        <strong id="probLluvia">--%</strong>
+            <!-- MÓDULO RESUMEN AGRÍCOLA & CONDICIONES LOCALES (EN TRES COLUMNAS CON CUADRADITOS) -->
+            <div class="card" style="margin-top: 15px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 12px;">🌾 Resumen Agrícola & Condiciones Locales</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                    
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">🌧️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Prob. Lluvia</small>
+                        <strong id="probLluvia" style="font-size: 0.95rem; color: var(--text-main);">--%</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item">
-                    <span class="resumen-icon">💧</span>
-                    <div>
-                        <small>Lluvia Total</small>
-                        <strong id="lluviaAcum">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Lluvia Total</small>
+                        <strong id="lluviaAcum" style="font-size: 0.95rem; color: var(--text-main);">-- mm</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item">
-                    <span class="resumen-icon">☀</span>
-                    <div>
-                        <small>Horas de Sol</small>
-                        <strong id="horasSol">-- hs</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">☀️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Horas de Sol</small>
+                        <strong id="horasSol" style="font-size: 0.95rem; color: var(--text-main);">-- hs</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item">
-                    <span class="resumen-icon">💨</span>
-                    <div>
-                        <small>Ráfagas Máx.</small>
-                        <strong id="rafagasMax">-- km/h</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">💨</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Ráfagas Máx.</small>
+                        <strong id="rafagasMax" style="font-size: 0.95rem; color: var(--text-main);">-- km/h</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item">
-                    <span class="resumen-icon">🌱</span>
-                    <div>
-                        <small>Humedad Suelo</small>
-                        <strong id="humSuelo">-- %</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">🌱</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Humedad Suelo</small>
+                        <strong id="humSuelo" style="font-size: 0.95rem; color: var(--text-main);">-- %</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item">
-                    <span class="resumen-icon">❄️</span>
-                    <div>
-                        <small>Riesgo Helada</small>
-                        <strong id="riesgoHelada" style="color:#22c55e;">Sin Riesgo</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">❄️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Riesgo Helada</small>
+                        <strong id="riesgoHelada" style="font-size: 0.95rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item">
-                    <span class="resumen-icon">💧</span>
-                    <div>
-                        <small>Evapotranspiración</small>
-                        <strong id="etoDiario">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Evapotranspiración</small>
+                        <strong id="etoDiario" style="font-size: 0.95rem; color: var(--text-main);">-- mm</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item">
-                    <span class="resumen-icon">👁</span>
-                    <div>
-                        <small>Visibilidad</small>
-                        <strong id="visibilidadKm">-- km</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;">👁️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Visibilidad</small>
+                        <strong id="visibilidadKm" style="font-size: 0.95rem; color: var(--text-main);">-- km</strong>
                     </div>
-                </div>
 
-                <div class="resumen-item" style="grid-column: span 2;">
-                    <span class="resumen-icon" id="zondaIcono">🟢</span>
-                    <div>
-                        <small>Riesgo Zonda</small>
-                        <strong id="zondaEstado" style="color:var(--accent);">Bajo</strong>
+                    <div style="background: var(--card-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.3rem;" id="zondaIcono">🟢</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Riesgo Zonda</small>
+                        <strong id="zondaEstado" style="font-size: 0.95rem; color:var(--accent);">Bajo</strong>
                     </div>
+
                 </div>
             </div>
+
         </div>
 
         <!-- MAPA MULTICAPA CON CALLES, RADAR Y FIRMS -->
