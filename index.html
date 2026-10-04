@@ -867,6 +867,38 @@
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
+            <!-- NUEVO MÓDULO INTERMEDIO: CONFORT TÉRMICO & RADIACIÓN SOLAR -->
+            <div class="card" style="margin-top: 15px; margin-bottom: 5px; background: var(--card-inner); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent);">⚡ Confort Térmico & Radiación Solar</h3>
+                <div class="resumen-diario-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 10px; background: transparent; padding: 0; border: none;">
+                    
+                    <div class="resumen-item">
+                        <span class="resumen-icon">🌡️</span>
+                        <div>
+                            <small>Bulbo Húmedo</small>
+                            <strong id="bulboHumedad">-- °C</strong>
+                        </div>
+                    </div>
+
+                    <div class="resumen-item">
+                        <span class="resumen-icon">☀️</span>
+                        <div>
+                            <small>Radiación Solar</small>
+                            <strong id="radiacionSolar">-- W/m²</strong>
+                        </div>
+                    </div>
+
+                    <div class="resumen-item">
+                        <span class="resumen-icon">⚡</span>
+                        <div>
+                            <small>Estrés Térmico</small>
+                            <strong id="estresTermico" style="color:#22c55e;">Confortable</strong>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- TABLA DE RESUMEN CLIMÁTICO Y AGRÍCOLA -->
             <div class="resumen-diario-grid">
                 <div class="resumen-item">
@@ -1275,7 +1307,7 @@
             if (code === 96 || code === 99) {
                 card.style.borderLeftColor = "#ef4444";
                 if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Granizo"; }
-                if (icono) icono.innerText = "🧊⛈️";
+                if (icono) icono.innerText = "🧊⛈️️";
                 if (titulo) titulo.innerText = "¡Alerta Severa por Caída de Granizo!";
                 if (desc) desc.innerText = "Se pronostican tormentas fuertes/severas con probable caída de granizo y ráfagas intensas.";
             } else {
@@ -1428,7 +1460,7 @@
 
     async function cargarClima() {
         try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,visibility&hourly=temperature_2m,surface_pressure,weather_code,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza`;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,visibility,shortwave_radiation&hourly=temperature_2m,surface_pressure,weather_code,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza`;
             const res = await fetch(url);
             const data = await res.json();
 
@@ -1443,6 +1475,30 @@
             const presionActual = data.current.surface_pressure ?? 1013;
             const uv = data.current.uv_index ?? 0;
             const code = data.current.weather_code ?? 0;
+            const radiacion = data.current.shortwave_radiation ?? 0;
+
+            // Cálculo aproximado de Temperatura de Bulbo Húmedo (Stull formula simplificada)
+            const tw = temp * Math.atan(0.151977 * Math.pow(humedad + 8.313659, 0.5)) + Math.atan(temp + humedad) - Math.atan(humedad - 1.676331) + 0.00391838 * Math.pow(humedad, 1.5) * Math.atan(0.023101 * humedad) - 4.686035;
+
+            const elBulbo = document.getElementById("bulboHumedad");
+            const elRad = document.getElementById("radiacionSolar");
+            const elEstres = document.getElementById("estresTermico");
+
+            if (elBulbo) elBulbo.innerText = tw.toFixed(1) + " °C";
+            if (elRad) elRad.innerText = Math.round(radiacion) + " W/m²";
+
+            if (elEstres) {
+                if (temp >= 32 && humedad > 50) {
+                    elEstres.innerText = "Peligroso";
+                    elEstres.style.color = "#ef4444";
+                } else if (temp >= 28) {
+                    elEstres.innerText = "Moderado";
+                    elEstres.style.color = "#facc15";
+                } else {
+                    elEstres.innerText = "Confortable";
+                    elEstres.style.color = "#22c55e";
+                }
+            }
 
             const elTemp = document.getElementById("temp");
             const elSt = document.getElementById("stTemp");
@@ -1468,7 +1524,7 @@
                 const diffPresion = presionActual - presionPasada;
 
                 if (diffPresion < -2.5) {
-                    if (elPresionTendencia) { elPresionTendencia.innerText = "⚠️️ Caída brusca (Alerta Zonda/Frente)"; elPresionTendencia.style.color = "#ef4444"; }
+                    if (elPresionTendencia) { elPresionTendencia.innerText = "⚠ Caída brusca (Alerta Zonda/Frente)"; elPresionTendencia.style.color = "#ef4444"; }
                 } else if (diffPresion < -1) {
                     if (elPresionTendencia) { elPresionTendencia.innerText = "📉 En descenso"; elPresionTendencia.style.color = "#facc15"; }
                 } else if (diffPresion > 1) {
