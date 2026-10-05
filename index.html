@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Test Radar Meteorológico</title>
+<title>Mapa Test</title>
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -15,32 +15,28 @@ html,body{
     margin:0;
     padding:0;
     height:100%;
-    background:#111827;
-    color:white;
     font-family:Arial,sans-serif;
 }
 
 #map{
-    height:100vh;
     width:100%;
+    height:100vh;
 }
 
 .panel{
     position:absolute;
-    z-index:9999;
     top:10px;
     left:10px;
-    background:rgba(17,24,39,.95);
+    z-index:9999;
+    background:white;
     padding:10px;
     border-radius:10px;
-    border:1px solid #374151;
+    box-shadow:0 0 10px rgba(0,0,0,.3);
 }
 
 button{
-    margin:3px;
     padding:8px 12px;
-    border:none;
-    border-radius:6px;
+    margin:3px;
     cursor:pointer;
 }
 
@@ -51,11 +47,11 @@ button{
 
 <div class="panel">
 
-<button onclick="mostrarBase()">🌍 Base</button>
+<button id="btnBase">🌍 Base</button>
 
-<button onclick="irArgentina()">🇦🇷 Argentina</button>
+<button id="btnArgentina">🇦🇷 Argentina</button>
 
-<button onclick="irGPS()">📍 GPS</button>
+<button id="btnGPS">📍 GPS</button>
 
 </div>
 
@@ -65,62 +61,89 @@ button{
 
 <script>
 
-// CREAR MAPA
+// Crear mapa
 
-const mapa = L.map('map').setView(
-    [-38.4161,-63.6167],
-    5
+const map = L.map('map').setView(
+[-38.4161,-63.6167],
+5
 );
 
-// CAPA BASE
+// Capa OSM
 
-const capaBase = L.tileLayer(
+const osm = L.tileLayer(
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-    attribution:'© OpenStreetMap'
+attribution:'© OpenStreetMap'
 }
 );
 
-capaBase.addTo(mapa);
+osm.addTo(map);
 
-// FUNCIONES
+// Botón Argentina
 
-function mostrarBase(){
+document
+.getElementById('btnArgentina')
+.addEventListener('click',function(){
 
-    mapa.eachLayer(function(layer){
-
-        if(layer !== capaBase){
-            mapa.removeLayer(layer);
-        }
-
-    });
-
-}
-
-function irArgentina(){
-
-    mapa.setView(
+    map.setView(
         [-38.4161,-63.6167],
         5
     );
 
-}
+});
 
-function irGPS(){
+// Botón Base
+
+document
+.getElementById('btnBase')
+.addEventListener('click',function(){
+
+    alert('Mapa Base OK');
+
+});
+
+// Botón GPS
+
+document
+.getElementById('btnGPS')
+.addEventListener('click',function(){
 
     navigator.geolocation.getCurrentPosition(
 
         function(pos){
 
-            let lat = pos.coords.latitude;
-            let lon = pos.coords.longitude;
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
 
             L.marker([lat,lon])
-            .addTo(mapa)
+            .addTo(map)
             .bindPopup("Tu ubicación")
             .openPopup();
 
-            mapa.setView(
+            map.setView(
                 [lat,lon],
                 12
-  
+            );
+
+        },
+
+        function(error){
+
+            alert(
+              "No se pudo obtener GPS"
+            );
+
+            console.log(error);
+
+        }
+
+    );
+
+});
+
+console.log("TODO OK");
+
+</script>
+
+</body>
+</html>
