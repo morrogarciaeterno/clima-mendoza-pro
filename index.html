@@ -1575,14 +1575,15 @@
             }
             if (markerInstance) mapInstance.removeLayer(markerInstance);
             
+            // Marcador GPS personalizado con un tractor 🚜
             markerInstance = L.marker([lat, lon], {
                 icon: L.divIcon({
-                    className: 'custom-gps-pin',
-                    html: `<div style="background-color: #38bdf8; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`,
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
+                    className: 'custom-tractor-pin',
+                    html: `<div style="background-color: #111827; width: 34px; height: 34px; border-radius: 50%; border: 2px solid #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);">🚜</div>`,
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17]
                 })
-            }).addTo(mapInstance).bindPopup("<b>Ubicación GPS Actual</b>").openPopup();
+            }).addTo(mapInstance).bindPopup("<b>Ubicación GPS Actual (Tractor)</b>").openPopup();
 
             mapInstance.setView([lat, lon], 15);
         } catch (e) {}
@@ -1774,7 +1775,7 @@
             if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
             capaActual.addTo(mapInstance);
-            if (tipo === 'base') { btnBase.classList.add("active"); mapTitle.innerText = "🗺️ Visor Geográfico"; }
+            if (tipo === 'base') { btnBase.classList.add("active"); mapTitle.innerText = "🗺️️ Visor Geográfico"; }
             else if (tipo === 'topo') { btnTopo.classList.add("active"); mapTitle.innerText = "⛰️ Visor Topográfico"; }
             else if (tipo === 'calles') { if (btnCalles) btnCalles.classList.add("active"); mapTitle.innerText = "🛣️ Red Vial"; }
         }
@@ -1816,7 +1817,7 @@
             mapInstance.removeLayer(markerPlagas);
             markerPlagas = null;
             btnPlagas.classList.remove("active");
-            mapTitle.innerText = "🗺️️ Visor Geográfico";
+            mapTitle.innerText = "🗺 Visor Geográfico";
             return;
         }
 
@@ -1894,7 +1895,7 @@
     function iconoClima(code) {
         if (code === 0) return "☀️";
         if (code <= 2) return "🌤️";
-        if (code === 3) return "☁️";
+        if (code === 3) return "☁️️";
         if (code <= 67) return "🌧️";
         if (code >= 95) return "⛈";
         return "🌦️";
