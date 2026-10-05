@@ -343,41 +343,6 @@
             margin-top: 2px;
         }
 
-        .polen-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .polen-card {
-            background: var(--card-inner);
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-
-        .polen-icon {
-            font-size: 1.8rem;
-            margin-bottom: 4px;
-        }
-
-        .polen-title {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
-
-        .polen-dias {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 0.75rem;
-            text-align: left;
-        }
-
         .embalses-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -452,33 +417,6 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             text-align: center;
-        }
-
-        .glosario-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .glosario-item {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        .glosario-titulo {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 3px;
-        }
-
-        .glosario-desc {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            line-height: 1.3;
         }
 
         .map-wrapper-container {
@@ -585,7 +523,6 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
-        /* VENTANA MODAL AMPLIADA */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -893,6 +830,50 @@
 
     <br>
 
+    <div class="card">
+        <div class="dashboard-row">
+            <div class="sismos-container-block">
+                <h3>🌋 Últimos Sismos (USGS Global)</h3>
+                <div class="sismos-table-wrapper">
+                    <table class="tabla-sismos">
+                        <thead>
+                        <tr>
+                            <th>Fecha u Hora</th>
+                            <th>Mag</th>
+                            <th>Ubicación</th>
+                        </tr>
+                        </thead>
+                        <tbody id="sismosLista">
+                        <tr><td colspan="3">Cargando sismos en vivo...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="solar-container">
+                <h3 style="width:100%; text-align:center;">🌅 Ciclo Solar</h3>
+                <div class="solar-arc">
+                    <div class="sun-pivot" id="sunPivot">
+                        <div class="sun-icon" id="sunIcon">☀️</div>
+                    </div>
+                </div>
+                <div class="solar-times">
+                    <div>Amanecer<strong id="amanecerTime">--:--</strong></div>
+                    <div style="text-align:right">Atardecer<strong id="atardecerTime">--:--</strong></div>
+                </div>
+            </div>
+
+            <div class="lunar-container">
+                <h3 style="width:100%; text-align:center;">🌙 Fase Lunar</h3>
+                <div class="moon-display" id="moonIcon">🌑</div>
+                <div class="moon-phase-title" id="moonPhaseName">--</div>
+                <div class="moon-illumination" id="moonIllumination">--%</div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
     <!-- ESTADO DE EMBALSES & RECURSOS HÍDRICOS -->
     <div class="card">
         <h3 id="embalsesTitulo">💧 Estado de Embalses & Recursos Hídricos</h3>
@@ -957,11 +938,11 @@
 
 </div>
 
-<!-- VENTANA MODAL AMPLIADA CON BUSCADOR Y RECOMENDACIÓN DE FERTILIZANTES -->
+<!-- VENTANA MODAL AMPLIADA CON BUSCADOR Y RECOMENDACIÓN DE AGROQUÍMICOS -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Gestión de Lotes, Suelo & Fertilización</h2>
+            <h2>📐 Gestión de Lotes, Suelo & Agroquímicos</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
@@ -972,7 +953,7 @@
                     <button type="button" class="modal-search-btn" onclick="centrarModalGPS()" title="Centrar en mi GPS">📍 GPS</button>
                 </div>
                 <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja tu lote para obtener el diagnóstico, costos y el **plan de fertilización según época y terreno**.
+                    Dibuja tu lote para obtener el diagnóstico de suelo, riesgos y agroquímicos sugeridos.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
@@ -980,7 +961,7 @@
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Lote Seleccionado</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 30px 10px;">
-                    👈 Busca tu zona o dibuja un polígono en el mapa para obtener el análisis agronómico completo.
+                    👈 Busca tu zona, centrate en tu GPS o dibuja un polígono en el mapa para obtener el análisis agronómico completo.
                 </div>
             </div>
         </div>
@@ -1002,15 +983,18 @@
     const infoCultivosAgro = {
         "Vid": {
             prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350,
-            plantacion: "Agosto - Septiembre", poda: "Junio - Julio", cosecha: "Febrero - Abril"
+            plantacion: "Agosto - Septiembre", poda: "Junio - Julio", cosecha: "Febrero - Abril",
+            quimicosPrep: "<b>Herbicida pre-emergente:</b> Glifosato (2.5 L/ha) + Oxifluorfen.<br><b>Enmienda edáfica:</b> Superfosfato triple (150 kg/ha) y Yeso agrícola (500 kg/ha)."
         },
         "Ajo": {
             prep: 350, implantacion: 2800, riego: 550, fitosanitarios: 700, totalHa: 4400,
-            plantacion: "Marzo - Mayo", poda: "Octubre (Desentechado)", cosecha: "Noviembre - Diciembre"
+            plantacion: "Marzo - Mayo", poda: "Octubre (Desentechado)", cosecha: "Noviembre - Diciembre",
+            quimicosPrep: "<b>Curado de semilla:</b> Inmersión en Carbendazim + Clorpirifos.<br><b>Suelo:</b> Urea granulada y Superfosfato de calcio."
         },
         "Olivo": {
             prep: 400, implantacion: 3000, riego: 500, fitosanitarios: 500, totalHa: 4400,
-            plantacion: "Septiembre - Octubre", poda: "Junio - Agosto", cosecha: "Marzo - Mayo"
+            plantacion: "Septiembre - Octubre", poda: "Junio - Agosto", cosecha: "Marzo - Mayo",
+            quimicosPrep: "<b>Enmienda orgánica:</b> Compost maduro (10 ton/ha).<br><b>Fitosanitario:</b> Caldo bordelés post-poda."
         }
     };
 
@@ -1130,67 +1114,6 @@
         renderizarPanelReporteYCostos("Vid");
     }
 
-    // 🧪 MÓDULO INTELIGENTE DE RECOMENDACIÓN DE FERTILIZANTES SEGÚN ÉPOCA Y TERRENO
-    function obtenerRecomendacionFertilizante(cultivo, humSuelo) {
-        const mes = new Date().getMonth() + 1; // 1 a 12
-        let epoca = "";
-        let producto = "";
-        let dosis = "";
-        let consejoTerreno = "";
-
-        // Análisis de Terreno según humedad estimada del suelo
-        if (humSuelo < 20) {
-            consejoTerreno = "<b>Terreno seco/arenoso:</b> Se recomienda fraccionar la aplicación en riegos cortos para evitar lavado de nutrientes.";
-        } else if (humSuelo > 45) {
-            consejoTerreno = "<b>Terreno húmedo/arcilloso:</b> Alta retención. Espaciar aplicaciones y priorizar abonos granulados de liberación lenta.";
-        } else {
-            consejoTerreno = "<b>Terreno equilibrado:</b> Textura franca óptima para absorción radicular directa.";
-        }
-
-        // Análisis por Época del Año (Hemisferio Sur)
-        if (mes >= 3 && mes <= 5) { // Otoño
-            epoca = "Otoño (Post-cosecha / Preparación raíz)";
-            if (cultivo === "Vid") {
-                producto = "Superfosfato Triple (Fósforo) + Compost Orgánico";
-                dosis = "120 kg/ha de Fósforo y 5 ton/ha de materia orgánica al pie de la planta.";
-            } else if (cultivo === "Ajo") {
-                producto = "Fosfato Monoamónico (MAP) + Sulfato de Potasio";
-                dosis = "100 kg/ha en fondo de surco antes de la plantación.";
-            } else {
-                producto = "Abono orgánico maduro + Micorrizas";
-                dosis = "8 ton/ha incorporadas con labranza superficial.";
-            }
-        } else if (mes >= 6 && mes <= 8) { // Invierno
-            epoca = "Invierno (Dormancia / Enmienda basal)";
-            producto = "Yeso Agrícola + Nitrato de Calcio";
-            dosis = "400 kg/ha de Yeso para estructurar el suelo + 80 kg/ha de Nitrato.";
-        } else if (mes >= 9 && mes <= 11) { // Primavera
-            epoca = "Primavera (Brotación & Crecimiento vegetativo)";
-            if (cultivo === "Vid") {
-                producto = "Urea Granulada (Nitrógeno) + Nitrato de Potasio";
-                dosis = "150 kg/ha de Urea dividida en fertirriego (brote y cuaje).";
-            } else {
-                producto = "Nitrato de Amonio + Micronutrientes (Boro y Zinc)";
-                dosis = "120 kg/ha aplicados junto al sistema de riego por goteo.";
-            }
-        } else { // Verano
-            epoca = "Verano (Llenado de grano / Maduración)";
-            producto = "Nitrato de Potasio (Foliar o Fertirriego)";
-            dosis = "80 kg/ha para favorecer el tamaño y calidad de cosecha.";
-        }
-
-        return `
-            <div style="margin-top: 4px;">
-                <b>📅 Época Actual:</b> ${epoca}<br>
-                <b>🧪 Producto Sugerido:</b> <span style="color:var(--accent);">${producto}</span><br>
-                <b>⚖️ Dosis Estimada:</b> ${dosis}<br>
-                <div style="margin-top: 6px; border-top: 1px dashed var(--border); padding-top: 4px;">
-                    ${consejoTerreno}
-                </div>
-            </div>
-        `;
-    }
-
     function renderizarPanelReporteYCostos(cultivoSeleccionado) {
         if (!datosLoteActual) {
             datosLoteActual = { nombreLugar: "Godoy Cruz", provinciaZona: "Mendoza", hectareas: 1, tempSueloVal: 11, humSueloVal: 19, balanceH: -4.6, riesgoHeladaTxt: "Sin Riesgo", colorHelada: "#22c55e" };
@@ -1201,7 +1124,6 @@
         const d = datosLoteActual;
         const info = infoCultivosAgro[cultivoSeleccionado] || infoCultivosAgro["Vid"];
         const totalLoteUSD = Math.round(info.totalHa * d.hectareas);
-        const recomendacionFert = obtenerRecomendacionFertilizante(cultivoSeleccionado, d.humSueloVal);
 
         let listaCultivosHtml = Object.keys(infoCultivosAgro).map(c => `
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
@@ -1212,18 +1134,18 @@
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} hectáreas</span>
             </div>
-            <div class="report-section-title">🌡️ Diagnóstico de Suelo & Terreno</div>
+            <div class="report-section-title">🌡️ Diagnóstico de Suelo & Riesgos</div>
             <div class="recommendation-card">
                 <b>Temp. Suelo:</b> ${d.tempSueloVal}°C | <b>Humedad:</b> ${d.humSueloVal}%<br>
                 <b>Riesgo Helada:</b> <span style="color:${d.colorHelada};">${d.riesgoHeladaTxt}</span>
             </div>
-            <div class="report-section-title">🌾 Cultivos</div>
+            <div class="report-section-title">🧪 Agroquímicos Sugeridos</div>
+            <div class="recommendation-card" style="border-left: 3px solid var(--accent);">
+                ${info.quimicosPrep}
+            </div>
+            <div class="report-section-title">🌱 Cultivos</div>
             <div class="recommendation-card">
                 <div>${listaCultivosHtml}</div>
-            </div>
-            <div class="report-section-title">🌱 Plan de Fertilización (Según Terreno y Época)</div>
-            <div class="recommendation-card" style="border-left: 3px solid #22c55e;">
-                ${recomendacionFert}
             </div>
             <div class="report-section-title">💰 Presupuesto (USD)</div>
             <div class="recommendation-card">
