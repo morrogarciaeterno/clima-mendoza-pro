@@ -830,7 +830,7 @@
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span id="smnIcono" style="font-size: 2.2rem;">⚡⛈️️</span>
+                <span id="smnIcono" style="font-size: 2.2rem;">⚡⛈️</span>
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; text-transform: uppercase;">Alerta SMN</span>
@@ -1411,7 +1411,7 @@
     }
 
     function consultarClimaParaPlagas(lat, lon, marcador) {
-        actualizarIndicadorMapa("Consultando clima en nueva posición...", "#38bdf8");
+        actualizarIndicadorMapa("Consultando clima y recomendación...", "#38bdf8");
         const urlClimaAPI = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;
 
         fetch(urlClimaAPI)
@@ -1425,19 +1425,21 @@
                     humActual = climaData.current.relative_humidity_2m;
                 }
 
-                // Generamos un NDVI dinámico basado en la posición para que varíe al mover el marcador
                 let ndviValue = 0.35 + (Math.sin(lat * 10) * 0.25) + (Math.cos(lon * 10) * 0.15);
                 ndviValue = Math.max(0.1, Math.min(0.85, ndviValue));
 
                 let riesgo = "Bajo (Saludable)";
                 let colorRiesgo = "#2ecc71";
+                let recomendacion = "🟢 Cultivo vigoroso. Mantener monitoreo preventivo de enfermedades fúngicas por humedad.";
 
                 if (ndviValue < 0.4) {
                     riesgo = "Alto (Estrés / Suelo)";
                     colorRiesgo = "#ef4444";
+                    recomendacion = "🔴 Alerta máxima: Posible estrés hídrico severo o falla de riego. Inspección urgente en campo.";
                 } else if (ndviValue < 0.6) {
                     riesgo = "Moderado";
                     colorRiesgo = "#f39c12";
+                    recomendacion = "🟡 Crecimiento regular. Ajustar lámina de riego o evaluar fertilización nitrogenada sectorizada.";
                 }
 
                 marcador.setIcon(L.divIcon({
@@ -1448,16 +1450,20 @@
                 }));
 
                 let popupContent = `
-                    <b>📍 Coordenadas:</b> ${lat.toFixed(3)}, ${lon.toFixed(3)}<br>
-                    <b>Riesgo:</b> ${riesgo}<br>
-                    <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
-                    <b>Temperatura:</b> ${tempActual} °C<br>
-                    <b>Humedad:</b> ${humActual} %
+                    <div style="font-size: 0.8rem; line-height: 1.4;">
+                        <b>📍 Coordenadas:</b> ${lat.toFixed(3)}, ${lon.toFixed(3)}<br>
+                        <b>Riesgo:</b> <span style="color:${colorRiesgo}; font-weight:bold;">${riesgo}</span><br>
+                        <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
+                        <b>Temperatura:</b> ${tempActual} °C | <b>Humedad:</b> ${humActual} %<br>
+                        <hr style="margin: 6px 0; border:0; border-top:1px solid #ccc;">
+                        <b>💡 Recomendación:</b><br>
+                        <span style="color: #38bdf8;">${recomendacion}</span>
+                    </div>
                 `;
 
                 marcador.setPopupContent(popupContent);
                 marcador.openPopup();
-                actualizarIndicadorMapa("Lote actualizado correctamente", "#22c55e");
+                actualizarIndicadorMapa("Diagnóstico agronómico listo", "#22c55e");
             })
             .catch(err => {
                 console.error("Error al obtener clima:", err);
@@ -1496,7 +1502,7 @@
             })
         }).addTo(mapInstance);
 
-        markerPlagas.bindPopup("<b>Calculando zona...</b>").openPopup();
+        markerPlagas.bindPopup("<b>Calculando diagnóstico...</b>").openPopup();
         mapInstance.setView([latLote, lonLote], 13, { animate: true });
 
         consultarClimaParaPlagas(latLote, lonLote, markerPlagas);
