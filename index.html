@@ -617,7 +617,7 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
-        /* ESTILOS AMPLIADOS PARA LA VENTANA MODAL DE LOTES Y RECOMENDACIONES */
+        /* VENTANA MODAL AMPLIADA */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -638,8 +638,8 @@
             border: 1px solid var(--accent);
             border-radius: 20px;
             width: 100%;
-            max-width: 1100px;
-            height: 90vh;
+            max-width: 1150px;
+            height: 92vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -736,6 +736,18 @@
             padding: 10px;
             font-size: 0.78rem;
             line-height: 1.4;
+        }
+
+        .cultivo-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 2px;
+            font-size: 0.75rem;
         }
 
         .pasos-grid {
@@ -1260,27 +1272,27 @@
 
 </div>
 
-<!-- VENTANA MODAL AMPLIADA CON RECOMENDACIONES AGRONÓMICAS -->
+<!-- VENTANA MODAL AMPLIADA CON SUGERENCIA DE CULTIVOS -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Gestión de Lotes & Recomendaciones Agronómicas</h2>
+            <h2>📐 Gestión de Lotes & Sugerencia de Cultivos Regionales</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
             <!-- Columna Izquierda: Mapa de Dibujo -->
             <div class="modal-map-container">
                 <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja el polígono de tu lote arriba a la derecha. El sistema procesará el área y generará el reporte a la derecha.
+                    Dibuja tu lote arriba a la derecha. El sistema evaluará el suelo y clima para recomendar qué plantar.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
 
-            <!-- Columna Derecha: Panel de Diagnóstico y Recomendaciones Pro -->
+            <!-- Columna Derecha: Panel de Diagnóstico y Sugerencias de Cultivos -->
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Lote Seleccionado</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 30px 10px;">
-                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis agronómico, estado NDVI, recomendaciones de riego y ventana de fitosanitarios.
+                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis agronómico, estado NDVI y las sugerencias de plantación (vid, hortalizas, frutales).
                 </div>
             </div>
         </div>
@@ -1511,14 +1523,16 @@
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Consultando modelos climáticos y satelitales en la nube...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Consultando modelos climáticos y aptitud de suelo...</div>`;
 
         let nombreLugar = `Lote Agrícola`;
+        let provinciaZona = "Mendoza";
         try {
             const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
             const geoData = await geoRes.json();
             if (geoData && geoData.address) {
                 const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || "";
+                provinciaZona = geoData.address.state || "Mendoza";
                 if (ciudad) nombreLugar = `${ciudad}`;
             }
         } catch(e) {}
@@ -1543,7 +1557,7 @@
 
             // Balance Hídrico
             let deficit = (lluvia - et0).toFixed(1);
-            let riegoRecomendado = deficit < 0 ? Math.abs(deficit) * 10 : 0; // en mm o m3/ha
+            let riegoRecomendado = deficit < 0 ? Math.abs(deficit) * 10 : 0;
 
             // Semáforo Fitosanitario
             let semaforoFito = "🟢 Favorable para Aplicar";
@@ -1559,12 +1573,40 @@
             let alertaFungica = "🟢 Riesgo Fúngico Bajo";
             let colorHongo = "#22c55e";
             if (hum > 70 && temp >= 18 && temp <= 26) {
-                alertaFungica = "⚠️️ Alerta de Hongos (Oídio / Peronóspora)";
+                alertaFungica = "⚠ Alerta de Hongos (Oídio / Peronóspora)";
                 colorHongo = "#f59e0b";
             }
 
+            // Sugerencia de Cultivos según Región
+            let cultivosSugeridos = `
+                <span class="cultivo-badge">🍇 Vid (Malbec / Cabernet)</span>
+                <span class="cultivo-badge">🧄 Ajo Blanco / Colorado</span>
+                <span class="cultivo-badge">🧅 Cebolla Valencianita</span>
+                <span class="cultivo-badge">🫒 Olivo (Aptitud Cuyo)</span>
+                <span class="cultivo-badge">🍅 Tomate Industrial</span>
+            `;
+            let descripcionCultivo = "Zona ideal para cultivos agroindustriales y hortícolas de alta demanda hídrica controlada bajo riego por goteo o manto.";
+
+            if (provinciaZona.toLowerCase().includes("neuquén") || provinciaZona.toLowerCase().includes("rionegro") || provinciaZona.toLowerCase().includes("patagonia")) {
+                cultivosSugeridos = `
+                    <span class="cultivo-badge">🍎 Manzana Red Delicious</span>
+                    <span class="cultivo-badge">🍐 Pera D'Anjou / Williams</span>
+                    <span class="cultivo-badge">🍒 Cerezos de Exportación</span>
+                    <span class="cultivo-badge">🍇 Vid Patagónica (Pinot Noir)</span>
+                `;
+                descripcionCultivo = "Aptitud excelente para frutales de pepita y carozo gracias al régimen térmico y horas de frío patagónicas.";
+            } else if (provinciaZona.toLowerCase().includes("córdoba") || provinciaZona.toLowerCase().includes("santa fe") || provinciaZona.toLowerCase().includes("buenos aires")) {
+                cultivosSugeridos = `
+                    <span class="cultivo-badge">🌽 Maíz de Alta Producción</span>
+                    <span class="cultivo-badge">🌱 Soja de Primera</span>
+                    <span class="cultivo-badge">🌾 Trigo / Cebada</span>
+                    <span class="cultivo-badge">🌻 Girasol</span>
+                `;
+                descripcionCultivo = "Zona pampeana con alta aptitud para cultivos extensivos de secano (granos y oleaginosas).";
+            }
+
             panel.innerHTML = `
-                <div class="report-section-title">📊 Reporte de Lote: ${nombreLugar}</div>
+                <div class="report-section-title">📊 Reporte de Lote: ${nombreLugar} (${provinciaZona})</div>
                 
                 <div class="recommendation-card">
                     <b>Superficie Delimitada:</b> <span style="color:var(--accent); font-weight:bold;">${hectareas} hectáreas</span><br>
@@ -1572,10 +1614,16 @@
                     <b>Clima en Lote:</b> ${temp}°C | ${hum}% Humedad | ${viento} km/h Viento
                 </div>
 
+                <div class="report-section-title">🌱 Sugerencia de Plantación & Cultivos Aptos</div>
+                <div class="recommendation-card">
+                    <div style="margin-bottom: 6px;">${cultivosSugeridos}</div>
+                    <span style="color: var(--text-muted);">${descripcionCultivo}</span>
+                </div>
+
                 <div class="report-section-title">💧 Recomendación de Riego Inteligente</div>
                 <div class="recommendation-card">
                     <b>Balance Hídrico Neto:</b> <span style="color:${deficit >= 0 ? '#22c55e':'#ef4444'}; font-weight:bold;">${deficit} mm</span> (Lluvia vs Evapotranspiración ET0)<br>
-                    <span style="color: var(--accent);">💡 <b>Sugerencia:</b> ${riegoRecomendado > 0 ? `Se recomienda aplicar un riego de refuerzo de ${Math.round(riegoRecomendado)} m³/ha en las próximas 48 hs para mantener la capacidad de campo.` : `El balance hídrico es favorable. No se requiere riego complementario por el momento.`}</span>
+                    <span style="color: var(--accent);">💡 <b>Sugerencia:</b> ${riegoRecomendado > 0 ? `Se recomienda aplicar un riego de refuerzo de ${Math.round(riegoRecomendado)} m³/ha en las próximas 48 hs.` : `El balance hídrico es favorable. No se requiere riego complementario.`}</span>
                 </div>
 
                 <div class="report-section-title">🚜 Semáforo de Fitosanitarios & Deriva</div>
@@ -1863,7 +1911,7 @@
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
-        if (codigo <= 67) return "🌧️️";
+        if (codigo <= 67) return "🌧️";
         if (codigo >= 95) return "⛈️";
         return "⛈️";
     }
