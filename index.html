@@ -1164,19 +1164,17 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA CON RADAR LLUVIA Y VIENTOS -->
+        <!-- MAPA MULTICAPA LIMPIO (SIN LLUVIA NI VIENTOS) -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
-            <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
+            <h3 id="mapTitle">🗺️️ Visor Geográfico</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
-                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topo</button>
+                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️️ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
-                <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
-                <button class="map-btn" id="btnVientos" onclick="cambiarCapaMapa('vientos')">💨 Vientos</button>
                 <button class="map-btn" id="btnPlagas" onclick="toggleCapaPlagas()" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171;">🌱 Plagas</button>
-                <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
+                <button class="map-btn" onclick="verVistaPais()" style="grid-column: span 2;">🇦🇷 País</button>
             </div>
 
             <div class="map-wrapper-container">
@@ -1198,9 +1196,7 @@
     let markerInstance = null;
     let markerPlagas = null;
     let capaActual = null;
-    let capaLluviaRadar = null;
     let capaFuegosFIRMS = null;
-    let capaVientos = null;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
@@ -1350,12 +1346,6 @@
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
-                capaVientos = L.tileLayer('https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=demo', {
-                    maxZoom: 18,
-                    opacity: 0.6,
-                    attribution: '&copy; OpenWeatherMap Wind'
-                });
-
                 mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
                 mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor interactivo activo", "#22c55e"); });
 
@@ -1382,9 +1372,7 @@
         const btnBase = document.getElementById("btnBase");
         const btnTopo = document.getElementById("btnTopo");
         const btnCalles = document.getElementById("btnCalles");
-        const btnLluvia = document.getElementById("btnLluvia");
         const btnFuego = document.getElementById("btnFuego");
-        const btnVientos = document.getElementById("btnVientos");
         const mapTitle = document.getElementById("mapTitle");
 
         if (!mapInstance) return;
@@ -1392,43 +1380,15 @@
         btnBase.classList.remove("active");
         btnTopo.classList.remove("active");
         if (btnCalles) btnCalles.classList.remove("active");
-        btnLluvia.classList.remove("active");
         btnFuego.classList.remove("active");
-        if (btnVientos) btnVientos.classList.remove("active");
 
-        if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
-        if (capaVientos && mapInstance.hasLayer(capaVientos)) mapInstance.removeLayer(capaVientos);
 
-        if (tipo === 'lluvia') {
-            btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧️ Radar de Precipitaciones en Vivo";
-            actualizarIndicadorMapa("Cargando radar de lluvia...", "#38bdf8");
-
-            if (!capaLluviaRadar) {
-                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/weather-maps/0/{z}/{x}/{y}/256/2_1.png', {
-                    tileSize: 256,
-                    opacity: 0.8,
-                    maxZoom: 18,
-                    attribution: '&copy; RainViewer'
-                });
-            }
-
-            if (!mapInstance.hasLayer(capaLluviaRadar)) {
-                capaLluviaRadar.addTo(mapInstance);
-            }
-            actualizarIndicadorMapa("Capa de Lluvia Activa", "#22c55e");
-
-        } else if (tipo === 'fuego') {
+        if (tipo === 'fuego') {
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
             mapTitle.innerText = "🔥 Monitoreo de Incendios en Vivo (NASA FIRMS)";
             actualizarIndicadorMapa("Capa de Incendios Activa (Últimas 24hs)", "#f59e0b");
-        } else if (tipo === 'vientos') {
-            if (!mapInstance.hasLayer(capaVientos)) capaVientos.addTo(mapInstance);
-            if (btnVientos) btnVientos.classList.add("active");
-            mapTitle.innerText = "💨 Corrientes de Viento en Vivo";
-            actualizarIndicadorMapa("Capa de Vientos Activa", "#38bdf8");
         } else {
             if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
@@ -1436,7 +1396,7 @@
 
             if (tipo === 'base') {
                 btnBase.classList.add("active");
-                mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+                mapTitle.innerText = "🗺️ Visor Geográfico";
                 actualizarIndicadorMapa("Capa Estándar activa", "#22c55e");
             } else if (tipo === 'topo') {
                 btnTopo.classList.add("active");
@@ -1460,7 +1420,7 @@
             mapInstance.removeLayer(markerPlagas);
             markerPlagas = null;
             btnPlagas.classList.remove("active");
-            mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+            mapTitle.innerText = "🗺️ Visor Geográfico";
             actualizarIndicadorMapa("Capa de Plagas desactivada", "#22c55e");
             return;
         }
@@ -1661,7 +1621,7 @@
     function iconoClima(codigo) {
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
-        if (codigo === 3) return "☁️️";
+        if (codigo === 3) return "☁️";
         if (codigo <= 67) return "🌧️";
         if (codigo >= 95) return "⛈️";
         return "⛈️";
@@ -2175,8 +2135,8 @@
                     let provinciaDetectada = "Mendoza";
 
                     try {
-                        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=10`);
-                        const geoData = await geoRes.json();
+                        const geoRes = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=10`;
+                        const geoData = await (await fetch(geoRes)).json();
                         if (geoData && geoData.address) {
                             const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || "";
                             provinciaDetectada = geoData.address.state || "Mendoza";
