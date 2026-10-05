@@ -699,13 +699,51 @@
             min-height: 380px;
         }
 
+        .modal-search-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .modal-search-input {
+            flex-grow: 1;
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            outline: none;
+        }
+
+        .modal-search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-search-btn {
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .modal-search-btn:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
         #mapaModalDibujo {
             width: 100%;
             flex-grow: 1;
             border-radius: 12px;
             border: 2px solid var(--border);
             background-color: #090d16 !important;
-            min-height: 350px;
+            min-height: 330px;
         }
 
         .modal-report-panel {
@@ -795,62 +833,6 @@
             color: var(--accent);
             display: block;
             margin-bottom: 2px;
-        }
-
-        .pasos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .paso-card {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .paso-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-
-        .paso-nombre {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .paso-provincia {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-        }
-
-        .paso-estado {
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 6px;
-        }
-
-        .estado-abierto { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .estado-precaucion { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-        .estado-cerrado { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-
-        @keyframes alertaParpadeo {
-            0% { border-color: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
-            50% { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); }
-            100% { border-color: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
-        }
-
-        .alerta-activa-animacion {
-            animation: alertaParpadeo 1.5s infinite ease-in-out;
         }
 
         @media (max-width: 900px) {
@@ -1173,7 +1155,7 @@
                 <div class="grid-agricola">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌧️️</span>
+                        <span style="font-size: 1.2rem;">🌧</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Prob. Lluvia</small>
                         <strong id="probLluvia" style="font-size: 0.88rem; color: var(--text-main);">--%</strong>
                     </div>
@@ -1319,27 +1301,32 @@
 
 </div>
 
-<!-- VENTANA MODAL AMPLIADA CON DIAGNÓSTICO DE SUELO Y RIESGOS -->
+<!-- VENTANA MODAL AMPLIADA CON BUSCADOR Y RECOMENDACIÓN DE AGROQUÍMICOS -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Gestión de Lotes, Suelo & Presupuesto (USD)</h2>
+            <h2>📐 Gestión de Lotes, Suelo & Agroquímicos</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
-            <!-- Columna Izquierda: Mapa de Dibujo -->
+            <!-- Columna Izquierda: Mapa con Buscador y GPS -->
             <div class="modal-map-container">
-                <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja tu lote. El sistema evaluará el suelo, riesgos de helada y costos estimados en dólares.
+                <div class="modal-search-bar">
+                    <input type="text" id="inputBusquedaLugar" class="modal-search-input" placeholder="Buscar localidad o finca (Ej: Luján, Maipú)..." />
+                    <button type="button" class="modal-search-btn" onclick="buscarLugarModal()">🔍 Buscar</button>
+                    <button type="button" class="modal-search-btn" onclick="centrarModalGPS()" title="Centrar en mi GPS">📍 GPS</button>
+                </div>
+                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
+                    Dibuja tu lote para obtener el diagnóstico de suelo, riesgos y agroquímicos sugeridos.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
 
-            <!-- Columna Derecha: Panel de Diagnóstico, Suelo y Costos -->
+            <!-- Columna Derecha: Panel de Diagnóstico, Agroquímicos y Costos -->
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Lote Seleccionado</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 30px 10px;">
-                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis de suelo, estado hídrico, riesgos y costos.
+                    👈 Busca tu zona, centrate en tu GPS o dibuja un polígono en el mapa para obtener el análisis agronómico completo.
                 </div>
             </div>
         </div>
@@ -1362,34 +1349,42 @@
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
+    // Base de costos y recomendación de agroquímicos para preparación de suelo
     const infoCultivosAgro = {
         "Vid": {
             prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350,
-            plantacion: "Agosto - Septiembre", poda: "Junio - Julio", cosecha: "Febrero - Abril"
+            plantacion: "Agosto - Septiembre", poda: "Junio - Julio", cosecha: "Febrero - Abril",
+            quimicosPrep: "<b>Herbicida pre-emergente:</b> Glifosato (2.5 L/ha) + Oxifluorfen.<br><b>Enmienda edáfica:</b> Superfosfato triple (150 kg/ha) y Yeso agrícola (500 kg/ha) para suelos compactos o alcalinos."
         },
         "Cebolla": {
             prep: 300, implantacion: 1200, riego: 500, fitosanitarios: 450, totalHa: 2450,
-            plantacion: "Mayo - Julio", poda: "No requiere", cosecha: "Noviembre - Enero"
+            plantacion: "Mayo - Julio", poda: "No requiere", cosecha: "Noviembre - Enero",
+            quimicosPrep: "<b>Desinfección / Pre-siembra:</b> Metalaxil o fungicida sistémico radicular.<br><b>Fertilización base:</b> Fosfato diamónico (DAP) 180 kg/ha incorporado en labranza."
         },
         "Ajo": {
             prep: 350, implantacion: 2800, riego: 550, fitosanitarios: 700, totalHa: 4400,
-            plantacion: "Marzo - Mayo", poda: "Octubre (Desentechado)", cosecha: "Noviembre - Diciembre"
+            plantacion: "Marzo - Mayo", poda: "Octubre (Desentechado)", cosecha: "Noviembre - Diciembre",
+            quimicosPrep: "<b>Curado de semilla:</b> Inmersión en Carbendazim + Clorpirifos previo plantación.<br><b>Suelo:</b> Aplicación de Urea granulada y Superfosfato de calcio."
         },
         "Olivo": {
             prep: 400, implantacion: 3000, riego: 500, fitosanitarios: 500, totalHa: 4400,
-            plantacion: "Septiembre - Octubre", poda: "Junio - Agosto", cosecha: "Marzo - Mayo"
+            plantacion: "Septiembre - Octubre", poda: "Junio - Agosto", cosecha: "Marzo - Mayo",
+            quimicosPrep: "<b>Enmienda orgánica:</b> Compost maduro o estiércol bovino (10 ton/ha).<br><b>Fitosanitario preventivo:</b> Caldo bordelés o cúpricos post-poda."
         },
         "Tomate": {
             prep: 300, implantacion: 1800, riego: 600, fitosanitarios: 650, totalHa: 3350,
-            plantacion: "Octubre - Noviembre", poda: "Diciembre (Guiado)", cosecha: "Enero - Marzo"
+            plantacion: "Octubre - Noviembre", poda: "Diciembre (Guiado)", cosecha: "Enero - Marzo",
+            quimicosPrep: "<b>Fumigación de suelo:</b> Nematicida / Metam Sodio si hay antecedentes.<br><b>Fertilización:</b> Nitrato de amonio y Fósforo asimilable."
         },
         "Frutales (Manzana/Pera)": {
             prep: 500, implantacion: 4200, riego: 700, fitosanitarios: 900, totalHa: 6300,
-            plantacion: "Julio - Agosto", poda: "Junio - Agosto", cosecha: "Enero - Abril"
+            plantacion: "Julio - Agosto", poda: "Junio - Agosto", cosecha: "Enero - Abril",
+            quimicosPrep: "<b>Invierno:</b> Aceite mineral (2%) + Polisulfuro de calcio.<br><b>Suelo:</b> Corrección con Fósforo y Potasio según análisis."
         },
         "Cultivos Extensivos (Maíz/Soja)": {
             prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900,
-            plantacion: "Septiembre - Noviembre", poda: "No aplica", cosecha: "Febrero - Mayo"
+            plantacion: "Septiembre - Noviembre", poda: "No aplica", cosecha: "Febrero - Mayo",
+            quimicosPrep: "<b>Quema barbecho:</b> Glifosato 48% (3 L/ha) + 2,4-D + Residual (Atrazina o S-Metolacloro)."
         }
     };
 
@@ -1440,23 +1435,6 @@
             `;
         });
     }
-
-    function solicitarPermisoNotificaciones() {
-        if (!("Notification" in window)) return;
-        Notification.requestPermission().then((permission) => {
-            if (permission === "granted") {
-                new Notification("🛰️ AgroTech Argentina", {
-                    body: "¡Notificaciones activadas correctamente!",
-                    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
-                });
-            }
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const btnCampana = document.getElementById("btnCampanaNotif");
-        if (btnCampana) btnCampana.addEventListener("click", solicitarPermisoNotificaciones);
-    });
 
     const capasBase = {
         base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap' }),
@@ -1538,11 +1516,35 @@
         if (modal) modal.style.display = "none";
     }
 
+    async function buscarLugarModal() {
+        const input = document.getElementById("inputBusquedaLugar");
+        if (!input || !input.value.trim()) return;
+
+        const query = input.value.trim();
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ", Argentina")}`);
+            const data = await res.json();
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                if (modalMapInstance) modalMapInstance.setView([lat, lon], 14, { animate: true });
+            } else {
+                alert("No se encontró la localidad ingresada.");
+            }
+        } catch (e) {
+            alert("Error al realizar la búsqueda.");
+        }
+    }
+
+    function centrarModalGPS() {
+        if (modalMapInstance) modalMapInstance.setView([currentLat, currentLon], 15, { animate: true });
+    }
+
     async function analizarLoteModalPro(lat, lon, hectareas) {
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Procesando suelo, clima y riesgos en tiempo real...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Procesando suelo y agroquímicos sugeridos...</div>`;
 
         let nombreLugar = `Lote Agrícola`;
         let provinciaZona = "Mendoza";
@@ -1556,7 +1558,7 @@
             }
         } catch(e) {}
 
-        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=soil_temperature_0cm,soil_moisture_0_to_1cm&daily=precipitation_sum,et0_fao_evapotranspiration,temperature_2m_min,temperature_2m_max,weather_code&timezone=America%2FArgentina%2FMendoza`;
+        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=soil_temperature_0cm,soil_moisture_0_to_1cm&daily=precipitation_sum,et0_fao_evapotranspiration,temperature_2m_min,temperature_2m_max&timezone=America%2FArgentina%2FMendoza`;
         try {
             const res = await fetch(urlClima);
             const data = await res.json();
@@ -1578,7 +1580,6 @@
             }
 
             let balanceH = (lluvia - et0).toFixed(1);
-
             let riesgoHeladaTxt = minTemp <= 0 ? "Alto (≤0°C)" : (minTemp <= 3 ? "Moderado" : "Sin Riesgo");
             let colorHelada = minTemp <= 0 ? "#ef4444" : (minTemp <= 3 ? "#f59e0b" : "#22c55e");
 
@@ -1596,7 +1597,7 @@
             renderizarPanelReporteYCostos(cultivoDefault);
 
         } catch(e) {
-            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error al procesar los datos de suelo y clima. Intente nuevamente.</div>`;
+            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error al procesar los datos. Intente nuevamente.</div>`;
         }
     }
 
@@ -1641,12 +1642,19 @@
                         <strong style="display:block; color:${d.colorHelada}; font-size:0.85rem;">${d.riesgoHeladaTxt}</strong>
                     </div>
                 </div>
-                <span style="color:var(--text-muted); font-size:0.72rem;">💡 <b>Evaluación:</b> Con una temperatura de suelo de ${d.tempSueloVal}°C y humedad del ${d.humSueloVal}%, las condiciones son estables. ${d.balanceH < 0 ? 'Se aconseja planificar riego suplementario por déficit hídrico.' : 'Balance hídrico favorable.'}</span>
+                <span style="color:var(--text-muted); font-size:0.72rem;">💡 <b>Evaluación:</b> Temp. de suelo en ${d.tempSueloVal}°C. ${d.balanceH < 0 ? 'Déficit hídrico detectado, programar riego.' : 'Condiciones hídricas equilibradas.'}</span>
+            </div>
+
+            <div class="report-section-title">🧪 Agroquímicos & Enmiendas Sugeridas (Preparación)</div>
+            <div class="recommendation-card" style="border-left: 3px solid var(--accent);">
+                <div style="font-size:0.75rem; line-height: 1.4; color: var(--text-main);">
+                    ${info.quimicosPrep}
+                </div>
             </div>
 
             <div class="report-section-title">🌱 Cultivos & Calendario Estacional</div>
             <div class="recommendation-card">
-                <div style="margin-bottom: 6px; font-size:0.73rem; color:var(--text-muted);">Selecciona cultivo para ver costos y fechas:</div>
+                <div style="margin-bottom: 6px; font-size:0.73rem; color:var(--text-muted);">Selecciona cultivo para ver fechas y agroquímicos:</div>
                 <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
                 
                 <div class="calendario-grid">
@@ -1727,7 +1735,7 @@
                 actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
             } else if (tipo === 'calles') {
                 if (btnCalles) btnCalles.classList.add("active");
-                mapTitle.innerText = "🛣️ Red Vial & Localidades";
+                mapTitle.innerText = "🛣️️ Red Vial & Localidades";
                 actualizarIndicadorMapa("Capa de Calles activa", "#22c55e");
             }
         }
@@ -1825,62 +1833,11 @@
         if (mapInstance) mapInstance.setView([-38.4161, -63.6167], 5, { animate: true });
     }
 
-    function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    async function verificarProximidadIncendios(lat, lon) {
-        const card = document.getElementById("fuegoAlertaCard");
-        const espaciador = document.getElementById("fuegoEspaciador");
-        const desc = document.getElementById("fuegoAlertaDesc");
-        const titulo = document.getElementById("fuegoAlertaTitulo");
-
-        if (!card || !espaciador) return;
-
-        try {
-            const res = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${MAP_KEY_FIRMS}/VIIRS_SNPP_NRT/south-america/1`);
-            if (!res.ok) return;
-            const text = await res.text();
-            const lineas = text.split("\n");
-            if (lineas.length <= 1) return;
-
-            let cabecera = lineas[0].split(",");
-            let idxLat = cabecera.indexOf("latitude");
-            let idxLon = cabecera.indexOf("longitude");
-            if (idxLat === -1) { idxLat = 0; idxLon = 1; }
-
-            let fuegoCercanoKm = 9999;
-            for (let i = 1; i < lineas.length; i++) {
-                let cols = lineas[i].split(",");
-                if (cols.length > Math.max(idxLat, idxLon)) {
-                    let fLat = parseFloat(cols[idxLat]);
-                    let fLon = parseFloat(cols[idxLon]);
-                    if (!isNaN(fLat) && !isNaN(fLon)) {
-                        let distancia = calcularDistanciaKm(lat, lon, fLat, fLon);
-                        if (distancia < fuegoCercanoKm) fuegoCercanoKm = distancia;
-                    }
-                }
-            }
-
-            if (fuegoCercanoKm <= 100) {
-                card.style.display = "block";
-                espaciador.style.display = "block";
-                card.classList.add("alerta-activa-animacion");
-                titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
-                desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
-            }
-        } catch (e) {}
-    }
-
     function actualizarFechaYHoraDigital() {
         try {
-            const ahora = new Date();
-            document.getElementById("fecha").innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
-            document.getElementById("digitalFallback").innerText = ahora.toLocaleTimeString("es-AR") + " hs";
+            const aho = new Date();
+            document.getElementById("fecha").innerText = aho.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
+            document.getElementById("digitalFallback").innerText = aho.toLocaleTimeString("es-AR") + " hs";
         } catch(e) {}
     }
 
@@ -1893,17 +1850,15 @@
                     currentLon = position.coords.longitude;
                     actualizarEmbalsesSegunUbicacion("Mendoza");
                     inicializarMapaArgentina(currentLat, currentLon);
-                    verificarProximidadIncendios(currentLat, currentLon);
                 },
                 () => {
                     actualizarEmbalsesSegunUbicacion("Mendoza");
                     inicializarMapaArgentina(currentLat, currentLon);
-                    verificarProximidadIncendios(currentLat, currentLon);
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         } else {
-            actualizarEmbalsesSegunUbicacion("Mendoza");
+            actualizarEmbalsesSugunUbicacion("Mendoza");
             inicializarMapaArgentina(currentLat, currentLon);
         }
     }
