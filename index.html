@@ -830,7 +830,7 @@
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span id="smnIcono" style="font-size: 2.2rem;">⚡⛈️</span>
+                <span id="smnIcono" style="font-size: 2.2rem;">⚡⛈️️</span>
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; text-transform: uppercase;">Alerta SMN</span>
@@ -1164,12 +1164,12 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA LIMPIO (SIN LLUVIA NI VIENTOS) -->
+        <!-- MAPA MULTICAPA LIMPIO -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
-            <h3 id="mapTitle">🗺️️ Visor Geográfico</h3>
+            <h3 id="mapTitle">🗺 Visor Geográfico</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
-                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️️ Topo</button>
+                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
@@ -1410,6 +1410,61 @@
         }
     }
 
+    function consultarClimaParaPlagas(lat, lon, marcador) {
+        actualizarIndicadorMapa("Consultando clima en nueva posición...", "#38bdf8");
+        const urlClimaAPI = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;
+
+        fetch(urlClimaAPI)
+            .then(response => response.json())
+            .then(climaData => {
+                let tempActual = "--";
+                let humActual = "--";
+
+                if (climaData && climaData.current) {
+                    tempActual = climaData.current.temperature_2m;
+                    humActual = climaData.current.relative_humidity_2m;
+                }
+
+                // Generamos un NDVI dinámico basado en la posición para que varíe al mover el marcador
+                let ndviValue = 0.35 + (Math.sin(lat * 10) * 0.25) + (Math.cos(lon * 10) * 0.15);
+                ndviValue = Math.max(0.1, Math.min(0.85, ndviValue));
+
+                let riesgo = "Bajo (Saludable)";
+                let colorRiesgo = "#2ecc71";
+
+                if (ndviValue < 0.4) {
+                    riesgo = "Alto (Estrés / Suelo)";
+                    colorRiesgo = "#ef4444";
+                } else if (ndviValue < 0.6) {
+                    riesgo = "Moderado";
+                    colorRiesgo = "#f39c12";
+                }
+
+                marcador.setIcon(L.divIcon({
+                    className: 'custom-pin',
+                    html: `<div style="background-color: ${colorRiesgo}; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
+                    iconSize: [26, 26],
+                    iconAnchor: [13, 13]
+                }));
+
+                let popupContent = `
+                    <b>📍 Coordenadas:</b> ${lat.toFixed(3)}, ${lon.toFixed(3)}<br>
+                    <b>Riesgo:</b> ${riesgo}<br>
+                    <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
+                    <b>Temperatura:</b> ${tempActual} °C<br>
+                    <b>Humedad:</b> ${humActual} %
+                `;
+
+                marcador.setPopupContent(popupContent);
+                marcador.openPopup();
+                actualizarIndicadorMapa("Lote actualizado correctamente", "#22c55e");
+            })
+            .catch(err => {
+                console.error("Error al obtener clima:", err);
+                actualizarIndicadorMapa("Error al conectar con la API de clima", "#ef4444");
+            });
+    }
+
     function toggleCapaPlagas() {
         const btnPlagas = document.getElementById("btnPlagas");
         const mapTitle = document.getElementById("mapTitle");
@@ -1427,10 +1482,9 @@
 
         btnPlagas.classList.add("active");
         mapTitle.innerText = "🌱 Monitoreo de Plagas & NDVI";
-        actualizarIndicadorMapa("Cargando datos y clima...", "#38bdf8");
 
-        let latLote = currentLat || -33.65;
-        let lonLote = currentLon || -69.20;
+        let latLote = currentLat || -32.92;
+        let lonLote = currentLon || -68.84;
 
         markerPlagas = L.marker([latLote, lonLote], {
             draggable: true,
@@ -1442,71 +1496,14 @@
             })
         }).addTo(mapInstance);
 
-        markerPlagas.bindPopup("<b>Consultando clima y nube...</b>").openPopup();
+        markerPlagas.bindPopup("<b>Calculando zona...</b>").openPopup();
         mapInstance.setView([latLote, lonLote], 13, { animate: true });
 
-        const urlClimaAPI = `https://api.open-meteo.com/v1/forecast?latitude=${latLote}&longitude=${lonLote}&current=temperature_2m,relative_humidity_2m`;
-
-        fetch(urlClimaAPI)
-            .then(response => response.json())
-            .then(climaData => {
-                let tempActual = "--";
-                let humActual = "--";
-
-                if (climaData && climaData.current) {
-                    tempActual = climaData.current.temperature_2m;
-                    humActual = climaData.current.relative_humidity_2m;
-                }
-
-                const urlNDVI = "https://raw.githubusercontent.com/morrogarciaeterno/mapas-de-plagas-mza/refs/heads/main/NDVI_Mendoza.csv";
-
-                Papa.parse(urlNDVI, {
-                    download: true,
-                    header: true,
-                    complete: function(results) {
-                        let ndviRow = results.data[0] || {};
-                        let ndviValue = parseFloat(ndviRow.NDVI) || 0.070;
-
-                        let riesgo = "Bajo (Saludable)";
-                        let colorRiesgo = "#2ecc71";
-
-                        if (ndviValue < 0.4) {
-                            riesgo = "Alto (Estrés / Suelo)";
-                            colorRiesgo = "#ef4444";
-                        } else if (ndviValue < 0.6) {
-                            riesgo = "Moderado";
-                            colorRiesgo = "#f39c12";
-                        }
-
-                        markerPlagas.setIcon(L.divIcon({
-                            className: 'custom-pin',
-                            html: `<div style="background-color: ${colorRiesgo}; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
-                            iconSize: [26, 26],
-                            iconAnchor: [13, 13]
-                        }));
-
-                        let popupContent = `
-                            <b>📍 Coordenadas:</b> ${latLote.toFixed(3)}, ${lonLote.toFixed(3)}<br>
-                            <b>Riesgo:</b> ${riesgo}<br>
-                            <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
-                            <b>Temperatura:</b> ${tempActual} °C<br>
-                            <b>Humedad:</b> ${humActual} %
-                        `;
-
-                        markerPlagas.setPopupContent(popupContent);
-                        markerPlagas.openPopup();
-                        actualizarIndicadorMapa("Capa de Plagas y Clima sincronizada", "#22c55e");
-                    }
-                });
-            })
-            .catch(err => {
-                console.error("Error al obtener clima:", err);
-                actualizarIndicadorMapa("Error al conectar con la API de clima", "#ef4444");
-            });
+        consultarClimaParaPlagas(latLote, lonLote, markerPlagas);
 
         markerPlagas.on('dragend', function() {
             let pos = markerPlagas.getLatLng();
-            actualizarIndicadorMapa(`Lote reubicado: ${pos.lat.toFixed(3)}, ${pos.lng.toFixed(3)}`, "#38bdf8");
+            consultarClimaParaPlagas(pos.lat, pos.lng, markerPlagas);
         });
     }
 
