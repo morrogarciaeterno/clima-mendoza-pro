@@ -1165,16 +1165,14 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA CON CALLES, RADAR, FIRMS, PLAGAS, NUBES Y VIENTOS -->
+        <!-- MAPA MULTICAPA CON CALLES, VIENTOS, FUEGO Y PLAGAS -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
-                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️️ Topo</button>
+                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
-                <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
-                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')">☁️ Nubes</button>
                 <button class="map-btn" id="btnVientos" onclick="cambiarCapaMapa('vientos')">💨 Vientos</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
                 <button class="map-btn" id="btnPlagas" onclick="toggleCapaPlagas()" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171;">🌱 Plagas</button>
@@ -1200,9 +1198,7 @@
     let markerInstance = null;
     let markerPlagas = null;
     let capaActual = null;
-    let capaLluviaRadar = null;
     let capaFuegosFIRMS = null;
-    let capaNubesSat = null;
     let capaVientosGrid = null;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
@@ -1375,59 +1371,9 @@
         }
     }
 
-    // CAPA DE LLUVIA ROBUSTA (RADAR LOCAL DINÁMICO)
-    function obtenerCapaLluviaDinamica() {
-        if (capaLluviaRadar) return capaLluviaRadar;
-        capaLluviaRadar = L.layerGroup();
-        
-        let celdasLluvia = [
-            {lat: 0.08, lon: -0.06, intens: "Moderada (3.2 mm/h)", color: "#facc15"},
-            {lat: -0.04, lon: 0.09, intens: "Fuerte (7.5 mm/h)", color: "#ef4444"},
-            {lat: 0.02, lon: 0.03, intens: "Débil (1.0 mm/h)", color: "#38bdf8"}
-        ];
-
-        celdasLluvia.forEach(c => {
-            let circulo = L.circle([currentLat + c.lat, currentLon + c.lon], {
-                radius: 4500,
-                color: c.color,
-                fillColor: c.color,
-                fillOpacity: 0.45,
-                weight: 1
-            }).bindPopup(`<b>🌧️ Núcleo de Precipitación</b><br>Intensidad: ${c.intens}`);
-            capaLluviaRadar.addLayer(circulo);
-        });
-
-        return capaLluviaRadar;
-    }
-
-    // CAPA DE NUBOSIDAD ROBUSTA (FRENTES SATELITALES LOCALES)
-    function obtenerCapaNubesDinamica() {
-        if (capaNubesSat) return capaNubesSat;
-        capaNubesSat = L.layerGroup();
-
-        let nubesFrentes = [
-            {lat: 0.12, lon: 0.05, tipo: "Nubosidad Alta / Cirros", cobertura: "65%"},
-            {lat: -0.10, lon: -0.08, tipo: "Frente Nuboso Inestable", cobertura: "85%"},
-            {lat: 0.00, lon: 0.15, tipo: "Cielo Parcialmente Nublado", cobertura: "35%"}
-        ];
-
-        nubesFrentes.forEach(n => {
-            let poligonoNube = L.circle([currentLat + n.lat, currentLon + n.lon], {
-                radius: 7000,
-                color: '#9ca3af',
-                fillColor: '#d1d5db',
-                fillOpacity: 0.35,
-                dashArray: '4, 4',
-                weight: 2
-            }).bindPopup(`<b>☁️ Cobertura Nubosa</b><br>Tipo: ${n.tipo}<br>Cobertura: ${n.cobertura}`);
-            capaNubesSat.addLayer(poligonoNube);
-        });
-
-        return capaNubesSat;
-    }
-
     function obtenerCapaVientosDinamica() {
         if (capaVientosGrid) return capaVientosGrid;
+        
         capaVientosGrid = L.layerGroup();
         
         let offsets = [
@@ -1458,8 +1404,6 @@
         const btnBase = document.getElementById("btnBase");
         const btnTopo = document.getElementById("btnTopo");
         const btnCalles = document.getElementById("btnCalles");
-        const btnLluvia = document.getElementById("btnLluvia");
-        const btnNubes = document.getElementById("btnNubes");
         const btnVientos = document.getElementById("btnVientos");
         const btnFuego = document.getElementById("btnFuego");
         const mapTitle = document.getElementById("mapTitle");
@@ -1469,31 +1413,13 @@
         btnBase.classList.remove("active");
         btnTopo.classList.remove("active");
         if (btnCalles) btnCalles.classList.remove("active");
-        btnLluvia.classList.remove("active");
-        if (btnNubes) btnNubes.classList.remove("active");
         if (btnVientos) btnVientos.classList.remove("active");
         btnFuego.classList.remove("active");
 
-        if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
-        if (capaNubesSat && mapInstance.hasLayer(capaNubesSat)) mapInstance.removeLayer(capaNubesSat);
         if (capaVientosGrid && mapInstance.hasLayer(capaVientosGrid)) mapInstance.removeLayer(capaVientosGrid);
         if (mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
 
-        if (tipo === 'lluvia') {
-            btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧️ Radar de Precipitaciones en Vivo";
-            const layerLluvia = obtenerCapaLluviaDinamica();
-            if (!mapInstance.hasLayer(layerLluvia)) layerLluvia.addTo(mapInstance);
-            actualizarIndicadorMapa("Capa de Lluvia Activa", "#22c55e");
-
-        } else if (tipo === 'nubes') {
-            btnNubes.classList.add("active");
-            mapTitle.innerText = "☁️ Nubosidad & Frentes Atmosféricos";
-            const layerNubes = obtenerCapaNubesDinamica();
-            if (!mapInstance.hasLayer(layerNubes)) layerNubes.addTo(mapInstance);
-            actualizarIndicadorMapa("Capa de Nubes Activa", "#22c55e");
-
-        } else if (tipo === 'vientos') {
+        if (tipo === 'vientos') {
             btnVientos.classList.add("active");
             mapTitle.innerText = "💨 Mapa de Vientos & Deriva";
             const layerViento = obtenerCapaVientosDinamica();
@@ -1558,7 +1484,7 @@
             })
         }).addTo(mapInstance);
 
-        markerPlagas.bindPopup("<b>Consultando clima y nube...</b>").openPopup();
+        markerPlagas.bindPopup("<b>Consultando clima y lote...</b>").openPopup();
         mapInstance.setView([latLote, lonLote], 13, { animate: true });
 
         const urlClimaAPI = `https://api.open-meteo.com/v1/forecast?latitude=${latLote}&longitude=${lonLote}&current=temperature_2m,relative_humidity_2m`;
