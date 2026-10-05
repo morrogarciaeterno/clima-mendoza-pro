@@ -465,6 +465,52 @@
         .embalse-estado.warning { color: #f59e0b; }
         .embalse-estado.alert { color: #ef4444; }
 
+        .pasos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .paso-card {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .paso-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .paso-nombre {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .paso-provincia {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        .paso-estado {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .estado-abierto { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .estado-precaucion { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .estado-cerrado { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
         .dual-section {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
@@ -1050,7 +1096,7 @@
 
     <br>
 
-    <!-- ESTADO DE PASOS FRONTERIZOS FEDERALES -->
+    <!-- ESTADO DE PASOS FRONTERIZOS FEDERALES (CORREGIDO) -->
     <div class="card">
         <h3>🏔 Estado de Pasos Fronterizos Federales</h3>
         <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
@@ -1349,7 +1395,6 @@
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
-    // Base de costos y recomendación de agroquímicos para preparación de suelo
     const infoCultivosAgro = {
         "Vid": {
             prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350,
@@ -1735,61 +1780,10 @@
                 actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
             } else if (tipo === 'calles') {
                 if (btnCalles) btnCalles.classList.add("active");
-                mapTitle.innerText = "🛣️️ Red Vial & Localidades";
+                mapTitle.innerText = "🛣 Red Vial & Localidades";
                 actualizarIndicadorMapa("Capa de Calles activa", "#22c55e");
             }
         }
-    }
-
-    async function consultarClimaParaPlagas(lat, lon, marcador) {
-        actualizarIndicadorMapa("Consultando nombre de zona y clima...", "#38bdf8");
-
-        let nombreZona = `Coordenadas: ${lat.toFixed(3)}, ${lon.toFixed(3)}`;
-        try {
-            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
-            const geoData = await geoRes.json();
-            if (geoData && geoData.address) {
-                const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || "";
-                const prov = geoData.address.state || "";
-                if (ciudad) nombreZona = prov ? `${ciudad}, ${prov}` : ciudad;
-            }
-        } catch (e) {}
-
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`)
-            .then(res => res.json())
-            .then(climaData => {
-                let tempActual = climaData.current ? climaData.current.temperature_2m : "--";
-                let humActual = climaData.current ? climaData.current.relative_humidity_2m : "--";
-
-                let ndviValue = 0.35 + (Math.sin(lat * 10) * 0.25);
-                ndviValue = Math.max(0.1, Math.min(0.85, ndviValue));
-
-                let riesgo = "Bajo (Saludable)";
-                let colorRiesgo = "#2ecc71";
-                let recomendacion = "🟢 Cultivo vigoroso. Mantener monitoreo preventivo.";
-
-                if (ndviValue < 0.4) {
-                    riesgo = "Alto (Estrés / Suelo)";
-                    colorRiesgo = "#ef4444";
-                    recomendacion = "🔴 Alerta máxima: Posible estrés hídrico severo.";
-                }
-
-                marcador.setIcon(L.divIcon({
-                    className: 'custom-pin',
-                    html: `<div style="background-color: ${colorRiesgo}; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
-                    iconSize: [26, 26], iconAnchor: [13, 13]
-                }));
-
-                marcador.setPopupContent(`
-                    <div style="font-size: 0.8rem; line-height: 1.4; min-width: 180px;">
-                        <b>📍 Zona:</b> ${nombreZona}<br>
-                        <b>Riesgo:</b> <span style="color:${colorRiesgo}; font-weight:bold;">${riesgo}</span><br>
-                        <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
-                        <b>Temp:</b> ${tempActual}°C | <b>Humedad:</b> ${humActual}%
-                    </div>
-                `).openPopup();
-                actualizarIndicadorMapa("Diagnóstico agronómico listo", "#22c55e");
-            });
     }
 
     function toggleCapaPlagas() {
@@ -1817,12 +1811,6 @@
                 iconSize: [26, 26], iconAnchor: [13, 13]
             })
         }).addTo(mapInstance);
-
-        consultarClimaParaPlagas(currentLat, currentLon, markerPlagas);
-        markerPlagas.on('dragend', function() {
-            let pos = markerPlagas.getLatLng();
-            consultarClimaParaPlagas(pos.lat, pos.lng, markerPlagas);
-        });
     }
 
     function centrarUbicacion() {
@@ -1858,7 +1846,7 @@
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         } else {
-            actualizarEmbalsesSugunUbicacion("Mendoza");
+            actualizarEmbalsesSegunUbicacion("Mendoza");
             inicializarMapaArgentina(currentLat, currentLon);
         }
     }
