@@ -1017,7 +1017,7 @@
                 <div class="grid-agricola">
 
                     <div style="background: var(--card-bg); padding: 7px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.1rem;">🌧️️</span>
+                        <span style="font-size: 1.1rem;">🌧</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.62rem; margin-top: 2px;">Prob. Lluvia</small>
                         <strong id="probLluvia" style="font-size: 0.85rem; color: var(--text-main);">--%</strong>
                     </div>
@@ -1129,14 +1129,15 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA Y ACCESO A RADAR DACC -->
+        <!-- MAPA MULTICAPA CON RADAR DE NUBES Y LLUVIA INTEGRADO -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺 Visor Geográfico & Radares</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
-                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️️ Topo</button>
+                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
-                <a href="http://www.contingencias.mendoza.gov.ar/atm/radar/" target="_blank" class="map-btn" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); text-decoration: none; display: flex; align-items: center; justify-content: center;">📡 Radar DACC</a>
+                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent);">🌧️ Nubes / Lluvia</button>
+                <a href="http://www.contingencias.mendoza.gov.ar/atm/radar/" target="_blank" class="map-btn" style="background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent); text-decoration: none; display: flex; align-items: center; justify-content: center;">📡 DACC Web</a>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnVientos" onclick="cambiarCapaMapa('vientos')">💨 Vientos</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
@@ -1174,6 +1175,7 @@
     let capaActual = null;
     let capaFuegosFIRMS = null;
     let capaVientosGrid = null;
+    let capaRadarNubes = null;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
@@ -1256,7 +1258,7 @@
 
         Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
-                new Notification("🛰️️ AgroTech Argentina", {
+                new Notification("🛰️ AgroTech Argentina", {
                     body: "¡Notificaciones activadas correctamente! Te avisaremos ante cualquier alerta.",
                     icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
                 });
@@ -1327,6 +1329,14 @@
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
+                // Capa de radar de lluvia/nubes en tiempo real (RainViewer API)
+                capaRadarNubes = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t0/{z}/{x}/{y}/2/1_1.png', {
+                    tileSize: 256,
+                    opacity: 0.75,
+                    attribution: '&copy; RainViewer',
+                    maxZoom: 19
+                });
+
                 mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
                 mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor interactivo activo", "#22c55e"); });
 
@@ -1376,6 +1386,7 @@
         const btnBase = document.getElementById("btnBase");
         const btnTopo = document.getElementById("btnTopo");
         const btnCalles = document.getElementById("btnCalles");
+        const btnNubes = document.getElementById("btnNubes");
         const btnVientos = document.getElementById("btnVientos");
         const btnFuego = document.getElementById("btnFuego");
         const mapTitle = document.getElementById("mapTitle");
@@ -1385,13 +1396,20 @@
         btnBase.classList.remove("active");
         btnTopo.classList.remove("active");
         if (btnCalles) btnCalles.classList.remove("active");
+        if (btnNubes) btnNubes.classList.remove("active");
         if (btnVientos) btnVientos.classList.remove("active");
         btnFuego.classList.remove("active");
 
         if (capaVientosGrid && mapInstance.hasLayer(capaVientosGrid)) mapInstance.removeLayer(capaVientosGrid);
         if (mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
+        if (capaRadarNubes && mapInstance.hasLayer(capaRadarNubes)) mapInstance.removeLayer(capaRadarNubes);
 
-        if (tipo === 'vientos') {
+        if (tipo === 'nubes') {
+            if (capaRadarNubes) capaRadarNubes.addTo(mapInstance);
+            btnNubes.classList.add("active");
+            mapTitle.innerText = "🌧️ Radar de Nubes & Precipitaciones en Vivo";
+            actualizarIndicadorMapa("Capa de Radar de Lluvia Activa", "#38bdf8");
+        } else if (tipo === 'vientos') {
             btnVientos.classList.add("active");
             mapTitle.innerText = "💨 Mapa de Vientos & Deriva";
             const layerViento = obtenerCapaVientosDinamica();
@@ -1463,9 +1481,7 @@
         fetch(urlClimaAPI)
             .then(response => response.json())
             .then(climaData => {
-                let tempActual = "--";
-                let humActual = "--";
-
+                let tempActual = "--", humActual = "--";
                 if (climaData && climaData.current) {
                     tempActual = climaData.current.temperature_2m;
                     humActual = climaData.current.relative_humidity_2m;
@@ -1479,17 +1495,10 @@
                     complete: function(results) {
                         let ndviRow = results.data[0] || {};
                         let ndviValue = parseFloat(ndviRow.NDVI) || 0.070;
+                        let riesgo = "Bajo (Saludable)", colorRiesgo = "#2ecc71";
 
-                        let riesgo = "Bajo (Saludable)";
-                        let colorRiesgo = "#2ecc71";
-
-                        if (ndviValue < 0.4) {
-                            riesgo = "Alto (Estrés / Suelo)";
-                            colorRiesgo = "#ef4444";
-                        } else if (ndviValue < 0.6) {
-                            riesgo = "Moderado";
-                            colorRiesgo = "#f39c12";
-                        }
+                        if (ndviValue < 0.4) { riesgo = "Alto (Estrés / Suelo)"; colorRiesgo = "#ef4444"; }
+                        else if (ndviValue < 0.6) { riesgo = "Moderado"; colorRiesgo = "#f39c12"; }
 
                         markerPlagas.setIcon(L.divIcon({
                             className: 'custom-pin',
@@ -1505,7 +1514,6 @@
                             <b>Temperatura:</b> ${tempActual} °C<br>
                             <b>Humedad:</b> ${humActual} %
                         `;
-
                         markerPlagas.setPopupContent(popupContent);
                         markerPlagas.openPopup();
                         actualizarIndicadorMapa("Capa de Plagas y Clima sincronizada", "#22c55e");
@@ -1617,7 +1625,7 @@
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
-        if (codigo <= 67) return "🌧️";
+        if (codigo <= 67) return "🌧️️";
         if (codigo >= 95) return "⛈️";
         return "⛈️";
     }
@@ -1976,6 +1984,7 @@
     iniciarApp();
     setInterval(actualizarFechaYHoraDigital, 1000);
     setInterval(dispararCargaDeDatos, 300000);
+    setInterval(cargarCalidadGIF = dispararCargaDeDatos, 300000);
     setInterval(cargarCalidadAire, 300000);
     setInterval(cargarPolen, 3600000);
     setInterval(cargarSismos, 300000);
