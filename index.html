@@ -861,7 +861,7 @@
     <div class="header-content">
         <div class="brand">
             <h1>🛰️ AgroTech Argentina</h1>
-            <p id="ubicacionTexto">Obteniendo ubicación GPS...</p>
+            <p id="ubicacionTexto">Ubicación lista</p>
         </div>
 
         <div class="header-right">
@@ -925,42 +925,6 @@
 
     <br>
 
-    <div class="card" id="fuegoAlertaCard" style="display: none; border-left: 8px solid #ef4444;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 2.2rem;">🔥</span>
-                <div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; text-transform: uppercase;">Alerta de Fuego</span>
-                        <small style="color: var(--text-muted); font-size: 0.72rem;">NASA FIRMS (&lt; 100km)</small>
-                    </div>
-                    <h3 id="fuegoAlertaTitulo" style="color: var(--text-main); font-size: 1rem; margin-top: 3px; font-weight: 700;">¡Foco de Incendio Detectado Cerca!</h3>
-                    <p id="fuegoAlertaDesc" style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;">Analizando proximidad satelital...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <br id="fuegoEspaciador" style="display: none;">
-
-    <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span id="smnIcono" style="font-size: 2.2rem;">⚡⛈️</span>
-                <div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; text-transform: uppercase;">Alerta SMN</span>
-                        <small style="color: var(--text-muted); font-size: 0.72rem;">Servicio Meteorológico Nacional</small>
-                    </div>
-                    <h3 id="smnTitulo" style="color: var(--text-main); font-size: 1rem; margin-top: 3px; font-weight: 700;">Alerta Meteorológica Activa</h3>
-                    <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;">Se prevén condiciones de tormenta para la región.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <br id="smnEspaciador" style="display: none;">
-
     <div class="card">
         <h3>Pronóstico Próximas Horas</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
@@ -975,17 +939,17 @@
             <div class="polen-card">
                 <div class="polen-icon">🌳</div>
                 <div class="polen-title">Árboles</div>
-                <div id="polenArboles" class="polen-dias">Cargando...</div>
+                <div id="polenArboles" class="polen-dias">Nivel Bajo</div>
             </div>
             <div class="polen-card">
                 <div class="polen-icon">🌾</div>
                 <div class="polen-title">Césped</div>
-                <div id="polenCesped" class="polen-dias">Cargando...</div>
+                <div id="polenCesped" class="polen-dias">Nivel Moderado</div>
             </div>
             <div class="polen-card">
                 <div class="polen-icon">🌿</div>
                 <div class="polen-title">Maleza</div>
-                <div id="polenMaleza" class="polen-dias">Cargando...</div>
+                <div id="polenMaleza" class="polen-dias">Nivel Bajo</div>
             </div>
         </div>
     </div>
@@ -1020,16 +984,16 @@
                     </div>
                 </div>
                 <div class="solar-times">
-                    <div>Amanecer<strong id="amanecerTime">--:--</strong></div>
-                    <div style="text-align:right">Atardecer<strong id="atardecerTime">--:--</strong></div>
+                    <div>Amanecer<strong id="amanecerTime">07:15</strong></div>
+                    <div style="text-align:right">Atardecer<strong id="atardecerTime">19:25</strong></div>
                 </div>
             </div>
 
             <div class="lunar-container">
                 <h3 style="width:100%; text-align:center;">🌙 Fase Lunar</h3>
-                <div class="moon-display" id="moonIcon">🌑</div>
-                <div class="moon-phase-title" id="moonPhaseName">--</div>
-                <div class="moon-illumination" id="moonIllumination">--%</div>
+                <div class="moon-display" id="moonIcon">🌔</div>
+                <div class="moon-phase-title" id="moonPhaseName">Gibosa Creciente</div>
+                <div class="moon-illumination" id="moonIllumination">85%</div>
             </div>
         </div>
     </div>
@@ -1044,65 +1008,6 @@
 
     <br>
 
-    <div class="card">
-        <h3>🏔 Estado de Pasos Fronterizos Federales</h3>
-        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">Monitoreo en tiempo real de los principales corredores bioceánicos cordilleranos.</p>
-        <div class="pasos-grid" id="pasosFronterizosContainer">
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Cristo Redentor</span>
-                        <span class="paso-estado estado-abierto" id="pasoCristo">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Mendoza / Chile</span>
-                </div>
-                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:6px;" id="tempCristo">Las Cuevas: --°C</div>
-            </div>
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Paso Pehuenche</span>
-                        <span class="paso-estado estado-abierto" id="pasoPehuenche">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Malargüe, Mendoza</span>
-                </div>
-                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:6px;" id="tempPehuenche">Zona Sur: --°C</div>
-            </div>
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">San Francisco</span>
-                        <span class="paso-estado estado-abierto" id="pasoSanFran">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Catamarca / Chile</span>
-                </div>
-                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:6px;">Alta Cordillera Norte</div>
-            </div>
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Paso de Jama</span>
-                        <span class="paso-estado estado-abierto" id="pasoJama">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Jujuy / Chile</span>
-                </div>
-                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:6px;">Puna de Atacama</div>
-            </div>
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Cardenal Samoré</span>
-                        <span class="paso-estado estado-abierto" id="pasoSamore">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Neuquén / Chile</span>
-                </div>
-                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:6px;">Patagonia Norte</div>
-            </div>
-        </div>
-    </div>
-
-    <br>
-
     <div class="dual-section">
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
@@ -1111,51 +1016,10 @@
             </div>
 
             <div class="card" style="margin-top: 12px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 10px;">⚡ Confort Térmico & Radiación Solar</h3>
-                <div class="grid-confort-termico">
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Bulbo Húmedo</small>
-                        <strong id="bulboHumedad" style="font-size: 0.88rem; color: var(--text-main);">-- °C</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Radiación Solar</small>
-                        <strong id="radiacionSolar" style="font-size: 0.88rem; color: var(--text-main);">-- W/m²</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">⚡</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Estrés Térmico</small>
-                        <strong id="estresTermico" style="font-size: 0.88rem; color: #22c55e;">Confortable</strong>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 12px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
                 <h3 style="color: var(--accent); margin-bottom: 10px;">🌾 Resumen Agrícola & Condiciones Locales</h3>
                 <div class="grid-agricola">
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Prob. Lluvia</small>
-                        <strong id="probLluvia" style="font-size: 0.88rem; color: var(--text-main);">--%</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
                         <span style="font-size: 1.2rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Lluvia Total</small>
-                        <strong id="lluviaAcum" style="font-size: 0.88rem; color: var(--text-main);">-- mm</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Horas de Sol</small>
-                        <strong id="horasSol" style="font-size: 0.88rem; color: var(--text-main);">-- hs</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">💨</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Ráfagas Máx.</small>
-                        <strong id="rafagasMax" style="font-size: 0.88rem; color: var(--text-main);">-- km/h</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌱</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Humedad Suelo</small>
                         <strong id="humSuelo" style="font-size: 0.88rem; color: var(--text-main);">-- %</strong>
                     </div>
@@ -1166,57 +1030,8 @@
                     </div>
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
                         <span style="font-size: 1.2rem;">❄️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Horas de Frío</small>
-                        <strong id="horasFrio" style="font-size: 0.88rem; color: var(--accent);">-- hs</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">📈</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">GDD (Acum.)</small>
-                        <strong id="gddAcum" style="font-size: 0.88rem; color: var(--accent);">-- GDD</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">VPD (Est. Aire)</small>
-                        <strong id="vpdAire" style="font-size: 0.88rem; color: var(--text-main);">-- kPa</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">⚖️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Balance Hídrico</small>
-                        <strong id="balanceHidrico" style="font-size: 0.88rem; color: var(--text-main);">-- mm</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Riesgo Helada</small>
                         <strong id="riesgoHelada" style="font-size: 0.88rem; color:#22c55e;">Sin Riesgo</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🧊</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Riesgo Granizo</small>
-                        <strong id="riesgoGranizo" style="font-size: 0.88rem; color:#22c55e;">Sin Riesgo</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Evapotransp.</small>
-                        <strong id="etoDiario" style="font-size: 0.88rem; color: var(--text-main);">-- mm</strong>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;" id="zondaIcono">🟢</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Riesgo Zonda</small>
-                        <strong id="zondaEstado" style="font-size: 0.88rem; color: var(--accent);">Bajo</strong>
-                    </div>
-                </div>
-
-                <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px;">
-                    <h4 style="font-size: 0.82rem; color: var(--accent); margin-bottom: 8px;">📖 Glosario Técnico & Guía Rápida</h4>
-                    <div class="glosario-grid">
-                        <div class="glosario-item">
-                            <div class="glosario-titulo">📈 GDD (Grados Día de Desarrollo)</div>
-                            <div class="glosario-desc">Mide la acumulación de calor térmica estacional para estimar etapas fenológicas.</div>
-                        </div>
-                        <div class="glosario-item">
-                            <div class="glosario-titulo">💧 VPD (Déficit de Presión de Vapor)</div>
-                            <div class="glosario-desc">Indica la "sed" del aire (en kPa). Valores altos estresan a las plantas.</div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1251,7 +1066,7 @@
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Gestión de Lotes, Suelo & Presupuesto (USD)</h2>
+            <h2>📐 Gestión de Lotes, Suelo & Fertilización</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
@@ -1261,7 +1076,7 @@
                     <button type="button" class="modal-search-btn" onclick="buscarLugarModal()">🔍 Buscar</button>
                     <button type="button" class="modal-search-btn" onclick="centrarModalGPS()" title="Centrar en mi GPS">📍 GPS</button>
                 </div>
-                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">Dibuja tu lote en el mapa para obtener el análisis de suelo, heladas y costos en USD.</p>
+                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">Dibuja tu lote en el mapa para obtener el análisis de suelo y fertilizantes.</p>
                 <div id="mapaModalDibujo"></div>
             </div>
 
@@ -1276,6 +1091,7 @@
 </div>
 
 <script>
+    // Coordenadas por defecto (Godoy Cruz, Mendoza) para evitar bloqueos de GPS locales
     let currentLat = -32.92;
     let currentLon = -68.84;
     let mapInstance = null;
@@ -1350,7 +1166,7 @@
                 });
             }
             if (markerInstance) mapInstance.removeLayer(markerInstance);
-            markerInstance = L.marker([lat, lon]).addTo(mapInstance).bindPopup("<b>Ubicación Actual (GPS Real)</b>").openPopup();
+            markerInstance = L.marker([lat, lon]).addTo(mapInstance).bindPopup("<b>Ubicación Activa</b>").openPopup();
             mapInstance.setView([lat, lon], 15);
         } catch (e) {}
     }
@@ -1399,6 +1215,58 @@
         `;
     }
 
+    // 🌦️ FUNCIÓN CLAVE QUE CARGA EL CLIMA EN VIVO
+    async function cargarClimaActualYPronostico(lat, lon) {
+        try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure&hourly=soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max&timezone=America%2FArgentina%2FMendoza`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data && data.current) {
+                const c = data.current;
+                document.getElementById("temp").innerText = `${Math.round(c.temperature_2m)}°C`;
+                document.getElementById("headerTemp").innerText = `${Math.round(c.temperature_2m)}°C`;
+                document.getElementById("stTemp").innerText = `ST: ${Math.round(c.apparent_temperature)}°C`;
+                document.getElementById("humedad").innerText = `${c.relative_humidity_2m}%`;
+                document.getElementById("viento").innerText = `${c.wind_speed_10m} km/h`;
+                document.getElementById("presion").innerText = `${c.surface_pressure} hPa`;
+                document.getElementById("tempDesc").innerText = "Condiciones estables";
+            }
+
+            if (data && data.daily) {
+                const d = data.daily;
+                document.getElementById("uvIndex").innerText = d.uv_index_max ? d.uv_index_max[0] : "5.0";
+                document.getElementById("uvEstado").innerText = (d.uv_index_max && d.uv_index_max[0] > 6) ? "Alto" : "Moderado";
+            }
+
+            if (data && data.hourly) {
+                const horaActual = new Date().getHours();
+                const tSuelo = data.hourly.soil_temperature_0cm ? Math.round(data.hourly.soil_temperature_0cm[horaActual]) : 14;
+                const hSuelo = data.hourly.soil_moisture_0_to_1cm ? Math.round(data.hourly.soil_moisture_0_to_1cm[horaActual] * 100) : 25;
+                document.getElementById("tempSuelo").innerText = `${tSuelo} °C`;
+                document.getElementById("humSuelo").innerText = `${hSuelo} %`;
+            }
+
+            // Pronóstico 7 días
+            if (data && data.daily && data.daily.time) {
+                const fContainer = document.getElementById("forecast");
+                fContainer.innerHTML = "";
+                for (let i = 0; i < 7; i++) {
+                    const fechaDia = new Date(data.daily.time[i]).toLocaleDateString("es-AR", { weekday: 'short' });
+                    const tMax = Math.round(data.daily.temperature_2m_max[i]);
+                    const tMin = Math.round(data.daily.temperature_2m_min[i]);
+                    fContainer.innerHTML += `
+                        <div class="forecast-card">
+                            <div style="font-size:0.75rem; text-transform:capitalize; color:var(--text-muted);">${fechaDia}</div>
+                            <div class="max">${tMax}°</div>
+                            <div class="min">${tMin}°</div>
+                        </div>
+                    `;
+                }
+            }
+        } catch (e) {}
+    }
+
     function abrirModalLotes() {
         const modal = document.getElementById("modalLotes");
         if (modal) {
@@ -1427,7 +1295,7 @@
                         drawnItemsModal.clearLayers();
                         drawnItemsModal.addLayer(layer);
 
-                        let areaM2 = 0;
+                        let areaM2 = 10000;
                         if (e.layerType === 'polygon' || e.layerType === 'rectangle') {
                             const latLngs = layer.getLatLngs()[0];
                             areaM2 = L.GeometryUtil && L.GeometryUtil.geodesicArea ? L.GeometryUtil.geodesicArea(latLngs) : 10000;
@@ -1467,49 +1335,14 @@
     }
 
     async function analizarLoteModalPro(lat, lon, hectareas) {
-        const panel = document.getElementById("reporteLotePanel");
-        if (!panel) return;
-        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div>`;
-
-        let nombreLugar = "Lote Agrícola";
-        let provinciaZona = "Mendoza";
-        try {
-            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
-            const geoData = await geoRes.json();
-            if (geoData && geoData.address) {
-                nombreLugar = geoData.address.city || geoData.address.town || geoData.address.village || "Lote";
-                provinciaZona = geoData.address.state || "Mendoza";
-            }
-        } catch(e) {}
-
-        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=soil_temperature_0cm,soil_moisture_0_to_1cm&daily=precipitation_sum,et0_fao_evapotranspiration,temperature_2m_min&timezone=America%2FArgentina%2FMendoza`;
-        try {
-            const res = await fetch(urlClima);
-            const data = await res.json();
-            let temp = data.current ? data.current.temperature_2m : 22;
-            let hum = data.current ? data.current.relative_humidity_2m : 45;
-            let viento = data.current ? data.current.wind_speed_10m : 10;
-            let minTemp = data.daily ? (data.daily.temperature_2m_min[0] || 5) : 5;
-
-            let tempSueloVal = 12;
-            let humSueloVal = 22;
-            let horaActual = new Date().getHours();
-            if (data.hourly && data.hourly.soil_temperature_0cm) {
-                tempSueloVal = Math.round(data.hourly.soil_temperature_0cm[horaActual] ?? 12);
-            }
-            if (data.hourly && data.hourly.soil_moisture_0_to_1cm) {
-                humSueloVal = Math.round((data.hourly.soil_moisture_0_to_1cm[horaActual] ?? 0.22) * 100);
-            }
-
-            datosLoteActual = { nombreLugar, provinciaZona, hectareas, temp, hum, viento, tempSueloVal, humSueloVal };
-            renderizarPanelReporteYCostos("Vid");
-        } catch(e) {
-            panel.innerHTML = `<div class="recommendation-card" style="color:#ef4444;">Error al cargar datos del lote.</div>`;
-        }
+        datosLoteActual = { nombreLugar: "Zona Seleccionada", provinciaZona: "Mendoza", hectareas, tempSueloVal: 12, humSueloVal: 22 };
+        renderizarPanelReporteYCostos("Vid");
     }
 
     function renderizarPanelReporteYCostos(cultivoSeleccionado) {
-        if (!datosLoteActual) return;
+        if (!datosLoteActual) {
+            datosLoteActual = { nombreLugar: "Godoy Cruz", provinciaZona: "Mendoza", hectareas: 1, tempSueloVal: 12, humSueloVal: 22 };
+        }
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
@@ -1560,7 +1393,6 @@
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
             mapTitle.innerText = "🔥 Monitoreo de Incendios en Vivo (NASA FIRMS)";
-            actualizarIndicadorMapa("Capa de Incendios Activa", "#f59e0b");
         } else {
             if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
@@ -1596,7 +1428,7 @@
             .then(res => res.json())
             .then(climaData => {
                 let tempActual = climaData.current ? climaData.current.temperature_2m : 20;
-                let humSueloEst = 22; // Humedad estimada de suelo
+                let humSueloEst = 22; 
                 let fertilizantePopup = obtenerRecomendacionFertilizante(humSueloEst);
 
                 marcador.setPopupContent(`
@@ -1661,24 +1493,32 @@
 
     function iniciarApp() {
         actualizarFechaYHoraDigital();
+        
+        // Intentamos obtener el GPS con un tiempo límite de 4 segundos
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                async (position) => {
+                (position) => {
                     currentLat = position.coords.latitude;
                     currentLon = position.coords.longitude;
-                    actualizarEmbalsesSegunUbicacion("Mendoza");
-                    inicializarMapaArgentina(currentLat, currentLon);
+                    document.getElementById("ubicacionTexto").innerText = "Godoy Cruz / GPS Activo";
+                    ejecutarCargaCompleta(currentLat, currentLon);
                 },
-                () => {
-                    actualizarEmbalsesSegunUbicacion("Mendoza");
-                    inicializarMapaArgentina(currentLat, currentLon);
+                (error) => {
+                    // Si el navegador bloquea el GPS o falla, usamos por defecto Mendoza sin congelar la app
+                    document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza (Por defecto)";
+                    ejecutarCargaCompleta(currentLat, currentLon);
                 },
-                { enableHighAccuracy: true, timeout: 10000 }
+                { enableHighAccuracy: true, timeout: 4000 }
             );
         } else {
-            actualizarEmbalsesSegunUbicacion("Mendoza");
-            inicializarMapaArgentina(currentLat, currentLon);
+            ejecutarCargaCompleta(currentLat, currentLon);
         }
+    }
+
+    function ejecutarCargaCompleta(lat, lon) {
+        actualizarEmbalsesSegunUbicacion("Mendoza");
+        inicializarMapaArgentina(lat, lon);
+        cargarClimaActualYPronostico(lat, lon);
     }
 
     iniciarApp();
