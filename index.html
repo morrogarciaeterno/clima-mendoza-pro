@@ -699,13 +699,52 @@
             min-height: 380px;
         }
 
+        /* BUSCADOR DE LUGARES EN EL MODAL */
+        .modal-search-box {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .modal-search-input {
+            flex-grow: 1;
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            outline: none;
+        }
+
+        .modal-search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-search-btn {
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-search-btn:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
         #mapaModalDibujo {
             width: 100%;
             flex-grow: 1;
             border-radius: 12px;
             border: 2px solid var(--border);
             background-color: #090d16 !important;
-            min-height: 350px;
+            min-height: 320px;
         }
 
         .modal-report-panel {
@@ -1182,13 +1221,13 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️</span>
+                        <span style="font-size: 1.2rem;">🌡️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Temp. Suelo</small>
                         <strong id="tempSuelo" style="font-size: 0.88rem; color: var(--text-main);">-- °C</strong>
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄️️</span>
+                        <span style="font-size: 1.2rem;">❄</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Horas de Frío</small>
                         <strong id="horasFrio" style="font-size: 0.88rem; color: var(--accent);">-- hs</strong>
                     </div>
@@ -1206,13 +1245,13 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">⚖️</span>
+                        <span style="font-size: 1.2rem;">⚖️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Balance Hídrico</small>
                         <strong id="balanceHidrico" style="font-size: 0.88rem; color: var(--text-main);">-- mm</strong>
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄️️</span>
+                        <span style="font-size: 1.2rem;">❄</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Riesgo Helada</small>
                         <strong id="riesgoHelada" style="font-size: 0.88rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
@@ -1247,7 +1286,7 @@
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">💧 VPD (Déficit de Presión de Vapor)</div>
-                            <div class="glosario-desc">Indica la "sed" del aire (en kPa). Valores altos (>1.5) estresan a las plantas y cierran estomas; values bajos (&lt;0.4) frenan la transpiración.</div>
+                            <div class="glosario-desc">Indica la "sed" del aire (en kPa). Valores altos (&gt;1.5) estresan a las plantas y cierran estomas; values bajos (&lt;0.4) frenan la transpiración.</div>
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">⚖️ Balance Hídrico</div>
@@ -1298,7 +1337,7 @@
 
 </div>
 
-<!-- VENTANA MODAL AMPLIADA CON ESTIMADOR DE COSTOS EN DÓLARES -->
+<!-- VENTANA MODAL AMPLIADA CON BUSCADOR Y ESTIMADOR DE COSTOS EN DÓLARES -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
@@ -1306,8 +1345,12 @@
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
-            <!-- Columna Izquierda: Mapa de Dibujo -->
+            <!-- Columna Izquierda: Buscador + Mapa de Dibujo -->
             <div class="modal-map-container">
+                <div class="modal-search-box">
+                    <input type="text" id="modalSearchInput" class="modal-search-input" placeholder="Buscar lugar, ciudad o provincia (ej: Luján de Cuyo)..." onkeypress="if(event.key === 'Enter') buscarLugarModal()">
+                    <button class="modal-search-btn" onclick="buscarLugarModal()">Buscar</button>
+                </div>
                 <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
                     Dibuja tu lote arriba a la derecha. Selecciona un cultivo para calcular los costos en dólares.
                 </p>
@@ -1352,7 +1395,6 @@
         "Cultivos Extensivos (Maíz/Soja)": { prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900 }
     };
 
-    // Diccionario de Recomendación de Fertilizantes según cultivo y estado nutricional
     const fertilizantesPorCultivo = {
         "Vid": {
             optimo: "Nitrato de Potasio (para equilibrar brotación y calidad en maduración) y aportes de Fósforo en pre-floración.",
@@ -1503,8 +1545,8 @@
     });
 
     const capasBase = {
-        base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap' }),
-        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap' }),
+        base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap', subdomains: 'abc', userAgent: 'AgroTechArgentinaApp/1.0' }),
+        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap', subdomains: 'abc' }),
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
@@ -1560,7 +1602,7 @@
             setTimeout(() => {
                 if (!modalMapInstance) {
                     modalMapInstance = L.map('mapaModalDibujo', { zoomControl: true }).setView([currentLat, currentLon], 15);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4 }).addTo(modalMapInstance);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, subdomains: 'abc', userAgent: 'AgroTechArgentinaApp/1.0' }).addTo(modalMapInstance);
 
                     drawnItemsModal = new L.FeatureGroup();
                     modalMapInstance.addLayer(drawnItemsModal);
@@ -1584,7 +1626,7 @@
 
                     modalMapInstance.on(L.Draw.Event.CREATED, function (e) {
                         const layer = e.layer;
-                        drawnItemsModal.clearLayers(); // Mantener solo el último lote dibujado
+                        drawnItemsModal.clearLayers();
                         drawnItemsModal.addLayer(layer);
 
                         let areaM2 = 0;
@@ -1607,6 +1649,29 @@
     function cerrarModalLotes() {
         const modal = document.getElementById("modalLotes");
         if (modal) modal.style.display = "none";
+    }
+
+    async function buscarLugarModal() {
+        const input = document.getElementById("modalSearchInput");
+        if (!input || !input.value.trim()) return;
+
+        const query = input.value.trim();
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                if (modalMapInstance) {
+                    modalMapInstance.setView([lat, lon], 14);
+                    L.marker([lat, lon]).addTo(modalMapInstance).bindPopup(`<b>Encontrado:</b> ${data[0].display_name}`).openPopup();
+                }
+            } else {
+                alert("No se encontró la ubicación ingresada.");
+            }
+        } catch (err) {
+            alert("Error al buscar la ubicación.");
+        }
     }
 
     async function analizarLoteModalPro(lat, lon, hectareas) {
@@ -1641,11 +1706,9 @@
             ndviEst = Math.max(0.2, Math.min(0.88, ndviEst));
 
             let estadoCultivo = "Vigoroso / Óptimo";
-            let colorEstado = "#22c55e";
-            if (ndviEst < 0.4) { estadoCultivo = "Estrés Hídrico Severo"; colorEstado = "#ef4444"; }
-            else if (ndviEst < 0.6) { estadoCultivo = "Crecimiento Regular"; colorEstado = "#f59e0b"; }
+            if (ndviEst < 0.4) { estadoCultivo = "Estrés Hídrico Severo"; }
+            else if (ndviEst < 0.6) { estadoCultivo = "Crecimiento Regular"; }
 
-            // Cultivos sugeridos por región por defecto
             let cultivoDefault = "Vid";
             if (provinciaZona.toLowerCase().includes("neuquén") || provinciaZona.toLowerCase().includes("rionegro")) {
                 cultivoDefault = "Frutales (Manzana/Pera/Cerezo)";
@@ -2003,7 +2066,7 @@
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
         if (codigo <= 67) return "🌧️";
-        if (codigo >= 95) return "⛈️";
+        if (codigo >= 95) return "⛈";
         return "⛈️";
     }
 
@@ -2453,7 +2516,7 @@
                 if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
                 if (elSunIcon) {
                     elSunIcon.style.transform = `rotate(-${angulo}deg)`;
-                    elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️️";
+                    elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀";
                 }
             }
 
