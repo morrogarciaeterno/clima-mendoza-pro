@@ -1164,12 +1164,12 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA CON RADAR LLUVIA RAINVIEWER -->
+        <!-- MAPA MULTICAPA CON RADAR LLUVIA DIRECTO -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
-            <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
+            <h3 id="mapTitle">🗺️️ Visor Geográfico & Radares</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
-                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️️ Topo</button>
+                <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
@@ -1370,30 +1370,7 @@
         }
     }
 
-    async function obtenerCapaLluviaDinamica() {
-        if (capaLluviaRadar) return capaLluviaRadar;
-        try {
-            const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-            const data = await res.json();
-            if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-                const latestTime = data.radar.past[data.radar.past.length - 1].time;
-                capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
-                    tileSize: 256,
-                    opacity: 0.75,
-                    maxZoom: 18,
-                    attribution: '&copy; RainViewer'
-                });
-            }
-        } catch (e) {
-            console.error("Error al conectar con el radar de lluvia:", e);
-            capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/weather-maps/0/{z}/{x}/{y}/256/2_1.png', {
-                tileSize: 256, opacity: 0.75, maxZoom: 18
-            });
-        }
-        return capaLluviaRadar;
-    }
-
-    async function cambiarCapaMapa(tipo) {
+    function cambiarCapaMapa(tipo) {
         const btnBase = document.getElementById("btnBase");
         const btnTopo = document.getElementById("btnTopo");
         const btnCalles = document.getElementById("btnCalles");
@@ -1410,16 +1387,24 @@
         btnFuego.classList.remove("active");
 
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
-        if (mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
+        if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
 
         if (tipo === 'lluvia') {
             btnLluvia.classList.add("active");
             mapTitle.innerText = "🌧️ Radar de Precipitaciones en Vivo";
-            actualizarIndicadorMapa("Conectando con radar de lluvia...", "#38bdf8");
+            actualizarIndicadorMapa("Cargando radar de lluvia...", "#38bdf8");
 
-            const layer = await obtenerCapaLluviaDinamica();
-            if (!mapInstance.hasLayer(layer)) {
-                layer.addTo(mapInstance);
+            if (!capaLluviaRadar) {
+                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/weather-maps/0/{z}/{x}/{y}/256/2_1.png', {
+                    tileSize: 256,
+                    opacity: 0.8,
+                    maxZoom: 18,
+                    attribution: '&copy; RainViewer'
+                });
+            }
+
+            if (!mapInstance.hasLayer(capaLluviaRadar)) {
+                capaLluviaRadar.addTo(mapInstance);
             }
             actualizarIndicadorMapa("Capa de Lluvia Activa", "#22c55e");
 
@@ -1429,7 +1414,7 @@
             mapTitle.innerText = "🔥 Monitoreo de Incendios en Vivo (NASA FIRMS)";
             actualizarIndicadorMapa("Capa de Incendios Activa (Últimas 24hs)", "#f59e0b");
         } else {
-            if (capaActual) mapInstance.removeLayer(capaActual);
+            if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
             capaActual.addTo(mapInstance);
 
@@ -1661,9 +1646,9 @@
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
-        if (codigo <= 67) return "🌧️";
+        if (codigo <= 67) return "🌧️️";
         if (codigo >= 95) return "⛈️";
-        return "⛈";
+        return "⛈️";
     }
 
     function calcularFaseLunar() {
