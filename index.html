@@ -699,51 +699,13 @@
             min-height: 380px;
         }
 
-        .modal-search-bar {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
-
-        .modal-search-input {
-            flex-grow: 1;
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.78rem;
-            outline: none;
-        }
-
-        .modal-search-input:focus {
-            border-color: var(--accent);
-        }
-
-        .modal-search-btn {
-            background: rgba(56, 189, 248, 0.2);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.78rem;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .modal-search-btn:hover {
-            background: var(--accent);
-            color: #000;
-        }
-
         #mapaModalDibujo {
             width: 100%;
             flex-grow: 1;
             border-radius: 12px;
             border: 2px solid var(--border);
             background-color: #090d16 !important;
-            min-height: 330px;
+            min-height: 350px;
         }
 
         .modal-report-panel {
@@ -1211,7 +1173,7 @@
                 <div class="grid-agricola">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌧</span>
+                        <span style="font-size: 1.2rem;">🌧️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Prob. Lluvia</small>
                         <strong id="probLluvia" style="font-size: 0.88rem; color: var(--text-main);">--%</strong>
                     </div>
@@ -1357,7 +1319,7 @@
 
 </div>
 
-<!-- VENTANA MODAL AMPLIADA CON BUSCADOR Y GEOLOCALIZADOR -->
+<!-- VENTANA MODAL AMPLIADA CON DIAGNÓSTICO DE SUELO Y RIESGOS -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
@@ -1365,15 +1327,10 @@
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
-            <!-- Columna Izquierda: Mapa de Dibujo con Buscador -->
+            <!-- Columna Izquierda: Mapa de Dibujo -->
             <div class="modal-map-container">
-                <div class="modal-search-bar">
-                    <input type="text" id="inputBusquedaLugar" class="modal-search-input" placeholder="Buscar localidad, finca o zona (Ej: Luján, Maipú)..." />
-                    <button type="button" class="modal-search-btn" onclick="buscarLugarModal()">🔍 Buscar</button>
-                    <button type="button" class="modal-search-btn" onclick="centrarModalGPS()" title="Centrar en mi GPS">📍 GPS</button>
-                </div>
-                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja tu lote en el mapa para obtener el análisis de suelo, heladas y costos en USD.
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
+                    Dibuja tu lote. El sistema evaluará el suelo, riesgos de helada y costos estimados en dólares.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
@@ -1382,7 +1339,7 @@
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Lote Seleccionado</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 30px 10px;">
-                    👈 Busca tu zona, centrate en tu GPS o dibuja un polígono en el mapa para obtener el análisis completo.
+                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis de suelo, estado hídrico, riesgos y costos.
                 </div>
             </div>
         </div>
@@ -1484,6 +1441,23 @@
         });
     }
 
+    function solicitarPermisoNotificaciones() {
+        if (!("Notification" in window)) return;
+        Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+                new Notification("🛰️ AgroTech Argentina", {
+                    body: "¡Notificaciones activadas correctamente!",
+                    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
+                });
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnCampana = document.getElementById("btnCampanaNotif");
+        if (btnCampana) btnCampana.addEventListener("click", solicitarPermisoNotificaciones);
+    });
+
     const capasBase = {
         base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap' }),
         topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap' }),
@@ -1562,34 +1536,6 @@
     function cerrarModalLotes() {
         const modal = document.getElementById("modalLotes");
         if (modal) modal.style.display = "none";
-    }
-
-    async function buscarLugarModal() {
-        const input = document.getElementById("inputBusquedaLugar");
-        if (!input || !input.value.trim()) return;
-
-        const query = input.value.trim();
-        try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ", Argentina")}`);
-            const data = await res.json();
-            if (data && data.length > 0) {
-                const lat = parseFloat(data[0].lat);
-                const lon = parseFloat(data[0].lon);
-                if (modalMapInstance) {
-                    modalMapInstance.setView([lat, lon], 14, { animate: true });
-                }
-            } else {
-                alert("No se encontró la localidad ingresada. Intente con otro nombre.");
-            }
-        } catch (e) {
-            alert("Error al realizar la búsqueda.");
-        }
-    }
-
-    function centrarModalGPS() {
-        if (modalMapInstance) {
-            modalMapInstance.setView([currentLat, currentLon], 15, { animate: true });
-        }
     }
 
     async function analizarLoteModalPro(lat, lon, hectareas) {
@@ -1879,6 +1825,57 @@
         if (mapInstance) mapInstance.setView([-38.4161, -63.6167], 5, { animate: true });
     }
 
+    function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    async function verificarProximidadIncendios(lat, lon) {
+        const card = document.getElementById("fuegoAlertaCard");
+        const espaciador = document.getElementById("fuegoEspaciador");
+        const desc = document.getElementById("fuegoAlertaDesc");
+        const titulo = document.getElementById("fuegoAlertaTitulo");
+
+        if (!card || !espaciador) return;
+
+        try {
+            const res = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${MAP_KEY_FIRMS}/VIIRS_SNPP_NRT/south-america/1`);
+            if (!res.ok) return;
+            const text = await res.text();
+            const lineas = text.split("\n");
+            if (lineas.length <= 1) return;
+
+            let cabecera = lineas[0].split(",");
+            let idxLat = cabecera.indexOf("latitude");
+            let idxLon = cabecera.indexOf("longitude");
+            if (idxLat === -1) { idxLat = 0; idxLon = 1; }
+
+            let fuegoCercanoKm = 9999;
+            for (let i = 1; i < lineas.length; i++) {
+                let cols = lineas[i].split(",");
+                if (cols.length > Math.max(idxLat, idxLon)) {
+                    let fLat = parseFloat(cols[idxLat]);
+                    let fLon = parseFloat(cols[idxLon]);
+                    if (!isNaN(fLat) && !isNaN(fLon)) {
+                        let distancia = calcularDistanciaKm(lat, lon, fLat, fLon);
+                        if (distancia < fuegoCercanoKm) fuegoCercanoKm = distancia;
+                    }
+                }
+            }
+
+            if (fuegoCercanoKm <= 100) {
+                card.style.display = "block";
+                espaciador.style.display = "block";
+                card.classList.add("alerta-activa-animacion");
+                titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
+                desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
+            }
+        } catch (e) {}
+    }
+
     function actualizarFechaYHoraDigital() {
         try {
             const ahora = new Date();
@@ -1896,10 +1893,12 @@
                     currentLon = position.coords.longitude;
                     actualizarEmbalsesSegunUbicacion("Mendoza");
                     inicializarMapaArgentina(currentLat, currentLon);
+                    verificarProximidadIncendios(currentLat, currentLon);
                 },
                 () => {
                     actualizarEmbalsesSegunUbicacion("Mendoza");
                     inicializarMapaArgentina(currentLat, currentLon);
+                    verificarProximidadIncendios(currentLat, currentLon);
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
