@@ -1057,7 +1057,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀️</span>
+                        <span style="font-size: 1.2rem;">☀️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Horas de Sol</small>
                         <strong id="horasSol" style="font-size: 0.88rem; color: var(--text-main);">-- hs</strong>
                     </div>
@@ -1151,7 +1151,7 @@
                             <div class="glosario-desc">Horas acumuladas con temperaturas entre 0°C y 7°C. Vitales para romper la dormancia invernal de frutales y vides.</div>
                         </div>
                         <div class="glosario-item">
-                            <div class="glosario-titulo">🌡️️ Temp. & Humedad de Suelo</div>
+                            <div class="glosario-titulo">🌡 Temp. & Humedad de Suelo</div>
                             <div class="glosario-desc">Condiciones basales de la tierra superficial (0-10cm) para controlar brotación radicular, germinación y retención hídrica.</div>
                         </div>
                         <div class="glosario-item">
@@ -1167,7 +1167,7 @@
 
         <!-- MAPA MULTICAPA CON CALLES, VIENTOS, FUEGO Y PLAGAS -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
-            <h3 id="mapTitle">🗺️️ Visor Geográfico & Radares</h3>
+            <h3 id="mapTitle">🗺 Visor Geográfico & Radares</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
                 <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topo</button>
@@ -1192,6 +1192,29 @@
 </div>
 
 <script>
+    // 🛡️ SCRIPT DE PROTECCIÓN CONTRA F12, CLIC DERECHO E INSPECCIÓN DE CÓDIGO
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        // Bloquear F12
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        // Bloquear Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Herramientas de desarrollador)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+            e.preventDefault();
+            return false;
+        }
+        // Bloquear Ctrl+U (Ver código fuente)
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
     let currentLat = -32.92;
     let currentLon = -68.84;
     let mapInstance = null;
@@ -1735,7 +1758,7 @@
             } else {
                 card.style.borderLeftColor = "#f59e0b";
                 if (badge) { badge.style.background = "#f59e0b"; badge.innerText = "Alerta Amarilla - Tormentas"; }
-                if (icono) icono.innerText = "⚡⛈️️";
+                if (icono) icono.innerText = "⚡⛈️";
                 if (titulo) titulo.innerText = "¡Atención: Tormentas Fuertes!";
                 if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua y actividad eléctrica.";
             }
