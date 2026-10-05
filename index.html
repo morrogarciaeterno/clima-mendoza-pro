@@ -1410,8 +1410,24 @@
         }
     }
 
-    function consultarClimaParaPlagas(lat, lon, marcador) {
-        actualizarIndicadorMapa("Consultando clima y recomendación...", "#38bdf8");
+    async function consultarClimaParaPlagas(lat, lon, marcador) {
+        actualizarIndicadorMapa("Consultando nombre de zona y clima...", "#38bdf8");
+
+        let nombreZona = `Coordenadas: ${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+        try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
+            const geoData = await geoRes.json();
+            if (geoData && geoData.address) {
+                const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || geoData.address.municipality || "";
+                const prov = geoData.address.state || "";
+                if (ciudad) {
+                    nombreZona = prov ? `${ciudad}, ${prov}` : ciudad;
+                }
+            }
+        } catch (e) {
+            console.warn("No se pudo resolver el nombre del lugar:", e);
+        }
+
         const urlClimaAPI = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;
 
         fetch(urlClimaAPI)
@@ -1450,8 +1466,8 @@
                 }));
 
                 let popupContent = `
-                    <div style="font-size: 0.8rem; line-height: 1.4;">
-                        <b>📍 Coordenadas:</b> ${lat.toFixed(3)}, ${lon.toFixed(3)}<br>
+                    <div style="font-size: 0.8rem; line-height: 1.4; min-width: 180px;">
+                        <b>📍 Zona:</b> ${nombreZona}<br>
                         <b>Riesgo:</b> <span style="color:${colorRiesgo}; font-weight:bold;">${riesgo}</span><br>
                         <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
                         <b>Temperatura:</b> ${tempActual} °C | <b>Humedad:</b> ${humActual} %<br>
@@ -1481,7 +1497,7 @@
             mapInstance.removeLayer(markerPlagas);
             markerPlagas = null;
             btnPlagas.classList.remove("active");
-            mapTitle.innerText = "🗺️ Visor Geográfico";
+            mapTitle.innerText = "🗺️️ Visor Geográfico";
             actualizarIndicadorMapa("Capa de Plagas desactivada", "#22c55e");
             return;
         }
@@ -1502,7 +1518,7 @@
             })
         }).addTo(mapInstance);
 
-        markerPlagas.bindPopup("<b>Calculando diagnóstico...</b>").openPopup();
+        markerPlagas.bindPopup("<b>Buscando nombre de la zona...</b>").openPopup();
         mapInstance.setView([latLote, lonLote], 13, { animate: true });
 
         consultarClimaParaPlagas(latLote, lonLote, markerPlagas);
@@ -1625,7 +1641,7 @@
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
-        if (codigo <= 67) return "🌧️";
+        if (codigo <= 67) return "🌧️️";
         if (codigo >= 95) return "⛈️";
         return "⛈️";
     }
