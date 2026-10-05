@@ -10,8 +10,6 @@
     <!-- Librería Leaflet.draw para dibujo de polígonos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <!-- Librería PapaParse -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root {
             --bg: #090d16;
@@ -212,222 +210,6 @@
             color: var(--text-muted);
         }
 
-        .dashboard-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .sismos-container-block {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        .sismos-table-wrapper {
-            width: 100%;
-            max-height: 180px;
-            overflow-y: auto;
-            touch-action: pan-y;
-            margin-top: 8px;
-            background: var(--card-inner);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .tabla-sismos {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.78rem;
-            text-align: center;
-        }
-
-        .tabla-sismos th {
-            position: sticky;
-            top: 0;
-            background-color: #374151;
-            color: #d1d5db;
-            padding: 6px 4px;
-            font-weight: 700;
-        }
-
-        .tabla-sismos td {
-            padding: 6px 4px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        .solar-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-left: 1px solid var(--border);
-            padding-left: 10px;
-        }
-
-        .solar-arc {
-            position: relative;
-            width: 110px;
-            height: 55px;
-            border: 2px dashed #374151;
-            border-bottom: 2px solid #374151;
-            border-radius: 55px 55px 0 0;
-            margin-top: 8px;
-        }
-
-        .sun-pivot {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            bottom: 0;
-            left: 0;
-            transform-origin: bottom center;
-            transition: transform 1s ease-out;
-        }
-
-        .sun-icon {
-            position: absolute;
-            left: -10px;
-            bottom: -10px;
-            font-size: 18px;
-        }
-
-        .solar-times {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 10px;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-        }
-
-        .solar-times strong {
-            color: var(--text-main);
-            display: block;
-        }
-
-        .lunar-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-left: 1px solid var(--border);
-            padding-left: 10px;
-        }
-
-        .moon-display {
-            font-size: 3.5rem;
-            line-height: 1;
-            margin: 4px 0;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
-        }
-
-        .moon-phase-title {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--text-main);
-            text-align: center;
-        }
-
-        .moon-illumination {
-            font-size: 0.8rem;
-            color: var(--accent);
-            font-weight: 700;
-            margin-top: 2px;
-        }
-
-        .polen-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .polen-card {
-            background: var(--card-inner);
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-
-        .polen-icon {
-            font-size: 1.8rem;
-            margin-bottom: 4px;
-        }
-
-        .polen-title {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
-
-        .polen-dias {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 0.75rem;
-            text-align: left;
-        }
-
-        .embalses-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .embalse-card {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .embalse-nombre {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 4px;
-        }
-
-        .embalse-nivel {
-            display: block;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 6px;
-        }
-
-        .progress-bar {
-            background: rgba(255, 255, 255, 0.1);
-            height: 6px;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 6px;
-        }
-
-        .progress-fill {
-            background: var(--accent);
-            height: 100%;
-            border-radius: 3px;
-        }
-
-        .embalse-estado {
-            font-size: 0.68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .embalse-estado.optimal { color: #22c55e; }
-        .embalse-estado.warning { color: #f59e0b; }
-        .embalse-estado.alert { color: #ef4444; }
-
         .dual-section {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
@@ -440,33 +222,6 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             text-align: center;
-        }
-
-        .glosario-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .glosario-item {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        .glosario-titulo {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 3px;
-        }
-
-        .glosario-desc {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            line-height: 1.3;
         }
 
         .map-wrapper-container {
@@ -573,7 +328,7 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
-        /* VENTANA MODAL AMPLIADA */
+        /* VENTANA MODAL */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -672,10 +427,6 @@
             outline: none;
         }
 
-        .modal-search-input:focus {
-            border-color: var(--accent);
-        }
-
         .modal-search-btn {
             background: rgba(56, 189, 248, 0.2);
             border: 1px solid var(--accent);
@@ -751,90 +502,6 @@
             color: #000;
         }
 
-        .tabla-costos {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            margin-top: 4px;
-        }
-
-        .tabla-costos th {
-            background: #374151;
-            color: #d1d5db;
-            padding: 5px;
-            text-align: left;
-        }
-
-        .tabla-costos td {
-            padding: 5px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .calendario-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .calendario-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-size: 0.73rem;
-        }
-
-        .calendario-item strong {
-            color: var(--accent);
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .pasos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .paso-card {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .paso-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-
-        .paso-nombre {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .paso-provincia {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-        }
-
-        .paso-estado {
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 6px;
-        }
-
-        .estado-abierto { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-
         @media (max-width: 900px) {
             .modal-body {
                 grid-template-columns: 1fr !important;
@@ -856,7 +523,7 @@
         </div>
 
         <div class="header-right">
-            <button type="button" class="btn-notif-header" id="btnCampanaNotif" title="Activar Alertas Push">🔔</button>
+            <button type="button" class="btn-notif-header" title="Alertas Push">🔔</button>
 
             <div class="date-display">
                 <div id="fecha">--</div>
@@ -920,7 +587,7 @@
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <h3>📅 Pronóstico 7 días</h3>
-                <div id="forecast" class="forecast-cards"></div>
+                <div id="forecast" class="forecast-cards">Cargando pronóstico...</div>
             </div>
 
             <div class="card" style="margin-top: 12px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
@@ -1063,7 +730,6 @@
         let dosis = "";
         let consejoTerreno = "";
 
-        // Análisis del Terreno según humedad estimada del suelo
         if (humSuelo < 20) {
             consejoTerreno = "<b>Terreno Seco/Arenoso:</b> Fraccionar aplicaciones en riegos cortos para evitar filtración profunda.";
         } else if (humSuelo > 45) {
@@ -1072,7 +738,6 @@
             consejoTerreno = "<b>Terreno Equilibrado:</b> Textura franca óptima para absorción radicular.";
         }
 
-        // Análisis por Época del Año (Hemisferio Sur)
         if (mes >= 3 && mes <= 5) {
             epoca = "Otoño (Post-cosecha / Preparación de raíz)";
             producto = "Superfosfato Triple (Fósforo) + Compost";
@@ -1268,9 +933,7 @@
             .then(res => res.json())
             .then(climaData => {
                 let tempActual = climaData.current ? climaData.current.temperature_2m : 20;
-                let humSueloEst = 22; // Humedad simulada del terreno para el popup
-
-                // Generamos la recomendación de fertilizantes para el popup del marcador
+                let humSueloEst = 22; 
                 let fertilizantePopup = obtenerRecomendacionFertilizante(humSueloEst);
 
                 marcador.setPopupContent(`
@@ -1333,6 +996,60 @@
         } catch(e) {}
     }
 
+    // 🌦️ FUNCIÓN CLAVE QUE CARGA EL CLIMA EN VIVO AL INICIAR
+    async function cargarClimaActualYPronostico(lat, lon) {
+        try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure&hourly=soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,sunrise,sunset,precipitation_sum&timezone=America%2FArgentina%2FMendoza`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data && data.current) {
+                const c = data.current;
+                document.getElementById("temp").innerText = `${Math.round(c.temperature_2m)}°C`;
+                document.getElementById("headerTemp").innerText = `${Math.round(c.temperature_2m)}°C`;
+                document.getElementById("stTemp").innerText = `ST: ${Math.round(c.apparent_temperature)}°C`;
+                document.getElementById("humedad").innerText = `${c.relative_humidity_2m}%`;
+                document.getElementById("viento").innerText = `${c.wind_speed_10m} km/h`;
+                document.getElementById("presion").innerText = `${c.surface_pressure} hPa`;
+                document.getElementById("tempDesc").innerText = "Condiciones estables";
+            }
+
+            if (data && data.daily) {
+                const d = data.daily;
+                document.getElementById("uvIndex").innerText = d.uv_index_max ? d.uv_index_max[0] : "5.0";
+                document.getElementById("uvEstado").innerText = (d.uv_index_max && d.uv_index_max[0] > 6) ? "Alto" : "Moderado";
+            }
+
+            if (data && data.hourly) {
+                const horaActual = new Date().getHours();
+                const tSuelo = data.hourly.soil_temperature_0cm ? Math.round(data.hourly.soil_temperature_0cm[horaActual]) : 14;
+                const hSuelo = data.hourly.soil_moisture_0_to_1cm ? Math.round(data.hourly.soil_moisture_0_to_1cm[horaActual] * 100) : 25;
+                document.getElementById("tempSuelo").innerText = `${tSuelo} °C`;
+                document.getElementById("humSuelo").innerText = `${hSuelo} %`;
+            }
+
+            // Pronóstico 7 días
+            if (data && data.daily && data.daily.time) {
+                const fContainer = document.getElementById("forecast");
+                fContainer.innerHTML = "";
+                for (let i = 0; i < 7; i++) {
+                    const fechaDia = new Date(data.daily.time[i]).toLocaleDateString("es-AR", { weekday: 'short' });
+                    const tMax = Math.round(data.daily.temperature_2m_max[i]);
+                    const tMin = Math.round(data.daily.temperature_2m_min[i]);
+                    fContainer.innerHTML += `
+                        <div class="forecast-card">
+                            <div style="font-size:0.75rem; text-transform:capitalize; color:var(--text-muted);">${fechaDia}</div>
+                            <div class="max">${tMax}°</div>
+                            <div class="min">${tMin}°</div>
+                        </div>
+                    `;
+                }
+            }
+        } catch (e) {
+            console.error("Error al cargar clima:", e);
+        }
+    }
+
     function iniciarApp() {
         actualizarFechaYHoraDigital();
         if (navigator.geolocation) {
@@ -1340,15 +1057,20 @@
                 (position) => {
                     currentLat = position.coords.latitude;
                     currentLon = position.coords.longitude;
+                    document.getElementById("ubicacionTexto").innerText = "Ubicación GPS Detectada";
                     inicializarMapaArgentina(currentLat, currentLon);
+                    cargarClimaActualYPronostico(currentLat, currentLon);
                 },
                 () => {
+                    document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza (GPS por defecto)";
                     inicializarMapaArgentina(currentLat, currentLon);
+                    cargarClimaActualYPronostico(currentLat, currentLon);
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         } else {
             inicializarMapaArgentina(currentLat, currentLon);
+            cargarClimaActualYPronostico(currentLat, currentLon);
         }
     }
 
