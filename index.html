@@ -1560,27 +1560,30 @@
     }
 
         function inicializarMapaArgentina(lat, lon) {
-        try {
-            if (!mapInstance) {
-                actualizarIndicadorMapa("Cargando cartografía...", "#facc15");
-                mapInstance = L.map('mapaArgentina', { zoomControl: true, dragging: true, tap: true }).setView([lat, lon], 14);
+    try {
+        if (!mapInstance) {
+            mapInstance = L.map('mapaArgentina', { zoomControl: true, dragging: true, tap: true }).setView([lat, lon], 14);
+            capaActual = capasBase.base;
+            capaActual.addTo(mapInstance);
 
-                capaActual = capasBase.base;
-                capaActual.addTo(mapInstance);
+            capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
+                layers: 'fires_viirs_24',
+                format: 'image/png',
+                transparent: true,
+                version: '1.3.0'
+            });
+        }
+        
+        // Si ya existía un marcador previo, lo borramos del mapa
+        if (markerInstance) {
+            mapInstance.removeLayer(markerInstance);
+            markerInstance = null;
+        }
 
-                capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
-                    layers: 'fires_viirs_24',
-                    format: 'image/png',
-                    transparent: true,
-                    version: '1.3.0',
-                    attribution: '&copy; NASA LANCE FIRMS'
-                });
-
-                mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
-                mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor interactivo activo", "#22c55e"); });
-
-                actualizarIndicadorMapa("Visor listo y operativo", "#22c55e");
-            }
+        // El mapa solo se centra en la ubicación GPS sin mostrar ningún pin ni línea
+        mapInstance.setView([lat, lon], 15);
+    } catch (e) {}
+}
 
             if (markerInstance) {
                 mapInstance.removeLayer(markerInstance);
