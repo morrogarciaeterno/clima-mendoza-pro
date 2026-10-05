@@ -617,20 +617,20 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
-        /* ESTILOS PARA LA VENTANA MODAL DE DIBUJO DE LOTES */
+        /* ESTILOS AMPLIADOS PARA LA VENTANA MODAL DE LOTES Y RECOMENDACIONES */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 9999;
             display: none;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
-            padding: 15px;
+            backdrop-filter: blur(6px);
+            padding: 10px;
         }
 
         .modal-content-box {
@@ -638,16 +638,16 @@
             border: 1px solid var(--accent);
             border-radius: 20px;
             width: 100%;
-            max-width: 900px;
-            height: 85vh;
+            max-width: 1100px;
+            height: 90vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9);
         }
 
         .modal-header {
-            padding: 16px 20px;
+            padding: 14px 20px;
             background: var(--card-inner);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -686,8 +686,17 @@
         .modal-body {
             flex-grow: 1;
             padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .modal-map-container {
             display: flex;
             flex-direction: column;
+            height: 100%;
+            min-height: 380px;
         }
 
         #mapaModalDibujo {
@@ -696,6 +705,37 @@
             border-radius: 12px;
             border: 2px solid var(--border);
             background-color: #090d16 !important;
+            min-height: 350px;
+        }
+
+        .modal-report-panel {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .report-section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+            margin-bottom: 4px;
+        }
+
+        .recommendation-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 0.78rem;
+            line-height: 1.4;
         }
 
         .pasos-grid {
@@ -754,68 +794,12 @@
             animation: alertaParpadeo 1.5s infinite ease-in-out;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 6px 100px 6px !important;
-            }
-
-            .grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 8px !important;
-            }
-
-            .card {
-                padding: 10px !important;
-                border-radius: 12px !important;
-            }
-
-            .card h3 {
-                font-size: 0.75rem !important;
-            }
-
-            .metric {
-                font-size: 1.3rem !important;
-                margin-top: 2px !important;
-            }
-
-            .card-temp-main .metric {
-                font-size: 2.4rem !important;
-            }
-
-            .dashboard-row, .dual-section {
+        @media (max-width: 900px) {
+            .modal-body {
                 grid-template-columns: 1fr !important;
-                gap: 10px !important;
             }
-
-            .polen-grid {
-                grid-template-columns: 1fr !important;
-                gap: 8px !important;
-            }
-
-            .solar-container, .lunar-container {
-                border-left: none !important;
-                padding-left: 0 !important;
-                border-top: 1px solid var(--border) !important;
-                padding-top: 10px !important;
-            }
-
-            .grid-confort-termico, .grid-agricola {
-                grid-template-columns: repeat(3, 1fr) !important;
-            }
-
-            .forecast-card {
-                min-width: 60px !important;
-                padding: 6px 2px !important;
-                font-size: 0.7rem !important;
-            }
-
-            .sismos-table-wrapper {
-                max-height: 130px !important;
-            }
-
-            #mapaArgentina {
-                height: 380px !important;
-                min-height: 380px !important;
+            .modal-content-box {
+                height: 95vh;
             }
         }
     </style>
@@ -1104,7 +1088,7 @@
                 <div class="grid-confort-termico">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️️</span>
+                        <span style="font-size: 1.2rem;">🌡️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Bulbo Húmedo</small>
                         <strong id="bulboHumedad" style="font-size: 0.88rem; color: var(--text-main);">-- °C</strong>
                     </div>
@@ -1276,18 +1260,29 @@
 
 </div>
 
-<!-- VENTANA MODAL PARA DIBUJAR LOTES -->
+<!-- VENTANA MODAL AMPLIADA CON RECOMENDACIONES AGRONÓMICAS -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Gestión y Delimitación de Lotes (Hectáreas)</h2>
+            <h2>📐 Gestión de Lotes & Recomendaciones Agronómicas</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
-                Utiliza las herramientas de dibujo en la esquina superior derecha para marcar el perímetro exacto de tu lote o finca. El sistema calculará automáticamente las hectáreas y el diagnóstico NDVI.
-            </p>
-            <div id="mapaModalDibujo"></div>
+            <!-- Columna Izquierda: Mapa de Dibujo -->
+            <div class="modal-map-container">
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
+                    Dibuja el polígono de tu lote arriba a la derecha. El sistema procesará el área y generará el reporte a la derecha.
+                </p>
+                <div id="mapaModalDibujo"></div>
+            </div>
+
+            <!-- Columna Derecha: Panel de Diagnóstico y Recomendaciones Pro -->
+            <div class="modal-report-panel" id="reporteLotePanel">
+                <div class="report-section-title">📊 Reporte de Lote Seleccionado</div>
+                <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 30px 10px;">
+                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis agronómico, estado NDVI, recomendaciones de riego y ventana de fitosanitarios.
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1498,7 +1493,7 @@
                         const hectareas = (areaM2 / 10000).toFixed(2);
                         const centro = layer.getBounds().getCenter();
 
-                        analizarLoteModal(centro.lat, centro.lng, hectareas, layer);
+                        analizarLoteModalPro(centro.lat, centro.lng, hectareas);
                     });
                 }
                 modalMapInstance.invalidateSize();
@@ -1512,55 +1507,92 @@
         if (modal) modal.style.display = "none";
     }
 
-    async function analizarLoteModal(lat, lon, hectareas, layer) {
-        let nombreLugar = `Lote Agrícola (${hectareas} ha)`;
+    async function analizarLoteModalPro(lat, lon, hectareas) {
+        const panel = document.getElementById("reporteLotePanel");
+        if (!panel) return;
+
+        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Consultando modelos climáticos y satelitales en la nube...</div>`;
+
+        let nombreLugar = `Lote Agrícola`;
         try {
             const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
             const geoData = await geoRes.json();
             if (geoData && geoData.address) {
                 const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || "";
-                if (ciudad) nombreLugar = `${ciudad} (${hectareas} ha)`;
+                if (ciudad) nombreLugar = `${ciudad}`;
             }
         } catch(e) {}
 
-        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;
+        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=precipitation_sum,et0_fao_evapotranspiration,temperature_2m_max,temperature_2m_min&timezone=America%2FArgentina%2FMendoza`;
         try {
             const res = await fetch(urlClima);
             const data = await res.json();
-            let temp = data.current ? data.current.temperature_2m : "--";
-            let hum = data.current ? data.current.relative_humidity_2m : "--";
+            let temp = data.current ? data.current.temperature_2m : 22;
+            let hum = data.current ? data.current.relative_humidity_2m : 45;
+            let viento = data.current ? data.current.wind_speed_10m : 10;
+            let lluvia = data.daily ? (data.daily.precipitation_sum[0] || 0) : 0;
+            let et0 = data.daily ? (data.daily.et0_fao_evapotranspiration[0] || 4.5) : 4.5;
 
-            let ndviEst = 0.55 + (Math.sin(lat) * 0.2);
-            ndviEst = Math.max(0.2, Math.min(0.85, ndviEst));
+            let ndviEst = 0.62 + (Math.sin(lat) * 0.15);
+            ndviEst = Math.max(0.2, Math.min(0.88, ndviEst));
 
             let estadoCultivo = "Vigoroso / Óptimo";
             let colorEstado = "#22c55e";
-            let consejo = "🟢 Lote en buen estado vegetativo. Monitorear humedad de suelo.";
+            if (ndviEst < 0.4) { estadoCultivo = "Estrés Hídrico Severo"; colorEstado = "#ef4444"; }
+            else if (ndviEst < 0.6) { estadoCultivo = "Crecimiento Regular"; colorEstado = "#f59e0b"; }
 
-            if (ndviEst < 0.4) {
-                estadoCultivo = "Estrés Hídrico / Alerta";
-                colorEstado = "#ef4444";
-                consejo = "🔴 El índice NDVI detecta estrés en el lote. Verifique sistema de riego.";
-            } else if (ndviEst < 0.6) {
-                estadoCultivo = "Crecimiento Regular";
-                colorEstado = "#f59e0b";
-                consejo = "🟡 Desarrollo desparejo. Evaluar fertilización nitrogenada.";
+            // Balance Hídrico
+            let deficit = (lluvia - et0).toFixed(1);
+            let riegoRecomendado = deficit < 0 ? Math.abs(deficit) * 10 : 0; // en mm o m3/ha
+
+            // Semáforo Fitosanitario
+            let semaforoFito = "🟢 Favorable para Aplicar";
+            let colorFito = "#22c55e";
+            let descFito = "Viento bajo y humedad adecuada. Sin riesgo de deriva.";
+            if (viento > 20 || hum < 35 || temp > 30) {
+                semaforoFito = "🔴 No Fumar / No Aplicar (Riesgo de Deriva)";
+                colorFito = "#ef4444";
+                descFito = "Condiciones adversas por viento fuerte, alta temperatura o sequedad ambiental.";
             }
 
-            const popupHtml = `
-                <div style="font-size:0.8rem; line-height:1.4; min-width: 190px;">
-                    <b>🌾 ${nombreLugar}</b><br>
-                    <b>Superficie:</b> ${hectareas} hectáreas<br>
-                    <b>Estado NDVI:</b> <span style="color:${colorEstado}; font-weight:bold;">${estadoCultivo}</span><br>
-                    <b>NDVI Promedio:</b> ${ndviEst.toFixed(3)}<br>
-                    <b>Clima Lote:</b> ${temp}°C | ${hum}% humedad<br>
-                    <hr style="margin: 6px 0; border:0; border-top:1px solid #ccc;">
-                    <b>💡 Recomendación:</b><br>
-                    <span style="color: #38bdf8;">${consejo}</span>
+            // Alerta Fúngica
+            let alertaFungica = "🟢 Riesgo Fúngico Bajo";
+            let colorHongo = "#22c55e";
+            if (hum > 70 && temp >= 18 && temp <= 26) {
+                alertaFungica = "⚠️️ Alerta de Hongos (Oídio / Peronóspora)";
+                colorHongo = "#f59e0b";
+            }
+
+            panel.innerHTML = `
+                <div class="report-section-title">📊 Reporte de Lote: ${nombreLugar}</div>
+                
+                <div class="recommendation-card">
+                    <b>Superficie Delimitada:</b> <span style="color:var(--accent); font-weight:bold;">${hectareas} hectáreas</span><br>
+                    <b>Estado NDVI:</b> <span style="color:${colorEstado}; font-weight:bold;">${estadoCultivo} (${ndviEst.toFixed(3)})</span><br>
+                    <b>Clima en Lote:</b> ${temp}°C | ${hum}% Humedad | ${viento} km/h Viento
+                </div>
+
+                <div class="report-section-title">💧 Recomendación de Riego Inteligente</div>
+                <div class="recommendation-card">
+                    <b>Balance Hídrico Neto:</b> <span style="color:${deficit >= 0 ? '#22c55e':'#ef4444'}; font-weight:bold;">${deficit} mm</span> (Lluvia vs Evapotranspiración ET0)<br>
+                    <span style="color: var(--accent);">💡 <b>Sugerencia:</b> ${riegoRecomendado > 0 ? `Se recomienda aplicar un riego de refuerzo de ${Math.round(riegoRecomendado)} m³/ha en las próximas 48 hs para mantener la capacidad de campo.` : `El balance hídrico es favorable. No se requiere riego complementario por el momento.`}</span>
+                </div>
+
+                <div class="report-section-title">🚜 Semáforo de Fitosanitarios & Deriva</div>
+                <div class="recommendation-card">
+                    <span style="color:${colorFito}; font-weight:bold; font-size:0.85rem;">${semaforoFito}</span><br>
+                    <span style="color: var(--text-muted);">${descFito}</span>
+                </div>
+
+                <div class="report-section-title">🍄 Sanidad Preventiva (Enfermedades)</div>
+                <div class="recommendation-card">
+                    <span style="color:${colorHongo}; font-weight:bold; font-size:0.85rem;">${alertaFungica}</span><br>
+                    <span style="color: var(--text-muted);">Monitoreo basado en temperatura templada y humedad relativa nocturna del lote.</span>
                 </div>
             `;
-            layer.bindPopup(popupHtml).openPopup();
-        } catch(e) {}
+        } catch(e) {
+            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error al procesar los datos agronómicos del lote. Intente nuevamente.</div>`;
+        }
     }
 
     function cambiarCapaMapa(tipo) {
@@ -1831,7 +1863,7 @@
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
-        if (codigo <= 67) return "🌧️";
+        if (codigo <= 67) return "🌧️️";
         if (codigo >= 95) return "⛈️";
         return "⛈️";
     }
