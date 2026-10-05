@@ -687,7 +687,7 @@
             flex-grow: 1;
             padding: 15px;
             display: grid;
-            grid-template-columns: 1fr 1.1fr;
+            grid-template-columns: 1fr 1.15fr;
             gap: 15px;
             overflow-y: auto;
         }
@@ -699,13 +699,51 @@
             min-height: 380px;
         }
 
+        .modal-search-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .modal-search-input {
+            flex-grow: 1;
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            outline: none;
+        }
+
+        .modal-search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-search-btn {
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .modal-search-btn:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
         #mapaModalDibujo {
             width: 100%;
             flex-grow: 1;
             border-radius: 12px;
             border: 2px solid var(--border);
             background-color: #090d16 !important;
-            min-height: 350px;
+            min-height: 330px;
         }
 
         .modal-report-panel {
@@ -774,6 +812,27 @@
         .tabla-costos td {
             padding: 5px;
             border-bottom: 1px solid var(--border);
+        }
+
+        .calendario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .calendario-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.73rem;
+        }
+
+        .calendario-item strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 2px;
         }
 
         .pasos-grid {
@@ -1152,7 +1211,7 @@
                 <div class="grid-agricola">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌧️</span>
+                        <span style="font-size: 1.2rem;">🌧</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Prob. Lluvia</small>
                         <strong id="probLluvia" style="font-size: 0.88rem; color: var(--text-main);">--%</strong>
                     </div>
@@ -1298,27 +1357,32 @@
 
 </div>
 
-<!-- VENTANA MODAL AMPLIADA CON ESTIMADOR DE COSTOS EN DÓLARES -->
+<!-- VENTANA MODAL AMPLIADA CON BUSCADOR Y GEOLOCALIZADOR -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Gestión de Lotes & Estimador de Costos (USD)</h2>
+            <h2>📐 Gestión de Lotes, Suelo & Presupuesto (USD)</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
-            <!-- Columna Izquierda: Mapa de Dibujo -->
+            <!-- Columna Izquierda: Mapa de Dibujo con Buscador -->
             <div class="modal-map-container">
-                <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja tu lote arriba a la derecha. Selecciona un cultivo para calcular los costos en dólares.
+                <div class="modal-search-bar">
+                    <input type="text" id="inputBusquedaLugar" class="modal-search-input" placeholder="Buscar localidad, finca o zona (Ej: Luján, Maipú)..." />
+                    <button type="button" class="modal-search-btn" onclick="buscarLugarModal()">🔍 Buscar</button>
+                    <button type="button" class="modal-search-btn" onclick="centrarModalGPS()" title="Centrar en mi GPS">📍 GPS</button>
+                </div>
+                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
+                    Dibuja tu lote en el mapa para obtener el análisis de suelo, heladas y costos en USD.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
 
-            <!-- Columna Derecha: Panel de Diagnóstico, Sugerencia y Costos -->
+            <!-- Columna Derecha: Panel de Diagnóstico, Suelo y Costos -->
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Lote Seleccionado</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 30px 10px;">
-                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis agronómico y el presupuesto detallado en dólares por hectárea.
+                    👈 Busca tu zona, centrate en tu GPS o dibuja un polígono en el mapa para obtener el análisis completo.
                 </div>
             </div>
         </div>
@@ -1341,15 +1405,35 @@
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
-    // Base de costos estimados por hectárea en USD
-    const costosCultivosUSD = {
-        "Vid": { prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350 },
-        "Cebolla": { prep: 300, implantacion: 1200, riego: 500, fitosanitarios: 450, totalHa: 2450 },
-        "Ajo": { prep: 350, implantacion: 2800, riego: 550, fitosanitarios: 700, totalHa: 4400 },
-        "Olivo": { prep: 400, implantacion: 3000, riego: 500, fitosanitarios: 500, totalHa: 4400 },
-        "Tomate": { prep: 300, implantacion: 1800, riego: 600, fitosanitarios: 650, totalHa: 3350 },
-        "Frutales (Manzana/Pera/Cerezo)": { prep: 500, implantacion: 4200, riego: 700, fitosanitarios: 900, totalHa: 6300 },
-        "Cultivos Extensivos (Maíz/Soja)": { prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900 }
+    const infoCultivosAgro = {
+        "Vid": {
+            prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350,
+            plantacion: "Agosto - Septiembre", poda: "Junio - Julio", cosecha: "Febrero - Abril"
+        },
+        "Cebolla": {
+            prep: 300, implantacion: 1200, riego: 500, fitosanitarios: 450, totalHa: 2450,
+            plantacion: "Mayo - Julio", poda: "No requiere", cosecha: "Noviembre - Enero"
+        },
+        "Ajo": {
+            prep: 350, implantacion: 2800, riego: 550, fitosanitarios: 700, totalHa: 4400,
+            plantacion: "Marzo - Mayo", poda: "Octubre (Desentechado)", cosecha: "Noviembre - Diciembre"
+        },
+        "Olivo": {
+            prep: 400, implantacion: 3000, riego: 500, fitosanitarios: 500, totalHa: 4400,
+            plantacion: "Septiembre - Octubre", poda: "Junio - Agosto", cosecha: "Marzo - Mayo"
+        },
+        "Tomate": {
+            prep: 300, implantacion: 1800, riego: 600, fitosanitarios: 650, totalHa: 3350,
+            plantacion: "Octubre - Noviembre", poda: "Diciembre (Guiado)", cosecha: "Enero - Marzo"
+        },
+        "Frutales (Manzana/Pera)": {
+            prep: 500, implantacion: 4200, riego: 700, fitosanitarios: 900, totalHa: 6300,
+            plantacion: "Julio - Agosto", poda: "Junio - Agosto", cosecha: "Enero - Abril"
+        },
+        "Cultivos Extensivos (Maíz/Soja)": {
+            prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900,
+            plantacion: "Septiembre - Noviembre", poda: "No aplica", cosecha: "Febrero - Mayo"
+        }
     };
 
     const embalsesPorProvincia = {
@@ -1385,10 +1469,7 @@
         if (!contenedor) return;
 
         let listaEmbalses = embalsesPorProvincia[provincia] || embalsesPorProvincia["Mendoza"];
-
-        if (subtitulo) {
-            subtitulo.innerText = `Monitoreo de diques y reservas hídricas (${provincia || 'Región Cuyo'})`;
-        }
+        if (subtitulo) subtitulo.innerText = `Monitoreo de diques y reservas hídricas (${provincia || 'Región Cuyo'})`;
 
         contenedor.innerHTML = "";
         listaEmbalses.forEach(e => {
@@ -1402,55 +1483,6 @@
             `;
         });
     }
-
-    function solicitarPermisoNotificaciones() {
-        if (!("Notification" in window)) {
-            alert("Tu navegador no soporta notificaciones de escritorio.");
-            return;
-        }
-
-        Notification.requestPermission().then((permission) => {
-            if (permission === "granted") {
-                new Notification("🛰️ AgroTech Argentina", {
-                    body: "¡Notificaciones activadas correctamente! Te avisaremos ante cualquier alerta.",
-                    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
-                });
-            } else if (permission === "denied") {
-                alert("Las notificaciones fueron bloqueadas. Habilítalas en el ícono de configuración o candado de la barra de direcciones de tu navegador.");
-            } else {
-                alert("Permiso de notificaciones pendiente o no concedido.");
-            }
-        });
-    }
-
-    function dispararNotificacionPush(titulo, mensaje, iconoTipo = "warning") {
-        if (!("Notification" in window)) return;
-
-        if (Notification.permission === "granted") {
-            let iconoUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
-            if (iconoTipo === "fuego") iconoUrl = "https://cdn-icons-png.flaticon.com/512/426/426833.png";
-            if (iconoTipo === "tormenta") iconoUrl = "https://cdn-icons-png.flaticon.com/512/1146/1146860.png";
-
-            const notif = new Notification(titulo, {
-                body: mensaje,
-                icon: iconoUrl,
-                vibrate: [200, 100, 200],
-                tag: "agrotech-alerta"
-            });
-
-            notif.onclick = function() {
-                window.focus();
-                notif.close();
-            };
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const btnCampana = document.getElementById("btnCampanaNotif");
-        if (btnCampana) {
-            btnCampana.addEventListener("click", solicitarPermisoNotificaciones);
-        }
-    });
 
     const capasBase = {
         base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap' }),
@@ -1468,39 +1500,18 @@
     function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
-                actualizarIndicadorMapa("Cargando cartografía...", "#facc15");
                 mapInstance = L.map('mapaArgentina', { zoomControl: true, dragging: true, tap: true }).setView([lat, lon], 14);
-
                 capaActual = capasBase.base;
                 capaActual.addTo(mapInstance);
 
                 capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
-                    layers: 'fires_viirs_24',
-                    format: 'image/png',
-                    transparent: true,
-                    version: '1.3.0',
-                    attribution: '&copy; NASA LANCE FIRMS'
+                    layers: 'fires_viirs_24', format: 'image/png', transparent: true, version: '1.3.0', attribution: '&copy; NASA LANCE FIRMS'
                 });
-
-                mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
-                mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor interactivo activo", "#22c55e"); });
-
-                actualizarIndicadorMapa("Visor listo y operativo", "#22c55e");
             }
-
-            if (markerInstance) {
-                mapInstance.removeLayer(markerInstance);
-            }
-
-            markerInstance = L.marker([lat, lon]).addTo(mapInstance)
-                .bindPopup("<b>Ubicación Actual (GPS Real)</b><br>Posición exacta sincronizada.")
-                .openPopup();
-
+            if (markerInstance) mapInstance.removeLayer(markerInstance);
+            markerInstance = L.marker([lat, lon]).addTo(mapInstance).bindPopup("<b>Ubicación Actual (GPS Real)</b>").openPopup();
             mapInstance.setView([lat, lon], 15);
-
-        } catch (e) {
-            actualizarIndicadorMapa("Error al cargar visor cartográfico", "#ef4444");
-        }
+        } catch (e) {}
     }
 
     function abrirModalLotes() {
@@ -1518,14 +1529,8 @@
                     const drawControlModal = new L.Control.Draw({
                         position: 'topright',
                         draw: {
-                            polygon: {
-                                allowIntersection: false,
-                                showArea: true,
-                                shapeOptions: { color: '#38bdf8', fillColor: '#38bdf8', fillOpacity: 0.3 }
-                            },
-                            rectangle: {
-                                shapeOptions: { color: '#22c55e', fillColor: '#22c55e', fillOpacity: 0.3 }
-                            },
+                            polygon: { allowIntersection: false, showArea: true, shapeOptions: { color: '#38bdf8', fillColor: '#38bdf8', fillOpacity: 0.3 } },
+                            rectangle: { shapeOptions: { color: '#22c55e', fillColor: '#22c55e', fillOpacity: 0.3 } },
                             polyline: false, circle: false, marker: false, circlemarker: false
                         },
                         edit: { featureGroup: drawnItemsModal, remove: true }
@@ -1534,7 +1539,7 @@
 
                     modalMapInstance.on(L.Draw.Event.CREATED, function (e) {
                         const layer = e.layer;
-                        drawnItemsModal.clearLayers(); // Mantener solo el último lote dibujado
+                        drawnItemsModal.clearLayers();
                         drawnItemsModal.addLayer(layer);
 
                         let areaM2 = 0;
@@ -1559,11 +1564,39 @@
         if (modal) modal.style.display = "none";
     }
 
+    async function buscarLugarModal() {
+        const input = document.getElementById("inputBusquedaLugar");
+        if (!input || !input.value.trim()) return;
+
+        const query = input.value.trim();
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ", Argentina")}`);
+            const data = await res.json();
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                if (modalMapInstance) {
+                    modalMapInstance.setView([lat, lon], 14, { animate: true });
+                }
+            } else {
+                alert("No se encontró la localidad ingresada. Intente con otro nombre.");
+            }
+        } catch (e) {
+            alert("Error al realizar la búsqueda.");
+        }
+    }
+
+    function centrarModalGPS() {
+        if (modalMapInstance) {
+            modalMapInstance.setView([currentLat, currentLon], 15, { animate: true });
+        }
+    }
+
     async function analizarLoteModalPro(lat, lon, hectareas) {
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Calculando costos y proyecciones en dólares...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Procesando suelo, clima y riesgos en tiempo real...</div>`;
 
         let nombreLugar = `Lote Agrícola`;
         let provinciaZona = "Mendoza";
@@ -1577,7 +1610,7 @@
             }
         } catch(e) {}
 
-        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=precipitation_sum,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza`;
+        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=soil_temperature_0cm,soil_moisture_0_to_1cm&daily=precipitation_sum,et0_fao_evapotranspiration,temperature_2m_min,temperature_2m_max,weather_code&timezone=America%2FArgentina%2FMendoza`;
         try {
             const res = await fetch(urlClima);
             const data = await res.json();
@@ -1586,31 +1619,38 @@
             let viento = data.current ? data.current.wind_speed_10m : 10;
             let lluvia = data.daily ? (data.daily.precipitation_sum[0] || 0) : 0;
             let et0 = data.daily ? (data.daily.et0_fao_evapotranspiration[0] || 4.5) : 4.5;
+            let minTemp = data.daily ? (data.daily.temperature_2m_min[0] || 5) : 5;
 
-            let ndviEst = 0.62 + (Math.sin(lat) * 0.15);
-            ndviEst = Math.max(0.2, Math.min(0.88, ndviEst));
+            let tempSueloVal = 11;
+            let humSueloVal = 19;
+            let horaActual = new Date().getHours();
+            if (data.hourly && data.hourly.soil_temperature_0cm) {
+                tempSueloVal = Math.round(data.hourly.soil_temperature_0cm[horaActual] ?? 11);
+            }
+            if (data.hourly && data.hourly.soil_moisture_0_to_1cm) {
+                humSueloVal = Math.round((data.hourly.soil_moisture_0_to_1cm[horaActual] ?? 0.19) * 100);
+            }
 
-            let estadoCultivo = "Vigoroso / Óptimo";
-            let colorEstado = "#22c55e";
-            if (ndviEst < 0.4) { estadoCultivo = "Estrés Hídrico Severo"; colorEstado = "#ef4444"; }
-            else if (ndviEst < 0.6) { estadoCultivo = "Crecimiento Regular"; colorEstado = "#f59e0b"; }
+            let balanceH = (lluvia - et0).toFixed(1);
 
-            // Cultivos sugeridos por región por defecto
+            let riesgoHeladaTxt = minTemp <= 0 ? "Alto (≤0°C)" : (minTemp <= 3 ? "Moderado" : "Sin Riesgo");
+            let colorHelada = minTemp <= 0 ? "#ef4444" : (minTemp <= 3 ? "#f59e0b" : "#22c55e");
+
             let cultivoDefault = "Vid";
             if (provinciaZona.toLowerCase().includes("neuquén") || provinciaZona.toLowerCase().includes("rionegro")) {
-                cultivoDefault = "Frutales (Manzana/Pera/Cerezo)";
+                cultivoDefault = "Frutales (Manzana/Pera)";
             } else if (provinciaZona.toLowerCase().includes("córdoba") || provinciaZona.toLowerCase().includes("santa fe")) {
                 cultivoDefault = "Cultivos Extensivos (Maíz/Soja)";
             }
 
             datosLoteActual = {
-                nombreLugar, provinciaZona, hectareas, temp, hum, viento, lluvia, et0, ndviEst, estadoCultivo, cultivoDefault
+                nombreLugar, provinciaZona, hectareas, temp, hum, viento, tempSueloVal, humSueloVal, balanceH, riesgoHeladaTxt, colorHelada, cultivoDefault
             };
 
             renderizarPanelReporteYCostos(cultivoDefault);
 
         } catch(e) {
-            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error al procesar los datos agronómicos. Intente nuevamente.</div>`;
+            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error al procesar los datos de suelo y clima. Intente nuevamente.</div>`;
         }
     }
 
@@ -1620,10 +1660,10 @@
         if (!panel) return;
 
         const d = datosLoteActual;
-        const costos = costosCultivosUSD[cultivoSeleccionado] || costosCultivosUSD["Vid"];
-        const totalLoteUSD = Math.round(costos.totalHa * d.hectareas);
+        const info = infoCultivosAgro[cultivoSeleccionado] || infoCultivosAgro["Vid"];
+        const totalLoteUSD = Math.round(info.totalHa * d.hectareas);
 
-        let listaCultivosHtml = Object.keys(costosCultivosUSD).map(c => `
+        let listaCultivosHtml = Object.keys(infoCultivosAgro).map(c => `
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
         `).join("");
 
@@ -1632,46 +1672,75 @@
             
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} hectáreas</span> | 
-                <b>NDVI:</b> <span style="color:${d.ndviEst < 0.4 ? '#ef4444':'#22c55e'}; font-weight:bold;">${d.ndviEst.toFixed(3)} (${d.estadoCultivo})</span><br>
-                <b>Clima:</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
+                <b>Clima Aire:</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
             </div>
 
-            <div class="report-section-title">💰 Estimador de Costos en Dólares (USD)</div>
+            <div class="report-section-title">🌡️ Diagnóstico de Suelo & Riesgo Agroclimático</div>
             <div class="recommendation-card">
-                <div style="margin-bottom: 6px; font-size:0.73rem; color:var(--text-muted);">Selecciona cultivo para recalcular presupuesto:</div>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px;">
+                    <div style="background:var(--card-bg); padding:6px; border-radius:6px; border:1px solid var(--border);">
+                        <small style="color:var(--text-muted); font-size:0.65rem;">Temp. Suelo (0-10cm)</small>
+                        <strong style="display:block; color:var(--text-main); font-size:0.85rem;">${d.tempSueloVal} °C</strong>
+                    </div>
+                    <div style="background:var(--card-bg); padding:6px; border-radius:6px; border:1px solid var(--border);">
+                        <small style="color:var(--text-muted); font-size:0.65rem;">Humedad de Suelo</small>
+                        <strong style="display:block; color:var(--text-main); font-size:0.85rem;">${d.humSueloVal}%</strong>
+                    </div>
+                    <div style="background:var(--card-bg); padding:6px; border-radius:6px; border:1px solid var(--border);">
+                        <small style="color:var(--text-muted); font-size:0.65rem;">Balance Hídrico Neto</small>
+                        <strong style="display:block; color:${d.balanceH >= 0 ? '#22c55e':'#ef4444'}; font-size:0.85rem;">${d.balanceH} mm</strong>
+                    </div>
+                    <div style="background:var(--card-bg); padding:6px; border-radius:6px; border:1px solid var(--border);">
+                        <small style="color:var(--text-muted); font-size:0.65rem;">Riesgo de Helada</small>
+                        <strong style="display:block; color:${d.colorHelada}; font-size:0.85rem;">${d.riesgoHeladaTxt}</strong>
+                    </div>
+                </div>
+                <span style="color:var(--text-muted); font-size:0.72rem;">💡 <b>Evaluación:</b> Con una temperatura de suelo de ${d.tempSueloVal}°C y humedad del ${d.humSueloVal}%, las condiciones son estables. ${d.balanceH < 0 ? 'Se aconseja planificar riego suplementario por déficit hídrico.' : 'Balance hídrico favorable.'}</span>
+            </div>
+
+            <div class="report-section-title">🌱 Cultivos & Calendario Estacional</div>
+            <div class="recommendation-card">
+                <div style="margin-bottom: 6px; font-size:0.73rem; color:var(--text-muted);">Selecciona cultivo para ver costos y fechas:</div>
                 <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
                 
-                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(56,189,248,0.1); padding:6px 8px; border-radius:6px; margin-bottom:8px;">
-                    <span style="font-weight:bold; color:var(--text-main);">Cultivo Analizado:</span>
-                    <span style="color:var(--accent); font-weight:bold;">${cultivoSeleccionado}</span>
+                <div class="calendario-grid">
+                    <div class="calendario-item">
+                        <strong>📅 Plantación</strong>
+                        ${info.plantacion}
+                    </div>
+                    <div class="calendario-item">
+                        <strong>✂️ Poda / Manejo</strong>
+                        ${info.poda}
+                    </div>
+                    <div class="calendario-item">
+                        <strong>🍇 Cosecha</strong>
+                        ${info.cosecha}
+                    </div>
                 </div>
+            </div>
 
+            <div class="report-section-title">💰 Presupuesto Estimado en Dólares (USD)</div>
+            <div class="recommendation-card">
                 <table class="tabla-costos">
                     <thead>
                         <tr>
-                            <th>Concepto Operativo</th>
-                            <th>USD / Hectárea</th>
+                            <th>Concepto</th>
+                            <th>USD/ha</th>
                             <th>Total (${d.hectareas} ha)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Preparación de Suelo</td><td>$${costos.prep}</td><td>$${Math.round(costos.prep * d.hectareas)}</td></tr>
-                        <tr><td>Implantación / Plantas</td><td>$${costos.implantacion}</td><td>$${Math.round(costos.implantacion * d.hectareas)}</td></tr>
-                        <tr><td>Sistema de Riego</td><td>$${costos.riego}</td><td>$${Math.round(costos.riego * d.hectareas)}</td></tr>
-                        <tr><td>Fitosanitarios / Curaciones</td><td>$${costos.fitosanitarios}</td><td>$${Math.round(costos.fitosanitarios * d.hectareas)}</td></tr>
+                        <tr><td>Preparación Suelo</td><td>$${info.prep}</td><td>$${Math.round(info.prep * d.hectareas)}</td></tr>
+                        <tr><td>Implantación</td><td>$${info.implantacion}</td><td>$${Math.round(info.implantacion * d.hectareas)}</td></tr>
+                        <tr><td>Sistema Riego</td><td>$${info.riego}</td><td>$${Math.round(info.riego * d.hectareas)}</td></tr>
+                        <tr><td>Fitosanitarios</td><td>$${info.fitosanitarios}</td><td>$${Math.round(info.fitosanitarios * d.hectareas)}</td></tr>
                         <tr style="font-weight:bold; color:var(--accent);">
-                            <td>Inversión Total Estimada</td>
-                            <td>$${costos.totalHa} USD/ha</td>
+                            <td>Inversión Total</td>
+                            <td>$${info.totalHa} USD/ha</td>
                             <td>$${totalLoteUSD} USD</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="report-section-title">💧 Recomendación de Riego & Fitosanitarios</div>
-            <div class="recommendation-card">
-                <b>Balance Hídrico Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm<br>
-                <span style="color: var(--accent);">💡 <b>Sugerencia:</b> Mantener control estricto de riego por goteo según los requerimientos hídricos del cultivo seleccionado.</span>
             </div>
         `;
     }
@@ -1696,7 +1765,7 @@
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
             mapTitle.innerText = "🔥 Monitoreo de Incendios en Vivo (NASA FIRMS)";
-            actualizarIndicadorMapa("Capa de Incendios Activa (Últimas 24hs)", "#f59e0b");
+            actualizarIndicadorMapa("Capa de Incendios Activa", "#f59e0b");
         } else {
             if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
@@ -1726,69 +1795,46 @@
             const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
             const geoData = await geoRes.json();
             if (geoData && geoData.address) {
-                const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || geoData.address.municipality || "";
+                const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || "";
                 const prov = geoData.address.state || "";
-                if (ciudad) {
-                    nombreZona = prov ? `${ciudad}, ${prov}` : ciudad;
-                }
+                if (ciudad) nombreZona = prov ? `${ciudad}, ${prov}` : ciudad;
             }
         } catch (e) {}
 
-        const urlClimaAPI = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;
-
-        fetch(urlClimaAPI)
-            .then(response => response.json())
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`)
+            .then(res => res.json())
             .then(climaData => {
-                let tempActual = "--";
-                let humActual = "--";
+                let tempActual = climaData.current ? climaData.current.temperature_2m : "--";
+                let humActual = climaData.current ? climaData.current.relative_humidity_2m : "--";
 
-                if (climaData && climaData.current) {
-                    tempActual = climaData.current.temperature_2m;
-                    humActual = climaData.current.relative_humidity_2m;
-                }
-
-                let ndviValue = 0.35 + (Math.sin(lat * 10) * 0.25) + (Math.cos(lon * 10) * 0.15);
+                let ndviValue = 0.35 + (Math.sin(lat * 10) * 0.25);
                 ndviValue = Math.max(0.1, Math.min(0.85, ndviValue));
 
                 let riesgo = "Bajo (Saludable)";
                 let colorRiesgo = "#2ecc71";
-                let recomendacion = "🟢 Cultivo vigoroso. Mantener monitoreo preventivo de enfermedades fúngicas por humedad.";
+                let recomendacion = "🟢 Cultivo vigoroso. Mantener monitoreo preventivo.";
 
                 if (ndviValue < 0.4) {
                     riesgo = "Alto (Estrés / Suelo)";
                     colorRiesgo = "#ef4444";
-                    recomendacion = "🔴 Alerta máxima: Posible estrés hídrico severo o falla de riego. Inspección urgente en campo.";
-                } else if (ndviValue < 0.6) {
-                    riesgo = "Moderado";
-                    colorRiesgo = "#f39c12";
-                    recomendacion = "🟡 Crecimiento regular. Ajustar lámina de riego o evaluar fertilización nitrogenada sectorizada.";
+                    recomendacion = "🔴 Alerta máxima: Posible estrés hídrico severo.";
                 }
 
                 marcador.setIcon(L.divIcon({
                     className: 'custom-pin',
                     html: `<div style="background-color: ${colorRiesgo}; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
-                    iconSize: [26, 26],
-                    iconAnchor: [13, 13]
+                    iconSize: [26, 26], iconAnchor: [13, 13]
                 }));
 
-                let popupContent = `
+                marcador.setPopupContent(`
                     <div style="font-size: 0.8rem; line-height: 1.4; min-width: 180px;">
                         <b>📍 Zona:</b> ${nombreZona}<br>
                         <b>Riesgo:</b> <span style="color:${colorRiesgo}; font-weight:bold;">${riesgo}</span><br>
                         <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
-                        <b>Temperatura:</b> ${tempActual} °C | <b>Humedad:</b> ${humActual} %<br>
-                        <hr style="margin: 6px 0; border:0; border-top:1px solid #ccc;">
-                        <b>💡 Recomendación:</b><br>
-                        <span style="color: #38bdf8;">${recomendacion}</span>
+                        <b>Temp:</b> ${tempActual}°C | <b>Humedad:</b> ${humActual}%
                     </div>
-                `;
-
-                marcador.setPopupContent(popupContent);
-                marcador.openPopup();
+                `).openPopup();
                 actualizarIndicadorMapa("Diagnóstico agronómico listo", "#22c55e");
-            })
-            .catch(err => {
-                actualizarIndicadorMapa("Error al conectar con la API de clima", "#ef4444");
             });
     }
 
@@ -1803,31 +1849,22 @@
             markerPlagas = null;
             btnPlagas.classList.remove("active");
             mapTitle.innerText = "🗺️ Visor Geográfico";
-            actualizarIndicadorMapa("Capa de Plagas desactivada", "#22c55e");
             return;
         }
 
         btnPlagas.classList.add("active");
         mapTitle.innerText = "🌱 Monitoreo de Plagas & NDVI";
 
-        let latLote = currentLat || -32.92;
-        let lonLote = currentLon || -68.84;
-
-        markerPlagas = L.marker([latLote, lonLote], {
+        markerPlagas = L.marker([currentLat, currentLon], {
             draggable: true,
             icon: L.divIcon({
                 className: 'custom-pin',
                 html: `<div style="background-color: #f39c12; width: 26px; height: 26px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.6);"></div>`,
-                iconSize: [26, 26],
-                iconAnchor: [13, 13]
+                iconSize: [26, 26], iconAnchor: [13, 13]
             })
         }).addTo(mapInstance);
 
-        markerPlagas.bindPopup("<b>Buscando nombre de la zona...</b>").openPopup();
-        mapInstance.setView([latLote, lonLote], 13, { animate: true });
-
-        consultarClimaParaPlagas(latLote, lonLote, markerPlagas);
-
+        consultarClimaParaPlagas(currentLat, currentLon, markerPlagas);
         markerPlagas.on('dragend', function() {
             let pos = markerPlagas.getLatLng();
             consultarClimaParaPlagas(pos.lat, pos.lng, markerPlagas);
@@ -1835,678 +1872,45 @@
     }
 
     function centrarUbicacion() {
-        if (mapInstance) {
-            mapInstance.setView([currentLat, currentLon], 15, { animate: true });
-            if (markerInstance) markerInstance.openPopup();
-            actualizarIndicadorMapa("Centrado en GPS actual", "#22c55e");
-        }
+        if (mapInstance) mapInstance.setView([currentLat, currentLon], 15, { animate: true });
     }
 
     function verVistaPais() {
-        if (mapInstance) {
-            mapInstance.setView([-38.4161, -63.6167], 5, { animate: true });
-            actualizarIndicadorMapa("Vista general de Argentina", "#22c55e");
-        }
-    }
-
-    function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a =
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    }
-
-    async function verificarProximidadIncendios(lat, lon) {
-        const card = document.getElementById("fuegoAlertaCard");
-        const espaciador = document.getElementById("fuegoEspaciador");
-        const desc = document.getElementById("fuegoAlertaDesc");
-        const titulo = document.getElementById("fuegoAlertaTitulo");
-
-        if (!card || !espaciador) return;
-
-        try {
-            const urlFirmsCSV = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${MAP_KEY_FIRMS}/VIIRS_SNPP_NRT/south-america/1`;
-            const res = await fetch(urlFirmsCSV);
-            if (!res.ok) return;
-            const text = await res.text();
-            const lineas = text.split("\n");
-
-            if (lineas.length <= 1) return;
-
-            let cabecera = lineas[0].split(",");
-            let idxLat = cabecera.indexOf("latitude");
-            let idxLon = cabecera.indexOf("longitude");
-
-            if (idxLat === -1 || idxLon === -1) {
-                idxLat = 0; idxLon = 1;
-            }
-
-            let fuegoCercanoKm = 9999;
-
-            for (let i = 1; i < lineas.length; i++) {
-                let cols = lineas[i].split(",");
-                if (cols.length > Math.max(idxLat, idxLon)) {
-                    let fLat = parseFloat(cols[idxLat]);
-                    let fLon = parseFloat(cols[idxLon]);
-                    if (!isNaN(fLat) && !isNaN(fLon)) {
-                        let distancia = calcularDistanciaKm(lat, lon, fLat, fLon);
-                        if (distancia < fuegoCercanoKm) {
-                            fuegoCercanoKm = distancia;
-                        }
-                    }
-                }
-            }
-
-            if (fuegoCercanoKm <= 100) {
-                card.style.display = "block";
-                espaciador.style.display = "block";
-                card.classList.add("alerta-activa-animacion");
-                titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
-                desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
-
-                dispararNotificacionPush(
-                    "🔥 ¡Alerta de Incendio Cerca!",
-                    `Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu ubicación.`,
-                    "fuego"
-                );
-            } else {
-                card.style.display = "none";
-                espaciador.style.display = "none";
-                card.classList.remove("alerta-activa-animacion");
-            }
-        } catch (e) {}
+        if (mapInstance) mapInstance.setView([-38.4161, -63.6167], 5, { animate: true });
     }
 
     function actualizarFechaYHoraDigital() {
         try {
             const ahora = new Date();
-            const elFecha = document.getElementById("fecha");
-            const elClock = document.getElementById("digitalFallback");
-
-            if (elFecha) elFecha.innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
-            if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR") + " hs";
+            document.getElementById("fecha").innerText = ahora.toLocaleDateString("es-AR", { weekday: 'long', day: 'numeric', month: 'short' });
+            document.getElementById("digitalFallback").innerText = ahora.toLocaleTimeString("es-AR") + " hs";
         } catch(e) {}
-    }
-
-    function obtenerDireccionViento(grados) {
-        if (grados === undefined || grados === null) return "N/D";
-        const direcciones = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-        const val = Math.floor((grados / 22.5) + 0.5);
-        return direcciones[(val % 16)];
-    }
-
-    function iconoClima(codigo) {
-        if (codigo === 0) return "☀️";
-        if (codigo <= 2) return "🌤️";
-        if (codigo === 3) return "☁️";
-        if (codigo <= 67) return "🌧️";
-        if (codigo >= 95) return "⛈️";
-        return "⛈️";
-    }
-
-    function calcularFaseLunar() {
-        try {
-            const ahora = new Date();
-            let year = ahora.getFullYear();
-            let month = ahora.getMonth() + 1;
-            let day = ahora.getDate();
-
-            if (month < 3) { year--; month += 12; }
-            month++;
-            let c = 365.25 * year;
-            let e = 30.6 * month;
-            let jd = c + e + day - 694039.09;
-            jd /= 29.5305882;
-            let b = Math.floor(jd);
-            jd -= b;
-
-            let fase = Math.round(jd * 8);
-            if (fase >= 8) fase = 0;
-
-            let iluminacion = Math.round((1 - Math.cos(jd * 2 * Math.PI)) / 2 * 100);
-            let nombre = "Luna Nueva";
-            let icono = "🌑";
-
-            if (fase === 0) { nombre = "Luna Nueva"; icono = "🌑"; }
-            else if (fase === 1) { nombre = "Creciente"; icono = "🌒"; }
-            else if (fase === 2) { nombre = "Cuarto Creciente"; icono = "🌓"; }
-            else if (fase === 3) { nombre = "Gibosa Creciente"; icono = "🌔"; }
-            else if (fase === 4) { nombre = "Luna Llena"; icono = "🌕"; }
-            else if (fase === 5) { nombre = "Gibosa Menguante"; icono = "🌖"; }
-            else if (fase === 6) { nombre = "Cuarto Menguante"; icono = "🌗"; }
-            else if (fase === 7) { nombre = "Menguante"; icono = "🌘"; }
-
-            const elIcon = document.getElementById("moonIcon");
-            const elName = document.getElementById("moonPhaseName");
-            const elIllum = document.getElementById("moonIllumination");
-
-            if (elIcon) elIcon.innerText = icono;
-            if (elName) elName.innerText = nombre;
-            if (elIllum) elIllum.innerText = iluminacion + "% iluminada";
-        } catch(e) {}
-    }
-
-    function gestionarAlertaSMN(code) {
-        const card = document.getElementById("smnAlertCard");
-        const espaciador = document.getElementById("smnEspaciador");
-        const badge = document.getElementById("smnNivelBadge");
-        const titulo = document.getElementById("smnTitulo");
-        const desc = document.getElementById("smnDescripcion");
-        const icono = document.getElementById("smnIcono");
-
-        if (!card || !espaciador) return;
-
-        if (code >= 95) {
-            card.style.display = "block";
-            espaciador.style.display = "block";
-            card.classList.add("alerta-activa-animacion");
-
-            if (code === 96 || code === 99) {
-                card.style.borderLeftColor = "#ef4444";
-                if (badge) { badge.style.background = "#ef4444"; badge.innerText = "Alerta Naranja - Tormentas Severas"; }
-                if (icono) icono.innerText = "⚡🌪️";
-                if (titulo) titulo.innerText = "¡Alerta Severa por Tormentas Fuertes!";
-                if (desc) desc.innerText = "Se pronostican tormentas intensas con ráfagas fuertes y abundante caída de agua.";
-            } else {
-                card.style.borderLeftColor = "#f59e0b";
-                if (badge) { badge.style.background = "#f59e0b"; badge.innerText = "Alerta Amarilla - Tormentas"; }
-                if (icono) icono.innerText = "⚡⛈️";
-                if (titulo) titulo.innerText = "¡Atención: Tormentas Fuertes!";
-                if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua y actividad eléctrica.";
-            }
-
-            dispararNotificacionPush(
-                "⚡ ¡Alerta Meteorológica Activa!",
-                "Se pronostican tormentas intensas para tu zona geográfica.",
-                "tormenta"
-            );
-        } else {
-            card.style.display = "none";
-            espaciador.style.display = "none";
-            card.classList.remove("alerta-activa-animacion");
-        }
-    }
-
-    async function cargarCalidadAire() {
-        try {
-            const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${currentLat}&longitude=${currentLon}&current=us_aqi&timezone=auto`;
-            const res = await fetch(url);
-            const data = await res.json();
-            if (!data || !data.current) return;
-
-            const aqi = data.current.us_aqi;
-            let estado = "Buena";
-            let color = "#22c55e";
-
-            if (aqi > 50 && aqi <= 100) { estado = "Moderada"; color = "#facc15"; }
-            else if (aqi > 100 && aqi <= 150) { estado = "Dañina"; color = "#fb923c"; }
-            else if (aqi > 150) { estado = "Mala"; color = "#ef4444"; }
-
-            const elAire = document.getElementById("aire");
-            const elEstado = document.getElementById("aireEstado");
-
-            if (elAire) {
-                elAire.innerText = aqi;
-                elAire.style.color = color;
-            }
-            if (elEstado) elEstado.innerText = estado;
-        } catch (error) {}
-    }
-
-    async function cargarPolen() {
-        try {
-            const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${currentLat}&longitude=${currentLon}&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen&timezone=America%2FArgentina%2FMendoza`;
-            const res = await fetch(url);
-            const data = await res.json();
-
-            if (!data || !data.hourly) return;
-
-            function evaluarNivel(valor) {
-                if (valor <= 0) return { texto: "Ninguno", clase: "dot-ninguno" };
-                if (valor <= 10) return { texto: "Bajo", clase: "dot-bajo" };
-                if (valor <= 30) return { texto: "Medio", clase: "dot-medio" };
-                if (valor <= 80) return { texto: "Alto", clase: "dot-alto" };
-                return { texto: "Muy alto", clase: "dot-muyalto" };
-            }
-
-            const indices = [12, 36, 60];
-            let htmlArboles = "", htmlCesped = "", htmlMaleza = "";
-
-            indices.forEach((idx, i) => {
-                const fechaObj = new Date(Date.now() + i * 86400000);
-                const dNombre = i === 0 ? "Hoy" : (i === 1 ? "Mañana" : fechaObj.toLocaleDateString("es-AR", { weekday: "short" }));
-
-                const valArbol = (data.hourly.alder_pollen[idx] || 0) + (data.hourly.birch_pollen[idx] || 0);
-                const valCesped = data.hourly.grass_pollen[idx] || 0;
-                const valMaleza = (data.hourly.mugwort_pollen[idx] || 0) + (data.hourly.ragweed_pollen[idx] || 0);
-
-                const nArbol = evaluarNivel(valArbol);
-                const nCesped = evaluarNivel(valCesped);
-                const nMaleza = evaluarNivel(valMaleza);
-
-                htmlArboles += `<div class="polen-item"><span class="dot-nivel ${nArbol.clase}"></span> <span style="text-transform:capitalize">${dNombre}:</span> <strong>${nArbol.texto}</strong></div>`;
-                htmlCesped += `<div class="polen-item"><span class="dot-nivel ${nCesped.clase}"></span> <span style="text-transform:capitalize">${dNombre}:</span> <strong>${nCesped.texto}</strong></div>`;
-                htmlMaleza += `<div class="polen-item"><span class="dot-nivel ${nMaleza.clase}"></span> <span style="text-transform:capitalize">${dNombre}:</span> <strong>${nMaleza.texto}</strong></div>`;
-            });
-
-            document.getElementById("polenArboles").innerHTML = htmlArboles;
-            document.getElementById("polenCesped").innerHTML = htmlCesped;
-            document.getElementById("polenMaleza").innerHTML = htmlMaleza;
-
-        } catch (e) {}
-    }
-
-    async function cargarSismos() {
-        const lista = document.getElementById("sismosLista");
-        if (!lista) return;
-
-        try {
-            const urlUSGS = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson";
-            const res = await fetch(urlUSGS);
-            if (!res.ok) throw new Error("Error HTTP " + res.status);
-
-            const data = await res.json();
-
-            if (data && data.features && data.features.length > 0) {
-                lista.innerHTML = "";
-                data.features.slice(0, 15).forEach(sismo => {
-                    const props = sismo.properties;
-                    const fecha = new Date(props.time).toLocaleString("es-AR", {
-                        day: 'numeric', month: 'numeric', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit', second: '2-digit'
-                    });
-
-                    const mag = props.mag ? props.mag.toFixed(1) : "--";
-                    const lugar = props.place || "Ubicación desconocida";
-
-                    const esArgentina = lugar.toUpperCase().includes("ARGENTINA") || lugar.toUpperCase().includes("MENDOZA") || lugar.toUpperCase().includes("SAN JUAN") || lugar.toUpperCase().includes("SALTA") || lugar.toUpperCase().includes("JUJUY");
-                    const claseColor = esArgentina ? "sismo-mendoza" : "sismo-normal";
-
-                    lista.innerHTML += `
-                        <tr>
-                            <td style="font-size:0.72rem">${fecha}</td>
-                            <td class="${claseColor}">${mag}</td>
-                            <td style="text-align:left; padding-left:6px;" class="${claseColor}">${lugar}</td>
-                        </tr>`;
-                });
-            } else {
-                lista.innerHTML = `<tr><td colspan="3">Sin sismos recientes registrados</td></tr>`;
-            }
-        } catch (err) {
-            lista.innerHTML = `<tr><td colspan="3" style="color:var(--text-muted)">Error al conectar con la red sísmica</td></tr>`;
-        }
-    }
-
-    async function actualizarAltaMontana() {
-        try {
-            const url = "https://api.open-meteo.com/v1/forecast?latitude=-32.81&longitude=-69.80&current=temperature_2m,snowfall&timezone=auto";
-            const res = await fetch(url);
-            const data = await res.json();
-            if (!data || !data.current) return;
-
-            const temp = Math.round(data.current.temperature_2m);
-            const nieve = data.current.snowfall || 0;
-
-            const elTempCristo = document.getElementById("tempCristo");
-            const elCristo = document.getElementById("pasoCristo");
-
-            if (elTempCristo) elTempCristo.textContent = "Las Cuevas: " + temp + "°C";
-
-            if (temp <= -5 || nieve > 0) {
-                if (elCristo) { elCristo.textContent = "Precaución"; elCristo.className = "paso-estado estado-precaucion"; }
-            } else {
-                if (elCristo) { elCristo.textContent = "Habilitado"; elCristo.className = "paso-estado estado-abierto"; }
-            }
-        } catch (e) {}
-    }
-
-    async function cargarClima() {
-        try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,visibility,shortwave_radiation&hourly=temperature_2m,relative_humidity_2m,surface_pressure,weather_code,soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza`;
-            const res = await fetch(url);
-            const data = await res.json();
-
-            if (!data || !data.current) return;
-
-            const temp = data.current.temperature_2m ?? 0;
-            const tempFormateada = Math.round(temp) + "°C";
-            const st = Math.round(data.current.apparent_temperature ?? temp);
-            const humedad = data.current.relative_humidity_2m ?? 0;
-            const viento = data.current.wind_speed_10m ?? 0;
-            const dirVientoGrados = data.current.wind_direction_10m ?? 0;
-            const presionActual = data.current.surface_pressure ?? 1013;
-            const uv = data.current.uv_index ?? 0;
-            const code = data.current.weather_code ?? 0;
-            const radiacion = data.current.shortwave_radiation ?? 0;
-
-            const tw = temp * Math.atan(0.151977 * Math.pow(humedad + 8.313659, 0.5)) + Math.atan(temp + humedad) - Math.atan(humedad - 1.676331) + 0.00391838 * Math.pow(humedad, 1.5) * Math.atan(0.023101 * humedad) - 4.686035;
-
-            const elBulbo = document.getElementById("bulboHumedad");
-            const elRad = document.getElementById("radiacionSolar");
-            const elEstres = document.getElementById("estresTermico");
-
-            if (elBulbo) elBulbo.innerText = tw.toFixed(1) + " °C";
-            if (elRad) elRad.innerText = Math.round(radiacion) + " W/m²";
-
-            if (elEstres) {
-                if (temp >= 32 && humedad > 50) {
-                    elEstres.innerText = "Peligroso";
-                    elEstres.style.color = "#ef4444";
-                } else if (temp >= 28) {
-                    elEstres.innerText = "Moderado";
-                    elEstres.style.color = "#facc15";
-                } else {
-                    elEstres.innerText = "Confortable";
-                    elEstres.style.color = "#22c55e";
-                }
-            }
-
-            const elTemp = document.getElementById("temp");
-            const elSt = document.getElementById("stTemp");
-            const elHeaderTemp = document.getElementById("headerTemp");
-            const elHum = document.getElementById("humedad");
-            const elViento = document.getElementById("viento");
-            const elVientoDir = document.getElementById("vientoDir");
-            const elPresion = document.getElementById("presion");
-            const elPresionTendencia = document.getElementById("presionTendencia");
-            const elIcon = document.getElementById("weatherIcon");
-
-            if (elTemp) elTemp.innerText = tempFormateada;
-            if (elSt) elSt.innerText = "ST: " + st + "°C";
-            if (elHeaderTemp) elHeaderTemp.textContent = tempFormateada;
-            if (elHum) elHum.innerText = humedad + "%";
-            if (elViento) elViento.innerText = Math.round(viento) + " km/h";
-            if (elVientoDir) elVientoDir.innerText = `Dir: ${obtenerDireccionViento(dirVientoGrados)} (${dirVientoGrados}°)`;
-            if (elPresion) elPresion.innerText = Math.round(presionActual);
-
-            if (data.hourly && data.hourly.surface_pressure) {
-                const h = new Date().getHours();
-                const presionPasada = data.hourly.surface_pressure[Math.max(0, h - 3)] ?? presionActual;
-                const diffPresion = presionActual - presionPasada;
-
-                if (diffPresion < -2.5) {
-                    if (elPresionTendencia) { elPresionTendencia.innerText = "⚠ Caída brusca (Zonda/Frente)"; elPresionTendencia.style.color = "#ef4444"; }
-                } else if (diffPresion < -1) {
-                    if (elPresionTendencia) { elPresionTendencia.innerText = "📉 En descenso"; elPresionTendencia.style.color = "#facc15"; }
-                } else if (diffPresion > 1) {
-                    if (elPresionTendencia) { elPresionTendencia.innerText = "📈 En ascenso"; elPresionTendencia.style.color = "#22c55e"; }
-                } else {
-                    if (elPresionTendencia) { elPresionTendencia.innerText = "➡ Estable"; elPresionTendencia.style.color = "var(--accent)"; }
-                }
-            }
-
-            if (data.hourly) {
-                const h = new Date().getHours();
-                if (data.hourly.soil_moisture_0_to_1cm) {
-                    const humSueloPct = Math.round((data.hourly.soil_moisture_0_to_1cm[h] ?? 0) * 100);
-                    const elHumS = document.getElementById("humSuelo");
-                    if (elHumS) elHumS.innerText = humSueloPct + "%";
-                }
-                if (data.hourly.soil_temperature_0cm) {
-                    const tSuelo = Math.round(data.hourly.soil_temperature_0cm[h] ?? temp);
-                    const elTS = document.getElementById("tempSuelo");
-                    if (elTS) elTS.innerText = tSuelo + " °C";
-                }
-
-                let horasFrioAcum = 0;
-                for (let i = Math.max(0, h - 24); i <= h; i++) {
-                    let tH = data.hourly.temperature_2m[i];
-                    if (tH !== undefined && tH >= 0 && tH <= 7) {
-                        horasFrioAcum++;
-                    }
-                }
-                const elHF = document.getElementById("horasFrio");
-                if (elHF) elHF.innerText = horasFrioAcum + " hs";
-
-                const tH = data.hourly.temperature_2m[h] ?? temp;
-                const rH = data.hourly.relative_humidity_2m[h] ?? humedad;
-                const es = 0.61078 * Math.exp((17.27 * tH) / (tH + 237.3));
-                const ea = es * (rH / 100);
-                const vpd = Math.max(0, es - ea);
-                const elVpd = document.getElementById("vpdAire");
-                if (elVpd) elVpd.innerText = vpd.toFixed(2) + " kPa";
-            }
-
-            let iconUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
-            let desc = "Despejado";
-
-            if (code === 0) {
-                desc = "Cielo despejado";
-                iconUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
-            } else if (code >= 1 && code <= 3) {
-                desc = "Parcialmente nublado";
-                iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163624.png";
-            } else if (code === 45 || code === 48) {
-                desc = "Neblina";
-                iconUrl = "https://cdn-icons-png.flaticon.com/512/4005/4005901.png";
-            } else if (code >= 51 && code <= 67) {
-                desc = "Lluvia";
-                iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163657.png";
-            } else if (code >= 80 && code <= 82) {
-                desc = "Chubascos";
-                iconUrl = "https://cdn-icons-png.flaticon.com/512/3351/3351979.png";
-            } else if (code >= 95) {
-                desc = "Tormenta Eléctrica";
-                iconUrl = "https://cdn-icons-png.flaticon.com/512/1146/1146860.png";
-            }
-
-            if (elIcon) elIcon.src = iconUrl;
-            const elTempDesc = document.getElementById("tempDesc");
-            if (elTempDesc) elTempDesc.innerText = desc;
-
-            gestionarAlertaSMN(code);
-
-            const elUv = document.getElementById("uvIndex");
-            const elUvEstado = document.getElementById("uvEstado");
-            if (elUv) elUv.innerText = uv.toFixed(1);
-            if (elUvEstado) {
-                if (uv <= 2) { elUvEstado.innerText = "Bajo"; elUvEstado.style.color = "#22c55e"; }
-                else if (uv <= 5) { elUvEstado.innerText = "Moderado"; elUvEstado.style.color = "#facc15"; }
-                else if (uv <= 7) { elUvEstado.innerText = "Alto"; elUvEstado.style.color = "#fb923c"; }
-                else { elUvEstado.innerText = "Muy Alto"; elUvEstado.style.color = "#ef4444"; }
-            }
-
-            let zonda = "Bajo";
-            let zondaIcono = "🟢";
-
-            if (humedad <= 30 && temp >= 20) { zonda = "Moderado"; zondaIcono = "🟡"; }
-            if (humedad <= 20 && temp >= 25 && viento >= 15) { zonda = "Alto"; zondaIcono = "🟠"; }
-            if (humedad <= 15 && temp >= 30 && viento >= 25) { zonda = "Muy Alto"; zondaIcono = "🔴"; }
-
-            const elZondaIcono = document.getElementById("zondaIcono");
-            const elZondaEstado = document.getElementById("zondaEstado");
-            if (elZondaIcono) elZondaIcono.innerText = zondaIcono;
-            if (elZondaEstado) elZondaEstado.innerText = zonda;
-
-            if (data.daily) {
-                const prob = data.daily.precipitation_probability_max[0] ?? 0;
-                const lluvia = data.daily.precipitation_sum[0] ?? 0;
-                const solSegundos = data.daily.sunshine_duration[0] ?? 0;
-                const horasSol = (solSegundos / 3600).toFixed(1);
-                const rafagas = Math.round(data.daily.wind_gusts_10m_max[0] ?? 0);
-                const eto = (data.daily.et0_fao_evapotranspiration[0] ?? 0).toFixed(1);
-                const minTemp = data.daily.temperature_2m_min[0] ?? 5;
-                const maxTempDay = data.daily.temperature_2m_max[0] ?? 20;
-
-                const gddDiario = Math.max(0, ((maxTempDay + minTemp) / 2) - 10);
-                const elGdd = document.getElementById("gddAcum");
-                if (elGdd) elGdd.innerText = Math.round(gddDiario) + " GDD";
-
-                const balance = (lluvia - parseFloat(eto)).toFixed(1);
-                const elBal = document.getElementById("balanceHidrico");
-                if (elBal) {
-                    elBal.innerText = balance + " mm";
-                    elBal.style.color = balance >= 0 ? "#22c55e" : "#ef4444";
-                }
-
-                const elProb = document.getElementById("probLluvia");
-                const elLluvia = document.getElementById("lluviaAcum");
-                const elSol = document.getElementById("horasSol");
-                const elRafagas = document.getElementById("rafagasMax");
-                const elEto = document.getElementById("etoDiario");
-                const elHelada = document.getElementById("riesgoHelada");
-                const elGranizo = document.getElementById("riesgoGranizo");
-
-                if (elProb) elProb.innerText = prob + "%";
-                if (elLluvia) elLluvia.innerText = lluvia + " mm";
-                if (elSol) elSol.innerText = horasSol + " hs";
-                if (elRafagas) elRafagas.innerText = rafagas + " km/h";
-                if (elEto) elEto.innerText = eto + " mm";
-
-                if (elHelada) {
-                    if (minTemp <= 0) { elHelada.innerText = "Alto (≤0°)"; elHelada.style.color = "#ef4444"; }
-                    else if (minTemp <= 3) { elHelada.innerText = "Moderado"; elHelada.style.color = "#facc15"; }
-                    else { elHelada.innerText = "Sin Riesgo"; elHelada.style.color = "#22c55e"; }
-                }
-
-                if (elGranizo) {
-                    if (code >= 96) {
-                        elGranizo.innerText = "Alerta";
-                        elGranizo.style.color = "#ef4444";
-                    } else if (code === 95 && prob >= 60) {
-                        elGranizo.innerText = "Observación";
-                        elGranizo.style.color = "#facc15";
-                    } else {
-                        elGranizo.innerText = "Sin Riesgo";
-                        elGranizo.style.color = "#22c55e";
-                    }
-                }
-
-                const ahora = new Date();
-                const amanecer = new Date(data.daily.sunrise[0]);
-                const atardecer = new Date(data.daily.sunset[0]);
-
-                const elAmanecer = document.getElementById("amanecerTime");
-                const elAtardecer = document.getElementById("atardecerTime");
-
-                if (elAmanecer) elAmanecer.innerText = amanecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
-                if (elAtardecer) elAtardecer.innerText = atardecer.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
-
-                let pct = (ahora - amanecer) / (atardecer - amanecer);
-                let angulo = Math.max(0, Math.min(1, pct)) * 180;
-                const elSunPivot = document.getElementById("sunPivot");
-                const elSunIcon = document.getElementById("sunIcon");
-
-                if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
-                if (elSunIcon) {
-                    elSunIcon.style.transform = `rotate(-${angulo}deg)`;
-                    elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
-                }
-            }
-
-            const hourly = document.getElementById("hourlyForecast");
-            if (hourly && data.hourly) {
-                hourly.innerHTML = "";
-                const h = new Date().getHours();
-                for(let i = h; i < h + 6; i++) {
-                    if (data.hourly.temperature_2m[i] !== undefined) {
-                        hourly.innerHTML += `
-                            <div class="forecast-card">
-                                <div>${i % 24}:00</div>
-                                <div class="icon">${iconoClima(data.hourly.weather_code[i])}</div>
-                                <div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div>
-                            </div>`;
-                    }
-                }
-            }
-
-            const forecast = document.getElementById("forecast");
-            if (forecast && data.daily) {
-                forecast.innerHTML = "";
-                data.daily.time.forEach((t, i) => {
-                    const d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", { weekday: "short" });
-                    forecast.innerHTML += `
-                        <div class="forecast-card">
-                            <div style="text-transform:capitalize">${d}</div>
-                            <div class="icon">${iconoClima(data.daily.weather_code[i])}</div>
-                            <div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div>
-                            <div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div>
-                        </div>`;
-                });
-            }
-
-        } catch(e) {}
-    }
-
-    function dispararCargaDeDatos() {
-        cargarClima();
-        cargarCalidadAire();
-        cargarPolen();
-        cargarSismos();
-        actualizarAltaMontana();
-        verificarProximidadIncendios(currentLat, currentLon);
     }
 
     function iniciarApp() {
         actualizarFechaYHoraDigital();
-        calcularFaseLunar();
-
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
                     currentLat = position.coords.latitude;
                     currentLon = position.coords.longitude;
-
-                    let nombreLugar = "Godoy Cruz, Mendoza";
-                    let provinciaDetectada = "Mendoza";
-
-                    try {
-                        const geoRes = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=10`;
-                        const geoData = await (await fetch(geoRes)).json();
-                        if (geoData && geoData.address) {
-                            const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || "";
-                            provinciaDetectada = geoData.address.state || "Mendoza";
-                            if (ciudad) {
-                                nombreLugar = provinciaDetectada ? `${ciudad}, ${provinciaDetectada}` : ciudad;
-                            }
-                        }
-                    } catch (err) {}
-
-                    if (provinciaDetectada.toLowerCase().includes("mendoza")) provinciaDetectada = "Mendoza";
-                    else if (provinciaDetectada.toLowerCase().includes("san juan")) provinciaDetectada = "San Juan";
-                    else if (provinciaDetectada.toLowerCase().includes("córdoba") || provinciaDetectada.toLowerCase().includes("cordoba")) provinciaDetectada = "Córdoba";
-                    else if (provinciaDetectada.toLowerCase().includes("neuquén") || provinciaDetectada.toLowerCase().includes("neuquen")) provinciaDetectada = "Neuquén";
-                    else provinciaDetectada = "Mendoza";
-
-                    actualizarEmbalsesSegunUbicacion(provinciaDetectada);
-
-                    const elUbi = document.getElementById("ubicacionTexto");
-                    if (elUbi) elUbi.innerText = nombreLugar;
-
-                    inicializarMapaArgentina(currentLat, currentLon);
-                    dispararCargaDeDatos();
-                },
-                (error) => {
                     actualizarEmbalsesSegunUbicacion("Mendoza");
-                    const elUbi = document.getElementById("ubicacionTexto");
-                    if (elUbi) elUbi.innerText = "Godoy Cruz, Mendoza";
                     inicializarMapaArgentina(currentLat, currentLon);
-                    dispararCargaDeDatos();
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                () => {
+                    actualizarEmbalsesSegunUbicacion("Mendoza");
+                    inicializarMapaArgentina(currentLat, currentLon);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
             );
         } else {
             actualizarEmbalsesSegunUbicacion("Mendoza");
-            const elUbi = document.getElementById("ubicacionTexto");
-            if (elUbi) elUbi.innerText = "Godoy Cruz, Mendoza";
             inicializarMapaArgentina(currentLat, currentLon);
-            dispararCargaDeDatos();
         }
     }
 
     iniciarApp();
-
     setInterval(actualizarFechaYHoraDigital, 1000);
-    setInterval(dispararCargaDeDatos, 300000);
-    setInterval(cargarCalidadAire, 300000);
-    setInterval(cargarPolen, 3600000);
-    setInterval(cargarSismos, 300000);
-    setInterval(actualizarAltaMontana, 300000);
 </script>
 
 </body>
