@@ -1188,7 +1188,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄️</span>
+                        <span style="font-size: 1.2rem;">❄️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Horas de Frío</small>
                         <strong id="horasFrio" style="font-size: 0.88rem; color: var(--accent);">-- hs</strong>
                     </div>
@@ -1212,7 +1212,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄️</span>
+                        <span style="font-size: 1.2rem;">❄️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Riesgo Helada</small>
                         <strong id="riesgoHelada" style="font-size: 0.88rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
@@ -1351,6 +1351,56 @@
         "Frutales (Manzana/Pera/Cerezo)": { prep: 500, implantacion: 4200, riego: 700, fitosanitarios: 900, totalHa: 6300 },
         "Cultivos Extensivos (Maíz/Soja)": { prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900 }
     };
+
+    // Diccionario de Recomendación de Fertilizantes según cultivo y estado nutricional
+    const fertilizantesPorCultivo = {
+        "Vid": {
+            optimo: "Nitrato de Potasio (para equilibrar brotación y calidad en maduración) y aportes de Fósforo en pre-floración.",
+            regular: "Fertilización nitrogenada (Urea o Nitrato de Amonio) fraccionada en riego por goteo para recuperar vigor.",
+            estres: "Corrección urgente con Fósforo acomplejado y aminoácidos libres vía foliar para superar el estrés hídrico/nutricional."
+        },
+        "Cebolla": {
+            optimo: "Sulfato de Amonio y Fósforo asimilable para el desarrollo del bulbo.",
+            regular: "Refuerzo de Nitrógeno y Potasio soluble en los tercios medios del ciclo.",
+            estres: "Aplicación radicular de macro y micronutrientes con enraizantes."
+        },
+        "Ajo": {
+            optimo: "Fosfato Diamónico (DAP) en base y coberteras nitrogenadas puntuales.",
+            regular: "Nitrógeno de rápida absorción y Sulfato de Potasio.",
+            estres: "Bioestimulantes radiculares y correctores de carencias con zinc y boro."
+        },
+        "Olivo": {
+            optimo: "Nitrato de Calcio y Potasio para sostenimiento de drupa.",
+            regular: "Fertilizante NPK balanceado (15-15-15) + picado de poda.",
+            estres: "Foliar con alto contenido de potasio y aminoácidos."
+        },
+        "Tomate": {
+            optimo: "Calcio, Nitrato de Potasio y Fósforo soluble para evitar podredumbre apical.",
+            regular: "Aumento de la tasa de fertirriego con Nitrógeno y Potasio.",
+            estres: "Recuperación con ácidos húmicos y complejos vitamínicos foliares."
+        },
+        "Frutales (Manzana/Pera/Cerezo)": {
+            optimo: "Nutrición post-cosecha con Nitrógeno y Boro; Nitrato de Potasio en engorde.",
+            regular: "Fertirriego nitrogenado ajustado al análisis foliar previo.",
+            estres: "Aplicación de fitohormonas de estrés y correctores foliares."
+        },
+        "Cultivos Extensivos (Maíz/Soja)": {
+            optimo: "Urea granulada al voleo/incorporada y arrancador fosforado en siembra.",
+            regular: "Refertilización nitrogenada en V6 (maíz) o refuerzo sulfurado.",
+            estres: "Evaluación de refertilización líquida si las condiciones hídricas mejoran."
+        }
+    };
+
+    function obtenerRecomendacionFertilizante(cultivo, ndvi) {
+        const dataCultivo = fertilizantesPorCultivo[cultivo] || fertilizantesPorCultivo["Vid"];
+        if (ndvi >= 0.6) {
+            return { tipo: "Mantenimiento / Óptimo", desc: dataCultivo.optimo, color: "#22c55e" };
+        } else if (ndvi >= 0.4) {
+            return { tipo: "Corrección Nutricional (Regular)", desc: dataCultivo.regular, color: "#f59e0b" };
+        } else {
+            return { tipo: "Alerta Crítica / Recuperación de Suelo", desc: dataCultivo.estres, color: "#ef4444" };
+        }
+    }
 
     const embalsesPorProvincia = {
         "Mendoza": [
@@ -1622,6 +1672,7 @@
         const d = datosLoteActual;
         const costos = costosCultivosUSD[cultivoSeleccionado] || costosCultivosUSD["Vid"];
         const totalLoteUSD = Math.round(costos.totalHa * d.hectareas);
+        const fertInfo = obtenerRecomendacionFertilizante(cultivoSeleccionado, d.ndviEst);
 
         let listaCultivosHtml = Object.keys(costosCultivosUSD).map(c => `
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
@@ -1672,6 +1723,13 @@
             <div class="recommendation-card">
                 <b>Balance Hídrico Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm<br>
                 <span style="color: var(--accent);">💡 <b>Sugerencia:</b> Mantener control estricto de riego por goteo según los requerimientos hídricos del cultivo seleccionado.</span>
+            </div>
+
+            <div class="report-section-title">🧪 Recomendación de Fertilizante Específico</div>
+            <div class="recommendation-card" style="border-left: 4px solid ${fertInfo.color};">
+                <b>Estado Nutricional Estimado:</b> <span style="color:${fertInfo.color}; font-weight:bold;">${fertInfo.tipo}</span><br>
+                <b>Insumo Sugerido:</b> <span style="color: var(--accent);">${fertInfo.desc}</span><br>
+                <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 4px;">* Sugerencia calculada en base al índice verdor NDVI (${d.ndviEst.toFixed(3)}) y requerimientos agronómicos zonales.</span>
             </div>
         `;
     }
@@ -2395,7 +2453,7 @@
                 if (elSunPivot) elSunPivot.style.transform = `rotate(${angulo}deg)`;
                 if (elSunIcon) {
                     elSunIcon.style.transform = `rotate(-${angulo}deg)`;
-                    elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️";
+                    elSunIcon.innerText = (pct === 0 || pct === 1) ? "🌙" : "☀️️";
                 }
             }
 
