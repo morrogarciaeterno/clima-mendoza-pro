@@ -1221,7 +1221,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️️</span>
+                        <span style="font-size: 1.2rem;">🌡</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Temp. Suelo</small>
                         <strong id="tempSuelo" style="font-size: 0.88rem; color: var(--text-main);">-- °C</strong>
                     </div>
@@ -1245,7 +1245,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">⚖️️</span>
+                        <span style="font-size: 1.2rem;">⚖</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Balance Hídrico</small>
                         <strong id="balanceHidrico" style="font-size: 0.88rem; color: var(--text-main);">-- mm</strong>
                     </div>
@@ -1282,27 +1282,27 @@
                     <div class="glosario-grid">
                         <div class="glosario-item">
                             <div class="glosario-titulo">📈 GDD (Grados Día de Desarrollo)</div>
-                            <div class="glosario-desc">Mide la acumulación de calor térmica estacional para estimar en qué etapa fenológica o de maduración se encuentra el cultivo.</div>
+                            <div class="glosario-desc">Mide la acumulación térmica estacional para estimar velocidad de rebrote y ciclo fenológico en pasturas y verdeos.</div>
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">💧 VPD (Déficit de Presión de Vapor)</div>
-                            <div class="glosario-desc">Indica la "sed" del aire (en kPa). Valores altos (&gt;1.5) estresan a las plantas y cierran estomas; values bajos (&lt;0.4) frenan la transpiración.</div>
+                            <div class="glosario-desc">Indica la "sed" del aire (en kPa). Valores altos estresan a las pasturas y reducen la tasa de conversión forrajera.</div>
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">⚖️ Balance Hídrico</div>
-                            <div class="glosario-desc">Diferencia neta entre el agua recibida por precipitaciones y la evaporada por el cultivo (ET0). Si es negativo, requiere riego de ajuste.</div>
+                            <div class="glosario-desc">Diferencia entre precipitaciones y evapotranspiración (ET0). Vital para anticipar baches forrajeros en ganadería bovina.</div>
                         </div>
                         <div class="glosario-item">
-                            <div class="glosario-titulo">❄️ Horas de Frío</div>
-                            <div class="glosario-desc">Horas acumuladas con temperaturas entre 0°C y 7°C. Vitales para romper la dormancia invernal de frutales y vides.</div>
+                            <div class="glosario-titulo">🐮 Carga Animal & Pasturas</div>
+                            <div class="glosario-desc">Gestión de oferta forrajera para alfalfa y verdeos, optimizando la asignación de hectáreas por cabeza (EV).</div>
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">🌡️ Temp. & Humedad de Suelo</div>
-                            <div class="glosario-desc">Condiciones basales de la tierra superficial (0-10cm) para controlar brotación radicular, germinación y retención hídrica.</div>
+                            <div class="glosario-desc">Condiciones basales de la tierra para asegurar el correcto achique del bache invernal y velocidad de implantación.</div>
                         </div>
                         <div class="glosario-item">
                             <div class="glosario-titulo">💨 Riesgo Zonda</div>
-                            <div class="glosario-desc">Alerta basada en ráfagas, humedad seca y presión en caída, previendo el ingreso de aire cálido y seco típico cordillerano.</div>
+                            <div class="glosario-desc">Alerta por ráfagas secas que resecan rápidamente los verdeos tiernos y aumentan el riesgo de estrés hídrico.</div>
                         </div>
                     </div>
                 </div>
@@ -1348,11 +1348,11 @@
             <!-- Columna Izquierda: Buscador + Mapa de Dibujo -->
             <div class="modal-map-container">
                 <div class="modal-search-box">
-                    <input type="text" id="modalSearchInput" class="modal-search-input" placeholder="Buscar lugar, ciudad o provincia (ej: Luján de Cuyo)..." onkeypress="if(event.key === 'Enter') buscarLugarModal()">
+                    <input type="text" id="modalSearchInput" class="modal-search-input" placeholder="Buscar lugar, ciudad o provincia (ej: San Luis, General Alvear)..." onkeypress="if(event.key === 'Enter') buscarLugarModal()">
                     <button class="modal-search-btn" onclick="buscarLugarModal()">Buscar</button>
                 </div>
                 <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja tu lote arriba a la derecha. Selecciona un cultivo para calcular los costos en dólares.
+                    Dibuja tu lote o pastura en el mapa. Selecciona cultivo agrícola o pastura bovina para calcular costos y carga animal.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
@@ -1384,57 +1384,63 @@
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
-    // Base de costos estimados por hectárea en USD
+    // Base de costos estimados por hectárea en USD (Incluyendo Pasturas y Ganadería Bovina)
     const costosCultivosUSD = {
+        "Alfalfa (Pastura Perenne)": { prep: 200, implantacion: 380, riego: 350, fitosanitarios: 220, totalHa: 1150 },
+        "Verdeo de Invierno (Avena/Cebadilla)": { prep: 120, implantacion: 150, riego: 180, fitosanitarios: 90, totalHa: 540 },
+        "Verdeo de Verano ( Sorgos / Moha)": { prep: 130, implantacion: 160, riego: 200, fitosanitarios: 110, totalHa: 600 },
         "Vid": { prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350 },
         "Cebolla": { prep: 300, implantacion: 1200, riego: 500, fitosanitarios: 450, totalHa: 2450 },
         "Ajo": { prep: 350, implantacion: 2800, riego: 550, fitosanitarios: 700, totalHa: 4400 },
         "Olivo": { prep: 400, implantacion: 3000, riego: 500, fitosanitarios: 500, totalHa: 4400 },
-        "Tomate": { prep: 300, implantacion: 1800, riego: 600, fitosanitarios: 650, totalHa: 3350 },
-        "Frutales (Manzana/Pera/Cerezo)": { prep: 500, implantacion: 4200, riego: 700, fitosanitarios: 900, totalHa: 6300 },
         "Cultivos Extensivos (Maíz/Soja)": { prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900 }
     };
 
     const fertilizantesPorCultivo = {
+        "Alfalfa (Pastura Perenne)": {
+            optimo: "Fosfato Monónico (MAP) a la siembra y aportes de Yeso Agrícola (Azufre/Calcio) para fijación biológica de nitrógeno.",
+            regular: "Fertilización fosforada de mantenimiento y control temprano de malezas para asegurar persistencia.",
+            estres: "Riego de rescate y bioestimulantes radiculares para recuperación tras defoliación o estrés hídrico."
+        },
+        "Verdeo de Invierno (Avena/Cebadilla)": {
+            optimo: "Urea granulada en cobertera al macollaje para potenciar producción de materia seca invernal.",
+            regular: "Nitrógeno fraccionado post-grazing para acelerar el rebrote del verdeo.",
+            estres: "Ajuste de carga animal inmediata (sacar hacienda) y fertilización nitrogenada líquida."
+        },
+        "Verdeo de Verano ( Sorgos / Moha)": {
+            optimo: "Fosforado a la siembra y refertilización nitrogenada en post-emergencia (V3-V4).",
+            regular: "Nitrógeno soluble en riego por aspersión o pivot.",
+            estres: "Monitoreo de ácido prúsico en sorgos ante sequía extrema y estrés térmico."
+        },
         "Vid": {
-            optimo: "Nitrato de Potasio (para equilibrar brotación y calidad en maduración) y aportes de Fósforo en pre-floración.",
-            regular: "Fertilización nitrogenada (Urea o Nitrato de Amonio) fraccionada en riego por goteo para recuperar vigor.",
-            estres: "Corrección urgente con Fósforo acomplejado y aminoácidos libres vía foliar para superar el estrés hídrico/nutricional."
+            optimo: "Nitrato de Potasio y Fósforo en pre-floración.",
+            regular: "Fertilización nitrogenada fraccionada en goteo.",
+            estres: "Fósforo acomplejado y aminoácidos libres vía foliar."
         },
         "Cebolla": {
-            optimo: "Sulfato de Amonio y Fósforo asimilable para el desarrollo del bulbo.",
-            regular: "Refuerzo de Nitrógeno y Potasio soluble en los tercios medios del ciclo.",
-            estres: "Aplicación radicular de macro y micronutrientes con enraizantes."
+            optimo: "Sulfato de Amonio y Fósforo asimilable.",
+            regular: "Refuerzo de Nitrógeno y Potasio soluble.",
+            estres: "Aplicación radicular de micronutrientes."
         },
         "Ajo": {
-            optimo: "Fosfato Diamónico (DAP) en base y coberteras nitrogenadas puntuales.",
-            regular: "Nitrógeno de rápida absorción y Sulfato de Potasio.",
-            estres: "Bioestimulantes radiculares y correctores de carencias con zinc y boro."
+            optimo: "Fosfato Diamónico (DAP) y coberteras nitrogenadas.",
+            regular: "Nitrógeno de rápida absorción.",
+            estres: "Correctores con zinc y boro."
         },
         "Olivo": {
-            optimo: "Nitrato de Calcio y Potasio para sostenimiento de drupa.",
-            regular: "Fertilizante NPK balanceado (15-15-15) + picado de poda.",
-            estres: "Foliar con alto contenido de potasio y aminoácidos."
-        },
-        "Tomate": {
-            optimo: "Calcio, Nitrato de Potasio y Fósforo soluble para evitar podredumbre apical.",
-            regular: "Aumento de la tasa de fertirriego con Nitrógeno y Potasio.",
-            estres: "Recuperación con ácidos húmicos y complejos vitamínicos foliares."
-        },
-        "Frutales (Manzana/Pera/Cerezo)": {
-            optimo: "Nutrición post-cosecha con Nitrógeno y Boro; Nitrato de Potasio en engorde.",
-            regular: "Fertirriego nitrogenado ajustado al análisis foliar previo.",
-            estres: "Aplicación de fitohormonas de estrés y correctores foliares."
+            optimo: "Nitrato de Calcio y Potasio.",
+            regular: "NPK balanceado + picado de poda.",
+            estres: "Foliar con alto contenido de potasio."
         },
         "Cultivos Extensivos (Maíz/Soja)": {
-            optimo: "Urea granulada al voleo/incorporada y arrancador fosforado en siembra.",
-            regular: "Refertilización nitrogenada en V6 (maíz) o refuerzo sulfurado.",
-            estres: "Evaluación de refertilización líquida si las condiciones hídricas mejoran."
+            optimo: "Urea granulada y arrancador fosforado.",
+            regular: "Refertilización nitrogenada en V6.",
+            estres: "Evaluación de refertilización líquida."
         }
     };
 
     function obtenerRecomendacionFertilizante(cultivo, ndvi) {
-        const dataCultivo = fertilizantesPorCultivo[cultivo] || fertilizantesPorCultivo["Vid"];
+        const dataCultivo = fertilizantesPorCultivo[cultivo] || fertilizantesPorCultivo["Alfalfa (Pastura Perenne)"];
         if (ndvi >= 0.6) {
             return { tipo: "Mantenimiento / Óptimo", desc: dataCultivo.optimo, color: "#22c55e" };
         } else if (ndvi >= 0.4) {
@@ -1455,6 +1461,10 @@
             { nombre: "Punta Negra", nivel: "310 hm³", pct: 75, estado: "Óptimo / Normal", clase: "optimal" },
             { nombre: "Cuesta del Viento", nivel: "110 hm³", pct: 50, estado: "Medio / Regulación", clase: "warning" }
         ],
+        "San Luis": [
+            { nombre: "La Florida", nivel: "65 hm³", pct: 72, estado: "Óptimo / Normal", clase: "optimal" },
+            { nombre: "Potrero de los Funes", nivel: "7 hm³", pct: 68, estado: "Óptimo / Normal", clase: "optimal" }
+        ],
         "Córdoba": [
             { nombre: "San Roque", nivel: "35 hm³", pct: 70, estado: "Óptimo / Normal", clase: "optimal" },
             { nombre: "Embalse Río Tercero", nivel: "480 hm³", pct: 85, estado: "Óptimo / Normal", clase: "optimal" },
@@ -1462,8 +1472,7 @@
         ],
         "Neuquén": [
             { nombre: "El Chocón", nivel: "1200 hm³", pct: 78, estado: "Óptimo / Normal", clase: "optimal" },
-            { nombre: "Piedra del Águila", nivel: "950 hm³", pct: 72, estado: "Óptimo / Normal", clase: "optimal" },
-            { nombre: "Cerros Colorados", nivel: "800 hm³", pct: 65, estado: "Medio / Regulación", clase: "warning" }
+            { nombre: "Piedra del Águila", nivel: "950 hm³", pct: 72, estado: "Óptimo / Normal", clase: "optimal" }
         ],
         "General": [
             { nombre: "Dique Regulador 1", nivel: "150 hm³", pct: 70, estado: "Óptimo / Normal", clase: "optimal" },
@@ -1479,7 +1488,7 @@
         let listaEmbalses = embalsesPorProvincia[provincia] || embalsesPorProvincia["Mendoza"];
 
         if (subtitulo) {
-            subtitulo.innerText = `Monitoreo de diques y reservas hídricas (${provincia || 'Región Cuyo'})`;
+            subtitulo.innerText = `Monitoreo de diques y reservas hídricas (${provincia || 'Región'})`;
         }
 
         contenedor.innerHTML = "";
@@ -1508,7 +1517,7 @@
                     icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
                 });
             } else if (permission === "denied") {
-                alert("Las notificaciones fueron bloqueadas. Habilítalas en el ícono de configuración o candado de la barra de direcciones de tu navegador.");
+                alert("Las notificaciones fueron bloqueadas. Habilítalas en la barra de direcciones de tu navegador.");
             } else {
                 alert("Permiso de notificaciones pendiente o no concedido.");
             }
@@ -1678,9 +1687,9 @@
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Calculando costos y proyecciones en dólares...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Calculando costos, NDVI y carga bovina...</div>`;
 
-        let nombreLugar = `Lote Agrícola`;
+        let nombreLugar = `Lote / Pastura`;
         let provinciaZona = "Mendoza";
         try {
             const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
@@ -1702,22 +1711,17 @@
             let lluvia = data.daily ? (data.daily.precipitation_sum[0] || 0) : 0;
             let et0 = data.daily ? (data.daily.et0_fao_evapotranspiration[0] || 4.5) : 4.5;
 
-            let ndviEst = 0.62 + (Math.sin(lat) * 0.15);
-            ndviEst = Math.max(0.2, Math.min(0.88, ndviEst));
+            let ndviEst = 0.58 + (Math.sin(lat) * 0.18);
+            ndviEst = Math.max(0.15, Math.min(0.85, ndviEst));
 
-            let estadoCultivo = "Vigoroso / Óptimo";
-            if (ndviEst < 0.4) { estadoCultivo = "Estrés Hídrico Severo"; }
-            else if (ndviEst < 0.6) { estadoCultivo = "Crecimiento Regular"; }
+            let estadoForrajero = "Vigoroso / Óptimo para Pastoreo";
+            if (ndviEst < 0.4) { estadoForrajero = "Estrés / Baja Disponibilidad Forrajera"; }
+            else if (ndviEst < 0.55) { estadoForrajero = "Crecimiento Forrajero Regular"; }
 
-            let cultivoDefault = "Vid";
-            if (provinciaZona.toLowerCase().includes("neuquén") || provinciaZona.toLowerCase().includes("rionegro")) {
-                cultivoDefault = "Frutales (Manzana/Pera/Cerezo)";
-            } else if (provinciaZona.toLowerCase().includes("córdoba") || provinciaZona.toLowerCase().includes("santa fe")) {
-                cultivoDefault = "Cultivos Extensivos (Maíz/Soja)";
-            }
+            let cultivoDefault = "Alfalfa (Pastura Perenne)";
 
             datosLoteActual = {
-                nombreLugar, provinciaZona, hectareas, temp, hum, viento, lluvia, et0, ndviEst, estadoCultivo, cultivoDefault
+                nombreLugar, provinciaZona, hectareas, temp, hum, viento, lluvia, et0, ndviEst, estadoForrajero, cultivoDefault
             };
 
             renderizarPanelReporteYCostos(cultivoDefault);
@@ -1733,30 +1737,51 @@
         if (!panel) return;
 
         const d = datosLoteActual;
-        const costos = costosCultivosUSD[cultivoSeleccionado] || costosCultivosUSD["Vid"];
+        const costos = costosCultivosUSD[cultivoSeleccionado] || costosCultivosUSD["Alfalfa (Pastura Perenne)"];
         const totalLoteUSD = Math.round(costos.totalHa * d.hectareas);
         const fertInfo = obtenerRecomendacionFertilizante(cultivoSeleccionado, d.ndviEst);
+
+        // Estimación de Carga Bovina (Cabezas / Hectárea) según NDVI y tipo de pastura
+        let cargaAnimalCabezasHa = (d.ndviEst * 2.5).toFixed(1);
+        let mensajeGanadero = "Pastura apta para ganadería bovina (cría/recría).";
+        if (cultivoSeleccionado.includes("Alfalfa")) {
+            cargaAnimalCabezasHa = (d.ndviEst * 3.2).toFixed(1);
+            mensajeGanadero = "🐄 **Alfalfa:** Excelente valor proteico para engorde o producción lechera. Controlar riesgo de meteorismo (bloate).";
+        } else if (cultivoSeleccionado.includes("Invierno")) {
+            cargaAnimalCabezasHa = (d.ndviEst * 2.8).toFixed(1);
+            mensajeGanadero = "🐄 **Verdeo de Invierno:** Clave para achicar el bache forrajero invernal en bovinos.";
+        } else if (cultivoSeleccionado.includes("Verano")) {
+            cargaAnimalCabezasHa = (d.ndviEst * 3.0).toFixed(1);
+            mensajeGanadero = "🐄 **Verdeo de Verano:** Gran producción de materia seca estival para invernada.";
+        }
 
         let listaCultivosHtml = Object.keys(costosCultivosUSD).map(c => `
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
         `).join("");
 
         panel.innerHTML = `
-            <div class="report-section-title">📊 Reporte de Lote: ${d.nombreLugar} (${d.provinciaZona})</div>
+            <div class="report-section-title">📊 Reporte de Pastura/Lote: ${d.nombreLugar} (${d.provinciaZona})</div>
             
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} hectáreas</span> | 
-                <b>NDVI:</b> <span style="color:${d.ndviEst < 0.4 ? '#ef4444':'#22c55e'}; font-weight:bold;">${d.ndviEst.toFixed(3)} (${d.estadoCultivo})</span><br>
+                <b>NDVI:</b> <span style="color:${d.ndviEst < 0.4 ? '#ef4444':'#22c55e'}; font-weight:bold;">${d.ndviEst.toFixed(3)} (${d.estadoForrajero})</span><br>
                 <b>Clima:</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
+            </div>
+
+            <div class="report-section-title">🐮 Capacidad de Carga Bovina Estimada</div>
+            <div class="recommendation-card" style="border-left: 4px solid #38bdf8;">
+                <b>Carga Sugerida:</b> <span style="color:var(--accent); font-weight:bold;">~${cargaAnimalCabezasHa} cabezas / hectárea</span><br>
+                <b>Total Estimado para ${d.hectareas} ha:</b> <span style="color:var(--text-main); font-weight:bold;">~${Math.round(cargaAnimalCabezasHa * d.hectareas)} animales (Equivalente Vaca)</span><br>
+                <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:3px;">${mensajeGanadero}</span>
             </div>
 
             <div class="report-section-title">💰 Estimador de Costos en Dólares (USD)</div>
             <div class="recommendation-card">
-                <div style="margin-bottom: 6px; font-size:0.73rem; color:var(--text-muted);">Selecciona cultivo para recalcular presupuesto:</div>
+                <div style="margin-bottom: 6px; font-size:0.73rem; color:var(--text-muted);">Selecciona cultivo o pastura para recalcular presupuesto:</div>
                 <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(56,189,248,0.1); padding:6px 8px; border-radius:6px; margin-bottom:8px;">
-                    <span style="font-weight:bold; color:var(--text-main);">Cultivo Analizado:</span>
+                    <span style="font-weight:bold; color:var(--text-main);">Opción Seleccionada:</span>
                     <span style="color:var(--accent); font-weight:bold;">${cultivoSeleccionado}</span>
                 </div>
 
@@ -1770,9 +1795,9 @@
                     </thead>
                     <tbody>
                         <tr><td>Preparación de Suelo</td><td>$${costos.prep}</td><td>$${Math.round(costos.prep * d.hectareas)}</td></tr>
-                        <tr><td>Implantación / Plantas</td><td>$${costos.implantacion}</td><td>$${Math.round(costos.implantacion * d.hectareas)}</td></tr>
-                        <tr><td>Sistema de Riego</td><td>$${costos.riego}</td><td>$${Math.round(costos.riego * d.hectareas)}</td></tr>
-                        <tr><td>Fitosanitarios / Curaciones</td><td>$${costos.fitosanitarios}</td><td>$${Math.round(costos.fitosanitarios * d.hectareas)}</td></tr>
+                        <tr><td>Implantación / Semilla</td><td>$${costos.implantacion}</td><td>$${Math.round(costos.implantacion * d.hectareas)}</td></tr>
+                        <tr><td>Riego / Asistencia Hídrica</td><td>$${costos.riego}</td><td>$${Math.round(costos.riego * d.hectareas)}</td></tr>
+                        <tr><td>Fitosanitarios / Fertilizantes</td><td>$${costos.fitosanitarios}</td><td>$${Math.round(costos.fitosanitarios * d.hectareas)}</td></tr>
                         <tr style="font-weight:bold; color:var(--accent);">
                             <td>Inversión Total Estimada</td>
                             <td>$${costos.totalHa} USD/ha</td>
@@ -1782,17 +1807,17 @@
                 </table>
             </div>
 
-            <div class="report-section-title">💧 Recomendación de Riego & Fitosanitarios</div>
+            <div class="report-section-title">💧 Balance Hídrico & Manejo Forrajero</div>
             <div class="recommendation-card">
                 <b>Balance Hídrico Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm<br>
-                <span style="color: var(--accent);">💡 <b>Sugerencia:</b> Mantener control estricto de riego por goteo según los requerimientos hídricos del cultivo seleccionado.</span>
+                <span style="color: var(--accent);">💡 <b>Sugerencia:</b> Implementar pastoreo rotativo intensivo (franjas) para maximizar la eficiencia de cosecha del pasto por el ganado bovino.</span>
             </div>
 
-            <div class="report-section-title">🧪 Recomendación de Fertilizante Específico</div>
+            <div class="report-section-title">🧪 Nutrición & Fertilizante Específico</div>
             <div class="recommendation-card" style="border-left: 4px solid ${fertInfo.color};">
                 <b>Estado Nutricional Estimado:</b> <span style="color:${fertInfo.color}; font-weight:bold;">${fertInfo.tipo}</span><br>
                 <b>Insumo Sugerido:</b> <span style="color: var(--accent);">${fertInfo.desc}</span><br>
-                <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 4px;">* Sugerencia calculada en base al índice verdor NDVI (${d.ndviEst.toFixed(3)}) y requerimientos agronómicos zonales.</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 4px;">* Sugerencia calculada en base al índice NDVI (${d.ndviEst.toFixed(3)}) y requerimientos forrajeros zonales.</span>
             </div>
         `;
     }
@@ -1868,21 +1893,21 @@
                     humActual = climaData.current.relative_humidity_2m;
                 }
 
-                let ndviValue = 0.35 + (Math.sin(lat * 10) * 0.25) + (Math.cos(lon * 10) * 0.15);
+                let ndviValue = 0.40 + (Math.sin(lat * 10) * 0.25) + (Math.cos(lon * 10) * 0.15);
                 ndviValue = Math.max(0.1, Math.min(0.85, ndviValue));
 
-                let riesgo = "Bajo (Saludable)";
+                let riesgo = "Óptimo (Buena Pastura)";
                 let colorRiesgo = "#2ecc71";
-                let recomendacion = "🟢 Cultivo vigoroso. Mantener monitoreo preventivo de enfermedades fúngicas por humedad.";
+                let recomendacion = "🟢 Pastura en buen estado. Apta para carga animal según planificación de rotación.";
 
                 if (ndviValue < 0.4) {
-                    riesgo = "Alto (Estrés / Suelo)";
+                    riesgo = "Bajo Forraje (Estrés)";
                     colorRiesgo = "#ef4444";
-                    recomendacion = "🔴 Alerta máxima: Posible estrés hídrico severo o falla de riego. Inspección urgente en campo.";
-                } else if (ndviValue < 0.6) {
-                    riesgo = "Moderado";
+                    recomendacion = "🔴 Alerta: Baja disponibilidad de materia seca. Rotar hacienda o suplementar.";
+                } else if (ndviValue < 0.55) {
+                    riesgo = "Crecimiento Moderado";
                     colorRiesgo = "#f39c12";
-                    recomendacion = "🟡 Crecimiento regular. Ajustar lámina de riego o evaluar fertilización nitrogenada sectorizada.";
+                    recomendacion = "🟡 Pastura recuperándose. Ajustar presión de pastoreo.";
                 }
 
                 marcador.setIcon(L.divIcon({
@@ -1895,18 +1920,18 @@
                 let popupContent = `
                     <div style="font-size: 0.8rem; line-height: 1.4; min-width: 180px;">
                         <b>📍 Zona:</b> ${nombreZona}<br>
-                        <b>Riesgo:</b> <span style="color:${colorRiesgo}; font-weight:bold;">${riesgo}</span><br>
+                        <b>Estado Pastura:</b> <span style="color:${colorRiesgo}; font-weight:bold;">${riesgo}</span><br>
                         <b>NDVI Est.:</b> ${ndviValue.toFixed(3)}<br>
                         <b>Temperatura:</b> ${tempActual} °C | <b>Humedad:</b> ${humActual} %<br>
                         <hr style="margin: 6px 0; border:0; border-top:1px solid #ccc;">
-                        <b>💡 Recomendación:</b><br>
+                        <b>💡 Sugerencia Ganadera:</b><br>
                         <span style="color: #38bdf8;">${recomendacion}</span>
                     </div>
                 `;
 
                 marcador.setPopupContent(popupContent);
                 marcador.openPopup();
-                actualizarIndicadorMapa("Diagnóstico agronómico listo", "#22c55e");
+                actualizarIndicadorMapa("Diagnóstico forrajero listo", "#22c55e");
             })
             .catch(err => {
                 actualizarIndicadorMapa("Error al conectar con la API de clima", "#ef4444");
@@ -1929,7 +1954,7 @@
         }
 
         btnPlagas.classList.add("active");
-        mapTitle.innerText = "🌱 Monitoreo de Plagas & NDVI";
+        mapTitle.innerText = "🌱 Monitoreo Forrajero & NDVI";
 
         let latLote = currentLat || -32.92;
         let lonLote = currentLon || -68.84;
@@ -2064,7 +2089,7 @@
     function iconoClima(codigo) {
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
-        if (codigo === 3) return "☁️";
+        if (codigo === 3) return "☁️️";
         if (codigo <= 67) return "🌧️";
         if (codigo >= 95) return "⛈";
         return "⛈️";
@@ -2590,6 +2615,7 @@
 
                     if (provinciaDetectada.toLowerCase().includes("mendoza")) provinciaDetectada = "Mendoza";
                     else if (provinciaDetectada.toLowerCase().includes("san juan")) provinciaDetectada = "San Juan";
+                    else if (provinciaDetectada.toLowerCase().includes("san luis")) provinciaDetectada = "San Luis";
                     else if (provinciaDetectada.toLowerCase().includes("córdoba") || provinciaDetectada.toLowerCase().includes("cordoba")) provinciaDetectada = "Córdoba";
                     else if (provinciaDetectada.toLowerCase().includes("neuquén") || provinciaDetectada.toLowerCase().includes("neuquen")) provinciaDetectada = "Neuquén";
                     else provinciaDetectada = "Mendoza";
