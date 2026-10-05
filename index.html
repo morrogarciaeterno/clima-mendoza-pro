@@ -69,6 +69,12 @@
             font-weight: 600;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .date-display {
             text-align: right;
         }
@@ -99,6 +105,28 @@
             font-weight: 700;
             color: var(--accent);
             display: inline-block;
+        }
+
+        .btn-notif-header {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn-notif-header:hover {
+            background: var(--accent);
+            color: #000;
+            transform: scale(1.05);
         }
 
         .container {
@@ -499,6 +527,21 @@
             border-radius: 12px;
             z-index: 1;
             border: 2px solid var(--border);
+            background-color: #090d16 !important; /* Fondo oscuro preventivo */
+        }
+
+        /* 🌙 FILTRO CSS DE MODO OSCURO AUTOMÁTICO PARA LOS MAPAS LEAFLET */
+        .leaflet-layer,
+        .leaflet-control-zoom,
+        .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
+        }
+
+        /* Excepción para mantener los íconos, radares y marcadores con sus colores reales vivos */
+        .leaflet-marker-icon,
+        .leaflet-popup,
+        .map-status-pill {
+            filter: none !important;
         }
 
         .map-status-pill {
@@ -704,11 +747,18 @@
             <p id="ubicacionTexto">Obteniendo ubicación GPS...</p>
         </div>
 
-        <div class="date-display">
-            <div id="fecha">--</div>
-            <div class="time-temp-container">
-                <span id="digitalFallback">00:00:00 hs</span>
-                <span id="headerTemp">--°C</span>
+        <div class="header-right">
+            <!-- 🔔 BOTÓN CAMPANA DE NOTIFICACIONES -->
+            <button type="button" class="btn-notif-header" id="btnCampanaNotif" title="Activar Alertas Push">
+                🔔
+            </button>
+
+            <div class="date-display">
+                <div id="fecha">--</div>
+                <div class="time-temp-container">
+                    <span id="digitalFallback">00:00:00 hs</span>
+                    <span id="headerTemp">--°C</span>
+                </div>
             </div>
         </div>
     </div>
@@ -977,7 +1027,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀</span>
+                        <span style="font-size: 1.2rem;">☀️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Radiación Solar</small>
                         <strong id="radiacionSolar" style="font-size: 0.88rem; color: var(--text-main);">-- W/m²</strong>
                     </div>
@@ -1009,7 +1059,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀️</span>
+                        <span style="font-size: 1.2rem;">☀️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Horas de Sol</small>
                         <strong id="horasSol" style="font-size: 0.88rem; color: var(--text-main);">-- hs</strong>
                     </div>
@@ -1027,7 +1077,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡</span>
+                        <span style="font-size: 1.2rem;">🌡️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Temp. Suelo</small>
                         <strong id="tempSuelo" style="font-size: 0.88rem; color: var(--text-main);">-- °C</strong>
                     </div>
@@ -1057,7 +1107,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄</span>
+                        <span style="font-size: 1.2rem;">❄️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Riesgo Helada</small>
                         <strong id="riesgoHelada" style="font-size: 0.88rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
@@ -1129,7 +1179,6 @@
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
                 <button class="map-btn" id="btnPlagas" onclick="toggleCapaPlagas()" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171;">🌱 Plagas</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
-                <button class="map-btn" onclick="solicitarPermisoNotificaciones()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">🔔 Activar Alertas</button>
             </div>
 
             <div class="map-wrapper-container">
@@ -1156,7 +1205,6 @@
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
-    // Base de datos federal de embalses por región/provincia
     const embalsesPorProvincia = {
         "Mendoza": [
             { nombre: "Potrerillos", nivel: "380 hm³", pct: 82, estado: "Óptimo / Normal", clase: "optimal" },
@@ -1208,7 +1256,7 @@
         });
     }
 
-    // 🔔 SISTEMA DE NOTIFICACIONES PUSH NATIVAS
+    // 🔔 LÓGICA ROBUSTA PARA EL BOTÓN DE NOTIFICACIONES
     function solicitarPermisoNotificaciones() {
         if (!("Notification" in window)) {
             alert("Tu navegador no soporta notificaciones de escritorio.");
@@ -1218,11 +1266,13 @@
         Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
                 new Notification("🛰️ AgroTech Argentina", {
-                    body: "¡Notificaciones activadas! Te avisaremos ante cualquier alerta climática o de incendios.",
+                    body: "¡Notificaciones activadas correctamente! Te avisaremos ante cualquier alerta.",
                     icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
                 });
+            } else if (permission === "denied") {
+                alert("Las notificaciones fueron bloqueadas. Habilítalas en el ícono de configuración o candado de la barra de direcciones de tu navegador.");
             } else {
-                alert("Permiso de notificaciones denegado. Habilítalo en la configuración de tu navegador.");
+                alert("Permiso de notificaciones pendiente o no concedido.");
             }
         });
     }
@@ -1248,6 +1298,13 @@
             };
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnCampana = document.getElementById("btnCampanaNotif");
+        if (btnCampana) {
+            btnCampana.addEventListener("click", solicitarPermisoNotificaciones);
+        }
+    });
 
     const capasBase = {
         base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1390,7 +1447,7 @@
                 actualizarIndicadorMapa("Capa Topográfica activa", "#22c55e");
             } else if (tipo === 'calles') {
                 if (btnCalles) btnCalles.classList.add("active");
-                mapTitle.innerText = "🛣 Red Vial & Localidades";
+                mapTitle.innerText = "🛣️ Red Vial & Localidades";
                 actualizarIndicadorMapa("Capa de Calles activa", "#22c55e");
             }
         }
@@ -1571,7 +1628,6 @@
                 titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
                 desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
 
-                // 🚀 LANZA LA PUSH NATIVA AL CELULAR / PC
                 dispararNotificacionPush(
                     "🔥 ¡Alerta de Incendio Cerca!",
                     `Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu ubicación.`,
@@ -1610,7 +1666,7 @@
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
         if (codigo <= 67) return "🌧️";
-        if (codigo >= 95) return "⛈";
+        if (codigo >= 95) return "⛈️";
         return "⛈️";
     }
 
@@ -1685,7 +1741,6 @@
                 if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua y actividad eléctrica.";
             }
 
-            // 🚀 LANZA LA PUSH NATIVA DE TORMENTA
             dispararNotificacionPush(
                 "⚡ ¡Alerta Meteorológica Activa!",
                 "Se pronostican tormentas intensas para tu zona geográfica.",
