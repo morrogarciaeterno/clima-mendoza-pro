@@ -700,7 +700,7 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <h1>🛰️ Agrotech Argentina</h1>
+            <h1>🛰️ AgroTech Argentina</h1>
             <p id="ubicacionTexto">Obteniendo ubicación GPS...</p>
         </div>
 
@@ -1129,6 +1129,7 @@
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
                 <button class="map-btn" id="btnPlagas" onclick="toggleCapaPlagas()" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171;">🌱 Plagas</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
+                <button class="map-btn" onclick="solicitarPermisoNotificaciones()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">🔔 Activar Alertas</button>
             </div>
 
             <div class="map-wrapper-container">
@@ -1188,7 +1189,6 @@
         const subtitulo = document.getElementById("embalsesSubtitulo");
         if (!contenedor) return;
 
-        // Buscar si existe la provincia en nuestra base de datos, sino usar por defecto Mendoza o General
         let listaEmbalses = embalsesPorProvincia[provincia] || embalsesPorProvincia["Mendoza"];
         
         if (subtitulo) {
@@ -1206,6 +1206,47 @@
                 </div>
             `;
         });
+    }
+
+    // 🔔 SISTEMA DE NOTIFICACIONES PUSH NATIVAS
+    function solicitarPermisoNotificaciones() {
+        if (!("Notification" in window)) {
+            alert("Tu navegador no soporta notificaciones de escritorio.");
+            return;
+        }
+
+        Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+                new Notification("🛰️ AgroTech Argentina", {
+                    body: "¡Notificaciones activadas! Te avisaremos ante cualquier alerta climática o de incendios.",
+                    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
+                });
+            } else {
+                alert("Permiso de notificaciones denegado. Habilítalo en la configuración de tu navegador.");
+            }
+        });
+    }
+
+    function dispararNotificacionPush(titulo, mensaje, iconoTipo = "warning") {
+        if (!("Notification" in window)) return;
+
+        if (Notification.permission === "granted") {
+            let iconoUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
+            if (iconoTipo === "fuego") iconoUrl = "https://cdn-icons-png.flaticon.com/512/426/426833.png";
+            if (iconoTipo === "tormenta") iconoUrl = "https://cdn-icons-png.flaticon.com/512/1146/1146860.png";
+
+            const notif = new Notification(titulo, {
+                body: mensaje,
+                icon: iconoUrl,
+                vibrate: [200, 100, 200],
+                tag: "agrotech-alerta"
+            });
+
+            notif.onclick = function() {
+                window.focus();
+                notif.close();
+            };
+        }
     }
 
     const capasBase = {
@@ -1276,7 +1317,6 @@
         }
     }
 
-    // Función inteligente para obtener la capa de lluvia en tiempo real desde RainViewer
     async function obtenerCapaLluviaDinamica() {
         if (capaLluviaRadar) return capaLluviaRadar;
         try {
@@ -1530,6 +1570,13 @@
                 card.classList.add("alerta-activa-animacion");
                 titulo.innerText = `¡Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu GPS!`;
                 desc.innerText = `Se registró actividad satelital de calor dentro de tu radio de seguridad de 100 km.`;
+
+                // 🚀 LANZA LA PUSH NATIVA AL CELULAR / PC
+                dispararNotificacionPush(
+                    "🔥 ¡Alerta de Incendio Cerca!",
+                    `Foco detectado a ${Math.round(fuegoCercanoKm)} km de tu ubicación.`,
+                    "fuego"
+                );
             } else {
                 card.style.display = "none";
                 espaciador.style.display = "none";
@@ -1637,6 +1684,13 @@
                 if (titulo) titulo.innerText = "¡Atención: Tormentas Fuertes!";
                 if (desc) desc.innerText = "Se prevén tormentas de variada intensidad con abundante caída de agua y actividad eléctrica.";
             }
+
+            // 🚀 LANZA LA PUSH NATIVA DE TORMENTA
+            dispararNotificacionPush(
+                "⚡ ¡Alerta Meteorológica Activa!",
+                "Se pronostican tormentas intensas para tu zona geográfica.",
+                "tormenta"
+            );
         } else {
             card.style.display = "none";
             espaciador.style.display = "none";
@@ -2082,14 +2136,12 @@
                         console.warn("No se pudo obtener el nombre del lugar, usando respaldo.", err);
                     }
 
-                    // Limpiar nombre de provincia para coincidir con el diccionario
                     if (provinciaDetectada.toLowerCase().includes("mendoza")) provinciaDetectada = "Mendoza";
                     else if (provinciaDetectada.toLowerCase().includes("san juan")) provinciaDetectada = "San Juan";
                     else if (provinciaDetectada.toLowerCase().includes("córdoba") || provinciaDetectada.toLowerCase().includes("cordoba")) provinciaDetectada = "Córdoba";
                     else if (provinciaDetectada.toLowerCase().includes("neuquén") || provinciaDetectada.toLowerCase().includes("neuquen")) provinciaDetectada = "Neuquén";
-                    else provinciaDetectada = "Mendoza"; // Predeterminado
+                    else provinciaDetectada = "Mendoza";
 
-                    // Actualizar los embalses dinámicamente según la provincia detectada por GPS
                     actualizarEmbalsesSegunUbicacion(provinciaDetectada);
 
                     const elUbi = document.getElementById("ubicacionTexto");
