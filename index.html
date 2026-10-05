@@ -407,7 +407,6 @@
         .dot-alto { background-color: #fb923c; }
         .dot-muyalto { background-color: #ef4444; }
 
-        /* ESTILOS DE CUADRADITOS PARA EMBALSES */
         .embalses-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -527,17 +526,15 @@
             border-radius: 12px;
             z-index: 1;
             border: 2px solid var(--border);
-            background-color: #090d16 !important; /* Fondo oscuro preventivo */
+            background-color: #090d16 !important;
         }
 
-        /* 🌙 FILTRO CSS DE MODO OSCURO AUTOMÁTICO PARA LOS MAPAS LEAFLET */
         .leaflet-layer,
         .leaflet-control-zoom,
         .leaflet-control-attribution {
             filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
         }
 
-        /* Excepción para mantener los íconos, radares y marcadores con sus colores reales vivos */
         .leaflet-marker-icon,
         .leaflet-popup,
         .map-status-pill {
@@ -833,7 +830,7 @@
     <div class="card" id="smnAlertCard" style="display: none; border-left: 8px solid #f59e0b;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span id="smnIcono" style="font-size: 2.2rem;">⚡⛈️</span>
+                <span id="smnIcono" style="font-size: 2.2rem;">⚡⛈️️</span>
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; text-transform: uppercase;">Alerta SMN</span>
@@ -1021,7 +1018,7 @@
                 <div class="grid-confort-termico">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️</span>
+                        <span style="font-size: 1.2rem;">🌡️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Bulbo Húmedo</small>
                         <strong id="bulboHumedad" style="font-size: 0.88rem; color: var(--text-main);">-- °C</strong>
                     </div>
@@ -1059,7 +1056,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀️️</span>
+                        <span style="font-size: 1.2rem;">☀</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 3px;">Horas de Sol</small>
                         <strong id="horasSol" style="font-size: 0.88rem; color: var(--text-main);">-- hs</strong>
                     </div>
@@ -1167,15 +1164,15 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA CON CALLES, RADAR, FIRMS Y PLAGAS MENDOZA -->
+        <!-- MAPA MULTICAPA CON NUBES OPENWEATHERMAP -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
-            <h3 id="mapTitle">🗺️ Visor Geográfico & Radares</h3>
+            <h3 id="mapTitle">🗺️ Visor Geográfico & Nubes (OpenWeather)</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
                 <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰️ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
-                <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧️ Lluvia</button>
+                <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">☁ Nubes</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
                 <button class="map-btn" id="btnPlagas" onclick="toggleCapaPlagas()" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171;">🌱 Plagas</button>
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
@@ -1200,10 +1197,11 @@
     let markerInstance = null;
     let markerPlagas = null;
     let capaActual = null;
-    let capaLluviaRadar = null;
+    let capaNubesOWM = null;
     let capaFuegosFIRMS = null;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
+    const OPENWEATHER_API_KEY = "141bbae82a1d82e377374fcc4a377f40";
 
     const embalsesPorProvincia = {
         "Mendoza": [
@@ -1256,7 +1254,6 @@
         });
     }
 
-    // 🔔 LÓGICA ROBUSTA PARA EL BOTÓN DE NOTIFICACIONES
     function solicitarPermisoNotificaciones() {
         if (!("Notification" in window)) {
             alert("Tu navegador no soporta notificaciones de escritorio.");
@@ -1352,6 +1349,14 @@
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
+                // Inicializar capa de nubes de OpenWeatherMap con tu API Key
+                capaNubesOWM = L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OPENWEATHER_API_KEY}`, {
+                    tileSize: 256,
+                    opacity: 0.8,
+                    maxZoom: 18,
+                    attribution: '&copy; OpenWeatherMap'
+                });
+
                 mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
                 mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor interactivo activo", "#22c55e"); });
 
@@ -1374,29 +1379,6 @@
         }
     }
 
-    async function obtenerCapaLluviaDinamica() {
-        if (capaLluviaRadar) return capaLluviaRadar;
-        try {
-            const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-            const data = await res.json();
-            if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-                const latestTime = data.radar.past[data.radar.past.length - 1].time;
-                capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
-                    tileSize: 256,
-                    opacity: 0.75,
-                    maxZoom: 18,
-                    attribution: '&copy; RainViewer'
-                });
-            }
-        } catch (e) {
-            console.error("Error al conectar con el radar de lluvia:", e);
-            capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/weather-maps/0/{z}/{x}/{y}/256/2_1.png', {
-                tileSize: 256, opacity: 0.75, maxZoom: 18
-            });
-        }
-        return capaLluviaRadar;
-    }
-
     async function cambiarCapaMapa(tipo) {
         const btnBase = document.getElementById("btnBase");
         const btnTopo = document.getElementById("btnTopo");
@@ -1413,19 +1395,18 @@
         btnLluvia.classList.remove("active");
         btnFuego.classList.remove("active");
 
-        if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
+        if (capaNubesOWM && mapInstance.hasLayer(capaNubesOWM)) mapInstance.removeLayer(capaNubesOWM);
         if (mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
 
         if (tipo === 'lluvia') {
             btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧️ Radar de Precipitaciones en Vivo";
-            actualizarIndicadorMapa("Conectando con radar de lluvia...", "#38bdf8");
+            mapTitle.innerText = "☁️ Cobertura Nubosa (OpenWeatherMap)";
+            actualizarIndicadorMapa("Cargando capa de nubes OWM...", "#38bdf8");
 
-            const layer = await obtenerCapaLluviaDinamica();
-            if (!mapInstance.hasLayer(layer)) {
-                layer.addTo(mapInstance);
+            if (!mapInstance.hasLayer(capaNubesOWM)) {
+                capaNubesOWM.addTo(mapInstance);
             }
-            actualizarIndicadorMapa("Capa de Lluvia Activa", "#22c55e");
+            actualizarIndicadorMapa("Capa de Nubes OWM Activa", "#22c55e");
 
         } else if (tipo === 'fuego') {
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
@@ -1439,7 +1420,7 @@
 
             if (tipo === 'base') {
                 btnBase.classList.add("active");
-                mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+                mapTitle.innerText = "🗺️ Visor Geográfico & Nubes";
                 actualizarIndicadorMapa("Capa Estándar activa", "#22c55e");
             } else if (tipo === 'topo') {
                 btnTopo.classList.add("active");
@@ -1463,7 +1444,7 @@
             mapInstance.removeLayer(markerPlagas);
             markerPlagas = null;
             btnPlagas.classList.remove("active");
-            mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+            mapTitle.innerText = "🗺️ Visor Geográfico & Nubes";
             actualizarIndicadorMapa("Capa de Plagas desactivada", "#22c55e");
             return;
         }
@@ -1667,7 +1648,7 @@
         if (codigo === 3) return "☁️";
         if (codigo <= 67) return "🌧️";
         if (codigo >= 95) return "⛈️";
-        return "⛈️";
+        return "⛈️️";
     }
 
     function calcularFaseLunar() {
