@@ -1574,7 +1574,17 @@
                 });
             }
             if (markerInstance) mapInstance.removeLayer(markerInstance);
-            markerInstance = L.marker([lat, lon]).addTo(mapInstance).bindPopup("<b>Ubicación GPS Actual</b>").openPopup();
+            
+            // Marcador GPS limpio sin línea vertical superior
+            markerInstance = L.marker([lat, lon], {
+                icon: L.divIcon({
+                    className: 'custom-gps-pin',
+                    html: `<div style="background-color: #38bdf8; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                })
+            }).addTo(mapInstance).bindPopup("<b>Ubicación GPS Actual</b>").openPopup();
+
             mapInstance.setView([lat, lon], 15);
         } catch (e) {}
     }
