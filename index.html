@@ -30,7 +30,7 @@
         }
 
         html, body {
-            background-color: var(--bg);
+            background-color: var--bg);
             color: var(--text-main);
             width: 100%;
             min-height: 100vh;
@@ -539,7 +539,8 @@
 
         .leaflet-marker-icon,
         .leaflet-popup,
-        .map-status-pill {
+        .map-status-pill,
+        .radar-timeline-control {
             filter: none !important;
         }
 
@@ -561,6 +562,56 @@
             gap: 6px;
             pointer-events: none;
             backdrop-filter: blur(4px);
+        }
+
+        /* ⏱️ BARRA DE REPRODUCCIÓN DE RADAR ANIMADO */
+        .radar-timeline-control {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(17, 24, 39, 0.92);
+            border: 1px solid var(--accent);
+            padding: 8px 14px;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            width: 85%;
+            max-width: 420px;
+        }
+
+        .radar-timeline-control button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .radar-timeline-control input[type=range] {
+            flex-grow: 1;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .radar-time-label {
+            font-size: 0.72rem;
+            color: var(--text-main);
+            font-weight: 700;
+            min-width: 48px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
         }
 
         .pulse-dot {
@@ -612,61 +663,6 @@
             color: #000;
             border-color: var(--accent);
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-        }
-
-        /* 🪟 VENTANA MODAL INTERNA PARA EL RADAR */
-        #radarModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(9, 13, 22, 0.85);
-            z-index: 9999;
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .radar-modal-content {
-            background: var(--card-bg);
-            border: 2px solid var(--accent);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 900px;
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-
-        .radar-modal-header {
-            background: var(--card-inner);
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .radar-modal-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .btn-cerrar-modal {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            cursor: pointer;
         }
 
         .pasos-grid {
@@ -759,20 +755,6 @@
 </head>
 
 <body>
-
-<!-- 🪟 MODAL INTERNO PARA EL RADAR (SIN SALIR DE LA URL) -->
-<div id="radarModal">
-    <div class="radar-modal-content">
-        <div class="radar-modal-header">
-            <span class="radar-modal-title">📡 Visor Radar DACC (Mendoza en Vivo)</span>
-            <button type="button" class="btn-cerrar-modal" onclick="cerrarModalRadar()">✕ Cerrar</button>
-        </div>
-        <div style="flex-grow: 1; background: #000; position: relative; display: flex; align-items: center; justify-content: center;">
-            <!-- Contenedor con iframe interno o aviso de restricción X-Frame -->
-            <iframe src="http://www.contingencias.mendoza.gov.ar/atm/radar/" style="width: 100%; height: 100%; border: none;" title="Radar DACC"></iframe>
-        </div>
-    </div>
-</div>
 
 <header>
     <div class="header-content">
@@ -1146,7 +1128,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 7px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.1rem;">❄️</span>
+                        <span style="font-size: 1.1rem;">❄️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.62rem; margin-top: 2px;">Riesgo Helada</small>
                         <strong id="riesgoHelada" style="font-size: 0.85rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
@@ -1198,15 +1180,14 @@
 
         </div>
 
-        <!-- MAPA MULTICAPA Y BOTÓN DE RADAR INTERNO -->
+        <!-- MAPA MULTICAPA CON RADAR ANIMADO DE LUJO -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
-            <h3 id="mapTitle">🗺 Visor Geográfico & Radares</h3>
+            <h3 id="mapTitle">🗺 Visor Geográfico & Radar de Tormentas</h3>
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
                 <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
-                <button class="map-btn" id="btnNubes" onclick="cambiarCapaMapa('nubes')" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent);">🌧️ Nubes / Lluvia</button>
-                <button class="map-btn" onclick="abrirModalRadar()" style="background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent);">📡 Radar DACC</button>
+                <button class="map-btn" id="btnRadarAnimado" onclick="cambiarCapaMapa('radar')" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent);">🌧️ Radar Animado</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnVientos" onclick="cambiarCapaMapa('vientos')">💨 Vientos</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
@@ -1219,6 +1200,14 @@
                     <span class="pulse-dot"></span>
                     <span id="mapStatusText">Visor listo (Operativo)</span>
                 </div>
+
+                <!-- BARRA DE REPRODUCCIÓN PARA EL RADAR ANIMADO -->
+                <div class="radar-timeline-control" id="radarTimelineBar">
+                    <button type="button" id="btnPlayRadar" onclick="togglePlayRadar()">▶</button>
+                    <input type="range" id="radarRange" min="0" max="0" value="0" oninput="cambiarFrameRadar(this.value)">
+                    <span class="radar-time-label" id="radarTimeLabel">--:--</span>
+                </div>
+
                 <div id="mapaArgentina"></div>
             </div>
         </div>
@@ -1244,20 +1233,15 @@
     let capaActual = null;
     let capaFuegosFIRMS = null;
     let capaVientosGrid = null;
-    let capaRadarNubes = null;
+
+    // Variables para el Radar Animado tipo "Tiempo&Radar"
+    let radarFrames = [];
+    let radarLayerIndex = 0;
+    let radarTileLayer = null;
+    let radarInterval = null;
+    let isPlayingRadar = false;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
-
-    // 🪟 FUNCIONES PARA ABRIR Y CERRAR EL MODAL DEL RADAR SIN SALIR DE LA URL
-    function abrirModalRadar() {
-        const modal = document.getElementById("radarModal");
-        if (modal) modal.style.display = "flex";
-    }
-
-    function cerrarModalRadar() {
-        const modal = document.getElementById("radarModal");
-        if (modal) modal.style.display = "none";
-    }
 
     // 🖥️ LÓGICA DE PANTALLA COMPLETA
     document.addEventListener("DOMContentLoaded", function() {
@@ -1277,7 +1261,82 @@
                 }
             });
         }
+        cargarDatosRadarAnimadoAPI();
     });
+
+    // Carga de frames de radar en vivo desde RainViewer API
+    async function cargarDatosRadarAnimadoAPI() {
+        try {
+            const res = await fetch("https://api.rainviewer.com/public/weather-maps.json");
+            const data = await res.json();
+            if (data && data.radar && data.radar.past) {
+                radarFrames = data.radar.past;
+                if (data.radar.nowcast) {
+                    radarFrames = radarFrames.concat(data.radar.nowcast);
+                }
+                const range = document.getElementById("radarRange");
+                if (range && radarFrames.length > 0) {
+                    range.min = 0;
+                    range.max = radarFrames.length - 1;
+                    range.value = radarFrames.length - 1;
+                    radarLayerIndex = radarFrames.length - 1;
+                }
+            }
+        } catch (e) {
+            console.warn("No se pudieron cargar los frames del radar animado:", e);
+        }
+    }
+
+    function mostrarFrameRadar(index) {
+        if (!radarFrames || radarFrames.length === 0 || !mapInstance) return;
+        radarLayerIndex = parseInt(index);
+        const frame = radarFrames[radarLayerIndex];
+        if (!frame) return;
+
+        if (radarTileLayer && mapInstance.hasLayer(radarTileLayer)) {
+            mapInstance.removeLayer(radarTileLayer);
+        }
+
+        radarTileLayer = L.tileLayer(`https://tile.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
+            tileSize: 256,
+            opacity: 0.8,
+            zIndex: 400,
+            attribution: '&copy; RainViewer'
+        });
+
+        radarTileLayer.addTo(mapInstance);
+
+        const fechaObj = new Date(frame.time * 1000);
+        const horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+        const label = document.getElementById("radarTimeLabel");
+        if (label) label.innerText = horaStr + " hs";
+
+        const range = document.getElementById("radarRange");
+        if (range) range.value = radarLayerIndex;
+    }
+
+    function cambiarFrameRadar(val) {
+        mostrarFrameRadar(val);
+    }
+
+    function togglePlayRadar() {
+        const btn = document.getElementById("btnPlayRadar");
+        if (isPlayingRadar) {
+            clearInterval(radarInterval);
+            isPlayingRadar = false;
+            if (btn) btn.innerText = "▶";
+        } else {
+            isPlayingRadar = true;
+            if (btn) btn.innerText = "❚❚";
+            radarInterval = setInterval(() => {
+                radarLayerIndex++;
+                if (radarLayerIndex >= radarFrames.length) {
+                    radarLayerIndex = 0;
+                }
+                mostrarFrameRadar(radarLayerIndex);
+            }, 600);
+        }
+    }
 
     const embalsesPorProvincia = {
         "Mendoza": [
@@ -1409,13 +1468,6 @@
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
-                capaRadarNubes = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t0/{z}/{x}/{y}/2/1_1.png', {
-                    tileSize: 256,
-                    opacity: 0.75,
-                    attribution: '&copy; RainViewer',
-                    maxZoom: 19
-                });
-
                 mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando región...", "#38bdf8"); });
                 mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor interactivo activo", "#22c55e"); });
 
@@ -1465,9 +1517,10 @@
         const btnBase = document.getElementById("btnBase");
         const btnTopo = document.getElementById("btnTopo");
         const btnCalles = document.getElementById("btnCalles");
-        const btnNubes = document.getElementById("btnNubes");
+        const btnRadarAnimado = document.getElementById("btnRadarAnimado");
         const btnVientos = document.getElementById("btnVientos");
         const btnFuego = document.getElementById("btnFuego");
+        const radarTimelineBar = document.getElementById("radarTimelineBar");
         const mapTitle = document.getElementById("mapTitle");
 
         if (!mapInstance) return;
@@ -1475,19 +1528,30 @@
         btnBase.classList.remove("active");
         btnTopo.classList.remove("active");
         if (btnCalles) btnCalles.classList.remove("active");
-        if (btnNubes) btnNubes.classList.remove("active");
+        if (btnRadarAnimado) btnRadarAnimado.classList.remove("active");
         if (btnVientos) btnVientos.classList.remove("active");
         btnFuego.classList.remove("active");
+        if (radarTimelineBar) radarTimelineBar.style.display = "none";
+
+        if (isPlayingRadar) {
+            clearInterval(radarInterval);
+            isPlayingRadar = false;
+            const btnPlay = document.getElementById("btnPlayRadar");
+            if (btnPlay) btnPlay.innerText = "▶";
+        }
 
         if (capaVientosGrid && mapInstance.hasLayer(capaVientosGrid)) mapInstance.removeLayer(capaVientosGrid);
         if (mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
-        if (capaRadarNubes && mapInstance.hasLayer(capaRadarNubes)) mapInstance.removeLayer(capaRadarNubes);
+        if (radarTileLayer && mapInstance.hasLayer(radarTileLayer)) mapInstance.removeLayer(radarTileLayer);
 
-        if (tipo === 'nubes') {
-            if (capaRadarNubes) capaRadarNubes.addTo(mapInstance);
-            btnNubes.classList.add("active");
-            mapTitle.innerText = "🌧️ Radar de Nubes & Precipitaciones en Vivo";
-            actualizarIndicadorMapa("Capa de Radar de Lluvia Activa", "#38bdf8");
+        if (tipo === 'radar') {
+            if (btnRadarAnimado) btnRadarAnimado.classList.add("active");
+            if (radarTimelineBar) radarTimelineBar.style.display = "flex";
+            mapTitle.innerText = "🌧️ Radar Meteorológico Animado en Vivo";
+            if (radarFrames.length > 0) {
+                mostrarFrameRadar(radarLayerIndex);
+            }
+            actualizarIndicadorMapa("Radar de Tormentas Activo", "#38bdf8");
         } else if (tipo === 'vientos') {
             btnVientos.classList.add("active");
             mapTitle.innerText = "💨 Mapa de Vientos & Deriva";
@@ -1506,7 +1570,7 @@
 
             if (tipo === 'base') {
                 btnBase.classList.add("active");
-                mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+                mapTitle.innerText = "🗺️ Visor Geográfico & Radar de Tormentas";
                 actualizarIndicadorMapa("Capa Estándar activa", "#22c55e");
             } else if (tipo === 'topo') {
                 btnTopo.classList.add("active");
@@ -1530,7 +1594,7 @@
             mapInstance.removeLayer(markerPlagas);
             markerPlagas = null;
             btnPlagas.classList.remove("active");
-            mapTitle.innerText = "🗺️ Visor Geográfico & Radares";
+            mapTitle.innerText = "🗺️ Visor Geográfico & Radar de Tormentas";
             actualizarIndicadorMapa("Capa de Plagas desactivada", "#22c55e");
             return;
         }
@@ -1702,7 +1766,7 @@
 
     function iconoClima(codigo) {
         if (codigo === 0) return "☀️";
-        if (codigo <= 2) return "🌤️";
+        if (codigo <= 2) return "🌤️️";
         if (codigo === 3) return "☁️";
         if (codigo <= 67) return "🌧️";
         if (codigo >= 95) return "⛈️";
@@ -2037,7 +2101,7 @@
 
                     if (provincia.toLowerCase().includes("san juan")) provincia = "San Juan";
                     else if (provincia.toLowerCase().includes("córdoba")) provincia = "Córdoba";
-                    else if (provincia.toLowerCase().includes("neuquén")) provincia = "Neuquén";
+                    else if (provincia.toLowerCase().json?.toLowerCase?.().includes?.("neuquén")) provincia = "Neuquén";
                     else provincia = "Mendoza";
 
                     actualizarEmbalsesSegunUbicacion(provincia);
