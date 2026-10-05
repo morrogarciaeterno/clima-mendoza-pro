@@ -638,8 +638,8 @@
             border: 1px solid var(--accent);
             border-radius: 20px;
             width: 100%;
-            max-width: 1150px;
-            height: 92vh;
+            max-width: 1200px;
+            height: 94vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -687,7 +687,7 @@
             flex-grow: 1;
             padding: 15px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1.15fr;
             gap: 15px;
             overflow-y: auto;
         }
@@ -715,39 +715,86 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             overflow-y: auto;
             max-height: 100%;
         }
 
         .report-section-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--accent);
             border-bottom: 1px solid var(--border);
-            padding-bottom: 6px;
-            margin-bottom: 4px;
+            padding-bottom: 4px;
+            margin-top: 4px;
         }
 
         .recommendation-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 10px;
-            font-size: 0.78rem;
-            line-height: 1.4;
+            padding: 9px;
+            font-size: 0.76rem;
+            line-height: 1.35;
         }
 
-        .cultivo-badge {
+        .cultivo-btn-select {
             display: inline-block;
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid var(--accent);
             color: var(--accent);
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 6px;
             font-weight: bold;
             margin: 2px;
             font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cultivo-btn-select:hover, .cultivo-btn-select.active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .tabla-costos {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+
+        .tabla-costos th {
+            background: #374151;
+            color: #d1d5db;
+            padding: 5px;
+            text-align: left;
+        }
+
+        .tabla-costos td {
+            padding: 5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .calendario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .calendario-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.73rem;
+        }
+
+        .calendario-item strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 2px;
         }
 
         .pasos-grid {
@@ -1272,27 +1319,27 @@
 
 </div>
 
-<!-- VENTANA MODAL AMPLIADA CON SUGERENCIA DE CULTIVOS -->
+<!-- VENTANA MODAL AMPLIADA CON CALENDARIO DE LABORES Y COSTOS EN USD -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Gestión de Lotes & Sugerencia de Cultivos Regionales</h2>
+            <h2>📐 Gestión de Lotes, Costos (USD) & Calendario Agrícola</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
             <!-- Columna Izquierda: Mapa de Dibujo -->
             <div class="modal-map-container">
                 <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja tu lote arriba a la derecha. El sistema evaluará el suelo y clima para recomendar qué plantar.
+                    Dibuja tu lote. Selecciona un cultivo para ver su presupuesto en dólares y fechas óptimas de poda y siembra.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
 
-            <!-- Columna Derecha: Panel de Diagnóstico y Sugerencias de Cultivos -->
+            <!-- Columna Derecha: Panel de Diagnóstico, Costos y Calendario -->
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Lote Seleccionado</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 30px 10px;">
-                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis agronómico, estado NDVI y las sugerencias de plantación (vid, hortalizas, frutales).
+                    👈 Dibuja un polígono o rectángulo en el mapa para obtener el análisis agronómico, costos en dólares y el calendario de labores estacionales.
                 </div>
             </div>
         </div>
@@ -1310,8 +1357,63 @@
 
     let modalMapInstance = null;
     let drawnItemsModal = null;
+    let loteHectareasGlobal = 1;
+    let datosLoteActual = null;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
+
+    // Base de costos en USD y Calendario de Labores Óptimas
+    const infoCultivosAgro = {
+        "Vid": {
+            prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350,
+            plantacion: "Agosto - Septiembre (Raíz desnuda o Steckling)",
+            poda: "Junio - Julio (Poda invernal de formación/fructificación)",
+            cosecha: "Febrero - Abril (Vendimia según varietal)",
+            fertilizacion: "Septiembre y Noviembre"
+        },
+        "Cebolla": {
+            prep: 300, implantacion: 1200, riego: 500, fitosanitarios: 450, totalHa: 2450,
+            plantacion: "Mayo - Julio (Alácigo / Trasplante a fin de invierno)",
+            poda: "No requiere (Deshierbe mecánico manual)",
+            cosecha: "Noviembre - Enero (Curado en campo)",
+            fertilizacion: "Julio y Septiembre"
+        },
+        "Ajo": {
+            prep: 350, implantacion: 2800, riego: 550, fitosanitarios: 700, totalHa: 4400,
+            plantacion: "Marzo - Mayo (Plantación de dientes en otoño)",
+            poda: "Octubre (Desentechado / Corte de inflorescencia)",
+            cosecha: "Noviembre - Diciembre (Arrance y estacionamiento)",
+            fertilizacion: "Mayo y Julio"
+        },
+        "Olivo": {
+            prep: 400, implantacion: 3000, riego: 500, fitosanitarios: 500, totalHa: 4400,
+            plantacion: "Septiembre - Octubre (Planes de primavera)",
+            poda: "Junio - Agosto (Post-cosecha e invierno)",
+            cosecha: "Marzo - Mayo (Aceituna de mesa o aceite)",
+            fertilizacion: "Agosto y Octubre"
+        },
+        "Tomate": {
+            prep: 300, implantacion: 1800, riego: 600, fitosanitarios: 650, totalHa: 3350,
+            plantacion: "Octubre - Noviembre (Trasplante libre de heladas)",
+            poda: "Diciembre (Guiado y desbrote opcional)",
+            cosecha: "Enero - Marzo (Recolección industrial/fresco)",
+            fertilizacion: "Noviembre y Diciembre"
+        },
+        "Frutales (Manzana/Pera)": {
+            prep: 500, implantacion: 4200, riego: 700, fitosanitarios: 900, totalHa: 6300,
+            plantacion: "Julio - Agosto (Reposo vegetativo invernal)",
+            poda: "Junio - Agosto (Poda de fructificación anual)",
+            cosecha: "Enero - Abril (Según madurez varietal)",
+            fertilizacion: "Julio y Septiembre"
+        },
+        "Cultivos Extensivos (Maíz/Soja)": {
+            prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900,
+            plantacion: "Septiembre - Noviembre (Siembra directa estacional)",
+            poda: "No aplica (Manejo con herbicidas selectivos)",
+            cosecha: "Febrero - Mayo (Madurez fisiológica)",
+            fertilizacion: "En siembra y V6"
+        }
+    };
 
     const embalsesPorProvincia = {
         "Mendoza": [
@@ -1495,6 +1597,7 @@
 
                     modalMapInstance.on(L.Draw.Event.CREATED, function (e) {
                         const layer = e.layer;
+                        drawnItemsModal.clearLayers();
                         drawnItemsModal.addLayer(layer);
 
                         let areaM2 = 0;
@@ -1502,10 +1605,10 @@
                             const latLngs = layer.getLatLngs()[0];
                             areaM2 = L.GeometryUtil && L.GeometryUtil.geodesicArea ? L.GeometryUtil.geodesicArea(latLngs) : 10000;
                         }
-                        const hectareas = (areaM2 / 10000).toFixed(2);
+                        loteHectareasGlobal = parseFloat((areaM2 / 10000).toFixed(2));
                         const centro = layer.getBounds().getCenter();
 
-                        analizarLoteModalPro(centro.lat, centro.lng, hectareas);
+                        analizarLoteModalPro(centro.lat, centro.lng, loteHectareasGlobal);
                     });
                 }
                 modalMapInstance.invalidateSize();
@@ -1523,7 +1626,7 @@
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Consultando modelos climáticos y aptitud de suelo...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Analizando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Procesando costos y calendario agrícola...</div>`;
 
         let nombreLugar = `Lote Agrícola`;
         let provinciaZona = "Mendoza";
@@ -1537,7 +1640,7 @@
             }
         } catch(e) {}
 
-        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=precipitation_sum,et0_fao_evapotranspiration,temperature_2m_max,temperature_2m_min&timezone=America%2FArgentina%2FMendoza`;
+        const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=precipitation_sum,et0_fao_evapotranspiration&timezone=America%2FArgentina%2FMendoza`;
         try {
             const res = await fetch(urlClima);
             const data = await res.json();
@@ -1551,96 +1654,98 @@
             ndviEst = Math.max(0.2, Math.min(0.88, ndviEst));
 
             let estadoCultivo = "Vigoroso / Óptimo";
-            let colorEstado = "#22c55e";
-            if (ndviEst < 0.4) { estadoCultivo = "Estrés Hídrico Severo"; colorEstado = "#ef4444"; }
-            else if (ndviEst < 0.6) { estadoCultivo = "Crecimiento Regular"; colorEstado = "#f59e0b"; }
+            if (ndviEst < 0.4) estadoCultivo = "Estrés Hídrico Severo";
+            else if (ndviEst < 0.6) estadoCultivo = "Crecimiento Regular";
 
-            // Balance Hídrico
-            let deficit = (lluvia - et0).toFixed(1);
-            let riegoRecomendado = deficit < 0 ? Math.abs(deficit) * 10 : 0;
-
-            // Semáforo Fitosanitario
-            let semaforoFito = "🟢 Favorable para Aplicar";
-            let colorFito = "#22c55e";
-            let descFito = "Viento bajo y humedad adecuada. Sin riesgo de deriva.";
-            if (viento > 20 || hum < 35 || temp > 30) {
-                semaforoFito = "🔴 No Fumar / No Aplicar (Riesgo de Deriva)";
-                colorFito = "#ef4444";
-                descFito = "Condiciones adversas por viento fuerte, alta temperatura o sequedad ambiental.";
+            let cultivoDefault = "Vid";
+            if (provinciaZona.toLowerCase().includes("neuquén") || provinciaZona.toLowerCase().includes("rionegro")) {
+                cultivoDefault = "Frutales (Manzana/Pera)";
+            } else if (provinciaZona.toLowerCase().includes("córdoba") || provinciaZona.toLowerCase().includes("santa fe")) {
+                cultivoDefault = "Cultivos Extensivos (Maíz/Soja)";
             }
 
-            // Alerta Fúngica
-            let alertaFungica = "🟢 Riesgo Fúngico Bajo";
-            let colorHongo = "#22c55e";
-            if (hum > 70 && temp >= 18 && temp <= 26) {
-                alertaFungica = "⚠ Alerta de Hongos (Oídio / Peronóspora)";
-                colorHongo = "#f59e0b";
-            }
+            datosLoteActual = {
+                nombreLugar, provinciaZona, hectareas, temp, hum, viento, lluvia, et0, ndviEst, estadoCultivo, cultivoDefault
+            };
 
-            // Sugerencia de Cultivos según Región
-            let cultivosSugeridos = `
-                <span class="cultivo-badge">🍇 Vid (Malbec / Cabernet)</span>
-                <span class="cultivo-badge">🧄 Ajo Blanco / Colorado</span>
-                <span class="cultivo-badge">🧅 Cebolla Valencianita</span>
-                <span class="cultivo-badge">🫒 Olivo (Aptitud Cuyo)</span>
-                <span class="cultivo-badge">🍅 Tomate Industrial</span>
-            `;
-            let descripcionCultivo = "Zona ideal para cultivos agroindustriales y hortícolas de alta demanda hídrica controlada bajo riego por goteo o manto.";
+            renderizarPanelReporteYCostos(cultivoDefault);
 
-            if (provinciaZona.toLowerCase().includes("neuquén") || provinciaZona.toLowerCase().includes("rionegro") || provinciaZona.toLowerCase().includes("patagonia")) {
-                cultivosSugeridos = `
-                    <span class="cultivo-badge">🍎 Manzana Red Delicious</span>
-                    <span class="cultivo-badge">🍐 Pera D'Anjou / Williams</span>
-                    <span class="cultivo-badge">🍒 Cerezos de Exportación</span>
-                    <span class="cultivo-badge">🍇 Vid Patagónica (Pinot Noir)</span>
-                `;
-                descripcionCultivo = "Aptitud excelente para frutales de pepita y carozo gracias al régimen térmico y horas de frío patagónicas.";
-            } else if (provinciaZona.toLowerCase().includes("córdoba") || provinciaZona.toLowerCase().includes("santa fe") || provinciaZona.toLowerCase().includes("buenos aires")) {
-                cultivosSugeridos = `
-                    <span class="cultivo-badge">🌽 Maíz de Alta Producción</span>
-                    <span class="cultivo-badge">🌱 Soja de Primera</span>
-                    <span class="cultivo-badge">🌾 Trigo / Cebada</span>
-                    <span class="cultivo-badge">🌻 Girasol</span>
-                `;
-                descripcionCultivo = "Zona pampeana con alta aptitud para cultivos extensivos de secano (granos y oleaginosas).";
-            }
-
-            panel.innerHTML = `
-                <div class="report-section-title">📊 Reporte de Lote: ${nombreLugar} (${provinciaZona})</div>
-                
-                <div class="recommendation-card">
-                    <b>Superficie Delimitada:</b> <span style="color:var(--accent); font-weight:bold;">${hectareas} hectáreas</span><br>
-                    <b>Estado NDVI:</b> <span style="color:${colorEstado}; font-weight:bold;">${estadoCultivo} (${ndviEst.toFixed(3)})</span><br>
-                    <b>Clima en Lote:</b> ${temp}°C | ${hum}% Humedad | ${viento} km/h Viento
-                </div>
-
-                <div class="report-section-title">🌱 Sugerencia de Plantación & Cultivos Aptos</div>
-                <div class="recommendation-card">
-                    <div style="margin-bottom: 6px;">${cultivosSugeridos}</div>
-                    <span style="color: var(--text-muted);">${descripcionCultivo}</span>
-                </div>
-
-                <div class="report-section-title">💧 Recomendación de Riego Inteligente</div>
-                <div class="recommendation-card">
-                    <b>Balance Hídrico Neto:</b> <span style="color:${deficit >= 0 ? '#22c55e':'#ef4444'}; font-weight:bold;">${deficit} mm</span> (Lluvia vs Evapotranspiración ET0)<br>
-                    <span style="color: var(--accent);">💡 <b>Sugerencia:</b> ${riegoRecomendado > 0 ? `Se recomienda aplicar un riego de refuerzo de ${Math.round(riegoRecomendado)} m³/ha en las próximas 48 hs.` : `El balance hídrico es favorable. No se requiere riego complementario.`}</span>
-                </div>
-
-                <div class="report-section-title">🚜 Semáforo de Fitosanitarios & Deriva</div>
-                <div class="recommendation-card">
-                    <span style="color:${colorFito}; font-weight:bold; font-size:0.85rem;">${semaforoFito}</span><br>
-                    <span style="color: var(--text-muted);">${descFito}</span>
-                </div>
-
-                <div class="report-section-title">🍄 Sanidad Preventiva (Enfermedades)</div>
-                <div class="recommendation-card">
-                    <span style="color:${colorHongo}; font-weight:bold; font-size:0.85rem;">${alertaFungica}</span><br>
-                    <span style="color: var(--text-muted);">Monitoreo basado en temperatura templada y humedad relativa nocturna del lote.</span>
-                </div>
-            `;
         } catch(e) {
-            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error al procesar los datos agronómicos del lote. Intente nuevamente.</div>`;
+            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error al procesar los datos agronómicos. Intente nuevamente.</div>`;
         }
+    }
+
+    function renderizarPanelReporteYCostos(cultivoSeleccionado) {
+        if (!datosLoteActual) return;
+        const panel = document.getElementById("reporteLotePanel");
+        if (!panel) return;
+
+        const d = datosLoteActual;
+        const info = infoCultivosAgro[cultivoSeleccionado] || infoCultivosAgro["Vid"];
+        const totalLoteUSD = Math.round(info.totalHa * d.hectareas);
+
+        let listaCultivosHtml = Object.keys(infoCultivosAgro).map(c => `
+            <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
+        `).join("");
+
+        panel.innerHTML = `
+            <div class="report-section-title">📊 Reporte de Lote: ${d.nombreLugar} (${d.provinciaZona})</div>
+            
+            <div class="recommendation-card">
+                <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} hectáreas</span> | 
+                <b>NDVI:</b> <span style="color:${d.ndviEst < 0.4 ? '#ef4444':'#22c55e'}; font-weight:bold;">${d.ndviEst.toFixed(3)} (${d.estadoCultivo})</span><br>
+                <b>Clima en Lote:</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
+            </div>
+
+            <div class="report-section-title">🌱 Cultivos & Calendario Estacional</div>
+            <div class="recommendation-card">
+                <div style="margin-bottom: 6px; font-size:0.73rem; color:var(--text-muted);">Selecciona cultivo para ver costos y fechas sugeridas:</div>
+                <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
+                
+                <div class="calendario-grid">
+                    <div class="calendario-item">
+                        <strong>📅 Época de Plantación</strong>
+                        ${info.plantacion}
+                    </div>
+                    <div class="calendario-item">
+                        <strong>✂️ Época de Poda / Manejo</strong>
+                        ${info.poda}
+                    </div>
+                    <div class="calendario-item">
+                        <strong>🍇 Época de Cosecha</strong>
+                        ${info.cosecha}
+                    </div>
+                    <div class="calendario-item">
+                        <strong>🧪 Fertilización Clave</strong>
+                        ${info.fertilizacion}
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-section-title">💰 Presupuesto Estimado en Dólares (USD)</div>
+            <div class="recommendation-card">
+                <table class="tabla-costos">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>USD/ha</th>
+                            <th>Total (${d.hectareas} ha)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Preparación Suelo</td><td>$${info.prep}</td><td>$${Math.round(info.prep * d.hectareas)}</td></tr>
+                        <tr><td>Implantación</td><td>$${info.implantacion}</td><td>$${Math.round(info.implantacion * d.hectareas)}</td></tr>
+                        <tr><td>Sistema Riego</td><td>$${info.riego}</td><td>$${Math.round(info.riego * d.hectareas)}</td></tr>
+                        <tr><td>Fitosanitarios</td><td>$${info.fitosanitarios}</td><td>$${Math.round(info.fitosanitarios * d.hectareas)}</td></tr>
+                        <tr style="font-weight:bold; color:var(--accent);">
+                            <td>Inversión Total</td>
+                            <td>$${info.totalHa} USD/ha</td>
+                            <td>$${totalLoteUSD} USD</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
     }
 
     function cambiarCapaMapa(tipo) {
