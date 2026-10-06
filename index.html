@@ -552,7 +552,6 @@
             background-color: #070a14 !important;
         }
 
-        /* CONTROL DINÁMICO DE FILTROS PARA EL MAPA */
         .modo-oscuro-mapa .leaflet-tile-pane {
             filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
         }
@@ -1058,7 +1057,7 @@
                 <div class="grid-confort-termico">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️</span>
+                        <span style="font-size: 1.2rem;">🌡</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Bulbo Húmedo</small>
                         <strong id="bulboHumedad" style="font-size: 0.85rem; color: var(--text-main);">-- °C</strong>
                     </div>
@@ -1199,7 +1198,7 @@
             <div class="map-wrapper-container">
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer</div>
+                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, OpenWeather</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -1261,7 +1260,7 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
-    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer") {
+    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS") {
         const textEl = document.getElementById("mapStatusText");
         const sourceEl = document.getElementById("mapSourceText");
         const dotEl = document.querySelector(".pulse-dot");
@@ -1270,7 +1269,7 @@
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
-   async function inicializarCapasEspeciales() {
+    async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
             capaLluviaRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
                 tileSize: 256,
@@ -1281,15 +1280,15 @@
         }
 
         if (!capaSateliteGOES) {
-            capaSateliteGOES = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2026-09-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
+            capaSateliteGOES = L.tileLayer('https://tile.openweathermap.org/map/clouds/{z}/{x}/{y}.png?appid=b1b15e88fa797225412429c1c50c122a1', {
                 tileSize: 256,
-                maxZoom: 9,
                 opacity: 0.8,
                 zIndex: 500,
-                attribution: '&copy; NASA GIBS / VIIRS'
+                attribution: '&copy; OpenWeatherMap Clouds'
             });
         }
     }
+
     function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
@@ -1312,7 +1311,7 @@
                 mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8", "Coordenadas en movimiento"); });
                 mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e", "Fuentes: OpenStreetMap, Open-Meteo, NASA FIRMS, USGS"); });
 
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer");
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, OpenWeather");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -1557,16 +1556,16 @@
             btnLluvia.classList.add("active");
             mapTitle.innerText = "🌧 Radar de Lluvia sobre Mapa";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: RainViewer Weather API");
+            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: IEM Nexrad");
         } else if (tipo === 'satelite') {
             await inicializarCapasEspeciales();
             if (capaSateliteGOES && !mapInstance.hasLayer(capaSateliteGOES)) {
                 capaSateliteGOES.addTo(mapInstance);
             }
             if (btnSatinfra) btnSatinfra.classList.add("active");
-            mapTitle.innerText = "🛰️ Nubosidad GOES sobre Mapa";
+            mapTitle.innerText = "🛰️️ Nubosidad en Vivo";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Satélite GOES", "#38bdf8", "Fuente: GOES / RainViewer Infrared Satellite");
+            actualizarIndicadorMapa("Capa Nubes", "#38bdf8", "Fuente: OpenWeatherMap Clouds");
         }
     }
 
@@ -1973,15 +1972,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const btnCampana = document.getElementById("btnCampanaNotif");
         if (btnCampana) btnCampana.addEventListener("click", () => {
-            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y RainViewer.");
-        });
-    });
-
-    iniciarApp();
-    document.addEventListener("DOMContentLoaded", function() {
-        const btnCampana = document.getElementById("btnCampanaNotif");
-        if (btnCampana) btnCampana.addEventListener("click", () => {
-            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y RainViewer.");
+            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y OpenWeather.");
         });
         iniciarApp();
     });
