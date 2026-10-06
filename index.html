@@ -617,7 +617,7 @@
 
         @media (min-width: 500px) {
             .map-controls {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -1207,7 +1207,6 @@
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
                 <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Satélite VIIRS</button>
-                <button class="map-btn" id="btnHumedadSuelo" onclick="cambiarCapaMapa('suelo')" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e;">🌱 Humedad Suelo</button>
                 <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">📐 Dibujar Lote & Reporte</button>
             </div>
 
@@ -1261,7 +1260,6 @@
     let capaFuegosFIRMS = null;
     let capaLluviaRadar = null;
     let capaSateliteGOES = null;
-    let capaHumedadSuelo = null;
 
     let modalMapInstance = null;
     let drawnItemsModal = null;
@@ -1306,16 +1304,6 @@
                 opacity: 0.85,
                 zIndex: 500,
                 attribution: '&copy; NASA GIBS / VIIRS SNPP'
-            });
-        }
-
-        if (!capaHumedadSuelo) {
-            // Capa temática real de Open-Meteo / Servidor estándar de humedad/clima de suelo
-            capaHumedadSuelo = L.tileLayer('https://tile.openweathermap.org/map/soil_temp_new/{z}/{x}/{y}.png?appid=temp', {
-                tileSize: 256,
-                opacity: 0.6,
-                zIndex: 500,
-                attribution: '&copy; Open-Meteo & Servidores Climáticos Globales'
             });
         }
     }
@@ -1531,7 +1519,6 @@
         const btnFuego = document.getElementById("btnFuego");
         const btnLluvia = document.getElementById("btnLluvia");
         const btnSatinfra = document.getElementById("btnSatinfra");
-        const btnHumedadSuelo = document.getElementById("btnHumedadSuelo");
         const mapTitle = document.getElementById("mapTitle");
         const contenedorMapaDiv = document.getElementById("mapaArgentina");
 
@@ -1543,12 +1530,10 @@
         btnFuego.classList.remove("active");
         btnLluvia.classList.remove("active");
         if (btnSatinfra) btnSatinfra.classList.remove("active");
-        if (btnHumedadSuelo) btnHumedadSuelo.classList.remove("active");
 
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
-        if (capaHumedadSuelo && mapInstance.hasLayer(capaHumedadSuelo)) mapInstance.removeLayer(capaHumedadSuelo);
 
         if (!capaActual) {
             capaActual = capasBase.base;
@@ -1600,15 +1585,6 @@
             mapTitle.innerText = "🛰️ Satélite NASA VIIRS";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
             actualizarIndicadorMapa("Capa Satélite NASA", "#38bdf8", "Fuente: NASA GIBS / VIIRS SNPP");
-        } else if (tipo === 'suelo') {
-            await inicializarCapasEspeciales();
-            if (capaHumedadSuelo && !mapInstance.hasLayer(capaHumedadSuelo)) {
-                capaHumedadSuelo.addTo(mapInstance);
-            }
-            if (btnHumedadSuelo) btnHumedadSuelo.classList.add("active");
-            mapTitle.innerText = "🌱 Humedad y Temperatura de Suelo";
-            contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Suelo Activa", "#22c55e", "Fuente: Open-Meteo & Servidores Climáticos");
         }
     }
 
@@ -1716,7 +1692,6 @@
         const lblRiesgo = document.getElementById("riesgoHelada");
         if (!card) return;
 
-        // Cálculo termodinámico real de temperatura de rocío aproximada
         let td = tMin - ((100 - humedadRelativa) / 5);
 
         if (tMin <= 3.0) {
