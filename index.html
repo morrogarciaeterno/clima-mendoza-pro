@@ -1270,44 +1270,26 @@
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
-    async function inicializarCapasEspeciales() {
+   async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
-            try {
-                const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-                const data = await res.json();
-                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-                    const latestTime = data.radar.past[data.radar.past.length - 1].time;
-                    capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        tileSize: 256,
-                        opacity: 0.75,
-                        transparent: true,
-                        attribution: '&copy; RainViewer Radar'
-                    });
-                }
-            } catch (e) {
-                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t2/256/{z}/{x}/{y}/2/1_1.png', { opacity: 0.75, transparent: true });
-            }
+            capaLluviaRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
+                tileSize: 256,
+                opacity: 0.75,
+                zIndex: 500,
+                attribution: '&copy; IEM Nexrad Radar'
+            });
         }
 
         if (!capaSateliteGOES) {
-            try {
-                const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-                const data = await res.json();
-                if (data && data.satellite && data.satellite.infrared && data.satellite.infrared.length > 0) {
-                    const latestSatTime = data.satellite.infrared[data.satellite.infrared.length - 1].time;
-                    capaSateliteGOES = L.tileLayer(`https://tile.rainviewer.com/v2/satellite/${latestSatTime}/256/{z}/{x}/{y}/0/1_1.png`, {
-                        tileSize: 256,
-                        opacity: 0.8,
-                        transparent: true,
-                        attribution: '&copy; GOES / RainViewer Satellite IR'
-                    });
-                }
-            } catch(e) {
-                capaSateliteGOES = L.tileLayer('https://tile.rainviewer.com/v2/satellite/nowcast_t2/256/{z}/{x}/{y}/0/1_1.png', { opacity: 0.8, transparent: true });
-            }
+            capaSateliteGOES = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2026-09-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
+                tileSize: 256,
+                maxZoom: 9,
+                opacity: 0.8,
+                zIndex: 500,
+                attribution: '&copy; NASA GIBS / VIIRS'
+            });
         }
     }
-
     function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
