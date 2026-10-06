@@ -552,7 +552,11 @@
             background-color: #070a14 !important;
         }
 
-        .leaflet-layer,
+        /* FILTRO OSCURO SOLO PARA EL MAPA BASE, LIBRE PARA SATÉLITE Y RADAR */
+        .leaflet-base-layer {
+            filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
+        }
+
         .leaflet-control-zoom,
         .leaflet-control-attribution {
             filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
@@ -562,7 +566,8 @@
         .leaflet-popup,
         .map-status-pill,
         .leaflet-draw,
-        .modal-overlay {
+        .modal-overlay,
+        .leaflet-overlay-pane img {
             filter: none !important;
         }
 
@@ -1060,7 +1065,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀️️</span>
+                        <span style="font-size: 1.2rem;">☀</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Radiación</small>
                         <strong id="radiacionSolar" style="font-size: 0.85rem; color: var(--text-main);">-- W/m²</strong>
                     </div>
@@ -1079,7 +1084,7 @@
                 <div class="grid-agricola">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌧️️</span>
+                        <span style="font-size: 1.2rem;">🌧</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Prob. Lluvia</small>
                         <strong id="probLluvia" style="font-size: 0.85rem; color: var(--text-main);">--%</strong>
                     </div>
@@ -1252,9 +1257,9 @@
     const listaCultivosDisponibles = ["Vid", "Cebolla", "Ajo", "Olivo", "Tomate", "Frutales (Manz/Pera/Cerez)", "Extensivos (Maíz/Soja)"];
 
     const capasBase = {
-        base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap', subdomains: 'abc' }),
-        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap', subdomains: 'abc' }),
-        calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
+        base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap', subdomains: 'abc', className: 'leaflet-base-layer' }),
+        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap', subdomains: 'abc', className: 'leaflet-base-layer' }),
+        calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri', className: 'leaflet-base-layer' })
     };
 
     function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer") {
@@ -1285,7 +1290,6 @@
         }
 
         if (!capaSateliteGOES) {
-            // Capa satelital / infrarroja en tiempo real (RainViewer Satellite IR / NOAA composite)
             try {
                 const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
                 const data = await res.json();
@@ -1293,12 +1297,12 @@
                     const latestSatTime = data.satellite.infrared[data.satellite.infrared.length - 1].time;
                     capaSateliteGOES = L.tileLayer(`https://tile.rainviewer.com/v2/satellite/${latestSatTime}/256/{z}/{x}/{y}/1/1_1.png`, {
                         tileSize: 256,
-                        opacity: 0.65,
+                        opacity: 0.75,
                         attribution: '&copy; GOES / RainViewer Satellite IR'
                     });
                 }
             } catch(e) {
-                capaSateliteGOES = L.tileLayer('https://tile.rainviewer.com/v2/satellite/nowcast_t2/256/{z}/{x}/{y}/1/1_1.png', { opacity: 0.65 });
+                capaSateliteGOES = L.tileLayer('https://tile.rainviewer.com/v2/satellite/nowcast_t2/256/{z}/{x}/{y}/1/1_1.png', { opacity: 0.75 });
             }
         }
     }
