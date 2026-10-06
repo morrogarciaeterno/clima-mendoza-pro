@@ -244,20 +244,13 @@
 
         @media (min-width: 768px) {
             .dashboard-row {
-                grid-template-columns: 2fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
             }
-        }
-
-        .sismos-container-block {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            min-width: 0;
         }
 
         .sismos-table-wrapper {
             width: 100%;
-            max-height: 180px;
+            max-height: 220px;
             overflow-y: auto;
             touch-action: pan-y;
             margin-top: 8px;
@@ -278,12 +271,12 @@
             top: 0;
             background-color: #374151;
             color: #d1d5db;
-            padding: 6px 4px;
+            padding: 8px 6px;
             font-weight: 700;
         }
 
         .tabla-sismos td {
-            padding: 6px 4px;
+            padding: 8px 6px;
             border-bottom: 1px solid var(--border);
             color: var(--text-main);
         }
@@ -974,7 +967,7 @@
     <div class="header-content">
         <div class="brand">
             <h1>🛰 AgroTech Argentina</h1>
-            <p id="ubicacionTexto">Obteniendo GPS...</p>
+            <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Obteniendo localidad...</p>
         </div>
 
         <div class="header-right">
@@ -999,7 +992,7 @@
     <!-- 🚨 PANEL DE ALERTA MUNICIPAL DE CONTINGENCIAS -->
     <div class="card" id="contingenciaAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #111827 0%, #1f1118 100%);">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <span id="contingenciaIcono" style="font-size: 2.2rem; flex-shrink: 0;">❄️⚠️</span>
+            <span id="contingenciaIcono" style="font-size: 2.2rem; flex-shrink: 0;">❄️⚠</span>
             <div style="min-width: 0; flex-grow: 1;">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                     <span id="contingenciaBadge" style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase;">Alerta Oficial Municipal</span>
@@ -1130,24 +1123,6 @@
 
     <div class="card">
         <div class="dashboard-row">
-            <div class="sismos-container-block">
-                <h3>🌋 Últimos Sismos (USGS)</h3>
-                <div class="sismos-table-wrapper">
-                    <table class="tabla-sismos">
-                        <thead>
-                        <tr>
-                            <th>Fecha/Hora</th>
-                            <th>Mag</th>
-                            <th>Ubicación</th>
-                        </tr>
-                        </thead>
-                        <tbody id="sismosLista">
-                        <tr><td colspan="3">Cargando sismos...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <div class="solar-container">
                 <h3 style="width:100%; text-align:center;">🌅 Ciclo Solar</h3>
                 <div class="solar-arc">
@@ -1172,93 +1147,22 @@
 
     <br>
 
-    <!-- ESTADO DE EMBALSES & RECURSOS HÍDRICOS -->
+    <!-- 🌋 ÚLTIMOS SISMOS (USGS) -->
     <div class="card">
-        <h3 id="embalsesTitulo">💧 Estado de Embalses & Hídricos</h3>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;" id="embalsesSubtitulo">
-            Monitoreo adaptado según GPS.
-        </p>
-        <div class="embalses-grid" id="embalsesContainer">
-            <!-- Se carga dinámicamente -->
-        </div>
-    </div>
-
-    <br>
-
-    <!-- 🌊 RED DE COLECTORES ALUVIONALES AMPLIADA (GRAN MENDOZA) -->
-    <div class="card">
-        <h3 id="caucesTitulo">🌊 Red de Colectores Aluvionales (Gran Mendoza)</h3>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;" id="caucesSubtitulo">
-            Monitoreo en tiempo real de canales, zanjones y colectores del sistema pedemontano.
-        </p>
-        <div class="embalses-grid" id="caucesContainer">
-            <!-- Se carga dinámicamente -->
-        </div>
-    </div>
-
-    <br>
-
-    <!-- ESTADO DE PASOS FRONTERIZOS FEDERALES -->
-    <div class="card">
-        <h3>🏔 Estado de Pasos Fronterizos</h3>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
-            Monitoreo en tiempo real cordillerano.
-        </p>
-        <div class="pasos-grid" id="pasosFronterizosContainer">
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Cristo Redentor</span>
-                        <span class="paso-estado estado-abierto" id="pasoCristo">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Mendoza / Chile</span>
-                </div>
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;" id="tempCristo">Las Cuevas: --°C</div>
-            </div>
-
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Paso Pehuenche</span>
-                        <span class="paso-estado estado-abierto" id="pasoPehuenche">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Malargüe, Mendoza</span>
-                </div>
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;" id="tempPehuenche">Zona Sur: --°C</div>
-            </div>
-
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">San Francisco</span>
-                        <span class="paso-estado estado-abierto" id="pasoSanFran">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Catamarca / Chile</span>
-                </div>
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Alta Cordillera Norte</div>
-            </div>
-
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Paso de Jama</span>
-                        <span class="paso-estado estado-abierto" id="pasoJama">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Jujuy / Chile</span>
-                </div>
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Puna de Atacama</div>
-            </div>
-
-            <div class="paso-card">
-                <div>
-                    <div class="paso-header">
-                        <span class="paso-nombre">Cardenal Samoré</span>
-                        <span class="paso-estado estado-abierto" id="pasoSamore">Habilitado</span>
-                    </div>
-                    <span class="paso-provincia">Neuquén / Chile</span>
-                </div>
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Patagonia Norte</div>
-            </div>
+        <h3>🌋 Últimos Sismos (USGS)</h3>
+        <div class="sismos-table-wrapper">
+            <table class="tabla-sismos">
+                <thead>
+                <tr>
+                    <th style="width: 30%;">Fecha y Hora</th>
+                    <th style="width: 15%;">Mag</th>
+                    <th style="width: 55%; text-align: left; padding-left: 12px;">Ubicación</th>
+                </tr>
+                </thead>
+                <tbody id="sismosLista">
+                <tr><td colspan="3">Cargando sismos...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -1429,7 +1333,7 @@
             <div class="map-controls">
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
                 <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰ Topo</button>
-                <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣️ Calles</button>
+                <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣 Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego</button>
                 <button class="map-btn" id="btnPlagas" onclick="toggleCapaPlagas()" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171;">🌱 Plagas</button>
@@ -1443,6 +1347,145 @@
                     <span id="mapStatusText">Visor listo (Operativo)</span>
                 </div>
                 <div id="mapaArgentina"></div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- 🏔 LOGÍSTICA CORDILLERANA: PASOS FRONTERIZOS & RUTAS (MOVIDO AQUÍ ABAJO) -->
+    <div class="card">
+        <h3>🏔️ Logística Cordillerana & Rutas</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
+            Estado de pasos fronterizos y corredores viales principales.
+        </p>
+        <div class="pasos-grid" id="pasosFronterizosContainer">
+            <!-- Pasos -->
+            <div class="paso-card">
+                <div>
+                    <div class="paso-header">
+                        <span class="paso-nombre">Cristo Redentor</span>
+                        <span class="paso-estado estado-abierto" id="pasoCristo">Habilitado</span>
+                    </div>
+                    <span class="paso-provincia">Mendoza / Chile</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;" id="tempCristo">Las Cuevas: --°C</div>
+            </div>
+
+            <div class="paso-card">
+                <div>
+                    <div class="paso-header">
+                        <span class="paso-nombre">Paso Pehuenche</span>
+                        <span class="paso-estado estado-abierto" id="pasoPehuenche">Habilitado</span>
+                    </div>
+                    <span class="paso-provincia">Malargüe, Mendoza</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;" id="tempPehuenche">Zona Sur: --°C</div>
+            </div>
+
+            <div class="paso-card">
+                <div>
+                    <div class="paso-header">
+                        <span class="paso-nombre">San Francisco</span>
+                        <span class="paso-estado estado-abierto" id="pasoSanFran">Habilitado</span>
+                    </div>
+                    <span class="paso-provincia">Catamarca / Chile</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Alta Cordillera Norte</div>
+            </div>
+
+            <!-- Rutas -->
+            <div class="paso-card">
+                <div>
+                    <div class="paso-header">
+                        <span class="paso-nombre">Ruta Nacional 7</span>
+                        <span class="paso-estado estado-abierto" id="ruta7Estado">Transitable</span>
+                    </div>
+                    <span class="paso-provincia">Corredor Cuyo / Mendoza</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Precaución en Alta Montaña</div>
+            </div>
+
+            <div class="paso-card">
+                <div>
+                    <div class="paso-header">
+                        <span class="paso-nombre">Ruta Nacional 40</span>
+                        <span class="paso-estado estado-abierto" id="ruta40Estado">Transitable</span>
+                    </div>
+                    <span class="paso-provincia">Norte - Sur (Mendoza)</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Tránsito fluido y normal</div>
+            </div>
+
+            <div class="paso-card">
+                <div>
+                    <div class="paso-header">
+                        <span class="paso-nombre">Acceso Sur (RN 40)</span>
+                        <span class="paso-estado estado-abierto" id="accesoSurEstado">Normal</span>
+                    </div>
+                    <span class="paso-provincia">Gran Mendoza</span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Sin demoras reportadas</div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- 🌊 SECCIÓN HÍDRICA Y AMBIENTAL AVANZADA -->
+    
+    <!-- 1. Estado de Embalses -->
+    <div class="card">
+        <h3 id="embalsesTitulo">💧 Estado de Embalses & Reservas Hídricas</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;" id="embalsesSubtitulo">
+            Monitoreo adaptado según GPS.
+        </p>
+        <div class="embalses-grid" id="embalsesContainer"></div>
+    </div>
+
+    <br>
+
+    <!-- 2. Red de Colectores Aluvionales -->
+    <div class="card">
+        <h3 id="caucesTitulo">🌊 Red de Colectores Aluvionales & Zanjones</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;" id="caucesSubtitulo">
+            Monitoreo en tiempo real de caudales principales del sistema pedemontano.
+        </p>
+        <div class="embalses-grid" id="caucesContainer"></div>
+    </div>
+
+    <br>
+
+    <!-- 3. Variables Hídricas y Ambientales Avanzadas -->
+    <div class="card">
+        <h3 style="color: var(--accent);">🏔️ Variables Avanzadas de Cuenca & Alta Montaña</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 8px;">
+            Monitoreo nival, turbidez, canales secundarios y estabilidad de taludes.
+        </p>
+        <div class="embalses-grid">
+            <div class="embalse-card">
+                <span class="embalse-nombre">❄️ Acumulación Nival (SWE)</span>
+                <span class="embalse-nivel" id="varNieve">340 mm</span>
+                <div class="progress-bar"><div class="progress-fill" style="width: 72%;"></div></div>
+                <span class="embalse-estado optimal">Reserva Normal</span>
+            </div>
+            <div class="embalse-card">
+                <span class="embalse-nombre">🧪 Turbidez del Agua</span>
+                <span class="embalse-nivel" id="varTurbidez">4.2 NTU</span>
+                <div class="progress-bar"><div class="progress-fill" style="width: 25%; background: #22c55e;"></div></div>
+                <span class="embalse-estado optimal">Agua Clara</span>
+            </div>
+            <div class="embalse-card">
+                <span class="embalse-nombre">💧 Canales & Hijuelas</span>
+                <span class="embalse-nivel" id="varHijuelas">8.5 m³/s</span>
+                <div class="progress-bar"><div class="progress-fill" style="width: 55%;"></div></div>
+                <span class="embalse-estado optimal">Distribución OK</span>
+            </div>
+            <div class="embalse-card">
+                <span class="embalse-nombre">⚠️ Taludes del Pedemonte</span>
+                <span class="embalse-nivel" id="varTaludes">Estable</span>
+                <div class="progress-bar"><div class="progress-fill" style="width: 15%; background: #22c55e;"></div></div>
+                <span class="embalse-estado optimal">Sin Riesgo</span>
             </div>
         </div>
     </div>
@@ -1580,7 +1623,6 @@
         ]
     };
 
-    // 🌊 RED ALUVIONAL COMPLETA DEL GRAN MENDOZA Y ZONAS
     const caucesPorProvincia = {
         "Mendoza": [
             { nombre: "Zanjón de los Ciruelos", caudal: "12.0 m³/s", pct: 45, estado: "Estable", clase: "optimal" },
@@ -1636,7 +1678,7 @@
         if (!contenedor) return;
 
         let listaCauces = caucesPorProvincia[provincia] || caucesPorProvincia["Mendoza"];
-        if (subtitulo) subtitulo.innerText = `Monitoreo de caudal y colectores aluvionales (${provincia || 'Cuyo'})`;
+        if (subtitulo) subtitulo.innerText = `Monitoreo en tiempo real de canales, zanjones y colectores (${provincia || 'Cuyo'})`;
 
         contenedor.innerHTML = "";
         listaCauces.forEach(c => {
@@ -1658,7 +1700,7 @@
         }
         Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
-                new Notification("🛰️ AgroTech Municipio - Alerta Oficial", {
+                new Notification("🛰 AgroTech Municipio - Alerta Oficial", {
                     body: "¡Protocolo de Helada Activo! Aviso enviado a productores de la zona.",
                     icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
                 });
@@ -2072,10 +2114,28 @@
     }
 
     function centrarUbicacion() {
-        if (mapInstance) {
-            mapInstance.setView([currentLat, currentLon], 15);
-            if (markerInstance) markerInstance.openPopup();
-            actualizarIndicadorMapa("Centrado en GPS", "#22c55e");
+        if (navigator.geolocation) {
+            actualizarIndicadorMapa("Solicitando GPS...", "#facc15");
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    currentLat = pos.coords.latitude;
+                    currentLon = pos.coords.longitude;
+                    await procesarUbicacionExitosa(currentLat, currentLon);
+                    if (mapInstance) {
+                        mapInstance.setView([currentLat, currentLon], 15);
+                        if (markerInstance) markerInstance.openPopup();
+                    }
+                    actualizarIndicadorMapa("Ubicación GPS actualizada", "#22c55e");
+                },
+                (error) => {
+                    console.warn("GPS denegado o no disponible:", error.message);
+                    actualizarIndicadorMapa("GPS no disponible, usando defecto", "#ef4444");
+                    usarUbicacionPorDefecto();
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        } else {
+            alert("La geolocalización no está soportada en este navegador.");
         }
     }
 
@@ -2154,7 +2214,7 @@
             card.style.display = "block";
             espaciador.style.display = "block";
             card.classList.add("alerta-activa-animacion");
-            icono.innerText = "❄️⚠";
+            icono.innerText = "❄️⚠️";
             badge.style.background = minTemp <= 0 ? "#ef4444" : "#f59e0b";
             badge.innerText = minTemp <= 0 ? "Alerta Roja - Helada Severa" : "Alerta Amarilla - Helada Moderada";
             titulo.innerText = `Riesgo de Helada (${minTemp}°C mínimos)`;
@@ -2194,7 +2254,7 @@
     function iconoClima(codigo) {
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
-        if (codigo === 3) return "☁️";
+        if (codigo === 3) return "☁";
         if (codigo <= 67) return "🌧";
         if (codigo >= 95) return "⛈";
         return "⛈️";
@@ -2303,11 +2363,13 @@
                 lista.innerHTML = "";
                 data.features.slice(0, 10).forEach(s => {
                     let p = s.properties;
-                    let f = new Date(p.time).toLocaleTimeString("es-AR", {hour: '2-digit', minute:'2-digit'});
+                    let fechaObj = new Date(p.time);
+                    let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                    let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit' });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
                     let lugar = p.place || "";
                     let arg = lugar.toUpperCase().includes("ARGENTINA") || lugar.toUpperCase().includes("MENDOZA");
-                    lista.innerHTML += `<tr><td>${f}</td><td class="${arg?'sismo-mendoza':'sismo-normal'}">${mag}</td><td style="text-align:left">${lugar}</td></tr>`;
+                    lista.innerHTML += `<tr><td>${fechaStr} - ${horaStr}</td><td class="${arg?'sismo-mendoza':'sismo-normal'}">${mag}</td><td style="text-align:left; padding-left: 12px;">${lugar}</td></tr>`;
                 });
             } else {
                 lista.innerHTML = `<tr><td colspan="3">Sin sismos recientes</td></tr>`;
@@ -2415,6 +2477,48 @@
         verificarProximidadIncendios(currentLat, currentLon);
     }
 
+    async function procesarUbicacionExitosa(lat, lon) {
+        currentLat = lat;
+        currentLon = lon;
+        let nombreLugar = "Ubicación GPS";
+        let prov = "Mendoza";
+        try {
+            const res = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=10`)).json();
+            if (res && res.address) {
+                let ciudad = res.address.city || res.address.town || res.address.village || res.address.suburb || "";
+                prov = res.address.state || "Mendoza";
+                if (ciudad) {
+                    nombreLugar = `${ciudad}, ${prov}`;
+                } else {
+                    nombreLugar = prov;
+                }
+            }
+        } catch(e) {
+            nombreLugar = "Mendoza, Argentina";
+        }
+
+        if (prov.toLowerCase().includes("san juan")) prov = "San Juan";
+        else if (prov.toLowerCase().includes("córdoba")) prov = "Córdoba";
+        else if (prov.toLowerCase().includes("neuquén")) prov = "Neuquén";
+        else prov = "Mendoza";
+
+        actualizarEmbalsesSegunUbicacion(prov);
+        actualizarCaucesSegunUbicacion(prov);
+        document.getElementById("ubicacionTexto").innerText = nombreLugar;
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
+    }
+
+    function usarUbicacionPorDefecto() {
+        currentLat = -32.92;
+        currentLon = -68.84;
+        document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+        actualizarEmbalsesSegunUbicacion("Mendoza");
+        actualizarCaucesSegunUbicacion("Mendoza");
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
+    }
+
     function iniciarApp() {
         actualizarFechaYHoraDigital();
         calcularFaseLunar();
@@ -2422,43 +2526,16 @@
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
-                    currentLat = pos.coords.latitude;
-                    currentLon = pos.coords.longitude;
-                    let nombreLugar = "Godoy Cruz, Mendoza";
-                    let prov = "Mendoza";
-                    try {
-                        const res = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=10`)).json();
-                        if (res && res.address) {
-                            let ciudad = res.address.city || res.address.town || res.address.village || "";
-                            prov = res.address.state || "Mendoza";
-                            if (ciudad) nombreLugar = ciudad;
-                        }
-                    } catch(e) {}
-
-                    if (prov.toLowerCase().includes("san juan")) prov = "San Juan";
-                    else if (prov.toLowerCase().includes("córdoba")) prov = "Córdoba";
-                    else if (prov.toLowerCase().includes("neuquén")) prov = "Neuquén";
-                    else prov = "Mendoza";
-
-                    actualizarEmbalsesSegunUbicacion(prov);
-                    actualizarCaucesSegunUbicacion(prov);
-                    document.getElementById("ubicacionTexto").innerText = nombreLugar;
-                    inicializarMapaArgentina(currentLat, currentLon);
-                    dispararCargaDeDatos();
+                    await procesarUbicacionExitosa(pos.coords.latitude, pos.coords.longitude);
                 },
-                () => {
-                    actualizarEmbalsesSegunUbicacion("Mendoza");
-                    actualizarCaucesSegunUbicacion("Mendoza");
-                    inicializarMapaArgentina(currentLat, currentLon);
-                    dispararCargaDeDatos();
+                (error) => {
+                    console.warn("Geolocalización automática denegada o bloqueada:", error.message);
+                    usarUbicacionPorDefecto();
                 },
-                { enableHighAccuracy: true, timeout: 10000 }
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
         } else {
-            actualizarEmbalsesSegunUbicacion("Mendoza");
-            actualizarCaucesSegunUbicacion("Mendoza");
-            inicializarMapaArgentina(currentLat, currentLon);
-            dispararCargaDeDatos();
+            usarUbicacionPorDefecto();
         }
     }
 
