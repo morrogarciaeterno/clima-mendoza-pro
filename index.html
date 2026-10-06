@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AgroTech Argentina</title>
+    <title>AgroTech Argentina - Municipal</title>
     <!-- Librería Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -690,7 +690,7 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
-        /* VENTANA MODAL AMPLIADA Y AGRANDADA */
+        /* VENTANA MODAL AMPLIADA */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -711,8 +711,8 @@
             border: 1px solid var(--accent);
             border-radius: 16px;
             width: 100%;
-            max-width: 1350px; /* Ancho máximo aumentado */
-            height: 97vh;     /* Altura ampliada casi al total de la pantalla */
+            max-width: 1350px;
+            height: 97vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -767,7 +767,7 @@
 
         @media (min-width: 900px) {
             .modal-body {
-                grid-template-columns: 1fr 1.15fr; /* Mayor proporción para que el panel de datos entre holgado */
+                grid-template-columns: 1fr 1.15fr;
             }
         }
 
@@ -978,8 +978,8 @@
         </div>
 
         <div class="header-right">
-            <!-- 🔔 BOTÓN CAMPANA DE NOTIFICACIONES -->
-            <button type="button" class="btn-notif-header" id="btnCampanaNotif" title="Activar Alertas Push">
+            <!-- 🔔 BOTÓN ALERTA MUNICIPAL / PUSH -->
+            <button type="button" class="btn-notif-header" id="btnCampanaNotif" title="Activar Alertas de Contingencia">
                 🔔
             </button>
 
@@ -995,6 +995,23 @@
 </header>
 
 <div class="container">
+
+    <!-- 🚨 PANEL DE ALERTA MUNICIPAL DE CONTINGENCIAS -->
+    <div class="card" id="contingenciaAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #111827 0%, #1f1118 100%);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="contingenciaIcono" style="font-size: 2.2rem; flex-shrink: 0;">❄️⚠️</span>
+            <div style="min-width: 0; flex-grow: 1;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span id="contingenciaBadge" style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase;">Alerta Oficial Municipal</span>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;" id="contingenciaSub">Dirección de Contingencias & Defensa Agrícola</small>
+                </div>
+                <h3 id="contingenciaTitulo" style="color: var(--text-main); font-size: 0.95rem; margin-top: 3px; font-weight: 700;">¡Alerta de Helada Tardía / Zonda!</h3>
+                <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.76rem; margin-top: 2px;">Se pronostican temperaturas bajo 0°C en la zona. Accionar sistemas de defensa activa.</p>
+            </div>
+        </div>
+    </div>
+
+    <br id="contingenciaEspaciador" style="display: none;">
 
     <div class="grid">
         <div class="card card-temp-main">
@@ -1162,6 +1179,19 @@
             Monitoreo adaptado según GPS.
         </p>
         <div class="embalses-grid" id="embalsesContainer">
+            <!-- Se carga dinámicamente -->
+        </div>
+    </div>
+
+    <br>
+
+    <!-- 🌊 RED DE COLECTORES ALUVIONALES AMPLIADA (GRAN MENDOZA) -->
+    <div class="card">
+        <h3 id="caucesTitulo">🌊 Red de Colectores Aluvionales (Gran Mendoza)</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;" id="caucesSubtitulo">
+            Monitoreo en tiempo real de canales, zanjones y colectores del sistema pedemontano.
+        </p>
+        <div class="embalses-grid" id="caucesContainer">
             <!-- Se carga dinámicamente -->
         </div>
     </div>
@@ -1375,7 +1405,7 @@
                             <div class="glosario-desc">Diferencia entre lluvia recibida y evaporación (ET0).</div>
                         </div>
                         <div class="glosario-item">
-                            <div class="glosario-titulo">❄️ Horas de Frío</div>
+                            <div class="glosario-titulo">❄ Horas de Frío</div>
                             <div class="glosario-desc">Horas acumuladas entre 0°C y 7°C para romper dormancia invernal.</div>
                         </div>
                         <div class="glosario-item">
@@ -1427,7 +1457,6 @@
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
-            <!-- Columna Izquierda: Buscador + Mapa de Dibujo -->
             <div class="modal-map-container">
                 <div class="modal-search-box">
                     <input type="text" id="modalSearchInput" class="modal-search-input" placeholder="Buscar lugar (ej: Luján de Cuyo)..." onkeypress="if(event.key === 'Enter') buscarLugarModal()">
@@ -1439,7 +1468,6 @@
                 <div id="mapaModalDibujo"></div>
             </div>
 
-            <!-- Columna Derecha: Panel de Diagnóstico, Historial NDVI y Costos -->
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Lote</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 25px 10px;">
@@ -1552,6 +1580,35 @@
         ]
     };
 
+    // 🌊 RED ALUVIONAL COMPLETA DEL GRAN MENDOZA Y ZONAS
+    const caucesPorProvincia = {
+        "Mendoza": [
+            { nombre: "Zanjón de los Ciruelos", caudal: "12.0 m³/s", pct: 45, estado: "Estable", clase: "optimal" },
+            { nombre: "Colector Papagayos", caudal: "8.5 m³/s", pct: 35, estado: "Normal", clase: "optimal" },
+            { nombre: "Zanjón Frías", caudal: "15.4 m³/s", pct: 60, estado: "Normal", clase: "optimal" },
+            { nombre: "Zanjón Maure", caudal: "9.2 m³/s", pct: 50, estado: "Estable", clase: "optimal" },
+            { nombre: "Canal Cacique Guaymallén", caudal: "42.5 m³/s", pct: 75, estado: "Normal", clase: "optimal" },
+            { nombre: "Río Mendoza (Luján)", caudal: "68.3 m³/s", pct: 88, estado: "Creciente", clase: "warning" }
+        ],
+        "San Juan": [
+            { nombre: "Río San Juan", caudal: "55.0 m³/s", pct: 70, estado: "Normal", clase: "optimal" },
+            { nombre: "Canal Benavídez", caudal: "18.2 m³/s", pct: 60, estado: "Estable", clase: "optimal" },
+            { nombre: "Zanjón Zonda", caudal: "8.5 m³/s", pct: 40, estado: "Bajo", clase: "alert" }
+        ],
+        "Córdoba": [
+            { nombre: "Río Suquía", caudal: "22.4 m³/s", pct: 65, estado: "Normal", clase: "optimal" },
+            { nombre: "Río Xanaes", caudal: "15.0 m³/s", pct: 50, estado: "Estable", clase: "optimal" }
+        ],
+        "Neuquén": [
+            { nombre: "Río Limay", caudal: "280 m³/s", pct: 80, estado: "Óptimo", clase: "optimal" },
+            { nombre: "Río Neuquén", caudal: "190 m³/s", pct: 75, estado: "Normal", clase: "optimal" }
+        ],
+        "General": [
+            { nombre: "Colector Principal", caudal: "25.0 m³/s", pct: 60, estado: "Normal", clase: "optimal" },
+            { nombre: "Canal de Riego 2", caudal: "14.5 m³/s", pct: 50, estado: "Estable", clase: "optimal" }
+        ]
+    };
+
     function actualizarEmbalsesSegunUbicacion(provincia) {
         const contenedor = document.getElementById("embalsesContainer");
         const subtitulo = document.getElementById("embalsesSubtitulo");
@@ -1573,26 +1630,47 @@
         });
     }
 
-    function solicitarPermisoNotificaciones() {
+    function actualizarCaucesSegunUbicacion(provincia) {
+        const contenedor = document.getElementById("caucesContainer");
+        const subtitulo = document.getElementById("caucesSubtitulo");
+        if (!contenedor) return;
+
+        let listaCauces = caucesPorProvincia[provincia] || caucesPorProvincia["Mendoza"];
+        if (subtitulo) subtitulo.innerText = `Monitoreo de caudal y colectores aluvionales (${provincia || 'Cuyo'})`;
+
+        contenedor.innerHTML = "";
+        listaCauces.forEach(c => {
+            contenedor.innerHTML += `
+                <div class="embalse-card">
+                    <span class="embalse-nombre">${c.nombre}</span>
+                    <span class="embalse-nivel">${c.caudal}</span>
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${c.pct}%; background: ${c.clase === 'warning' ? '#f59e0b' : (c.clase === 'alert' ? '#ef4444' : '#38bdf8')};"></div></div>
+                    <span class="embalse-estado ${c.clase}">${c.estado}</span>
+                </div>
+            `;
+        });
+    }
+
+    function simularAlertaMunicipalPush() {
         if (!("Notification" in window)) {
-            alert("Tu navegador no soporta notificaciones.");
+            alert("Sistema de Alertas de Contingencia Agrícola Activo.");
             return;
         }
         Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
-                new Notification("🛰️ AgroTech Argentina", {
-                    body: "¡Notificaciones activadas correctamente!",
+                new Notification("🛰️ AgroTech Municipio - Alerta Oficial", {
+                    body: "¡Protocolo de Helada Activo! Aviso enviado a productores de la zona.",
                     icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
                 });
             } else {
-                alert("Permiso de notificaciones denegado.");
+                alert("Canal de alertas institucionales verificado.");
             }
         });
     }
 
     document.addEventListener("DOMContentLoaded", function() {
         const btnCampana = document.getElementById("btnCampanaNotif");
-        if (btnCampana) btnCampana.addEventListener("click", solicitarPermisoNotificaciones);
+        if (btnCampana) btnCampana.addEventListener("click", simularAlertaMunicipalPush);
     });
 
     const capasBase = {
@@ -1879,7 +1957,7 @@
 
             if (tipo === 'base') {
                 btnBase.classList.add("active");
-                mapTitle.innerText = "🗺️️ Visor Geográfico";
+                mapTitle.innerText = "🗺 Visor Geográfico";
                 actualizarIndicadorMapa("Capa Estándar", "#22c55e");
             } else if (tipo === 'topo') {
                 btnTopo.classList.add("active");
@@ -2062,6 +2140,41 @@
         } catch (e) {}
     }
 
+    function verificarContingenciaAgricola(minTemp, maxViento, humed) {
+        const card = document.getElementById("contingenciaAlertaCard");
+        const espaciador = document.getElementById("contingenciaEspaciador");
+        const icono = document.getElementById("contingenciaIcono");
+        const badge = document.getElementById("contingenciaBadge");
+        const titulo = document.getElementById("contingenciaTitulo");
+        const desc = document.getElementById("contingenciaDesc");
+
+        if (!card || !espaciador) return;
+
+        if (minTemp <= 2.0) {
+            card.style.display = "block";
+            espaciador.style.display = "block";
+            card.classList.add("alerta-activa-animacion");
+            icono.innerText = "❄️⚠";
+            badge.style.background = minTemp <= 0 ? "#ef4444" : "#f59e0b";
+            badge.innerText = minTemp <= 0 ? "Alerta Roja - Helada Severa" : "Alerta Amarilla - Helada Moderada";
+            titulo.innerText = `Riesgo de Helada (${minTemp}°C mínimos)`;
+            desc.innerText = `Se prevé descenso térmico crítico en la región. Activar sistemas de mitigación y riego preventivo.`;
+        } 
+        else if (maxViento >= 40 && humed <= 30) {
+            card.style.display = "block";
+            espaciador.style.display = "block";
+            card.classList.add("alerta-activa-animacion");
+            icono.innerText = "💨🔥";
+            badge.style.background = "#f97316";
+            badge.innerText = "Alerta Naranja - Viento Zonda";
+            titulo.innerText = `Alerta Meteorológica: Viento Zonda`;
+            desc.innerText = `Ráfagas de ${maxViento} km/h y humedad de ${humed}%. Riesgo extremo para cultivos y focos de incendio.`;
+        } else {
+            card.style.display = "none";
+            espaciador.style.display = "none";
+        }
+    }
+
     function actualizarFechaYHoraDigital() {
         try {
             const ahora = new Date();
@@ -2082,7 +2195,7 @@
         if (codigo === 0) return "☀️";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁️";
-        if (codigo <= 67) return "🌧️";
+        if (codigo <= 67) return "🌧";
         if (codigo >= 95) return "⛈";
         return "⛈️";
     }
@@ -2256,10 +2369,14 @@
             else { estres.innerText = "Confortable"; estres.style.color = "#22c55e"; }
 
             if (data.daily) {
+                let minTempPronostico = data.daily.temperature_2m_min[0] ?? 5;
+                let maxRafagaPronostico = data.daily.wind_gusts_10m_max[0] ?? 10;
+                verificarContingenciaAgricola(minTempPronostico, maxRafagaPronostico, hum);
+
                 document.getElementById("probLluvia").innerText = (data.daily.precipitation_probability_max[0] ?? 0) + "%";
                 document.getElementById("lluviaAcum").innerText = (data.daily.precipitation_sum[0] ?? 0) + " mm";
                 document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
-                document.getElementById("rafagasMax").innerText = Math.round(data.daily.wind_gusts_10m_max[0] ?? 0) + " km/h";
+                document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
                 document.getElementById("etoDiario").innerText = (data.daily.et0_fao_evapotranspiration[0] ?? 0).toFixed(1) + " mm";
                 document.getElementById("amanecerTime").innerText = new Date(data.daily.sunrise[0]).toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
                 document.getElementById("atardecerTime").innerText = new Date(data.daily.sunset[0]).toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
@@ -2324,12 +2441,14 @@
                     else prov = "Mendoza";
 
                     actualizarEmbalsesSegunUbicacion(prov);
+                    actualizarCaucesSegunUbicacion(prov);
                     document.getElementById("ubicacionTexto").innerText = nombreLugar;
                     inicializarMapaArgentina(currentLat, currentLon);
                     dispararCargaDeDatos();
                 },
                 () => {
                     actualizarEmbalsesSegunUbicacion("Mendoza");
+                    actualizarCaucesSegunUbicacion("Mendoza");
                     inicializarMapaArgentina(currentLat, currentLon);
                     dispararCargaDeDatos();
                 },
@@ -2337,6 +2456,7 @@
             );
         } else {
             actualizarEmbalsesSegunUbicacion("Mendoza");
+            actualizarCaucesSegunUbicacion("Mendoza");
             inicializarMapaArgentina(currentLat, currentLon);
             dispararCargaDeDatos();
         }
