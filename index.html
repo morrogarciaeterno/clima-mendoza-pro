@@ -1996,6 +1996,20 @@
     });
 
     iniciarApp();
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnCampana = document.getElementById("btnCampanaNotif");
+        if (btnCampana) btnCampana.addEventListener("click", () => {
+            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y RainViewer.");
+        });
+        iniciarApp();
+    });
+
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        iniciarApp();
+    } else {
+        window.addEventListener("DOMContentLoaded", iniciarApp);
+    }
+
     setInterval(actualizarFechaYHoraDigital, 1000);
     setInterval(dispararCargaDeDatos, 300000);
 </script>
