@@ -574,20 +574,17 @@
             background: rgba(14, 21, 38, 0.95);
             border: 1px solid var(--accent);
             color: var(--text-main);
-            padding: 4px 10px;
+            padding: 5px 10px;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 700;
             box-shadow: 0 4px 12px rgba(0,0,0,0.6);
             display: flex;
-            align-items: center;
-            gap: 6px;
+            flex-direction: column;
+            gap: 2px;
             pointer-events: none;
             backdrop-filter: blur(4px);
             max-width: calc(100% - 24px);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .pulse-dot {
@@ -598,6 +595,7 @@
             box-shadow: 0 0 8px #22c55e;
             animation: pulseGlow 1.5s infinite;
             flex-shrink: 0;
+            display: inline-block;
         }
 
         @keyframes pulseGlow {
@@ -881,7 +879,7 @@
             <div style="min-width: 0; flex-grow: 1;">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                     <span id="contingenciaBadge" style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Oficial</span>
-                    <small style="color: var(--text-muted); font-size: 0.68rem;">Open-Meteo</small>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Open-Meteo API</small>
                 </div>
                 <h3 id="contingenciaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Alerta Climática!</h3>
                 <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Condición extrema pronosticada.</p>
@@ -891,7 +889,7 @@
 
     <div class="grid">
         <div class="card card-temp-main">
-            <h3>Temperatura</h3>
+            <h3>Temperatura (Estación Virtual)</h3>
             <div class="temp-box">
                 <div class="metric" id="temp">--</div>
                 <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="clima">
@@ -941,7 +939,7 @@
             <div style="min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                     <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Fuego</span>
-                    <small style="color: var(--text-muted); font-size: 0.68rem;">NASA FIRMS</small>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: NASA FIRMS (VIIRS/MODIS)</small>
                 </div>
                 <h3 id="fuegoAlertaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 2px; font-weight: 800;">¡Foco Activo Detectado!</h3>
                 <p id="fuegoAlertaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Calculando distancia...</p>
@@ -955,7 +953,7 @@
             <div style="min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                     <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Tormenta</span>
-                    <small style="color: var(--text-muted); font-size: 0.68rem;">En Vivo</small>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Open-Meteo Synoptic</small>
                 </div>
                 <h3 id="smnTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 2px; font-weight: 800;">Condición Inestable</h3>
                 <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Actividad eléctrica detectada.</p>
@@ -964,7 +962,7 @@
     </div>
 
     <div class="card">
-        <h3>Pronóstico Próximas 12 Horas</h3>
+        <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
     </div>
 
@@ -997,7 +995,7 @@
         <div class="card">
             <h3>🌱 Desglose de Polen & Alérgenos</h3>
             <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;">
-                Previsión oficial satelital de alérgenos.
+                Previsión oficial satelital de alérgenos (Fuente: Open-Meteo Air Quality).
             </p>
             <div class="polen-grid">
                 <div class="polen-card">
@@ -1036,7 +1034,7 @@
     <br>
 
     <div class="card">
-        <h3>🌋 Últimos Sismos Registrados (USGS Global)</h3>
+        <h3>🌋 Últimos Sismos Registrados (Fuente: USGS Global Feed)</h3>
         <div id="sismosListaContainer" class="sismos-grid-horizontal">
             Cargando sismos en vivo...
         </div>
@@ -1062,7 +1060,7 @@
                     </div>
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀️</span>
+                        <span style="font-size: 1.2rem;">☀️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Radiación</small>
                         <strong id="radiacionSolar" style="font-size: 0.85rem; color: var(--text-main);">-- W/m²</strong>
                     </div>
@@ -1081,7 +1079,7 @@
                 <div class="grid-agricola">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌧️</span>
+                        <span style="font-size: 1.2rem;">🌧️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Prob. Lluvia</small>
                         <strong id="probLluvia" style="font-size: 0.85rem; color: var(--text-main);">--%</strong>
                     </div>
@@ -1190,13 +1188,14 @@
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
+                <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Nubosidad GOES</button>
                 <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">📐 Dibujar Lote & Reporte</button>
             </div>
 
             <div class="map-wrapper-container">
                 <div class="map-status-pill" id="mapStatusIndicator">
-                    <span class="pulse-dot"></span>
-                    <span id="mapStatusText">Visor GPS activo</span>
+                    <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
+                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer</div>
                 </div>
                 <div id="mapaArgentina"></div>
             </div>
@@ -1209,7 +1208,7 @@
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Medición de Lote & Reporte</h2>
+            <h2>📐 Medición de Lote & Reporte Agrometeorológico</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
@@ -1219,7 +1218,7 @@
                     <button class="modal-search-btn" onclick="buscarLugarModal()">Buscar</button>
                 </div>
                 <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja el polígono de tu lote en el mapa.
+                    Dibuja el polígono de tu lote en el mapa (Herramienta de dibujo superior derecha). Fuente: Open-Meteo & OpenStreetMap.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
@@ -1227,7 +1226,7 @@
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Finca / Lote</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 25px 10px;">
-                    👈 Dibuja un polígono en el mapa con la herramienta superior derecha para procesar las hectáreas.
+                    👈 Dibuja un polígono en el mapa con la herramienta superior derecha para procesar las hectáreas y el balance hídrico real.
                 </div>
             </div>
         </div>
@@ -1242,6 +1241,7 @@
     let capaActual = null;
     let capaFuegosFIRMS = null;
     let capaLluviaRadar = null;
+    let capaSateliteGOES = null;
 
     let modalMapInstance = null;
     let drawnItemsModal = null;
@@ -1257,36 +1257,56 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
-    function actualizarIndicadorMapa(texto, colorDot = "#22c55e") {
+    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer") {
         const textEl = document.getElementById("mapStatusText");
+        const sourceEl = document.getElementById("mapSourceText");
         const dotEl = document.querySelector(".pulse-dot");
         if (textEl) textEl.textContent = texto;
+        if (sourceEl) sourceEl.textContent = fuenteTxt;
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
-    async function inicializarCapaLluviaRainViewer() {
-        if (capaLluviaRadar) return;
-        try {
-            const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-            const data = await res.json();
-            if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-                const latestTime = data.radar.past[data.radar.past.length - 1].time;
-                capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
-                    tileSize: 256,
-                    opacity: 0.7,
-                    attribution: '&copy; RainViewer'
-                });
+    async function inicializarCapasEspeciales() {
+        if (!capaLluviaRadar) {
+            try {
+                const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+                const data = await res.json();
+                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+                    const latestTime = data.radar.past[data.radar.past.length - 1].time;
+                    capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
+                        tileSize: 256,
+                        opacity: 0.7,
+                        attribution: '&copy; RainViewer Radar'
+                    });
+                }
+            } catch (e) {
+                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t2/256/{z}/{x}/{y}/2/1_1.png', { opacity: 0.7 });
             }
-        } catch (e) {
-            // Fallback por si la API demora
-            capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t2/256/{z}/{x}/{y}/2/1_1.png', { opacity: 0.7 });
+        }
+
+        if (!capaSateliteGOES) {
+            // Capa satelital / infrarroja en tiempo real (RainViewer Satellite IR / NOAA composite)
+            try {
+                const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+                const data = await res.json();
+                if (data && data.satellite && data.satellite.infrared && data.satellite.infrared.length > 0) {
+                    const latestSatTime = data.satellite.infrared[data.satellite.infrared.length - 1].time;
+                    capaSateliteGOES = L.tileLayer(`https://tile.rainviewer.com/v2/satellite/${latestSatTime}/256/{z}/{x}/{y}/1/1_1.png`, {
+                        tileSize: 256,
+                        opacity: 0.65,
+                        attribution: '&copy; GOES / RainViewer Satellite IR'
+                    });
+                }
+            } catch(e) {
+                capaSateliteGOES = L.tileLayer('https://tile.rainviewer.com/v2/satellite/nowcast_t2/256/{z}/{x}/{y}/1/1_1.png', { opacity: 0.65 });
+            }
         }
     }
 
     function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
-                actualizarIndicadorMapa("Cargando mapa...", "#facc15");
+                actualizarIndicadorMapa("Cargando mapa...", "#facc15", "Inicializando motores de mapas...");
                 mapInstance = L.map('mapaArgentina', { zoomControl: true, dragging: true, tap: true }).setView([lat, lon], 14);
 
                 capaActual = capasBase.base;
@@ -1297,15 +1317,15 @@
                     format: 'image/png',
                     transparent: true,
                     version: '1.3.0',
-                    attribution: '&copy; NASA LANCE'
+                    attribution: '&copy; NASA LANCE FIRMS'
                 });
 
-                inicializarCapaLluviaRainViewer();
+                inicializarCapasEspeciales();
 
-                mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8"); });
-                mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e"); });
+                mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8", "Coordenadas en movimiento"); });
+                mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e", "Fuentes: OpenStreetMap, Open-Meteo, NASA FIRMS, USGS"); });
 
-                actualizarIndicadorMapa("Visor operativo", "#22c55e");
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -1318,12 +1338,12 @@
             });
 
             markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
-                .bindPopup("<b>Ubicación GPS Actual</b>")
+                .bindPopup("<b>Ubicación GPS Actual (Estación Virtual Open-Meteo)</b>")
                 .openPopup();
 
             mapInstance.setView([lat, lon], 15);
         } catch (e) {
-            actualizarIndicadorMapa("Error en mapa", "#ef4444");
+            actualizarIndicadorMapa("Error en mapa", "#ef4444", "Error cargando tiles");
         }
     }
 
@@ -1334,7 +1354,7 @@
             setTimeout(() => {
                 if (!modalMapInstance) {
                     modalMapInstance = L.map('mapaModalDibujo', { zoomControl: true }).setView([currentLat, currentLon], 15);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, subdomains: 'abc' }).addTo(modalMapInstance);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, subdomains: 'abc', attribution: '&copy; OpenStreetMap' }).addTo(modalMapInstance);
 
                     drawnItemsModal = new L.FeatureGroup();
                     modalMapInstance.addLayer(drawnItemsModal);
@@ -1390,7 +1410,7 @@
                 const lon = parseFloat(data[0].lon);
                 if (modalMapInstance) {
                     modalMapInstance.setView([lat, lon], 14);
-                    L.marker([lat, lon]).addTo(modalMapInstance).bindPopup(`<b>${data[0].display_name}</b>`).openPopup();
+                    L.marker([lat, lon]).addTo(modalMapInstance).bindPopup(`<b>${data[0].display_name}</b><br><small>Fuente: Nominatim / OSM</small>`).openPopup();
                 }
             } else {
                 alert("No se encontró la ubicación.");
@@ -1404,7 +1424,7 @@
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Procesando (${hectareas} ha)...</div><div style="text-align:center; padding: 25px; color:var(--accent);">Consultando clima...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Procesando (${hectareas} ha)...</div><div style="text-align:center; padding: 25px; color:var(--accent);">Consultando Open-Meteo API...</div>`;
 
         let nombreLugar = `Lote Agrícola GPS`;
         let provinciaZona = "Mendoza";
@@ -1433,7 +1453,7 @@
             renderizarPanelReporteYCostos(cultivoDefault);
 
         } catch(e) {
-            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error de red.</div>`;
+            panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error de red en Open-Meteo.</div>`;
         }
     }
 
@@ -1464,7 +1484,7 @@
             
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} ha</span><br>
-                <b>In situ:</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
+                <b>In situ (Open-Meteo):</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
             </div>
 
             <div class="report-section-title">🌱 Aptitud y Cultivo</div>
@@ -1479,7 +1499,7 @@
                 ${recomendacionFertilizante}
             </div>
 
-            <div class="report-section-title">💧 Balance Hídrico</div>
+            <div class="report-section-title">💧 Balance Hídrico (Fuente: Open-Meteo API)</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
                 <b>Precipitación:</b> ${d.lluvia} mm | <b>ET0:</b> ${d.et0} mm/día<br>
                 <b>Déficit Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm
@@ -1493,6 +1513,7 @@
         const btnCalles = document.getElementById("btnCalles");
         const btnFuego = document.getElementById("btnFuego");
         const btnLluvia = document.getElementById("btnLluvia");
+        const btnSatinfra = document.getElementById("btnSatinfra");
         const mapTitle = document.getElementById("mapTitle");
 
         if (!mapInstance) return;
@@ -1502,22 +1523,31 @@
         if (btnCalles) btnCalles.classList.remove("active");
         btnFuego.classList.remove("active");
         btnLluvia.classList.remove("active");
+        if (btnSatinfra) btnSatinfra.classList.remove("active");
 
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
+        if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
 
         if (tipo === 'fuego') {
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
-            mapTitle.innerText = "🔥 Fuego (NASA FIRMS)";
-            actualizarIndicadorMapa("Capa NASA Activa", "#f59e0b");
+            mapTitle.innerText = "🔥 Fuego (NASA FIRMS WMS)";
+            actualizarIndicadorMapa("Capa NASA Activa", "#f59e0b", "Fuente: NASA LANCE FIRMS (VIIRS/MODIS)");
         } else if (tipo === 'lluvia') {
             if (capaLluviaRadar) {
                 if (!mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
             }
             btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧 Radar de Lluvia y Nubes";
-            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8");
+            mapTitle.innerText = "🌧 Radar de Lluvia";
+            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: RainViewer Weather API");
+        } else if (tipo === 'satelite') {
+            if (capaSateliteGOES) {
+                if (!mapInstance.hasLayer(capaSateliteGOES)) capaSateliteGOES.addTo(mapInstance);
+            }
+            if (btnSatinfra) btnSatinfra.classList.add("active");
+            mapTitle.innerText = "🛰️ Nubosidad Satelital IR";
+            actualizarIndicadorMapa("Capa Satélite GOES", "#38bdf8", "Fuente: GOES / RainViewer Infrared Satellite");
         } else {
             if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
@@ -1526,22 +1556,22 @@
             if (tipo === 'base') {
                 btnBase.classList.add("active");
                 mapTitle.innerText = "🗺 Visor Geográfico Satelital";
-                actualizarIndicadorMapa("Capa Estándar", "#22c55e");
+                actualizarIndicadorMapa("Capa Estándar", "#22c55e", "Fuente: OpenStreetMap Contributors");
             } else if (tipo === 'topo') {
                 btnTopo.classList.add("active");
                 mapTitle.innerText = "⛰ Visor Topográfico";
-                actualizarIndicadorMapa("Capa Topo", "#22c55e");
+                actualizarIndicadorMapa("Capa Topo", "#22c55e", "Fuente: OpenTopoMap");
             } else if (tipo === 'calles') {
                 if (btnCalles) btnCalles.classList.add("active");
                 mapTitle.innerText = "🛣 Red Vial";
-                actualizarIndicadorMapa("Capa Calles", "#22c55e");
+                actualizarIndicadorMapa("Capa Calles", "#22c55e", "Fuente: Esri World Street Map");
             }
         }
     }
 
     function centrarUbicacion() {
         if (navigator.geolocation) {
-            actualizarIndicadorMapa("Buscando GPS...", "#facc15");
+            actualizarIndicadorMapa("Buscando GPS...", "#facc15", "Consultando geolocalización del dispositivo");
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
                     currentLat = pos.coords.latitude;
@@ -1551,10 +1581,10 @@
                         mapInstance.setView([currentLat, currentLon], 15);
                         if (markerInstance) markerInstance.openPopup();
                     }
-                    actualizarIndicadorMapa("GPS actualizado", "#22c55e");
+                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS");
                 },
                 (error) => {
-                    actualizarIndicadorMapa("GPS no disponible", "#ef4444");
+                    actualizarIndicadorMapa("GPS no disponible", "#ef4444", "Usando ubicación por defecto (Godoy Cruz, Mendoza)");
                     usarUbicacionPorDefecto();
                 },
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
@@ -1607,7 +1637,7 @@
                 card.style.display = "block";
                 card.classList.add("alerta-activa-animacion");
                 titulo.innerText = `¡Foco NASA a ${Math.round(fuegoCercanoKm)} km!`;
-                desc.innerText = `Actividad satelital detectada en la región.`;
+                desc.innerText = `Actividad satelital detectada en la región. Fuente: NASA FIRMS.`;
             } else {
                 card.style.display = "none";
             }
@@ -1624,12 +1654,12 @@
             card.style.display = "block";
             card.classList.add("alerta-activa-animacion");
             titulo.innerText = `¡Alerta Helada (${minTemp}°C)!`;
-            desc.innerText = `Descenso térmico crítico pronosticado.`;
+            desc.innerText = `Descenso térmico crítico pronosticado. Fuente: Open-Meteo.`;
         } else if (maxViento >= 40) {
             card.style.display = "block";
             card.classList.add("alerta-activa-animacion");
             titulo.innerText = `¡Ráfagas Severas (${maxViento} km/h)!`;
-            desc.innerText = `Vientos intensos detectados.`;
+            desc.innerText = `Vientos intensos detectados. Fuente: Open-Meteo.`;
         } else {
             card.style.display = "none";
         }
@@ -1652,7 +1682,7 @@
     }
 
     function iconoClima(codigo) {
-        if (codigo === 0) return "☀️️";
+        if (codigo === 0) return "☀";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁";
         if (codigo <= 67) return "🌧";
@@ -1689,7 +1719,7 @@
         if (code >= 95) {
             card.style.display = "block";
             card.classList.add("alerta-activa-animacion");
-            if (titulo) titulo.innerText = "¡Tormentas Severas!";
+            if (titulo) titulo.innerText = "¡Tormentas Severas! (Open-Meteo)";
         } else {
             card.style.display = "none";
         }
@@ -1707,7 +1737,7 @@
             const elAire = document.getElementById("aire");
             if (elAire) { elAire.innerText = aqi; elAire.style.color = color; }
             const elEstado = document.getElementById("aireEstado");
-            if (elEstado) elEstado.innerText = estado;
+            if (elEstado) elEstado.innerText = estado + " (Open-Meteo)";
         } catch (e) {}
     }
 
@@ -1942,7 +1972,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const btnCampana = document.getElementById("btnCampanaNotif");
         if (btnCampana) btnCampana.addEventListener("click", () => {
-            alert("Sistema Agrotech sincronizado con APIs oficiales en tiempo real.");
+            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y RainViewer.");
         });
     });
 
