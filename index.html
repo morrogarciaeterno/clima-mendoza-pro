@@ -1325,32 +1325,7 @@
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
-                inicializarCapasEspeciales();
-
-                mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8", "Coordenadas en movimiento"); });
-                mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e", "Fuentes: OpenStreetMap, Open-Meteo, NASA FIRMS, USGS"); });
-
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer");
-            }
-
-            if (markerInstance) mapInstance.removeLayer(markerInstance);
-
-            const iconoLimpio = L.divIcon({
-                className: '',
-                html: '<div style="background-color: #38bdf8; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"></div>',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-            });
-
-            markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
-                .bindPopup("<b>Ubicación GPS Actual (Estación Virtual Open-Meteo)</b>")
-                .openPopup();
-
-            mapInstance.setView([lat, lon], 15);
-        } catch (e) {
-            actualizarIndicadorMapa("Error en mapa", "#ef4444", "Error cargando tiles");
-        }
-    }
+               inicializarCapasEspeciales()
 
     function abrirModalLotes() {
         const modal = document.getElementById("modalLotes");
