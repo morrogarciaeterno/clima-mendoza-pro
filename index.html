@@ -1472,16 +1472,20 @@
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
         `).join("");
 
-        let tempSueloReal = d.temp;
-        let aptitudCultivo = "🟢 Condiciones favorables para el cultivo.";
-        let recomendacionFertilizante = "Aplicación estándar según plan de riego.";
+        // Motor de recomendación de fertilización basado en variables reales
+        let recomendacionFertilizante = "";
+        let alertaDeriva = "";
 
-        if (tempSueloReal < 10) {
-            aptitudCultivo = "🟡 Suelo frío: Latencia radicular.";
-            recomendacionFertilizante = "Priorizar Fósforo para proteger el sistema radicular.";
-        } else if (tempSueloReal > 28) {
-            aptitudCultivo = "🟠 Suelo cálido: Alta tasa de evaporación.";
-            recomendacionFertilizante = "Aplicar Nitrógeno fraccionado vía fertirriego nocturno.";
+        if (d.viento > 20) {
+            alertaDeriva = `<br><span style="color:#ef4444; font-weight:bold;">⚠ ALERTA DE DERIVA:</span> Viento superior a 20 km/h. No realizar aplicaciones foliares ni pulverización.`;
+        }
+
+        if (d.temp < 12) {
+            recomendacionFertilizante = `Suelo/Ambiente frío (${d.temp}°C): Priorizar aplicación fosforada (Fosfatos) para estimular el enraizamiento inicial del cultivo de ${cultivoSeleccionado}.${alertaDeriva}`;
+        } else if (d.temp > 28) {
+            recomendacionFertilizante = `Temperatura elevada (${d.temp}°C): Alto riesgo de volatilización de Urea. Se recomienda fraccionar el nitrógeno y aplicarlo mediante fertirriego nocturno.${alertaDeriva}`;
+        } else {
+            recomendacionFertilizante = `Condiciones estables (${d.temp}°C, ${d.viento} km/h): Apto para fertilización nitrogenada de cobertura o soporte radicular según demanda de ${cultivoSeleccionado}.${alertaDeriva}`;
         }
 
         panel.innerHTML = `
@@ -1496,10 +1500,10 @@
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
                 <div style="margin-bottom: 6px; font-size:0.7rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
                 <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
-                <b>Evaluación para ${cultivoSeleccionado}:</b> ${aptitudCultivo}
+                <b>Evaluación para ${cultivoSeleccionado}:</b> Condiciones óptimas de monitoreo.
             </div>
 
-            <div class="report-section-title">🧪 Guía de Fertilización</div>
+            <div class="report-section-title">🧪 Recomendación Experta de Fertilización</div>
             <div class="recommendation-card" style="border-left: 4px solid #22c55e;">
                 ${recomendacionFertilizante}
             </div>
