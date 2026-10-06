@@ -1420,12 +1420,37 @@
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
         `).join("");
 
+        let tempSueloReal = d.temp;
+        let aptitudCultivo = "🟢 Condiciones térmicas e hídricas favorables para el cultivo.";
+        let recomendacionFertilizante = "Aplicación estándar de cobertera nitrogenada según plan de riego.";
+
+        if (tempSueloReal < 10) {
+            aptitudCultivo = "🟡 Suelo frío: Latencia radicular. No apto para siembras estivales ni brotación rápida.";
+            recomendacionFertilizante = "Priorizar Fósforo (Fosfato Diamónico) para proteger el sistema radicular y evitar lavado por bajas temperaturas.";
+        } else if (tempSueloReal > 28) {
+            aptitudCultivo = "🟠 Suelo cálido: Alta tasa de evaporación. Exige monitoreo estricto de lámina de riego.";
+            recomendacionFertilizante = "Aplicar Nitrógeno fraccionado vía fertirriego nocturno para evitar volatilización por alta temperatura.";
+        } else {
+            recomendacionFertilizante = "Balance NPK equilibrado (Nitrato de Potasio y Urea) fraccionado con el ciclo de riego.";
+        }
+
         panel.innerHTML = `
             <div class="report-section-title">📊 ${d.nombreLugar} (${d.provinciaZona})</div>
             
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} hectáreas</span><br>
-                <b>Condiciones Meteorológicas in situ:</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
+                <b>Condiciones in situ:</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
+            </div>
+
+            <div class="report-section-title">🌱 Aptitud del Suelo & Recomendación de Cultivo</div>
+            <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
+                <b>Cultivo Seleccionado:</b> ${cultivoSeleccionado}<br>
+                <b>Evaluación Térmica:</b> <span style="color:var(--text-main);">${aptitudCultivo}</span>
+            </div>
+
+            <div class="report-section-title">🧪 Guía de Fertilización Sugerida (Basada en Suelo)</div>
+            <div class="recommendation-card" style="border-left: 4px solid #22c55e;">
+                <b>Nutrición Recomendada:</b> <span style="color:var(--text-main);">${recomendacionFertilizante}</span>
             </div>
 
             <div class="report-section-title">💰 Costos de Implantación y Producción (USD)</div>
@@ -1458,8 +1483,8 @@
             <div class="report-section-title">💧 Balance Hídrico del Lote</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
                 <b>Precipitación Reciente:</b> ${d.lluvia} mm<br>
-                <b>Evapotranspiración del Cultivo (ET0):</b> ${d.et0} mm/día<br>
-                <b>Déficit Hídrico Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm (Requiere ajuste de riego programado).
+                <b>Evapotranspiración (ET0):</b> ${d.et0} mm/día<br>
+                <b>Déficit Hídrico Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm (Requiere ajuste de riego).
             </div>
         `;
     }
