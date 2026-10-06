@@ -552,7 +552,6 @@
             background-color: #070a14 !important;
         }
 
-        /* CONTROL DINÁMICO DE FILTROS PARA EL MAPA */
         .modo-oscuro-mapa .leaflet-tile-pane {
             filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
         }
@@ -1058,7 +1057,7 @@
                 <div class="grid-confort-termico">
 
                     <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡️</span>
+                        <span style="font-size: 1.2rem;">🌡️️</span>
                         <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Bulbo Húmedo</small>
                         <strong id="bulboHumedad" style="font-size: 0.85rem; color: var(--text-main);">-- °C</strong>
                     </div>
@@ -1270,7 +1269,7 @@
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
-async function inicializarCapasEspeciales() {
+    async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
             capaLluviaRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
                 tileSize: 256,
@@ -1290,7 +1289,8 @@ async function inicializarCapasEspeciales() {
                 attribution: '&copy; NASA GIBS / MODIS Terra'
             });
         }
-    }    
+    }
+
     function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
@@ -1308,7 +1308,32 @@ async function inicializarCapasEspeciales() {
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
-               inicializarCapasEspeciales()
+                inicializarCapasEspeciales();
+
+                mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8", "Coordenadas en movimiento"); });
+                mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e", "Fuentes: OpenStreetMap, Open-Meteo, NASA FIRMS, USGS"); });
+
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer");
+            }
+
+            if (markerInstance) mapInstance.removeLayer(markerInstance);
+
+            const iconoLimpio = L.divIcon({
+                className: '',
+                html: '<div style="background-color: #38bdf8; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
+                .bindPopup("<b>Ubicación GPS Actual (Estación Virtual Open-Meteo)</b>")
+                .openPopup();
+
+            mapInstance.setView([lat, lon], 15);
+        } catch (e) {
+            actualizarIndicadorMapa("Error en mapa", "#ef4444", "Error cargando tiles");
+        }
+    }
 
     function abrirModalLotes() {
         const modal = document.getElementById("modalLotes");
@@ -1533,16 +1558,16 @@ async function inicializarCapasEspeciales() {
             btnLluvia.classList.add("active");
             mapTitle.innerText = "🌧 Radar de Lluvia sobre Mapa";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: RainViewer Weather API");
+            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: IEM Nexrad");
         } else if (tipo === 'satelite') {
             await inicializarCapasEspeciales();
             if (capaSateliteGOES && !mapInstance.hasLayer(capaSateliteGOES)) {
                 capaSateliteGOES.addTo(mapInstance);
             }
             if (btnSatinfra) btnSatinfra.classList.add("active");
-            mapTitle.innerText = "🛰️ Nubosidad GOES sobre Mapa";
+            mapTitle.innerText = "🛰️ Nubosidad Satelital NASA";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Satélite GOES", "#38bdf8", "Fuente: GOES / RainViewer Infrared Satellite");
+            actualizarIndicadorMapa("Capa Satélite NASA", "#38bdf8", "Fuente: NASA GIBS / MODIS Terra");
         }
     }
 
