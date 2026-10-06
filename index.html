@@ -1198,7 +1198,7 @@
             <div class="map-wrapper-container">
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, OpenWeather</div>
+                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, NASA WMS</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -1280,11 +1280,15 @@
         }
 
         if (!capaSateliteGOES) {
-            capaSateliteGOES = L.tileLayer('https://tile.openweathermap.org/map/clouds/{z}/{x}/{y}.png?appid=b1b15e88fa797225412429c1c50c122a1', {
-                tileSize: 256,
+            // Capa WMS oficial de la NASA GIBS para satélite y nubes (idéntico funcionamiento al de incendios)
+            capaSateliteGOES = L.tileLayer.wms('https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi', {
+                layers: 'MODIS_Terra_CorrectedReflectance_TrueColor',
+                format: 'image/png',
+                transparent: true,
+                version: '1.3.0',
                 opacity: 0.8,
                 zIndex: 500,
-                attribution: '&copy; OpenWeatherMap Clouds'
+                attribution: '&copy; NASA GIBS WMS'
             });
         }
     }
@@ -1311,7 +1315,7 @@
                 mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8", "Coordenadas en movimiento"); });
                 mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e", "Fuentes: OpenStreetMap, Open-Meteo, NASA FIRMS, USGS"); });
 
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, OpenWeather");
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, NASA WMS");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -1563,9 +1567,9 @@
                 capaSateliteGOES.addTo(mapInstance);
             }
             if (btnSatinfra) btnSatinfra.classList.add("active");
-            mapTitle.innerText = "🛰️️ Nubosidad en Vivo";
+            mapTitle.innerText = "🛰️ Satélite NASA WMS";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Nubes", "#38bdf8", "Fuente: OpenWeatherMap Clouds");
+            actualizarIndicadorMapa("Capa Satelital WMS", "#38bdf8", "Fuente: NASA GIBS WMS");
         }
     }
 
@@ -1972,7 +1976,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const btnCampana = document.getElementById("btnCampanaNotif");
         if (btnCampana) btnCampana.addEventListener("click", () => {
-            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y OpenWeather.");
+            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y NASA WMS.");
         });
         iniciarApp();
     });
