@@ -1281,15 +1281,15 @@
 
         if (!capaSateliteGOES) {
             const fechaAyer = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            // Configuración con maxNativeZoom: 9 y maxZoom: 18 para reescalar perfectamente al hacer zoom de cerca
-            capaSateliteGOES = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/${fechaAyer}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
+            // Usamos VIIRS SNPP en lugar de MODIS para evitar franjas negras y reescalar perfecto
+            capaSateliteGOES = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${fechaAyer}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
                 tileSize: 256,
                 minZoom: 4,
                 maxZoom: 18,
                 maxNativeZoom: 9,
                 opacity: 0.85,
                 zIndex: 500,
-                attribution: '&copy; NASA GIBS / MODIS Terra'
+                attribution: '&copy; NASA GIBS / VIIRS SNPP'
             });
         }
     }
