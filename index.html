@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Librería Leaflet.draw para dibujo de polígonos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -1333,6 +1333,15 @@
                 <button class="map-btn" onclick="verVistaPais()">🇦🇷 País</button>
             </div>
 
+            <!-- BOTÓN PARA CARGAR GEOJSON OFICIAL DESDE ARCHIVO -->
+            <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                <label for="inputGeoJson" class="map-btn" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #4ade80; cursor: pointer; display: inline-block; padding: 6px 8px;">
+                    📂 Cargar GeoJSON Oficial (.geojson)
+                </label>
+                <input type="file" id="inputGeoJson" accept=".geojson,.json" style="display: none;" onchange="manejarCargaGeoJsonArchivo(event)">
+                <span id="geoJsonInfoEstado" style="font-size: 0.68rem; color: var(--text-muted);">Modo censo simulado activo</span>
+            </div>
+
             <div class="map-wrapper-container">
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <span class="pulse-dot"></span>
@@ -1519,6 +1528,7 @@
     let drawnItemsModal = null;
     let loteHectareasGlobal = 1;
     let datosLoteActual = null;
+    let geoJsonDatosCargados = null;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
@@ -2104,7 +2114,7 @@
         });
     }
 
-    // 🌳 CENSO MASIVO DE ARBOLADO URBANO CON ESPECIES Y PORCENTAJES REALES DE MENDOZA
+    // 🌳 FUNCIÓN PARA CARGAR DATOS GEOGRÁFICOS REALES (GEOJSON OFICIAL) O SIMULADOS
     function toggleCapaRiesgoArboles() {
         const btn = document.getElementById("btnArbolesRiesgo");
         const mapTitle = document.getElementById("mapTitle");
@@ -2119,6 +2129,12 @@
             return;
         }
 
+        // Si el usuario ya cargó un archivo GeoJSON real previamente, lo usamos
+        if (geoJsonDatosCargados) {
+            renderizarCapaGeoJSON(geoJsonDatosCargados);
+            return;
+        }
+
         btn.classList.add("active");
         mapTitle.innerText = "🌳 Censo Forestal y Riesgo de Caída (Godoy Cruz / Mendoza)";
         actualizarIndicadorMapa("Generando censo masivo de arbolado...", "#f59e0b");
@@ -2128,7 +2144,6 @@
         let latBase = currentLat || -32.9225;
         let lonBase = currentLon || -68.8427;
         
-        // Ponderación exacta basada en las estadísticas de arbolado público de Mendoza
         function obtenerEspecieRealMendoza() {
             let r = Math.random() * 100;
             if (r < 30) return "Morera Blanca (Morus alba)";
@@ -2143,10 +2158,9 @@
         }
 
         let criticosCount = 0;
-        let totalEjemplares = 250; // Malla masiva para cubrir todo el entorno urbano
+        let totalEjemplares = 250;
 
         for (let i = 0; i < totalEjemplares; i++) {
-            // Distribución amplia en la retícula de manzanas urbanas
             let dLat = (Math.random() - 0.5) * 0.032;
             let dLon = (Math.random() - 0.5) * 0.032;
             let treeLat = latBase + dLat;
@@ -2157,11 +2171,11 @@
             let estadoTexto = "Saludable / Estable";
 
             if (ndvi < 0.35) {
-                color = "#ef4444"; // Rojo (Alto riesgo de caída)
+                color = "#ef4444";
                 estadoTexto = "Crítico / Seco (Alto riesgo de quebradura)";
                 criticosCount++;
             } else if (ndvi < 0.5) {
-                color = "#f59e0b"; // Naranja (Precaución)
+                color = "#f59e0b";
                 estadoTexto = "Estrés Moderado / Ramas secas";
             }
 
@@ -2187,6 +2201,81 @@
 
         capaRiesgoArbolesGroup.addTo(mapInstance);
         actualizarIndicadorMapa(`Censo Activo: ${totalEjemplares} ejemplares analizados (${criticosCount} críticos)`, "#ef4444");
+    }
+
+    function renderizarCapaGeoJSON(geojsonData) {
+        const btn = document.getElementById("btnArbolesRiesgo");
+        const mapTitle = document.getElementById("mapTitle");
+        if (!mapInstance) return;
+
+        if (capaRiesgoArbolesGroup) {
+            mapInstance.removeLayer(capaRiesgoArbolesGroup);
+            capaRiesgoArbolesGroup = null;
+        }
+
+        btn.classList.add("active");
+        mapTitle.innerText = "🌳 Censo Oficial GeoJSON (Bosque Urbano Mendoza)";
+        actualizarIndicadorMapa("Renderizando arbolado oficial...", "#38bdf8");
+
+        capaRiesgoArbolesGroup = L.geoJSON(geojsonData, {
+            pointToLayer: function (feature, latlng) {
+                let props = feature.properties || {};
+                let ndvi = props.ndvi || props.indice_vigor || 0.6;
+                let estado = props.estado || "Estable";
+
+                let color = "#22c55e";
+                if (ndvi < 0.35 || estado.toLowerCase().includes("crítico") || estado.toLowerCase().includes("seco")) {
+                    color = "#ef4444";
+                } else if (ndvi < 0.5 || estado.toLowerCase().includes("moderado")) {
+                    color = "#f59e0b";
+                }
+
+                let iconoArbol = L.divIcon({
+                    className: '',
+                    html: `<div style="background-color: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; font-size: 7px;">🌳</div>`,
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
+                });
+
+                return L.marker(latlng, { icon: iconoArbol });
+            },
+            onEachFeature: function (feature, layer) {
+                let p = feature.properties || {};
+                let especie = p.especie || p.nombre_comun || "Árbol Urbano";
+                let direccion = p.direccion || p.calle || "Vía Pública";
+                let ndvi = p.ndvi || "0.65";
+
+                layer.bindPopup(`
+                    <div style="font-size: 0.75rem; line-height: 1.4; min-width: 180px;">
+                        <b style="color:var(--accent);">📍 ${especie}</b><br>
+                        <b>Ubicación:</b> ${direccion}<br>
+                        <b>Índice Vigor (NDVI):</b> ${ndvi}<br>
+                        <span style="color:var(--accent); font-weight:bold;">✔ Registro Oficial Georreferenciado</span>
+                    </div>
+                `);
+            }
+        });
+
+        capaRiesgoArbolesGroup.addTo(mapInstance);
+        actualizarIndicadorMapa("Capa oficial cargada con éxito", "#22c55e");
+    }
+
+    function manejarCargaGeoJsonArchivo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const jsonContent = JSON.parse(e.target.result);
+                geoJsonDatosCargados = jsonContent;
+                document.getElementById("geoJsonInfoEstado").innerText = `Archivo cargado: ${file.name}`;
+                renderizarCapaGeoJSON(geoJsonDatosCargados);
+            } catch (err) {
+                alert("El archivo seleccionado no es un formato GeoJSON válido.");
+            }
+        };
+        reader.readAsText(file);
     }
 
     function centrarUbicacion() {
