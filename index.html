@@ -552,8 +552,8 @@
             background-color: #070a14 !important;
         }
 
-        /* FILTRO OSCURO SOLO PARA EL MAPA BASE, LIBRE PARA SATÉLITE Y RADAR */
-        .leaflet-base-layer {
+        /* CONTROL DINÁMICO DE FILTROS PARA EL MAPA */
+        .modo-oscuro-mapa .leaflet-tile-pane {
             filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
         }
 
@@ -566,8 +566,7 @@
         .leaflet-popup,
         .map-status-pill,
         .leaflet-draw,
-        .modal-overlay,
-        .leaflet-overlay-pane img {
+        .modal-overlay {
             filter: none !important;
         }
 
@@ -1202,7 +1201,7 @@
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
                     <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer</div>
                 </div>
-                <div id="mapaArgentina"></div>
+                <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
         </div>
     </div>
@@ -1257,9 +1256,9 @@
     const listaCultivosDisponibles = ["Vid", "Cebolla", "Ajo", "Olivo", "Tomate", "Frutales (Manz/Pera/Cerez)", "Extensivos (Maíz/Soja)"];
 
     const capasBase = {
-        base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap', subdomains: 'abc', className: 'leaflet-base-layer' }),
-        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap', subdomains: 'abc', className: 'leaflet-base-layer' }),
-        calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri', className: 'leaflet-base-layer' })
+        base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap', subdomains: 'abc' }),
+        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap', subdomains: 'abc' }),
+        calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
     function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, RainViewer") {
@@ -1280,12 +1279,12 @@
                     const latestTime = data.radar.past[data.radar.past.length - 1].time;
                     capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
                         tileSize: 256,
-                        opacity: 0.7,
+                        opacity: 0.75,
                         attribution: '&copy; RainViewer Radar'
                     });
                 }
             } catch (e) {
-                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t2/256/{z}/{x}/{y}/2/1_1.png', { opacity: 0.7 });
+                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t2/256/{z}/{x}/{y}/2/1_1.png', { opacity: 0.75 });
             }
         }
 
@@ -1297,12 +1296,12 @@
                     const latestSatTime = data.satellite.infrared[data.satellite.infrared.length - 1].time;
                     capaSateliteGOES = L.tileLayer(`https://tile.rainviewer.com/v2/satellite/${latestSatTime}/256/{z}/{x}/{y}/1/1_1.png`, {
                         tileSize: 256,
-                        opacity: 0.75,
+                        opacity: 0.85,
                         attribution: '&copy; GOES / RainViewer Satellite IR'
                     });
                 }
             } catch(e) {
-                capaSateliteGOES = L.tileLayer('https://tile.rainviewer.com/v2/satellite/nowcast_t2/256/{z}/{x}/{y}/1/1_1.png', { opacity: 0.75 });
+                capaSateliteGOES = L.tileLayer('https://tile.rainviewer.com/v2/satellite/nowcast_t2/256/{z}/{x}/{y}/1/1_1.png', { opacity: 0.85 });
             }
         }
     }
@@ -1519,6 +1518,7 @@
         const btnLluvia = document.getElementById("btnLluvia");
         const btnSatinfra = document.getElementById("btnSatinfra");
         const mapTitle = document.getElementById("mapTitle");
+        const contenedorMapaDiv = document.getElementById("mapaArgentina");
 
         if (!mapInstance) return;
 
@@ -1537,6 +1537,7 @@
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
             mapTitle.innerText = "🔥 Fuego (NASA FIRMS WMS)";
+            contenedorMapaDiv.classList.add("modo-oscuro-mapa");
             actualizarIndicadorMapa("Capa NASA Activa", "#f59e0b", "Fuente: NASA LANCE FIRMS (VIIRS/MODIS)");
         } else if (tipo === 'lluvia') {
             if (capaLluviaRadar) {
@@ -1544,6 +1545,7 @@
             }
             btnLluvia.classList.add("active");
             mapTitle.innerText = "🌧 Radar de Lluvia";
+            contenedorMapaDiv.classList.remove("modo-oscuro-mapa"); // Colores reales para ver nubes y precipitaciones
             actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: RainViewer Weather API");
         } else if (tipo === 'satelite') {
             if (capaSateliteGOES) {
@@ -1551,11 +1553,13 @@
             }
             if (btnSatinfra) btnSatinfra.classList.add("active");
             mapTitle.innerText = "🛰️ Nubosidad Satelital IR";
+            contenedorMapaDiv.classList.remove("modo-oscuro-mapa"); // ¡ACÁ ESTÁ LA CLAVE!: Remueve el modo oscuro para mostrar la atmósfera y nubes reales
             actualizarIndicadorMapa("Capa Satélite GOES", "#38bdf8", "Fuente: GOES / RainViewer Infrared Satellite");
         } else {
             if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
             capaActual.addTo(mapInstance);
+            contenedorMapaDiv.classList.add("modo-oscuro-mapa");
 
             if (tipo === 'base') {
                 btnBase.classList.add("active");
@@ -1687,11 +1691,11 @@
 
     function iconoClima(codigo) {
         if (codigo === 0) return "☀";
-        if (codigo <= 2) return "🌤️";
+        if (codigo <= 2) return "🌤️️";
         if (codigo === 3) return "☁";
         if (codigo <= 67) return "🌧";
         if (codigo >= 95) return "⛈";
-        return "⛈️";
+        return "⛈️️";
     }
 
     function calcularFaseLunar() {
