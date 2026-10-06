@@ -1270,7 +1270,6 @@
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
-    a// Modificamos la inicialización para asegurarnos de que la capa satelital y el radar actúen como overlays transparentes
     async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
             try {
@@ -1296,7 +1295,6 @@
                 const data = await res.json();
                 if (data && data.satellite && data.satellite.infrared && data.satellite.infrared.length > 0) {
                     const latestSatTime = data.satellite.infrared[data.satellite.infrared.length - 1].time;
-                    // Usamos el esquema de color 5 (enhanced/satelite) o 0 para infrarrojo con alta nitidez
                     capaSateliteGOES = L.tileLayer(`https://tile.rainviewer.com/v2/satellite/${latestSatTime}/256/{z}/{x}/{y}/0/1_1.png`, {
                         tileSize: 256,
                         opacity: 0.8,
@@ -1309,14 +1307,6 @@
             }
         }
     }
-
-    // NUEVA LÓGICA DE CAPAS: Mantiene siempre el mapa base activo abajo y superpone las nubes/radar arriba
-    async function cambiarCapaMapa(tipo) {
-        const btnBase = document.getElementById("btnBase");
-        const btnTopo = document.getElementById("btnTopo");
-        const btnCalles = document.getElementById("btnCalles");
-        const btnFuego = document.getElementById("btnFuego");
-        const btnLluvia = document.getElementById("btnLluvia");
 
     function inicializarMapaArgentina(lat, lon) {
         try {
@@ -1522,7 +1512,7 @@
         `;
     }
 
-    function cambiarCapaMapa(tipo) {
+    async function cambiarCapaMapa(tipo) {
         const btnBase = document.getElementById("btnBase");
         const btnTopo = document.getElementById("btnTopo");
         const btnCalles = document.getElementById("btnCalles");
@@ -1545,30 +1535,15 @@
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
 
-        if (tipo === 'fuego') {
-            if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
-            btnFuego.classList.add("active");
-            mapTitle.innerText = "🔥 Fuego (NASA FIRMS WMS)";
-            contenedorMapaDiv.classList.add("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa NASA Activa", "#f59e0b", "Fuente: NASA LANCE FIRMS (VIIRS/MODIS)");
-        } else if (tipo === 'lluvia') {
-            if (capaLluviaRadar) {
-                if (!mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
-            }
-            btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧 Radar de Lluvia";
-            contenedorMapaDiv.classList.remove("modo-oscuro-mapa"); // Colores reales para ver nubes y precipitaciones
-            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: RainViewer Weather API");
-        } else if (tipo === 'satelite') {
-            if (capaSateliteGOES) {
-                if (!mapInstance.hasLayer(capaSateliteGOES)) capaSateliteGOES.addTo(mapInstance);
-            }
-            if (btnSatinfra) btnSatinfra.classList.add("active");
-            mapTitle.innerText = "🛰️ Nubosidad Satelital IR";
-            contenedorMapaDiv.classList.remove("modo-oscuro-mapa"); // ¡ACÁ ESTÁ LA CLAVE!: Remueve el modo oscuro para mostrar la atmósfera y nubes reales
-            actualizarIndicadorMapa("Capa Satélite GOES", "#38bdf8", "Fuente: GOES / RainViewer Infrared Satellite");
-        } else {
-            if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
+        if (!capaActual) {
+            capaActual = capasBase.base;
+        }
+        if (!mapInstance.hasLayer(capaActual)) {
+            capaActual.addTo(mapInstance);
+        }
+
+        if (tipo === 'base' || tipo === 'topo' || tipo === 'calles') {
+            mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
             capaActual.addTo(mapInstance);
             contenedorMapaDiv.classList.add("modo-oscuro-mapa");
@@ -1586,6 +1561,30 @@
                 mapTitle.innerText = "🛣 Red Vial";
                 actualizarIndicadorMapa("Capa Calles", "#22c55e", "Fuente: Esri World Street Map");
             }
+        } else if (tipo === 'fuego') {
+            if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
+            btnFuego.classList.add("active");
+            mapTitle.innerText = "🔥 Fuego (NASA FIRMS WMS)";
+            contenedorMapaDiv.classList.add("modo-oscuro-mapa");
+            actualizarIndicadorMapa("Capa NASA Activa", "#f59e0b", "Fuente: NASA LANCE FIRMS (VIIRS/MODIS)");
+        } else if (tipo === 'lluvia') {
+            await inicializarCapasEspeciales();
+            if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) {
+                capaLluviaRadar.addTo(mapInstance);
+            }
+            btnLluvia.classList.add("active");
+            mapTitle.innerText = "🌧 Radar de Lluvia sobre Mapa";
+            contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
+            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: RainViewer Weather API");
+        } else if (tipo === 'satelite') {
+            await inicializarCapasEspeciales();
+            if (capaSateliteGOES && !mapInstance.hasLayer(capaSateliteGOES)) {
+                capaSateliteGOES.addTo(mapInstance);
+            }
+            if (btnSatinfra) btnSatinfra.classList.add("active");
+            mapTitle.innerText = "🛰️ Nubosidad GOES sobre Mapa";
+            contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
+            actualizarIndicadorMapa("Capa Satélite GOES", "#38bdf8", "Fuente: GOES / RainViewer Infrared Satellite");
         }
     }
 
@@ -1703,11 +1702,11 @@
 
     function iconoClima(codigo) {
         if (codigo === 0) return "☀";
-        if (codigo <= 2) return "🌤️️";
+        if (codigo <= 2) return "🌤";
         if (codigo === 3) return "☁";
         if (codigo <= 67) return "🌧";
         if (codigo >= 95) return "⛈";
-        return "⛈️️";
+        return "⛈";
     }
 
     function calcularFaseLunar() {
