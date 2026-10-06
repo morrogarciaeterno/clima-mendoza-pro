@@ -1826,63 +1826,40 @@
 
         const bounds = capaRiesgoArbolesGroup.getBounds();
         if (bounds.isValid()) {
-            mapInstance.fitBounds(bounds);
+            mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
         }
         actualizarIndicadorMapa("Dataset GeoJSON Real cargado con éxito", "#22c55e");
     }
 
     function renderizarCapaCSVRealMendoza(dataRows, fields) {
-    if (!mapInstance) return;
-    if (capaRiesgoArbolesGroup) {
-        mapInstance.removeLayer(capaRiesgoArbolesGroup);
-    }
-
-    capaRiesgoArbolesGroup = L.layerGroup();
-    let contadorCargados = 0;
-    let bounds = L.latLngBounds();
-
-    dataRows.forEach(row => {
-        let lat = row.lat || row.latitude || row.LAT || row.Lat || row.Y || row.y;
-        let lon = row.lon || row.longitude || row.LONG || row.Lon || row.LONGITUD || row.X || row.x;
-
-        if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
-            lat = -32.92 + (Math.random() - 0.5) * 0.1;
-            lon = -68.84 + (Math.random() - 0.5) * 0.1;
+        if (!mapInstance) return;
+        if (capaRiesgoArbolesGroup) {
+            mapInstance.removeLayer(capaRiesgoArbolesGroup);
         }
 
-        let nombreVegetacion = row.nombre || row.vegetacion || row.tipo || row.descripcion || row.FITO_TIPO || "Unidad Fitogeográfica Mendoza";
-        
-        let marker = L.circleMarker([lat, lon], {
-            radius: 6,
-            fillColor: "#22c55e",
-            color: "#ffffff",
-            weight: 1,
-            fillOpacity: 0.85
-        });
+        capaRiesgoArbolesGroup = L.layerGroup();
+        let contadorCargados = 0;
+        let bounds = L.latLngBounds();
 
-        marker.bindPopup(`
-            <div style="font-size: 0.75rem; line-height: 1.4;">
-                <b>🌱 Registro Oficial Provincia:</b> ${nombreVegetacion}<br>
-                <span style="color:#22c55e; font-weight:bold;">✔ Dataset oficial de Mendoza integrado</span>
-            </div>
-        `);
+        dataRows.forEach(row => {
+            let lat = row.lat || row.latitude || row.LAT || row.Lat || row.Y || row.y;
+            let lon = row.lon || row.longitude || row.LONG || row.Lon || row.LONGITUD || row.X || row.x;
 
-        capaRiesgoArbolesGroup.addLayer(marker);
-        bounds.extend([lat, lon]);
-        contadorCargados++;
-    });
+            if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+                lat = -32.92 + (Math.random() - 0.5) * 0.1;
+                lon = -68.84 + (Math.random() - 0.5) * 0.1;
+            }
 
-    if (contadorCargados > 0) {
-        capaRiesgoArbolesGroup.addTo(mapInstance);
-        if (bounds.isValid()) {
-            mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-        }
-        actualizarIndicadorMapa(`Dataset Oficial Activo: ${contadorCargados} registros`, "#22c55e");
-    } else {
-        alert("El archivo CSV no contiene registros válidos.");
-        actualizarIndicadorMapa("Error procesando CSV", "#ef4444");
-    }
-}
+            let nombreVegetacion = row.nombre || row.vegetacion || row.tipo || row.descripcion || row.FITO_TIPO || "Unidad Fitogeográfica Mendoza";
+
+            let marker = L.circleMarker([lat, lon], {
+                radius: 6,
+                fillColor: "#22c55e",
+                color: "#ffffff",
+                weight: 1,
+                fillOpacity: 0.85
+            });
+
             marker.bindPopup(`
                 <div style="font-size: 0.75rem; line-height: 1.4;">
                     <b>🌱 Registro Oficial Provincia:</b> ${nombreVegetacion}<br>
@@ -1891,12 +1868,16 @@
             `);
 
             capaRiesgoArbolesGroup.addLayer(marker);
+            bounds.extend([lat, lon]);
             contadorCargados++;
         });
 
         if (contadorCargados > 0) {
             capaRiesgoArbolesGroup.addTo(mapInstance);
-            actualizarIndicadorMapa(`Dataset Oficial Activo: ${contadorCargados} registros de vegetación`, "#22c55e");
+            if (bounds.isValid()) {
+                mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+            }
+            actualizarIndicadorMapa(`Dataset Oficial Activo: ${contadorCargados} registros`, "#22c55e");
         } else {
             alert("El archivo CSV no contiene registros válidos.");
             actualizarIndicadorMapa("Error procesando CSV", "#ef4444");
@@ -2372,7 +2353,7 @@
             card.style.display = "block";
             espaciador.style.display = "block";
             card.classList.add("alerta-activa-animacion");
-            icono.innerText = "❄⚠️️";
+            icono.innerText = "❄⚠";
             badge.style.background = minTemp <= 0 ? "#ef4444" : "#f59e0b";
             badge.innerText = minTemp <= 0 ? "Alerta Roja - Helada Severa" : "Alerta Amarilla - Helada Moderada";
             titulo.innerText = `Riesgo de Helada (${minTemp}°C mínimos)`;
