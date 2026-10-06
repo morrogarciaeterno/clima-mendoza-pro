@@ -616,7 +616,7 @@
 
         @media (min-width: 500px) {
             .map-controls {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -1189,6 +1189,7 @@
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣 Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
+                <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
                 <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">📐 Dibujar Lote & Reporte</button>
             </div>
 
@@ -1240,6 +1241,7 @@
     let markerInstance = null;
     let capaActual = null;
     let capaFuegosFIRMS = null;
+    let capaLluviaRadar = null;
 
     let modalMapInstance = null;
     let drawnItemsModal = null;
@@ -1262,6 +1264,25 @@
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
+    async function inicializarCapaLluviaRainViewer() {
+        if (capaLluviaRadar) return;
+        try {
+            const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+            const data = await res.json();
+            if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+                const latestTime = data.radar.past[data.radar.past.length - 1].time;
+                capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
+                    tileSize: 256,
+                    opacity: 0.7,
+                    attribution: '&copy; RainViewer'
+                });
+            }
+        } catch (e) {
+            // Fallback por si la API demora
+            capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_t2/256/{z}/{x}/{y}/2/1_1.png', { opacity: 0.7 });
+        }
+    }
+
     function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
@@ -1278,6 +1299,8 @@
                     version: '1.3.0',
                     attribution: '&copy; NASA LANCE'
                 });
+
+                inicializarCapaLluviaRainViewer();
 
                 mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8"); });
                 mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e"); });
@@ -1469,6 +1492,7 @@
         const btnTopo = document.getElementById("btnTopo");
         const btnCalles = document.getElementById("btnCalles");
         const btnFuego = document.getElementById("btnFuego");
+        const btnLluvia = document.getElementById("btnLluvia");
         const mapTitle = document.getElementById("mapTitle");
 
         if (!mapInstance) return;
@@ -1477,14 +1501,23 @@
         btnTopo.classList.remove("active");
         if (btnCalles) btnCalles.classList.remove("active");
         btnFuego.classList.remove("active");
+        btnLluvia.classList.remove("active");
 
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
+        if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
 
         if (tipo === 'fuego') {
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
             mapTitle.innerText = "🔥 Fuego (NASA FIRMS)";
             actualizarIndicadorMapa("Capa NASA Activa", "#f59e0b");
+        } else if (tipo === 'lluvia') {
+            if (capaLluviaRadar) {
+                if (!mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
+            }
+            btnLluvia.classList.add("active");
+            mapTitle.innerText = "🌧 Radar de Lluvia y Nubes";
+            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8");
         } else {
             if (capaActual && mapInstance.hasLayer(capaActual)) mapInstance.removeLayer(capaActual);
             capaActual = capasBase[tipo];
@@ -1785,15 +1818,12 @@
 
                 verificarContingenciaClimatica(minTempPronostico, maxRafagaPronostico);
 
-                // CÁLCULO CIENTÍFICO REAL: Riego Neto (ET0 - Precipitación)
                 let riegoNeto = Math.max(0, et0Hoy - precipitacionHoy);
                 document.getElementById("lluviaAcum").innerText = riegoNeto.toFixed(1) + " mm";
 
-                // CÁLCULO CIENTÍFICO REAL: GDD (Grados Día de Desarrollo - Base 10°C)
                 let gddHoy = Math.max(0, ((tMaxHoy + tMinHoy) / 2) - 10);
                 document.getElementById("gddAcum").innerText = Math.round(gddHoy) + " GDD";
 
-                // CÁLCULO CIENTÍFICO REAL: Balance Hídrico Neto
                 let balanceNeto = precipitacionHoy - et0Hoy;
                 document.getElementById("balanceHidrico").innerText = balanceNeto.toFixed(1) + " mm";
 
@@ -1805,7 +1835,6 @@
                 document.getElementById("atardecerTime").innerText = new Date(data.daily.sunset[0]).toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
             }
 
-            // CÁLCULO CIENTÍFICO REAL: Horas de Frío acumuladas (< 7°C) de las últimas 24hs
             if (data.hourly && data.hourly.temperature_2m) {
                 let horasFrioCount = 0;
                 let temps24 = data.hourly.temperature_2m.slice(0, 24);
@@ -1814,7 +1843,6 @@
                 });
                 document.getElementById("horasFrio").innerText = horasFrioCount + " hs";
 
-                // CÁLCULO CIENTÍFICO REAL: VPD (Déficit de Presión de Vapor en kPa)
                 let tActual = data.current.temperature_2m;
                 let rhActual = data.current.relative_humidity_2m;
                 let es = 0.61078 * Math.exp((17.27 * tActual) / (tActual + 237.3));
