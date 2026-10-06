@@ -14,13 +14,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root {
-            --bg: #090d16;
-            --card-bg: #111827;
-            --card-inner: #1f2937;
+            --bg: #070a14;
+            --card-bg: #0e1526;
+            --card-inner: #162035;
             --accent: #38bdf8;
-            --text-main: #f9fafb;
-            --text-muted: #9ca3af;
-            --border: #1f2937;
+            --accent-glow: rgba(56, 189, 248, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
         }
 
         * {
@@ -45,12 +46,13 @@
         header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
-            padding: 10px 12px;
-            padding-top: max(12px, env(safe-area-inset-top));
+            padding: 14px 16px;
+            padding-top: max(16px, env(safe-area-inset-top));
             position: sticky;
             top: 0;
             z-index: 100;
             width: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .header-content {
@@ -60,7 +62,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .brand {
@@ -69,8 +71,8 @@
         }
 
         .brand h1 {
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 1.15rem;
+            font-weight: 800;
             letter-spacing: -0.5px;
             white-space: nowrap;
             overflow: hidden;
@@ -78,18 +80,19 @@
         }
 
         .brand p {
-            font-size: 0.7rem;
+            font-size: 0.78rem;
             color: var(--accent);
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-top: 2px;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             flex-shrink: 0;
         }
 
@@ -98,8 +101,8 @@
         }
 
         #fecha {
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 700;
             color: var(--text-main);
             text-transform: capitalize;
         }
@@ -108,79 +111,82 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 4px;
-            margin-top: 1px;
+            gap: 6px;
+            margin-top: 2px;
         }
 
         #digitalFallback {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--accent);
             font-variant-numeric: tabular-nums;
+            font-weight: 600;
         }
 
         #headerTemp {
-            font-size: 0.72rem;
-            font-weight: 700;
+            font-size: 0.78rem;
+            font-weight: 800;
             color: var(--accent);
         }
 
         .btn-notif-header {
-            background: rgba(56, 189, 248, 0.15);
+            background: var(--accent-glow);
             border: 1px solid var(--accent);
             color: var(--accent);
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
             flex-shrink: 0;
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         .container {
             width: 100%;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 8px 8px 40px 8px;
+            padding: 12px 12px 50px 12px;
         }
 
-        /* CORRECCIÓN CLAVE CELULARES: Grid de métricas a 2 columnas fijas adaptadas */
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 12px;
             width: 100%;
         }
 
         @media (min-width: 768px) {
             .grid {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
+            border-radius: 16px;
+            padding: 14px;
             width: 100%;
             min-width: 0;
             overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
         .card h3 {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .metric {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 800;
             color: var(--text-main);
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .card-temp-main {
@@ -194,12 +200,12 @@
         }
 
         .card-temp-main .metric {
-            font-size: 2.4rem !important;
+            font-size: 2.8rem !important;
             font-weight: 900 !important;
             color: #ffffff !important;
             line-height: 0.95;
-            margin-top: 2px;
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
+            margin-top: 4px;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
         }
 
         .temp-box {
@@ -209,75 +215,77 @@
         }
 
         #weatherIcon {
-            width: 38px;
-            height: 38px;
+            width: 44px;
+            height: 44px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
         }
 
-        /* CORRECCIÓN PRONÓSTICO 12 HORAS: Scroll horizontal fluido en móviles */
         .forecast-cards {
             display: flex;
             justify-content: flex-start;
-            gap: 6px;
-            margin-top: 6px;
+            gap: 8px;
+            margin-top: 10px;
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
         }
 
         .forecast-card {
-            flex: 0 0 65px;
+            flex: 0 0 72px;
             background: var(--card-inner);
-            border-radius: 8px;
-            padding: 6px 2px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 4px;
             text-align: center;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
         }
 
         .forecast-card .icon {
-            font-size: 1.1rem;
-            margin: 2px 0;
+            font-size: 1.3rem;
+            margin: 4px 0;
         }
 
         .forecast-card .max {
-            font-size: 0.85rem;
-            font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 800;
             color: var(--accent);
         }
 
         .forecast-card .min {
-            font-size: 0.68rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
         }
 
         .sismos-grid-horizontal {
             display: flex;
             justify-content: flex-start;
-            gap: 6px;
-            margin-top: 6px;
+            gap: 8px;
+            margin-top: 10px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             width: 100%;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
         }
 
         .sismo-mini-card {
-            flex: 0 0 120px;
+            flex: 0 0 140px;
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 6px;
+            border-radius: 12px;
+            padding: 10px;
             text-align: center;
         }
 
         .sismo-mini-mag {
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 2px 0;
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 3px 0;
         }
 
         .sismo-mendoza {
             color: #ef4444 !important;
-            font-weight: bold;
+            font-weight: 900;
         }
 
         .sismo-normal {
@@ -287,7 +295,7 @@
         .dashboard-row {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
         }
 
@@ -307,12 +315,12 @@
 
         .solar-arc {
             position: relative;
-            width: 100px;
-            height: 50px;
-            border: 2px dashed #374151;
-            border-bottom: 2px solid #374151;
-            border-radius: 50px 50px 0 0;
-            margin-top: 4px;
+            width: 120px;
+            height: 60px;
+            border: 2px dashed #334155;
+            border-bottom: 2px solid #334155;
+            border-radius: 60px 60px 0 0;
+            margin-top: 8px;
         }
 
         .sun-pivot {
@@ -327,24 +335,25 @@
 
         .sun-icon {
             position: absolute;
-            left: -8px;
-            bottom: -8px;
-            font-size: 16px;
+            left: -10px;
+            bottom: -10px;
+            font-size: 18px;
         }
 
         .solar-times {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 160px;
-            margin-top: 4px;
-            font-size: 0.65rem;
+            max-width: 180px;
+            margin-top: 8px;
+            font-size: 0.72rem;
             color: var(--text-muted);
         }
 
         .solar-times strong {
             color: var(--text-main);
             display: block;
+            font-size: 0.78rem;
         }
 
         .lunar-container {
@@ -356,34 +365,35 @@
         }
 
         .moon-display {
-            font-size: 2rem;
+            font-size: 2.4rem;
             line-height: 1;
-            margin: 2px 0;
+            margin: 4px 0;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.25));
         }
 
         .moon-phase-title {
-            font-size: 0.75rem;
+            font-size: 0.82rem;
             font-weight: 800;
             color: var(--text-main);
             text-align: center;
         }
 
         .moon-illumination {
-            font-size: 0.68rem;
+            font-size: 0.75rem;
             color: var(--accent);
-            font-weight: 700;
-            margin-top: 1px;
+            font-weight: 800;
+            margin-top: 2px;
         }
 
         .polen-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 6px;
-            margin-top: 4px;
+            gap: 10px;
+            margin-top: 10px;
             width: 100%;
         }
 
-        @media (min-width: 500px) {
+        @media (min-width: 600px) {
             .polen-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -391,60 +401,71 @@
 
         .polen-card {
             background: var(--card-inner);
-            border-radius: 8px;
-            padding: 6px;
-            text-align: center;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: left;
             border: 1px solid var(--border);
             width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .polen-header-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
         }
 
         .polen-icon {
-            font-size: 1.1rem;
-            margin-bottom: 2px;
+            font-size: 1.4rem;
         }
 
         .polen-title {
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 0.85rem;
+            font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 2px;
         }
 
         .polen-dias {
             display: flex;
             flex-direction: column;
-            gap: 2px;
-            font-size: 0.62rem;
-            text-align: left;
+            gap: 5px;
+            font-size: 0.72rem;
         }
 
         .polen-item {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            background: rgba(0,0,0,0.15);
+            padding: 4px 6px;
+            border-radius: 6px;
         }
 
         .dot-nivel {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             display: inline-block;
             flex-shrink: 0;
+            box-shadow: 0 0 6px currentColor;
         }
 
-        .dot-ninguno { background-color: #9ca3af; }
-        .dot-bajo { background-color: #22c55e; }
-        .dot-medio { background-color: #facc15; }
-        .dot-alto { background-color: #fb923c; }
-        .dot-muyalto { background-color: #ef4444; }
+        .dot-ninguno { background-color: #94a3b8; color: #94a3b8; }
+        .dot-bajo { background-color: #22c55e; color: #22c55e; }
+        .dot-medio { background-color: #facc15; color: #facc15; }
+        .dot-alto { background-color: #fb923c; color: #fb923c; }
+        .dot-muyalto { background-color: #ef4444; color: #ef4444; }
 
         .dual-section {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
         }
 
@@ -457,7 +478,7 @@
         .grid-confort-termico {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
+            gap: 6px;
             text-align: center;
             width: 100%;
         }
@@ -465,7 +486,7 @@
         .grid-agricola {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
+            gap: 6px;
             text-align: center;
             width: 100%;
         }
@@ -479,8 +500,8 @@
         .glosario-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 6px;
-            margin-top: 6px;
+            gap: 8px;
+            margin-top: 8px;
             width: 100%;
         }
 
@@ -493,22 +514,22 @@
         .glosario-item {
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 6px;
+            border-radius: 8px;
+            padding: 8px;
             width: 100%;
         }
 
         .glosario-titulo {
-            font-size: 0.72rem;
-            font-weight: 700;
+            font-size: 0.78rem;
+            font-weight: 800;
             color: var(--accent);
             margin-bottom: 2px;
         }
 
         .glosario-desc {
-            font-size: 0.65rem;
+            font-size: 0.68rem;
             color: var(--text-muted);
-            line-height: 1.2;
+            line-height: 1.3;
         }
 
         .map-wrapper-container {
@@ -517,18 +538,18 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            margin-top: 6px;
-            min-height: 320px;
+            margin-top: 8px;
+            min-height: 350px;
         }
 
         #mapaArgentina {
             width: 100%;
             height: 100%;
-            min-height: 320px;
-            border-radius: 8px;
+            min-height: 350px;
+            border-radius: 12px;
             z-index: 1;
             border: 2px solid var(--border);
-            background-color: #090d16 !important;
+            background-color: #070a14 !important;
         }
 
         .leaflet-layer,
@@ -547,49 +568,49 @@
 
         .map-status-pill {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
+            bottom: 12px;
+            left: 12px;
             z-index: 1000;
-            background: rgba(17, 24, 39, 0.9);
+            background: rgba(14, 21, 38, 0.95);
             border: 1px solid var(--accent);
             color: var(--text-main);
-            padding: 3px 8px;
-            border-radius: 16px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             pointer-events: none;
             backdrop-filter: blur(4px);
-            max-width: calc(100% - 20px);
+            max-width: calc(100% - 24px);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         .pulse-dot {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             background-color: #22c55e;
             border-radius: 50%;
-            box-shadow: 0 0 5px #22c55e;
+            box-shadow: 0 0 8px #22c55e;
             animation: pulseGlow 1.5s infinite;
             flex-shrink: 0;
         }
 
         @keyframes pulseGlow {
             0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 10px #22c55e; }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #22c55e; }
             100% { transform: scale(0.95); opacity: 0.8; }
         }
 
         .map-controls {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
-            margin-top: 6px;
+            gap: 6px;
+            margin-top: 8px;
             width: 100%;
         }
 
@@ -603,10 +624,10 @@
             background: var(--card-inner);
             color: var(--text-main);
             border: 1px solid var(--border);
-            padding: 6px 4px;
-            border-radius: 6px;
-            font-size: 0.62rem;
-            font-weight: 700;
+            padding: 8px 6px;
+            border-radius: 8px;
+            font-size: 0.68rem;
+            font-weight: 800;
             cursor: pointer;
             text-align: center;
             white-space: nowrap;
@@ -614,10 +635,11 @@
             text-overflow: ellipsis;
             transition: all 0.2s;
             width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .map-btn:hover {
-            background: #374151;
+            background: #1e293b;
             border-color: var(--accent);
         }
 
@@ -625,7 +647,7 @@
             background: var(--accent);
             color: #000;
             border-color: var(--accent);
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
         }
 
         .modal-overlay {
@@ -639,25 +661,25 @@
             display: none;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(6px);
-            padding: 4px;
+            backdrop-filter: blur(8px);
+            padding: 6px;
         }
 
         .modal-content-box {
             background: var(--card-bg);
             border: 1px solid var(--accent);
-            border-radius: 12px;
+            border-radius: 16px;
             width: 100%;
             max-width: 1300px;
             height: 96vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9);
         }
 
         .modal-header {
-            padding: 8px 12px;
+            padding: 10px 16px;
             background: var(--card-inner);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -666,38 +688,40 @@
         }
 
         .modal-header h2 {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-weight: 800;
         }
 
         .btn-cerrar-modal {
             background: #ef4444;
             color: white;
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(239,68,68,0.5);
         }
 
         .modal-body {
             flex-grow: 1;
-            padding: 8px;
+            padding: 12px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 12px;
             overflow-y: auto;
             width: 100%;
         }
@@ -712,14 +736,14 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            min-height: 280px;
+            min-height: 300px;
             width: 100%;
         }
 
         .modal-search-box {
             display: flex;
-            gap: 4px;
-            margin-bottom: 4px;
+            gap: 6px;
+            margin-bottom: 6px;
             width: 100%;
         }
 
@@ -728,9 +752,9 @@
             background: var(--card-inner);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 0.7rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
             outline: none;
             min-width: 0;
         }
@@ -740,13 +764,13 @@
         }
 
         .modal-search-btn {
-            background: rgba(56, 189, 248, 0.2);
+            background: var(--accent-glow);
             border: 1px solid var(--accent);
             color: var(--accent);
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 800;
             cursor: pointer;
             flex-shrink: 0;
         }
@@ -754,20 +778,20 @@
         #mapaModalDibujo {
             width: 100%;
             flex-grow: 1;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 2px solid var(--border);
-            background-color: #090d16 !important;
-            min-height: 250px;
+            background-color: #070a14 !important;
+            min-height: 280px;
         }
 
         .modal-report-panel {
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             overflow-y: auto;
             max-height: 100%;
             width: 100%;
@@ -775,35 +799,35 @@
         }
 
         .report-section-title {
-            font-size: 0.78rem;
-            font-weight: 700;
+            font-size: 0.85rem;
+            font-weight: 800;
             color: var(--accent);
             border-bottom: 1px solid var(--border);
-            padding-bottom: 3px;
-            margin-top: 2px;
+            padding-bottom: 4px;
+            margin-top: 4px;
         }
 
         .recommendation-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 8px;
-            font-size: 0.72rem;
-            line-height: 1.3;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.76rem;
+            line-height: 1.4;
             width: 100%;
             overflow-x: auto;
         }
 
         .cultivo-btn-select {
             display: inline-block;
-            background: rgba(56, 189, 248, 0.15);
+            background: var(--accent-glow);
             border: 1px solid var(--accent);
             color: var(--accent);
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin: 2px;
-            font-size: 0.68rem;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            margin: 3px;
+            font-size: 0.72rem;
             cursor: pointer;
         }
 
@@ -813,9 +837,9 @@
         }
 
         @keyframes alertaParpadeo {
-            0% { border-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
-            50% { border-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.8); }
-            100% { border-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+            0% { border-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+            50% { border-color: #f59e0b; box-shadow: 0 0 16px rgba(245, 158, 11, 0.8); }
+            100% { border-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
         }
 
         .alerta-activa-animacion {
@@ -851,16 +875,16 @@
 
 <div class="container">
 
-    <div class="card" id="contingenciaAlertaCard" style="display: none; border-left: 5px solid #ef4444; background: linear-gradient(135deg, #111827 0%, #1f1118 100%); margin-bottom: 8px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span id="contingenciaIcono" style="font-size: 1.8rem; flex-shrink: 0;">❄️️⚠</span>
+    <div class="card" id="contingenciaAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="contingenciaIcono" style="font-size: 2rem; flex-shrink: 0;">❄⚠</span>
             <div style="min-width: 0; flex-grow: 1;">
-                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                    <span id="contingenciaBadge" style="background: #ef4444; color: #fff; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-size: 0.62rem; text-transform: uppercase;">Alerta Oficial</span>
-                    <small style="color: var(--text-muted); font-size: 0.62rem;">Open-Meteo</small>
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span id="contingenciaBadge" style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Oficial</span>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;">Open-Meteo</small>
                 </div>
-                <h3 id="contingenciaTitulo" style="color: var(--text-main); font-size: 0.85rem; margin-top: 2px; font-weight: 700;">¡Alerta Climática!</h3>
-                <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.7rem; margin-top: 1px;">Condición extrema pronosticada.</p>
+                <h3 id="contingenciaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Alerta Climática!</h3>
+                <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Condición extrema pronosticada.</p>
             </div>
         </div>
     </div>
@@ -872,9 +896,9 @@
                 <div class="metric" id="temp">--</div>
                 <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="clima">
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3px;">
-                <small id="tempDesc" style="color:var(--text-muted); font-size:0.68rem;">Cargando...</small>
-                <small id="stTemp" style="color:var(--accent); font-weight: 700; font-size:0.68rem;">ST: --°C</small>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                <small id="tempDesc" style="color:var(--text-muted); font-size:0.75rem;">Cargando...</small>
+                <small id="stTemp" style="color:var(--accent); font-weight: 800; font-size:0.75rem;">ST: --°C</small>
             </div>
         </div>
 
@@ -886,55 +910,55 @@
         <div class="card">
             <h3>Viento</h3>
             <div class="metric" id="viento">--</div>
-            <small id="vientoDir" style="color:var(--text-muted); font-size:0.68rem;">Dir: --</small>
+            <small id="vientoDir" style="color:var(--text-muted); font-size:0.72rem;">Dir: --</small>
         </div>
 
         <div class="card">
             <h3>Índice UV</h3>
             <div class="metric" id="uvIndex">--</div>
-            <small id="uvEstado" style="color:var(--text-muted); font-size:0.68rem;">Cargando...</small>
+            <small id="uvEstado" style="color:var(--text-muted); font-size:0.72rem;">Cargando...</small>
         </div>
 
         <div class="card">
             <h3>Presión Atmosférica</h3>
             <div class="metric" id="presion">--</div>
-            <small id="presionTendencia" style="color:var(--accent); font-weight:700; font-size:0.65rem;">Hectopascales</small>
+            <small id="presionTendencia" style="color:var(--accent); font-weight:800; font-size:0.7rem;">Hectopascales</small>
         </div>
 
         <div class="card">
             <h3>Calidad del Aire</h3>
             <div class="metric" id="aire">--</div>
-            <small id="aireEstado" style="color:var(--text-muted); font-size:0.68rem;">Cargando AQI...</small>
+            <small id="aireEstado" style="color:var(--text-muted); font-size:0.72rem;">Cargando AQI...</small>
         </div>
     </div>
 
     <br>
 
     <!-- ALERTA DE INCENDIOS NASA FIRMS (REAL) -->
-    <div class="card" id="fuegoAlertaCard" style="display: none; border-left: 5px solid #ef4444; margin-bottom: 8px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.6rem; flex-shrink: 0;">🔥</span>
+    <div class="card" id="fuegoAlertaCard" style="display: none; border-left: 6px solid #ef4444; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.8rem; flex-shrink: 0;">🔥</span>
             <div style="min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                    <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-size: 0.62rem; text-transform: uppercase;">Alerta Fuego</span>
-                    <small style="color: var(--text-muted); font-size: 0.62rem;">NASA FIRMS</small>
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Fuego</span>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;">NASA FIRMS</small>
                 </div>
-                <h3 id="fuegoAlertaTitulo" style="color: var(--text-main); font-size: 0.85rem; margin-top: 2px; font-weight: 700;">¡Foco Activo Detectado!</h3>
-                <p id="fuegoAlertaDesc" style="color: var(--text-muted); font-size: 0.7rem; margin-top: 1px;">Calculando distancia...</p>
+                <h3 id="fuegoAlertaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 2px; font-weight: 800;">¡Foco Activo Detectado!</h3>
+                <p id="fuegoAlertaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Calculando distancia...</p>
             </div>
         </div>
     </div>
 
-    <div class="card" id="smnAlertCard" style="display: none; border-left: 5px solid #f59e0b; margin-bottom: 8px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span id="smnIcono" style="font-size: 1.6rem; flex-shrink: 0;">⚡⛈</span>
+    <div class="card" id="smnAlertCard" style="display: none; border-left: 6px solid #f59e0b; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="smnIcono" style="font-size: 1.8rem; flex-shrink: 0;">⚡⛈</span>
             <div style="min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                    <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-size: 0.62rem; text-transform: uppercase;">Tormenta</span>
-                    <small style="color: var(--text-muted); font-size: 0.62rem;">En Vivo</small>
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span id="smnNivelBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Tormenta</span>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;">En Vivo</small>
                 </div>
-                <h3 id="smnTitulo" style="color: var(--text-main); font-size: 0.85rem; margin-top: 2px; font-weight: 700;">Condición Inestable</h3>
-                <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.7rem; margin-top: 1px;">Actividad eléctrica detectada.</p>
+                <h3 id="smnTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 2px; font-weight: 800;">Condición Inestable</h3>
+                <p id="smnDescripcion" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Actividad eléctrica detectada.</p>
             </div>
         </div>
     </div>
@@ -948,15 +972,15 @@
 
     <div class="dashboard-row">
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <h3 style="margin-bottom: 4px;">🌅 Astronomía & Ciclo Solar</h3>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; padding: 2px 0;">
+            <h3 style="margin-bottom: 6px;">🌅 Astronomía & Ciclo Solar</h3>
+            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; padding: 6px 0;">
                 <div class="solar-container" style="padding-top:0;">
-                    <div class="solar-arc" style="margin: 2px auto;">
+                    <div class="solar-arc" style="margin: 4px auto;">
                         <div class="sun-pivot" id="sunPivot">
                             <div class="sun-icon" id="sunIcon">☀</div>
                         </div>
                     </div>
-                    <div class="solar-times" style="margin: 2px auto 0 auto;">
+                    <div class="solar-times" style="margin: 6px auto 0 auto;">
                         <div>Amanecer<strong id="amanecerTime">--:--</strong></div>
                         <div style="text-align:right">Atardecer<strong id="atardecerTime">--:--</strong></div>
                     </div>
@@ -972,26 +996,38 @@
 
         <div class="card">
             <h3>🌱 Desglose de Polen & Alérgenos</h3>
-            <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 1px; margin-bottom: 3px;">
-                Previsión oficial satelital.
+            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;">
+                Previsión oficial satelital de alérgenos.
             </p>
             <div class="polen-grid">
                 <div class="polen-card">
-                    <div class="polen-icon">🌳</div>
-                    <div class="polen-title">Árboles</div>
-                    <div id="polenArboles" class="polen-dias">Cargando...</div>
+                    <div>
+                        <div class="polen-header-box">
+                            <span class="polen-icon">🌳</span>
+                            <div class="polen-title">Árboles</div>
+                        </div>
+                        <div id="polenArboles" class="polen-dias">Cargando...</div>
+                    </div>
                 </div>
 
                 <div class="polen-card">
-                    <div class="polen-icon">🌾</div>
-                    <div class="polen-title">Césped</div>
-                    <div id="polenCesped" class="polen-dias">Cargando...</div>
+                    <div>
+                        <div class="polen-header-box">
+                            <span class="polen-icon">🌾</span>
+                            <div class="polen-title">Césped</div>
+                        </div>
+                        <div id="polenCesped" class="polen-dias">Cargando...</div>
+                    </div>
                 </div>
 
                 <div class="polen-card">
-                    <div class="polen-icon">🌿</div>
-                    <div class="polen-title">Maleza</div>
-                    <div id="polenMaleza" class="polen-dias">Cargando...</div>
+                    <div>
+                        <div class="polen-header-box">
+                            <span class="polen-icon">🌿</span>
+                            <div class="polen-title">Maleza</div>
+                        </div>
+                        <div id="polenMaleza" class="polen-dias">Cargando...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1015,111 +1051,111 @@
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <div class="card" style="margin-top: 8px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 6px;">⚡ Confort Térmico & Radiación</h3>
+            <div class="card" style="margin-top: 12px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 8px;">⚡ Confort Térmico & Radiación</h3>
                 <div class="grid-confort-termico">
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">🌡️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Bulbo Húmedo</small>
-                        <strong id="bulboHumedad" style="font-size: 0.75rem; color: var(--text-main);">-- °C</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">🌡️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Bulbo Húmedo</small>
+                        <strong id="bulboHumedad" style="font-size: 0.85rem; color: var(--text-main);">-- °C</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">☀️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Radiación</small>
-                        <strong id="radiacionSolar" style="font-size: 0.75rem; color: var(--text-main);">-- W/m²</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">☀️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Radiación</small>
+                        <strong id="radiacionSolar" style="font-size: 0.85rem; color: var(--text-main);">-- W/m²</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">⚡</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Estrés Térmico</small>
-                        <strong id="estresTermico" style="font-size: 0.75rem; color: #22c55e;">Confortable</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">⚡</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Estrés Térmico</small>
+                        <strong id="estresTermico" style="font-size: 0.85rem; color: #22c55e;">Confortable</strong>
                     </div>
 
                 </div>
             </div>
 
-            <div class="card" style="margin-top: 8px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 6px;">🌾 Resumen Agrometeorológico Local</h3>
+            <div class="card" style="margin-top: 12px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 8px;">🌾 Resumen Agrometeorológico Local</h3>
                 <div class="grid-agricola">
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">🌧️</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Prob. Lluvia</small>
-                        <strong id="probLluvia" style="font-size: 0.75rem; color: var(--text-main);">--%</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">🌧️</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Prob. Lluvia</small>
+                        <strong id="probLluvia" style="font-size: 0.85rem; color: var(--text-main);">--%</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Lluvia Total</small>
-                        <strong id="lluviaAcum" style="font-size: 0.75rem; color: var(--text-main);">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Riego Neto</small>
+                        <strong id="lluviaAcum" style="font-size: 0.85rem; color: var(--accent);">-- mm</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">☀</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Horas de Sol</small>
-                        <strong id="horasSol" style="font-size: 0.75rem; color: var(--text-main);">-- hs</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">☀</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Horas de Sol</small>
+                        <strong id="horasSol" style="font-size: 0.85rem; color: var(--text-main);">-- hs</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">💨</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Ráfagas Máx.</small>
-                        <strong id="rafagasMax" style="font-size: 0.75rem; color: var(--text-main);">-- km/h</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">💨</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Ráfagas Máx.</small>
+                        <strong id="rafagasMax" style="font-size: 0.85rem; color: var(--text-main);">-- km/h</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">🌱</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Humedad Suelo</small>
-                        <strong id="humSuelo" style="font-size: 0.75rem; color: var(--text-main);">-- %</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">🌱</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Humedad Suelo</small>
+                        <strong id="humSuelo" style="font-size: 0.85rem; color: var(--text-main);">-- %</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">🌡</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Temp. Suelo</small>
-                        <strong id="tempSuelo" style="font-size: 0.75rem; color: var(--text-main);">-- °C</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">🌡</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Temp. Suelo</small>
+                        <strong id="tempSuelo" style="font-size: 0.85rem; color: var(--text-main);">-- °C</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">❄</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Horas de Frío</small>
-                        <strong id="horasFrio" style="font-size: 0.75rem; color: var(--accent);">-- hs</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">❄</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Horas de Frío</small>
+                        <strong id="horasFrio" style="font-size: 0.85rem; color: var(--accent);">-- hs</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">📈</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">GDD (Acum.)</small>
-                        <strong id="gddAcum" style="font-size: 0.75rem; color: var(--accent);">-- GDD</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">📈</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">GDD (Acum.)</small>
+                        <strong id="gddAcum" style="font-size: 0.85rem; color: var(--accent);">-- GDD</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">VPD (Aire)</small>
-                        <strong id="vpdAire" style="font-size: 0.75rem; color: var(--text-main);">-- kPa</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">VPD (Aire)</small>
+                        <strong id="vpdAire" style="font-size: 0.85rem; color: var(--text-main);">-- kPa</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">⚖</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Balance Hídrico</small>
-                        <strong id="balanceHidrico" style="font-size: 0.75rem; color: var(--text-main);">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">⚖</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Balance Hídrico</small>
+                        <strong id="balanceHidrico" style="font-size: 0.85rem; color: var(--text-main);">-- mm</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">❄</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Riesgo Helada</small>
-                        <strong id="riesgoHelada" style="font-size: 0.75rem; color:#22c55e;">Sin Riesgo</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">❄</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Riesgo Helada</small>
+                        <strong id="riesgoHelada" style="font-size: 0.85rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 5px; border-radius: 5px; border: 1px solid var(--border);">
-                        <span style="font-size: 1rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.58rem; margin-top: 1px;">Evapotransp.</small>
-                        <strong id="etoDiario" style="font-size: 0.75rem; color: var(--text-main);">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 1.2rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Evapotransp.</small>
+                        <strong id="etoDiario" style="font-size: 0.85rem; color: var(--text-main);">-- mm</strong>
                     </div>
 
                 </div>
 
-                <div style="margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px;">
-                    <h4 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 4px;">📖 Glosario Técnico</h4>
+                <div style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px;">
+                    <h4 style="font-size: 0.8rem; color: var(--accent); margin-bottom: 6px;">📖 Glosario Técnico</h4>
                     <div class="glosario-grid">
                         <div class="glosario-item">
                             <div class="glosario-titulo">📈 GDD (Grados Día)</div>
@@ -1181,7 +1217,7 @@
                     <input type="text" id="modalSearchInput" class="modal-search-input" placeholder="Buscar zona (ej: Godoy Cruz)..." onkeypress="if(event.key === 'Enter') buscarLugarModal()">
                     <button class="modal-search-btn" onclick="buscarLugarModal()">Buscar</button>
                 </div>
-                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">
+                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
                     Dibuja el polígono de tu lote en el mapa.
                 </p>
                 <div id="mapaModalDibujo"></div>
@@ -1189,7 +1225,7 @@
 
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Finca / Lote</div>
-                <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 20px 10px;">
+                <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 25px 10px;">
                     👈 Dibuja un polígono en el mapa con la herramienta superior derecha para procesar las hectáreas.
                 </div>
             </div>
@@ -1253,9 +1289,9 @@
 
             const iconoLimpio = L.divIcon({
                 className: '',
-                html: '<div style="background-color: #38bdf8; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #111827; box-shadow: 0 0 8px rgba(56, 189, 248, 0.9);"></div>',
-                iconSize: [18, 18],
-                iconAnchor: [9, 9]
+                html: '<div style="background-color: #38bdf8; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
             });
 
             markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
@@ -1345,7 +1381,7 @@
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Procesando (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent);">Consultando clima...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Procesando (${hectareas} ha)...</div><div style="text-align:center; padding: 25px; color:var(--accent);">Consultando clima...</div>`;
 
         let nombreLugar = `Lote Agrícola GPS`;
         let provinciaZona = "Mendoza";
@@ -1410,8 +1446,8 @@
 
             <div class="report-section-title">🌱 Aptitud y Cultivo</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
-                <div style="margin-bottom: 4px; font-size:0.65rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
-                <div style="margin-bottom: 6px;">${listaCultivosHtml}</div>
+                <div style="margin-bottom: 6px; font-size:0.7rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
+                <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
                 <b>Evaluación para ${cultivoSeleccionado}:</b> ${aptitudCultivo}
             </div>
 
@@ -1583,7 +1619,7 @@
     }
 
     function iconoClima(codigo) {
-        if (codigo === 0) return "☀️";
+        if (codigo === 0) return "☀️️";
         if (codigo <= 2) return "🌤️";
         if (codigo === 3) return "☁";
         if (codigo <= 67) return "🌧";
@@ -1662,9 +1698,9 @@
                 let nC = evalNivel(data.hourly.grass_pollen[idx] || 0);
                 let nM = evalNivel(data.hourly.ragweed_pollen[idx] || 0);
 
-                htmlA += `<div class="polen-item"><span class="dot-nivel ${nA.c}"></span><span>${d}:</span><strong>${nA.t}</strong></div>`;
-                htmlC += `<div class="polen-item"><span class="dot-nivel ${nC.c}"></span><span>${d}:</span><strong>${nC.t}</strong></div>`;
-                htmlM += `<div class="polen-item"><span class="dot-nivel ${nM.c}"></span><span>${d}:</span><strong>${nM.t}</strong></div>`;
+                htmlA += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:4px;">${nA.t}</span><span class="dot-nivel ${nA.c}"></span></div></div>`;
+                htmlC += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:4px;">${nC.t}</span><span class="dot-nivel ${nC.c}"></span></div></div>`;
+                htmlM += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:4px;">${nM.t}</span><span class="dot-nivel ${nM.c}"></span></div></div>`;
             });
 
             document.getElementById("polenArboles").innerHTML = htmlA;
@@ -1691,17 +1727,17 @@
                     
                     contenedor.innerHTML += `
                         <div class="sismo-mini-card">
-                            <div style="font-size: 0.62rem; color: var(--text-muted);">${horaStr}</div>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight:600;">${horaStr}</div>
                             <div class="sismo-mini-mag ${arg ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
-                            <div style="font-size: 0.62rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.place}">${lugarCorto}</div>
+                            <div style="font-size: 0.68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.place}">${lugarCorto}</div>
                         </div>
                     `;
                 });
             } else {
-                contenedor.innerHTML = `<div style="font-size:0.7rem; color:var(--text-muted); text-align:center; padding:8px;">Sin sismos recientes</div>`;
+                contenedor.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); text-align:center; padding:10px;">Sin sismos recientes</div>`;
             }
         } catch (e) {
-            contenedor.innerHTML = `<div style="font-size:0.7rem; color:#ef4444; text-align:center; padding:8px;">Error USGS</div>`;
+            contenedor.innerHTML = `<div style="font-size:0.72rem; color:#ef4444; text-align:center; padding:10px;">Error USGS</div>`;
         }
     }
 
@@ -1742,15 +1778,49 @@
             if (data.daily) {
                 let minTempPronostico = data.daily.temperature_2m_min[0] ?? 5;
                 let maxRafagaPronostico = data.daily.wind_gusts_10m_max[0] ?? 10;
+                let precipitacionHoy = data.daily.precipitation_sum[0] ?? 0;
+                let et0Hoy = data.daily.et0_fao_evapotranspiration[0] ?? 4.5;
+                let tMaxHoy = data.daily.temperature_2m_max[0] ?? 25;
+                let tMinHoy = data.daily.temperature_2m_min[0] ?? 15;
+
                 verificarContingenciaClimatica(minTempPronostico, maxRafagaPronostico);
 
+                // CÁLCULO CIENTÍFICO REAL: Riego Neto (ET0 - Precipitación)
+                let riegoNeto = Math.max(0, et0Hoy - precipitacionHoy);
+                document.getElementById("lluviaAcum").innerText = riegoNeto.toFixed(1) + " mm";
+
+                // CÁLCULO CIENTÍFICO REAL: GDD (Grados Día de Desarrollo - Base 10°C)
+                let gddHoy = Math.max(0, ((tMaxHoy + tMinHoy) / 2) - 10);
+                document.getElementById("gddAcum").innerText = Math.round(gddHoy) + " GDD";
+
+                // CÁLCULO CIENTÍFICO REAL: Balance Hídrico Neto
+                let balanceNeto = precipitacionHoy - et0Hoy;
+                document.getElementById("balanceHidrico").innerText = balanceNeto.toFixed(1) + " mm";
+
                 document.getElementById("probLluvia").innerText = (data.daily.precipitation_probability_max[0] ?? 0) + "%";
-                document.getElementById("lluviaAcum").innerText = (data.daily.precipitation_sum[0] ?? 0) + " mm";
                 document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
                 document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
-                document.getElementById("etoDiario").innerText = (data.daily.et0_fao_evapotranspiration[0] ?? 0).toFixed(1) + " mm";
+                document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
                 document.getElementById("amanecerTime").innerText = new Date(data.daily.sunrise[0]).toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
                 document.getElementById("atardecerTime").innerText = new Date(data.daily.sunset[0]).toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
+            }
+
+            // CÁLCULO CIENTÍFICO REAL: Horas de Frío acumuladas (< 7°C) de las últimas 24hs
+            if (data.hourly && data.hourly.temperature_2m) {
+                let horasFrioCount = 0;
+                let temps24 = data.hourly.temperature_2m.slice(0, 24);
+                temps24.forEach(t => {
+                    if (t >= 0 && t <= 7) horasFrioCount++;
+                });
+                document.getElementById("horasFrio").innerText = horasFrioCount + " hs";
+
+                // CÁLCULO CIENTÍFICO REAL: VPD (Déficit de Presión de Vapor en kPa)
+                let tActual = data.current.temperature_2m;
+                let rhActual = data.current.relative_humidity_2m;
+                let es = 0.61078 * Math.exp((17.27 * tActual) / (tActual + 237.3));
+                let ea = es * (rhActual / 100);
+                let vpdVal = es - ea;
+                document.getElementById("vpdAire").innerText = vpdVal.toFixed(2) + " kPa";
             }
 
             if (data.hourly && data.hourly.soil_moisture_0_to_1cm) {
@@ -1768,7 +1838,7 @@
                 let h = new Date().getHours();
                 for(let i = h; i < h + 12; i++) {
                     if (data.hourly.temperature_2m[i] !== undefined) {
-                        hourly.innerHTML += `<div class="forecast-card"><div>${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i])}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
+                        hourly.innerHTML += `<div class="forecast-card"><div style="font-size:0.72rem; font-weight:700;">${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i])}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
                     }
                 }
             }
@@ -1778,7 +1848,7 @@
                 forecast.innerHTML = "";
                 data.daily.time.forEach((t, i) => {
                     let d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", {weekday: "short"});
-                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i])}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
+                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize; font-weight:700;">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i])}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
                 });
             }
 
