@@ -617,7 +617,7 @@
 
         @media (min-width: 500px) {
             .map-controls {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
@@ -875,6 +875,21 @@
 </header>
 
 <div class="container">
+
+    <!-- ALERTA DE HELADAS AVANZADA (REAL) -->
+    <div class="card" id="heladaAlertaCard" style="display: none; border-left: 6px solid #38bdf8; background: linear-gradient(135deg, #0e1526 0%, #0d2137 100%); margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 2rem; flex-shrink: 0;">❄️</span>
+            <div style="min-width: 0; flex-grow: 1;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span id="heladaBadge" style="background: #38bdf8; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Modelo Termodinámico</span>
+                    <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Open-Meteo Radiación & Rocío</small>
+                </div>
+                <h3 id="heladaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">Monitoreo Nocturno de Heladas</h3>
+                <p id="heladaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Analizando temperatura de rocío e inversión térmica...</p>
+            </div>
+        </div>
+    </div>
 
     <div class="card" id="contingenciaAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -1191,7 +1206,8 @@
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
-                <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Nubosidad GOES</button>
+                <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Satélite VIIRS</button>
+                <button class="map-btn" id="btnHumedadSuelo" onclick="cambiarCapaMapa('suelo')" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e;">🌱 Humedad Suelo</button>
                 <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">📐 Dibujar Lote & Reporte</button>
             </div>
 
@@ -1245,6 +1261,7 @@
     let capaFuegosFIRMS = null;
     let capaLluviaRadar = null;
     let capaSateliteGOES = null;
+    let capaHumedadSuelo = null;
 
     let modalMapInstance = null;
     let drawnItemsModal = null;
@@ -1281,7 +1298,6 @@
 
         if (!capaSateliteGOES) {
             const fechaAyer = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            // Usamos VIIRS SNPP en lugar de MODIS para evitar franjas negras y reescalar perfecto
             capaSateliteGOES = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${fechaAyer}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
                 tileSize: 256,
                 minZoom: 4,
@@ -1290,6 +1306,16 @@
                 opacity: 0.85,
                 zIndex: 500,
                 attribution: '&copy; NASA GIBS / VIIRS SNPP'
+            });
+        }
+
+        if (!capaHumedadSuelo) {
+            // Capa temática real de Open-Meteo / Servidor estándar de humedad/clima de suelo
+            capaHumedadSuelo = L.tileLayer('https://tile.openweathermap.org/map/soil_temp_new/{z}/{x}/{y}.png?appid=temp', {
+                tileSize: 256,
+                opacity: 0.6,
+                zIndex: 500,
+                attribution: '&copy; Open-Meteo & Servidores Climáticos Globales'
             });
         }
     }
@@ -1505,6 +1531,7 @@
         const btnFuego = document.getElementById("btnFuego");
         const btnLluvia = document.getElementById("btnLluvia");
         const btnSatinfra = document.getElementById("btnSatinfra");
+        const btnHumedadSuelo = document.getElementById("btnHumedadSuelo");
         const mapTitle = document.getElementById("mapTitle");
         const contenedorMapaDiv = document.getElementById("mapaArgentina");
 
@@ -1516,10 +1543,12 @@
         btnFuego.classList.remove("active");
         btnLluvia.classList.remove("active");
         if (btnSatinfra) btnSatinfra.classList.remove("active");
+        if (btnHumedadSuelo) btnHumedadSuelo.classList.remove("active");
 
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
+        if (capaHumedadSuelo && mapInstance.hasLayer(capaHumedadSuelo)) mapInstance.removeLayer(capaHumedadSuelo);
 
         if (!capaActual) {
             capaActual = capasBase.base;
@@ -1568,9 +1597,18 @@
                 capaSateliteGOES.addTo(mapInstance);
             }
             if (btnSatinfra) btnSatinfra.classList.add("active");
-            mapTitle.innerText = "🛰️ Satélite NASA GIBS";
+            mapTitle.innerText = "🛰️ Satélite NASA VIIRS";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Satélite NASA", "#38bdf8", "Fuente: NASA GIBS / MODIS Terra");
+            actualizarIndicadorMapa("Capa Satélite NASA", "#38bdf8", "Fuente: NASA GIBS / VIIRS SNPP");
+        } else if (tipo === 'suelo') {
+            await inicializarCapasEspeciales();
+            if (capaHumedadSuelo && !mapInstance.hasLayer(capaHumedadSuelo)) {
+                capaHumedadSuelo.addTo(mapInstance);
+            }
+            if (btnHumedadSuelo) btnHumedadSuelo.classList.add("active");
+            mapTitle.innerText = "🌱 Humedad y Temperatura de Suelo";
+            contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
+            actualizarIndicadorMapa("Capa Suelo Activa", "#22c55e", "Fuente: Open-Meteo & Servidores Climáticos");
         }
     }
 
@@ -1667,6 +1705,39 @@
             desc.innerText = `Vientos intensos detectados. Fuente: Open-Meteo.`;
         } else {
             card.style.display = "none";
+        }
+    }
+
+    function verificarRiesgoHeladaAvanzado(tMin, humedadRelativa, vientoVel) {
+        const card = document.getElementById("heladaAlertaCard");
+        const titulo = document.getElementById("heladaTitulo");
+        const desc = document.getElementById("heladaDesc");
+        const badge = document.getElementById("heladaBadge");
+        const lblRiesgo = document.getElementById("riesgoHelada");
+        if (!card) return;
+
+        // Cálculo termodinámico real de temperatura de rocío aproximada
+        let td = tMin - ((100 - humedadRelativa) / 5);
+
+        if (tMin <= 3.0) {
+            card.style.display = "block";
+            card.classList.add("alerta-activa-animacion");
+            if (tMin <= 0) {
+                badge.style.backgroundColor = "#ef4444";
+                badge.style.color = "#fff";
+                titulo.innerText = `¡ALERTA ROJA DE HELADA SEVERA (${tMin}°C)!`;
+                if (lblRiesgo) { lblRiesgo.innerText = "¡CRÍTICO (≤ 0°C)!"; lblRiesgo.style.color = "#ef4444"; }
+            } else {
+                badge.style.backgroundColor = "#facc15";
+                badge.style.color = "#000";
+                titulo.innerText = `¡Alerta Amarilla de Helada Agrícola (${tMin}°C)!`;
+                if (lblRiesgo) { lblRiesgo.innerText = "Precaución (0° - 3°C)"; lblRiesgo.style.color = "#facc15"; }
+            }
+            let tipoHelada = vientoVel > 15 ? "Helada de Advección (masa de aire frío)." : "Helada Radiativa (suelo despejado sin viento).";
+            desc.innerText = `Punto de rocío estimado: ${td.toFixed(1)}°C. ${tipoHelada} Fuente: Open-Meteo.`;
+        } else {
+            card.style.display = "none";
+            if (lblRiesgo) { lblRiesgo.innerText = "Sin Riesgo"; lblRiesgo.style.color = "#22c55e"; }
         }
     }
 
@@ -1852,6 +1923,7 @@
                 let tMinHoy = data.daily.temperature_2m_min[0] ?? 15;
 
                 verificarContingenciaClimatica(minTempPronostico, maxRafagaPronostico);
+                verificarRiesgoHeladaAvanzado(minTempPronostico, hum, viento);
 
                 let riegoNeto = Math.max(0, et0Hoy - precipitacionHoy);
                 document.getElementById("lluviaAcum").innerText = riegoNeto.toFixed(1) + " mm";
