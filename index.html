@@ -804,22 +804,6 @@
             color: #000;
         }
 
-        .tabla-costos {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.74rem;
-            margin-top: 4px;
-            overflow-x: auto;
-            display: block;
-        }
-
-        .tabla-costos th, .tabla-costos td {
-            padding: 5px 8px;
-            border-bottom: 1px solid var(--border);
-            text-align: left;
-            white-space: nowrap;
-        }
-
         @keyframes alertaParpadeo {
             0% { border-color: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
             50% { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.8); }
@@ -1167,7 +1151,7 @@
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣 Calles</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
-                <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">📐 Dibujar Lote & Costos</button>
+                <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">📐 Dibujar Lote & Reporte</button>
             </div>
 
             <div class="map-wrapper-container">
@@ -1182,11 +1166,11 @@
 
 </div>
 
-<!-- VENTANA MODAL PARA LOTES Y COSTOS REALES -->
+<!-- VENTANA MODAL PARA LOTES Y REPORTE REAL -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
-            <h2>📐 Medición de Lote & Costos de Implantación</h2>
+            <h2>📐 Medición de Lote & Reporte Agrometeorológico</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalLotes()">✕</button>
         </div>
         <div class="modal-body">
@@ -1196,7 +1180,7 @@
                     <button class="modal-search-btn" onclick="buscarLugarModal()">Buscar</button>
                 </div>
                 <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
-                    Dibuja el polígono de tu lote en el mapa para calcular superficie exacta por GPS y costos agronómicos.
+                    Dibuja el polígono de tu lote en el mapa para calcular la superficie exacta por GPS y el reporte en vivo.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
@@ -1204,7 +1188,7 @@
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Finca / Lote</div>
                 <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 25px 10px;">
-                    👈 Dibuja un rectángulo o polígono en el mapa con la herramienta superior derecha para procesar las hectáreas y costos reales.
+                    👈 Dibuja un rectángulo o polígono en el mapa con la herramienta superior derecha para procesar las hectáreas y variables reales.
                 </div>
             </div>
         </div>
@@ -1226,15 +1210,7 @@
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
 
-    const costosCultivosUSD = {
-        "Vid": { prep: 450, implantacion: 3500, riego: 600, fitosanitarios: 800, totalHa: 5350 },
-        "Cebolla": { prep: 300, implantacion: 1200, riego: 500, fitosanitarios: 450, totalHa: 2450 },
-        "Ajo": { prep: 350, implantacion: 2800, riego: 550, fitosanitarios: 700, totalHa: 4400 },
-        "Olivo": { prep: 400, implantacion: 3000, riego: 500, fitosanitarios: 500, totalHa: 4400 },
-        "Tomate": { prep: 300, implantacion: 1800, riego: 600, fitosanitarios: 650, totalHa: 3350 },
-        "Frutales (Manz/Pera/Cerez)": { prep: 500, implantacion: 4200, riego: 700, fitosanitarios: 900, totalHa: 6300 },
-        "Extensivos (Maíz/Soja)": { prep: 120, implantacion: 350, riego: 150, fitosanitarios: 280, totalHa: 900 }
-    };
+    const listaCultivosDisponibles = ["Vid", "Cebolla", "Ajo", "Olivo", "Tomate", "Frutales (Manz/Pera/Cerez)", "Extensivos (Maíz/Soja)"];
 
     const capasBase = {
         base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap', subdomains: 'abc' }),
@@ -1368,7 +1344,7 @@
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Procesando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 30px; color:var(--accent);">Consultando variables climáticas de la zona...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Procesando Lote (${hectareas} ha)...</div><div style="text-align:center; padding: 30px; color:var(--accent);">Consultando variables climáticas en tiempo real...</div>`;
 
         let nombreLugar = `Lote Agrícola GPS`;
         let provinciaZona = "Mendoza";
@@ -1413,10 +1389,8 @@
         if (!panel) return;
 
         const d = datosLoteActual;
-        const costos = costosCultivosUSD[cultivoSeleccionado] || costosCultivosUSD["Vid"];
-        const totalLoteUSD = Math.round(costos.totalHa * d.hectareas);
 
-        let listaCultivosHtml = Object.keys(costosCultivosUSD).map(c => `
+        let listaCultivosHtml = listaCultivosDisponibles.map(c => `
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
         `).join("");
 
@@ -1438,14 +1412,15 @@
             <div class="report-section-title">📊 ${d.nombreLugar} (${d.provinciaZona})</div>
             
             <div class="recommendation-card">
-                <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} hectáreas</span><br>
-                <b>Condiciones in situ:</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
+                <b>Superficie Georreferenciada:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} hectáreas</span><br>
+                <b>Condiciones in situ (Open-Meteo):</b> ${d.temp}°C | ${d.hum}% Humedad | ${d.viento} km/h Viento
             </div>
 
             <div class="report-section-title">🌱 Aptitud del Suelo & Recomendación de Cultivo</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
-                <b>Cultivo Seleccionado:</b> ${cultivoSeleccionado}<br>
-                <b>Evaluación Térmica:</b> <span style="color:var(--text-main);">${aptitudCultivo}</span>
+                <div style="margin-bottom: 6px; font-size:0.7rem; color:var(--text-muted);">Seleccionar Cultivo a Evaluar:</div>
+                <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
+                <b>Evaluación Térmica para ${cultivoSeleccionado}:</b> <span style="color:var(--text-main);">${aptitudCultivo}</span>
             </div>
 
             <div class="report-section-title">🧪 Guía de Fertilización Sugerida (Basada en Suelo)</div>
@@ -1453,38 +1428,11 @@
                 <b>Nutrición Recomendada:</b> <span style="color:var(--text-main);">${recomendacionFertilizante}</span>
             </div>
 
-            <div class="report-section-title">💰 Costos de Implantación y Producción (USD)</div>
-            <div class="recommendation-card">
-                <div style="margin-bottom: 4px; font-size:0.7rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
-                <div style="margin-bottom: 6px;">${listaCultivosHtml}</div>
-
-                <table class="tabla-costos">
-                    <thead>
-                        <tr>
-                            <th>Concepto</th>
-                            <th>USD/ha</th>
-                            <th>Total (${d.hectareas}ha)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Preparación de Suelo</td><td>$${costos.prep}</td><td>$${Math.round(costos.prep * d.hectareas)}</td></tr>
-                        <tr><td>Implantación / Plantas</td><td>$${costos.implantacion}</td><td>$${Math.round(costos.implantacion * d.hectareas)}</td></tr>
-                        <tr><td>Gestión de Riego</td><td>$${costos.riego}</td><td>$${Math.round(costos.riego * d.hectareas)}</td></tr>
-                        <tr><td>Fitosanitarios</td><td>$${costos.fitosanitarios}</td><td>$${Math.round(costos.fitosanitarios * d.hectareas)}</td></tr>
-                        <tr style="font-weight:bold; color:var(--accent);">
-                            <td>Inversión Total Finca</td>
-                            <td>$${costos.totalHa}/ha</td>
-                            <td>$${totalLoteUSD} USD</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
             <div class="report-section-title">💧 Balance Hídrico del Lote</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
                 <b>Precipitación Reciente:</b> ${d.lluvia} mm<br>
                 <b>Evapotranspiración (ET0):</b> ${d.et0} mm/día<br>
-                <b>Déficit Hídrico Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm (Requiere ajuste de riego).
+                <b>Déficit Hídrico Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm (Calculado en tiempo real).
             </div>
         `;
     }
