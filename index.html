@@ -1487,31 +1487,39 @@
     }
 
     // Función principal de guardado vinculada por ID y listener
-    function guardarRegistroArbol() {
-        const especie = document.getElementById("selectEspecieArbol").value;
-        const estado = document.getElementById("selectEstadoArbol").value;
-        const observaciones = document.getElementById("txtObservacionesArbol").value;
+   function guardarRegistroArbol() {
+    alert("1. Iniciando guardado...");
 
-        const nuevoArbol = {
-            especie,
-            estado,
-            observaciones: observaciones || "Sin observaciones",
-            lat: currentLat,
-            lon: currentLon,
-            fecha: new Date().toLocaleDateString("es-AR")
-        };
+    const especie = document.getElementById("selectEspecieArbol").value;
+    const estado = document.getElementById("selectEstadoArbol").value;
+    const observaciones = document.getElementById("txtObservacionesArbol").value;
 
-        db.collection("arboles_censados").add(nuevoArbol)
-            .then((docRef) => {
-                alert(`¡Éxito! Árbol (${especie}) guardado en Firebase con ID: ${docRef.id}`);
-                cerrarModalCensoForestal();
-            })
-            .catch((error) => {
-                alert("Error al conectar con Firebase: " + error.message);
-            });
+    const nuevoArbol = {
+        especie,
+        estado,
+        observaciones: observaciones || "Sin observaciones",
+        lat: currentLat,
+        lon: currentLon,
+        fecha: new Date().toLocaleDateString("es-AR")
+    };
+
+    alert("2. Datos preparados. Intentando conectar con Firebase...");
+
+    // Verificamos si db existe antes de intentar guardar
+    if (typeof db === 'undefined') {
+        alert("ERROR: La base de datos 'db' no está definida.");
+        return;
     }
 
-    // Escucha en tiempo real los árboles de todos los colaboradores
+    db.collection("arboles_censados").add(nuevoArbol)
+        .then((docRef) => {
+            alert(`¡3. GUARDADO EXITOSO! ID en la nube: ${docRef.id}`);
+            cerrarModalCensoForestal();
+        })
+        .catch((error) => {
+            alert("4. ERROR DE FIREBASE: " + error.message);
+        });
+}    // Escucha en tiempo real los árboles de todos los colaboradores
     function escucharArbolesEnTiempoReal() {
         db.collection("arboles_censados").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
