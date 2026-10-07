@@ -1434,12 +1434,12 @@
         let nombreLugar = `Lote Agrícola GPS`;
         let provinciaZona = "Mendoza";
         try {
-            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=12`);
             const geoData = await geoRes.json();
             if (geoData && geoData.address) {
-                const ciudad = geoData.address.city || geoData.address.town || geoData.address.village || "";
+                const localidad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.suburb || geoData.address.municipality || "";
                 provinciaZona = geoData.address.state || "Mendoza";
-                if (ciudad) nombreLugar = ciudad;
+                if (localidad) nombreLugar = localidad;
             }
         } catch(e) {}
 
@@ -1472,7 +1472,6 @@
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
         `).join("");
 
-        // Motor de recomendación de fertilización basado en variables reales
         let recomendacionFertilizante = "";
         let alertaDeriva = "";
 
@@ -1489,7 +1488,7 @@
         }
 
         panel.innerHTML = `
-            <div class="report-section-title">📊 ${d.nombreLugar} (${d.provinciaZona})</div>
+            <div class="report-section-title">📊 ${d.nombreLugar}, ${d.provinciaZona}</div>
             
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} ha</span><br>
@@ -1981,19 +1980,23 @@
     async function procesarUbicacionExitosa(lat, lon) {
         currentLat = lat;
         currentLon = lon;
-        let nombreLugar = "Ubicación GPS";
+        let nombreTextoFinal = "Godoy Cruz, Mendoza";
         try {
-            const res = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=10`)).json();
+            const res = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=12`)).json();
             if (res && res.address) {
-                let ciudad = res.address.city || res.address.town || res.address.village || res.address.suburb || "";
-                let prov = res.address.state || "Mendoza";
-                nombreLugar = ciudad ? `${ciudad}, ${prov}` : prov;
+                let localidad = res.address.city || res.address.town || res.address.village || res.address.suburb || res.address.municipality || "";
+                let provincia = res.address.state || "Mendoza";
+                if (localidad) {
+                    nombreTextoFinal = `${localidad}, ${provincia}`;
+                } else {
+                    nombreTextoFinal = provincia;
+                }
             }
         } catch(e) {
-            nombreLugar = "Argentina";
+            nombreTextoFinal = "Godoy Cruz, Mendoza";
         }
 
-        document.getElementById("ubicacionTexto").innerText = nombreLugar;
+        document.getElementById("ubicacionTexto").innerText = nombreTextoFinal;
         inicializarMapaArgentina(currentLat, currentLon);
         dispararCargaDeDatos();
     }
