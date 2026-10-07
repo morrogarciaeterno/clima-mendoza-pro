@@ -1487,31 +1487,43 @@
     }
 
     // Función de guardado con diagnóstico y respuesta inmediata asegurada
-    function guardarRegistroArbol() {
-        const especie = document.getElementById("selectEspecieArbol").value;
-        const estado = document.getElementById("selectEstadoArbol").value;
-        const observaciones = document.getElementById("txtObservacionesArbol").value;
+   function guardarRegistroArbol() {
+    try {
+        const especieSelect = document.getElementById("selectEspecieArbol");
+        const estadoSelect = document.getElementById("selectEstadoArbol");
+        const obsTextarea = document.getElementById("txtObservacionesArbol");
+
+        const especie = especieSelect ? especieSelect.value : "Desconocida";
+        const estado = estadoSelect ? estadoSelect.value : "Sano";
+        const observaciones = obsTextarea ? obsTextarea.value : "";
 
         const nuevoArbol = {
             especie,
             estado,
             observaciones: observaciones || "Sin observaciones",
-            lat: currentLat,
-            lon: currentLon,
+            lat: typeof currentLat !== 'undefined' ? currentLat : -32.92,
+            lon: typeof currentLon !== 'undefined' ? currentLon : -68.84,
             fecha: new Date().toLocaleDateString("es-AR")
         };
 
+        if (typeof db === 'undefined') {
+            alert("Error crítico: Firebase (db) no está inicializado.");
+            return;
+        }
+
         db.collection("arboles_censados").add(nuevoArbol)
             .then((docRef) => {
-                alert(`¡Éxito! Árbol (${especie}) guardado en Firebase con ID: ${docRef.id}`);
+                alert(`¡Éxito total! Árbol guardado en la nube con ID: ${docRef.id}`);
                 cerrarModalCensoForestal();
             })
             .catch((error) => {
-                alert("Error al conectar con Firebase: " + error.message);
-                console.error("Firebase Error:", error);
+                alert("Error de Firebase al guardar: " + error.message);
             });
-    }
 
+    } catch (err) {
+        alert("Error crítico en la función: " + err.message);
+    }
+}
     // Escucha en tiempo real los árboles de todos los colaboradores
     function escucharArbolesEnTiempoReal() {
         db.collection("arboles_censados").onSnapshot((snapshot) => {
