@@ -964,7 +964,7 @@
                         <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Open-Meteo API</small>
                     </div>
                     <h3 id="contingenciaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Alerta Climática!</h3>
-                    <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Condición extrema pronosticada.</p>
+                    <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Condición extrema en tiempo real.</p>
                 </div>
             </div>
             <button class="btn-reconocer" onclick="reconocerAlerta('contingencia')">✅ Reconocer / Silenciar</button>
@@ -2112,12 +2112,15 @@
         } catch (e) {}
     }
 
-    function verificarContingenciaClimatica(minTemp, maxViento) {
+    // MODIFICADO: Ahora evalúa el viento y las ráfagas en tiempo real para evitar retenciones falsas
+    function verificarContingenciaClimatica(minTemp, vientoActual, rafagaActual) {
         const card = document.getElementById("contingenciaAlertaCard");
         const titulo = document.getElementById("contingenciaTitulo");
         const desc = document.getElementById("contingenciaDesc");
         const icono = document.getElementById("contingenciaIcono");
         if (!card) return;
+
+        const umbralViento = 40;
 
         if (minTemp <= 2.0) {
             card.style.display = "block";
@@ -2125,14 +2128,17 @@
             if (icono) icono.innerText = "❄⚠";
             titulo.innerText = `¡Alerta Helada (${minTemp}°C)!`;
             desc.innerText = `Descenso térmico crítico pronosticado. Fuente: Open-Meteo.`;
-        } else if (maxViento >= 40) {
+        } else if (vientoActual >= umbralViento || rafagaActual >= umbralViento) {
             card.style.display = "block";
-            if (card.dataset.reconocido !== "true") card.classList.add("alerta-activa-animacion");
+            if (card.dataset.reconocido !== "true") {
+                card.classList.add("alerta-activa-animacion");
+            }
             if (icono) icono.innerText = "💨⚠";
-            titulo.innerText = `¡Ráfagas Severas (${maxViento} km/h)!`;
-            desc.innerText = `Vientos intensos detectados. Fuente: Open-Meteo.`;
+            titulo.innerText = `¡Ráfagas Severas (${Math.round(Math.max(vientoActual, rafagaActual))} km/h)!`;
+            desc.innerText = `Vientos intensos detectados en tiempo real. Fuente: Open-Meteo.`;
         } else {
             card.style.display = "none";
+            card.dataset.reconocido = "false";
         }
     }
 
@@ -2309,7 +2315,7 @@
 
     async function cargarClima() {
         try {
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,shortwave_radiation&hourly=temperature_2m,relative_humidity_2m,surface_pressure,weather_code,soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,shortwave_radiation&hourly=temperature_2m,relative_humidity_2m,surface_pressure,weather_code,soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
             const data = await res.json();
             if (!data || !data.current) return;
 
@@ -2317,6 +2323,7 @@
             const st = Math.round(data.current.apparent_temperature ?? temp);
             const hum = data.current.relative_humidity_2m ?? 0;
             const viento = data.current.wind_speed_10m ?? 0;
+            const rafagaActual = data.current.wind_gusts_10m ?? viento;
             const dirV = data.current.wind_direction_10m ?? 0;
             const presion = data.current.surface_pressure ?? 1013;
             const uv = data.current.uv_index ?? 0;
@@ -2349,7 +2356,8 @@
                 let tMaxHoy = data.daily.temperature_2m_max[0] ?? 25;
                 let tMinHoy = data.daily.temperature_2m_min[0] ?? 15;
 
-                verificarContingenciaClimatica(minTempPronostico, maxRafagaPronostico);
+                // Llamada con variables actuales para evaluar el viento real
+                verificarContingenciaClimatica(minTempPronostico, viento, rafagaActual);
                 verificarRiesgoHeladaAvanzado(minTempPronostico, hum, viento);
 
                 let riegoNeto = Math.max(0, et0Hoy - precipitacionHoy);
