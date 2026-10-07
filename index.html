@@ -877,7 +877,7 @@
     </style>
 </head>
 
-<body>
+<body oncontextmenu="return false;">
 
 <header>
     <div class="header-content">
@@ -1337,6 +1337,18 @@
 </div>
 
 <script>
+    // Protección contra inspección de código (Bloqueo F12, Ctrl+Shift+I, Ctrl+U, etc.)
+    document.addEventListener('keydown', function(e) {
+        if (
+            e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) || 
+            (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
+        ) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
     // Configuración oficial de tu proyecto Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyBbQtPmOwpsADqzOE-MA_TRgmaHOIjJpsU",
@@ -1366,7 +1378,7 @@
     let capaFuegosFIRMS = null;
     let capaLluviaRadar = null;
     let capaSateliteGOES = null;
-    let capaCapaArboles = null; // Capa exclusiva para el censo de árboles
+    let capaCapaArboles = null;
 
     let modalMapInstance = null;
     let drawnItemsModal = null;
@@ -1436,12 +1448,11 @@
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
-                capaCapaArboles = L.layerGroup(); // Inicialmente independiente
+                capaCapaArboles = L.layerGroup();
 
                 inicializarCapasEspeciales();
                 escucharArbolesEnTiempoReal();
 
-                // Evento de clic en el mapa principal para capturar posición de censo si está activo
                 mapInstance.on('click', function(e) {
                     if (modoCensoActivo) {
                         latSeleccionadaCenso = e.latlng.lat;
@@ -1489,7 +1500,6 @@
             }
             if (banner) banner.style.display = "flex";
             
-            // Mostrar la capa de árboles exclusivamente al activar el modo censo
             if (mapInstance && capaCapaArboles && !mapInstance.hasLayer(capaCapaArboles)) {
                 capaCapaArboles.addTo(mapInstance);
             }
@@ -1501,7 +1511,6 @@
             }
             if (banner) banner.style.display = "none";
             
-            // Ocultar la capa de árboles al salir del modo censo
             if (mapInstance && capaCapaArboles && mapInstance.hasLayer(capaCapaArboles)) {
                 mapInstance.removeLayer(capaCapaArboles);
             }
@@ -1573,7 +1582,6 @@
         if (modal) modal.style.display = "none";
     }
 
-    // Guardar registro de árbol con las coordenadas seleccionadas en el mapa
     function guardarRegistroArbol() {
         const especie = document.getElementById("selectEspecieArbol").value;
         const estado = document.getElementById("selectEstadoArbol").value;
@@ -1603,8 +1611,7 @@
                 .then((docRef) => {
                     alert(`¡Árbol registrado con éxito en la nube! (ID: ${docRef.id})`);
                     cerrarModalCensoForestal();
-                    alternarModoCensoMapa(); // Desactivar modo censo al completar
-                    // Limpiar formulario
+                    alternarModoCensoMapa();
                     document.getElementById("txtObservacionesArbol").value = "";
                     if (fileInput) fileInput.value = "";
                 })
@@ -1637,7 +1644,6 @@
         }
     }
 
-    // Escucha en tiempo real los árboles y los añade exclusivamente a la capa dedicada
     function escucharArbolesEnTiempoReal() {
         if (!db) return;
         
@@ -1650,7 +1656,7 @@
                 if (change.type === "added" || change.type === "modified") {
                     const arbol = change.doc.data();
                     
-                    let colorPin = "#22c55e"; // Sano
+                    let colorPin = "#22c55e";
                     if (arbol.estado === "Regular") colorPin = "#facc15";
                     if (arbol.estado === "Baja") colorPin = "#ef4444";
 
@@ -2275,7 +2281,6 @@
         }
     }
 
-    // Listener seguro adjuntado al DOM para garantizar la reacción del botón de censo
     document.addEventListener("DOMContentLoaded", function() {
         const btnGuardar = document.getElementById("btnGuardarCenso");
         if (btnGuardar) {
