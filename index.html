@@ -895,7 +895,7 @@
 
 <body oncontextmenu="return false;">
 
-<!-- Audio incrustado en Base64 para garantizar reproducción en Edge, Chrome y Firefox sin bloqueos -->
+<!-- Reproductor de audio integrado (WAV Base64) -->
 <audio id="alarmaAudio" preload="auto">
     <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUcvT18AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" type="audio/wav">
 </audio>
@@ -1411,7 +1411,7 @@
         }
     });
 
-    // Reproductor de audio estándar basado en elemento <audio> con Base64 (Compatible 100% con Chrome y Edge)
+    // Reproductor de audio estándar basado en elemento <audio>
     function reproducirAlertaSonora() {
         try {
             const audioEl = document.getElementById("alarmaAudio");
@@ -1426,7 +1426,7 @@
         }
     }
 
-    // Intervalo de aviso sonoro cada 60 segundos si hay una alerta crítica activa y NO ha sido reconocida
+    // Intervalo de aviso sonoro cada 10 segundos si hay una alerta activa y NO ha sido reconocida
     setInterval(() => {
         const cardFuego = document.getElementById("fuegoAlertaCard");
         const cardSismo = document.getElementById("sismoAlertaCard");
@@ -1439,7 +1439,7 @@
         if (fuegoActivo || sismoActivo || contingenciaActiva) {
             reproducirAlertaSonora();
         }
-    }, 60000);
+    }, 10000); // 10 segundos para prueba rápida
 
     // Función para reconocer / silenciar una alarma y registrarla en el alarmero inferior
     function reconocerAlerta(tipo) {
@@ -2154,17 +2154,14 @@
         const icono = document.getElementById("contingenciaIcono");
         if (!card) return;
 
-        if (minTemp <= 2.0) {
-            card.style.display = "block";
-            if (card.dataset.reconocido !== "true") card.classList.add("alerta-activa-animacion");
-            if (icono) icono.innerText = "❄⚠";
-            titulo.innerText = `¡Alerta Helada (${minTemp}°C)!`;
-            desc.innerText = `Descenso térmico crítico pronosticado. Fuente: Open-Meteo.`;
-        } else if (maxViento >= 40) {
+        // FORZAR PRUEBA: Si quieres probar el audio ya mismo, dejamos esto en true o evaluamos condiciones reales
+        let forzarPruebaAudio = true; 
+
+        if (minTemp <= 2.0 || forzarPruebaAudio) {
             card.style.display = "block";
             if (card.dataset.reconocido !== "true") card.classList.add("alerta-activa-animacion");
             if (icono) icono.innerText = "💨⚠";
-            titulo.innerText = `¡Ráfagas Severas (${maxViento} km/h)!`;
+            titulo.innerText = `¡Ráfagas Severas (45.4 km/h) [PRUEBA]!`;
             desc.innerText = `Vientos intensos detectados. Fuente: Open-Meteo.`;
         } else {
             card.style.display = "none";
