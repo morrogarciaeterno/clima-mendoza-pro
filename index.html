@@ -12,6 +12,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
+    <!-- Firebase App y Firestore (Compat SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --bg: #070a14;
@@ -1214,7 +1219,7 @@
             <div class="map-wrapper-container">
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, NASA GIBS</div>
+                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, Firebase</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -1297,13 +1302,27 @@
             </div>
 
             <button onclick="guardarRegistroArbol()" style="background: #22c55e; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-top: 6px; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);">
-                💾 Guardar Censo y Ubicar en Mapa
+                💾 Guardar Censo en la Nube
             </button>
         </div>
     </div>
 </div>
 
 <script>
+    // Configuración oficial de tu proyecto Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBbQtPmOwpsADqzOE-MA_TRgmaHOIjJpsU",
+        authDomain: "agrotech-censo.firebaseapp.com",
+        projectId: "agrotech-censo",
+        storageBucket: "agrotech-censo.firebasestorage.app",
+        messagingSenderId: "507365835185",
+        appId: "1:507365835185:web:3580bdad2d3c5b34d4bd90"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     let currentLat = -32.92;
     let currentLon = -68.84;
     let mapInstance = null;
@@ -1317,7 +1336,6 @@
     let drawnItemsModal = null;
     let loteHectareasGlobal = 1;
     let datosLoteActual = null;
-    let arbolesCensadosArray = [];
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
     const listaCultivosDisponibles = ["Vid", "Cebolla", "Ajo", "Olivo", "Tomate", "Frutales (Manz/Pera/Cerez)", "Extensivos (Maíz/Soja)"];
@@ -1328,7 +1346,7 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
-    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS") {
+    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: OSM, Open-Meteo, NASA FIRMS, Firebase") {
         const textEl = document.getElementById("mapStatusText");
         const sourceEl = document.getElementById("mapSourceText");
         const dotEl = document.querySelector(".pulse-dot");
@@ -1379,7 +1397,8 @@
                 });
 
                 inicializarCapasEspeciales();
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, NASA GIBS");
+                escucharArbolesEnTiempoReal(); // <--- Conecta con la nube Firebase en vivo
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, Firebase");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -1464,30 +1483,55 @@
         if (modal) modal.style.display = "none";
     }
 
-    function guardarRegistroArbol() {
+    async function guardarRegistroArbol() {
         const especie = document.getElementById("selectEspecieArbol").value;
         const estado = document.getElementById("selectEstadoArbol").value;
         const observaciones = document.getElementById("txtObservacionesArbol").value;
 
-        let colorPin = "#22c55e"; // Sano por defecto
-        if (estado === "Regular") colorPin = "#facc15";
-        if (estado === "Baja") colorPin = "#ef4444";
+        const nuevoArbol = {
+            especie,
+            estado,
+            observaciones,
+            lat: currentLat,
+            lon: currentLon,
+            fecha: new Date().toLocaleDateString("es-AR")
+        };
 
-        let iconoArbol = L.divIcon({
-            className: '',
-            html: `<div style="background-color: ${colorPin}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0e1526; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌳</div>`,
-            iconSize: [18, 18],
-            iconAnchor: [9, 9]
-        });
-
-        if (mapInstance) {
-            L.marker([currentLat, currentLon], { icon: iconoArbol }).addTo(mapInstance)
-                .bindPopup(`<b>Árbol: ${especie}</b><br>Estado: <b>${estado}</b><br>Obs: ${observaciones || 'Sin observaciones'}`);
+        try {
+            // Guardar directo en Firestore (Sincronización en la nube en tiempo real)
+            await db.collection("arboles_censados").add(nuevoArbol);
+            alert(`¡Árbol (${especie} - ${estado}) censado y guardado en la nube!`);
+            cerrarModalCensoForestal();
+        } catch (e) {
+            alert("Error al guardar en la nube: " + e.message);
         }
+    }
 
-        arbolesCensadosArray.push({ especie, estado, observaciones, lat: currentLat, lon: currentLon });
-        alert(`¡Árbol (${especie} - ${estado}) censado y guardado con éxito en el mapa!`);
-        cerrarModalCensoForestal();
+    // Escucha en tiempo real los árboles de todos los colaboradores
+    function escucharArbolesEnTiempoReal() {
+        db.collection("arboles_censados").onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const arbol = change.doc.data();
+                    
+                    let colorPin = "#22c55e"; // Sano
+                    if (arbol.estado === "Regular") colorPin = "#facc15";
+                    if (arbol.estado === "Baja") colorPin = "#ef4444";
+
+                    let iconoArbol = L.divIcon({
+                        className: '',
+                        html: `<div style="background-color: ${colorPin}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0e1526; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌳</div>`,
+                        iconSize: [18, 18],
+                        iconAnchor: [9, 9]
+                    });
+
+                    if (mapInstance) {
+                        L.marker([arbol.lat, arbol.lon], { icon: iconoArbol }).addTo(mapInstance)
+                            .bindPopup(`<b>Árbol: ${arbol.especie}</b><br>Estado: <b>${arbol.estado}</b><br>Obs: ${arbol.observaciones || 'Sin observaciones'}<br><small>${arbol.fecha}</small>`);
+                    }
+                }
+            });
+        });
     }
 
     async function buscarLugarModal() {
@@ -1670,7 +1714,7 @@
                         mapInstance.setView([currentLat, currentLon], 15);
                         if (markerInstance) markerInstance.openPopup();
                     }
-                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS");
+                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: OSM, Open-Meteo, Firebase");
                 },
                 (error) => {
                     usarUbicacionPorDefecto();
@@ -2097,7 +2141,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const btnCampana = document.getElementById("btnCampanaNotif");
         if (btnCampana) btnCampana.addEventListener("click", () => {
-            alert("Sistema Agrotech sincronizado con APIs oficiales: Open-Meteo, NASA FIRMS, USGS y NASA GIBS.");
+            alert("Sistema Agrotech sincronizado con Firebase y APIs oficiales (Open-Meteo, NASA FIRMS, USGS).");
         });
         iniciarApp();
     });
