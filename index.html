@@ -51,8 +51,8 @@
         header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
-            padding: 12px 16px;
-            padding-top: max(14px, env(safe-area-inset-top));
+            padding: 10px 14px;
+            padding-top: max(12px, env(safe-area-inset-top));
             position: sticky;
             top: 0;
             z-index: 100;
@@ -67,21 +67,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             min-width: 0;
             flex-grow: 1;
         }
 
-        /* Estilo optimizado para el icono en el encabezado (tamaño y bordes limpios) */
         .brand-logo {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             object-fit: contain;
             border-radius: 50%;
             background: #ffffff;
@@ -97,7 +96,7 @@
         }
 
         .brand h1 {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             white-space: nowrap;
@@ -108,7 +107,7 @@
         }
 
         .brand p {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--accent);
             font-weight: 600;
             white-space: nowrap;
@@ -121,53 +120,59 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
 
         .date-display {
             text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         #fecha {
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: var(--text-main);
             text-transform: capitalize;
+            line-height: 1.1;
         }
 
         .time-temp-container {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 6px;
-            margin-top: 2px;
+            gap: 4px;
+            margin-top: 1px;
         }
 
         #digitalFallback {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--accent);
             font-variant-numeric: tabular-nums;
             font-weight: 600;
+            line-height: 1.1;
         }
 
         #headerTemp {
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 800;
             color: var(--accent);
+            line-height: 1.1;
         }
 
         .btn-notif-header {
             background: var(--accent-glow);
             border: 1px solid var(--accent);
             color: var(--accent);
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
             flex-shrink: 0;
             box-shadow: 0 0 10px var(--accent-glow);
@@ -344,22 +349,24 @@
             border-bottom: 2px solid #334155;
             border-radius: 60px 60px 0 0;
             margin-top: 8px;
+            overflow: visible;
         }
 
         .sun-pivot {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 120px;
+            height: 60px;
             bottom: 0;
             left: 0;
             transform-origin: bottom center;
+            transform: rotate(0deg);
             transition: transform 1s ease-out;
         }
 
         .sun-icon {
             position: absolute;
-            left: -10px;
-            bottom: -10px;
+            left: 54px;
+            top: -10px;
             font-size: 18px;
         }
 
@@ -915,7 +922,6 @@
 
 <header>
     <div class="header-content">
-        <!-- LOGO Y TÍTULO LIMPIO (SIN DUPLICAR "SISTEMA OFICIAL") -->
         <div class="brand">
             <img src="territoria-logo.png" alt="Territoria" class="brand-logo" onerror="this.style.display='none'">
             <div class="brand-text-container">
@@ -1417,7 +1423,6 @@
 </div>
 
 <script>
-    // Protección contra inspección de código
     document.addEventListener('keydown', function(e) {
         if (
             e.key === 'F12' || 
@@ -1741,7 +1746,6 @@
         if (modal) modal.style.display = "none";
     }
 
-    // FUNCIÓN DE GUARDADO MEJORADA CON COMPRESIÓN ROBUSTA Y GARANTÍA DE ASINCRONÍA
     function guardarRegistroArbol() {
         const especie = document.getElementById("selectEspecieArbol").value;
         const estado = document.getElementById("selectEstadoArbol").value;
@@ -1787,7 +1791,6 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    // Ancho reducido y calidad optimizada para evitar cualquier fallo en Firestore
                     const maxWidth = 300;
                     const scaleSize = maxWidth / img.width;
                     canvas.width = maxWidth;
@@ -1798,7 +1801,7 @@
                     enviarAFirebase(comprimidaBase64);
                 };
                 img.onerror = function() {
-                    enviarAFirebase(""); // Si falla la imagen, guarda el registro igual sin foto
+                    enviarAFirebase("");
                 };
                 img.src = e.target.result;
             };
@@ -2257,6 +2260,30 @@
         } catch(e) {}
     }
 
+    function actualizarCicloSolar(amanecerIso, atardecerIso) {
+        try {
+            const ahora = new Date();
+            const amanecer = new Date(amanecerIso);
+            const atardecer = new Date(atardecerIso);
+
+            document.getElementById("amanecerTime").innerText = amanecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
+            document.getElementById("atardecerTime").innerText = atardecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
+
+            let totalDiaMs = atardecer - amanecer;
+            let transcurridoMs = ahora - amanecer;
+            let porcentaje = transcurridoMs / totalDiaMs;
+
+            if (porcentaje < 0) porcentaje = 0;
+            if (porcentaje > 1) porcentaje = 1;
+
+            let gradosRotacion = -90 + (porcentaje * 180);
+            const sunPivot = document.getElementById("sunPivot");
+            if (sunPivot) {
+                sunPivot.style.transform = `rotate(${gradosRotacion}deg)`;
+            }
+        } catch(e) {}
+    }
+
     function gestionarAlertaSMN(code) {
         const card = document.getElementById("smnAlertCard");
         const titulo = document.getElementById("smnTitulo");
@@ -2415,8 +2442,8 @@
                 document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
                 document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
                 document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
-                document.getElementById("amanecerTime").innerText = new Date(data.daily.sunrise[0]).toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
-                document.getElementById("atardecerTime").innerText = new Date(data.daily.sunset[0]).toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
+                
+                actualizarCicloSolar(data.daily.sunrise[0], data.daily.sunset[0]);
             }
 
             if (data.hourly && data.hourly.temperature_2m) {
