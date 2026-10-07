@@ -1366,6 +1366,7 @@
     let capaFuegosFIRMS = null;
     let capaLluviaRadar = null;
     let capaSateliteGOES = null;
+    let capaCapaArboles = null; // Capa exclusiva para el censo de árboles
 
     let modalMapInstance = null;
     let drawnItemsModal = null;
@@ -1435,6 +1436,8 @@
                     attribution: '&copy; NASA LANCE FIRMS'
                 });
 
+                capaCapaArboles = L.layerGroup(); // Inicialmente independiente
+
                 inicializarCapasEspeciales();
                 escucharArbolesEnTiempoReal();
 
@@ -1474,6 +1477,10 @@
         const btnCenso = document.getElementById("btnModoCenso");
         const banner = document.getElementById("bannerModoCenso");
 
+        if (!capaCapaArboles && mapInstance) {
+            capaCapaArboles = L.layerGroup();
+        }
+
         if (modoCensoActivo) {
             if (btnCenso) {
                 btnCenso.classList.add("active");
@@ -1481,6 +1488,11 @@
                 btnCenso.style.color = "#000";
             }
             if (banner) banner.style.display = "flex";
+            
+            // Mostrar la capa de árboles exclusivamente al activar el modo censo
+            if (mapInstance && capaCapaArboles && !mapInstance.hasLayer(capaCapaArboles)) {
+                capaCapaArboles.addTo(mapInstance);
+            }
         } else {
             if (btnCenso) {
                 btnCenso.classList.remove("active");
@@ -1488,6 +1500,11 @@
                 btnCenso.style.color = "#22c55e";
             }
             if (banner) banner.style.display = "none";
+            
+            // Ocultar la capa de árboles al salir del modo censo
+            if (mapInstance && capaCapaArboles && mapInstance.hasLayer(capaCapaArboles)) {
+                mapInstance.removeLayer(capaCapaArboles);
+            }
         }
     }
 
@@ -1620,9 +1637,14 @@
         }
     }
 
-    // Escucha en tiempo real los árboles de todos los colaboradores y dibuja los pines
+    // Escucha en tiempo real los árboles y los añade exclusivamente a la capa dedicada
     function escucharArbolesEnTiempoReal() {
         if (!db) return;
+        
+        if (!capaCapaArboles) {
+            capaCapaArboles = L.layerGroup();
+        }
+
         db.collection("arboles_censados").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added" || change.type === "modified") {
@@ -1639,9 +1661,10 @@
                         iconAnchor: [10, 10]
                     });
 
-                    if (mapInstance && arbol.lat && arbol.lon) {
-                        L.marker([arbol.lat, arbol.lon], { icon: iconoArbol }).addTo(mapInstance)
-                            .bindPopup(`<b>Árbol: ${arbol.especie}</b><br>Estado: <b>${arbol.estado}</b><br>Obs: ${arbol.observaciones || 'Sin observaciones'}<br><small>${arbol.fecha}</small>`);
+                    if (capaCapaArboles && arbol.lat && arbol.lon) {
+                        L.marker([arbol.lat, arbol.lon], { icon: iconoArbol })
+                            .bindPopup(`<b>Árbol: ${arbol.especie}</b><br>Estado: <b>${arbol.estado}</b><br>Obs: ${arbol.observaciones || 'Sin observaciones'}<br><small>${arbol.fecha}</small>`)
+                            .addTo(capaCapaArboles);
                     }
                 }
             });
