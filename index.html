@@ -1207,7 +1207,8 @@
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
                 <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Satélite VIIRS</button>
-                <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 2;">📐 Dibujar Lote & Reporte</button>
+                <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 1;">📐 Lotes</button>
+                <button class="map-btn" onclick="abrirModalCensoForestal()" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e; grid-column: span 1;">🌳 Censo Árbol</button>
             </div>
 
             <div class="map-wrapper-container">
@@ -1236,7 +1237,7 @@
                     <button class="modal-search-btn" onclick="buscarLugarModal()">Buscar</button>
                 </div>
                 <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
-                    Dibuja el polígono de tu lote en el mapa (Herramienta de dibujo superior derecha). Fuente: Open-Meteo & OpenStreetMap.
+                    Dibuja el polígono de tu lote en el mapa. Fuente: Open-Meteo & OpenStreetMap.
                 </p>
                 <div id="mapaModalDibujo"></div>
             </div>
@@ -1247,6 +1248,57 @@
                     👈 Dibuja un polígono en el mapa con la herramienta superior derecha para procesar las hectáreas y el balance hídrico real.
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- VENTANA MODAL PARA CENSO FORESTAL URBANO (ÁRBOL) -->
+<div class="modal-overlay" id="modalCensoForestal">
+    <div class="modal-content-box" style="max-width: 600px; height: auto; max-height: 90vh;">
+        <div class="modal-header">
+            <h2>🌳 Censo Forestal Urbano (GPS & Foto)</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarModalCensoForestal()">✕</button>
+        </div>
+        <div class="modal-body" style="grid-template-columns: 1fr; gap: 10px;">
+            <div class="recommendation-card">
+                <b>Ubicación GPS Capturada:</b> <span id="arbolGpsText" style="color: var(--accent);">Obteniendo coordenadas...</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">1. Especie de Árbol Frecuente (Mendoza):</label>
+                <select id="selectEspecieArbol" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.8rem; outline: none;">
+                    <option value="Plátano">Plátano (Platanus acerifolia)</option>
+                    <option value="Fresno">Fresno (Fraxinus)</option>
+                    <option value="Paraíso">Paraíso (Melia azedarach)</option>
+                    <option value="Acacia Visco">Acacia Visco</option>
+                    <option value="Aguaribay">Aguaribay (Schinus molle)</option>
+                    <option value="Morera">Morera (Morus alba)</option>
+                    <option value="Otro">Otro / No especificado</option>
+                </select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">2. Estado Sanitario / Diagnóstico:</label>
+                <select id="selectEstadoArbol" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.8rem; outline: none;">
+                    <option value="Sano">🟢 Buen Estado (Sano)</option>
+                    <option value="Regular">🟡 Regular (Daño parcial / Intervención)</option>
+                    <option value="Baja">🔴 Para Dar de Baja / Extracción (Peligro)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">3. Evidencia Fotográfica (Cámara / Galería):</label>
+                <input type="file" id="inputFotoArbol" accept="image/*" capture="environment" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.75rem;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">4. Observaciones de Campo:</label>
+                <textarea id="txtObservacionesArbol" placeholder="Ej: Raíces rompiendo vereda, fuste inclinado, ramas secas..." style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.8rem; outline: none; height: 60px; resize: none;"></textarea>
+            </div>
+
+            <button onclick="guardarRegistroArbol()" style="background: #22c55e; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-top: 6px; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);">
+                💾 Guardar Censo y Ubicar en Mapa
+            </button>
         </div>
     </div>
 </div>
@@ -1265,6 +1317,7 @@
     let drawnItemsModal = null;
     let loteHectareasGlobal = 1;
     let datosLoteActual = null;
+    let arbolesCensadosArray = [];
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
     const listaCultivosDisponibles = ["Vid", "Cebolla", "Ajo", "Olivo", "Tomate", "Frutales (Manz/Pera/Cerez)", "Extensivos (Maíz/Soja)"];
@@ -1326,10 +1379,6 @@
                 });
 
                 inicializarCapasEspeciales();
-
-                mapInstance.on('movestart', () => { actualizarIndicadorMapa("Explorando...", "#38bdf8", "Coordenadas en movimiento"); });
-                mapInstance.on('moveend', () => { actualizarIndicadorMapa("Visor activo", "#22c55e", "Fuentes: OpenStreetMap, Open-Meteo, NASA FIRMS, USGS"); });
-
                 actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, NASA GIBS");
             }
 
@@ -1402,6 +1451,45 @@
         if (modal) modal.style.display = "none";
     }
 
+    function abrirModalCensoForestal() {
+        const modal = document.getElementById("modalCensoForestal");
+        if (modal) {
+            modal.style.display = "flex";
+            document.getElementById("arbolGpsText").innerText = `${currentLat.toFixed(5)}, ${currentLon.toFixed(5)}`;
+        }
+    }
+
+    function cerrarModalCensoForestal() {
+        const modal = document.getElementById("modalCensoForestal");
+        if (modal) modal.style.display = "none";
+    }
+
+    function guardarRegistroArbol() {
+        const especie = document.getElementById("selectEspecieArbol").value;
+        const estado = document.getElementById("selectEstadoArbol").value;
+        const observaciones = document.getElementById("txtObservacionesArbol").value;
+
+        let colorPin = "#22c55e"; // Sano
+        if (estado === "Regular") colorPin = "#facc15";
+        if (estado === "Baja") colorPin = "#ef4444";
+
+        let iconoArbol = L.divIcon({
+            className: '',
+            html: `<div style="background-color: ${colorPin}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0e1526; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌳</div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+        });
+
+        if (mapInstance) {
+            L.marker([currentLat, currentLon], { icon: iconoArbol }).addTo(mapInstance)
+                .bindPopup(`<b>Árbol: ${especie}</b><br>Estado: <b>${estado}</b><br>Obs: ${observaciones || 'Sin observaciones'}`);
+        }
+
+        arbolesCensadosArray.push({ especie, estado, observaciones, lat: currentLat, lon: currentLon });
+        alert(`¡Árbol (${especie} - ${estado}) censado y guardado con éxito en el mapa!`);
+        cerrarModalCensoForestal();
+    }
+
     async function buscarLugarModal() {
         const input = document.getElementById("modalSearchInput");
         if (!input || !input.value.trim()) return;
@@ -1415,7 +1503,7 @@
                 const lon = parseFloat(data[0].lon);
                 if (modalMapInstance) {
                     modalMapInstance.setView([lat, lon], 14);
-                    L.marker([lat, lon]).addTo(modalMapInstance).bindPopup(`<b>${data[0].display_name}</b><br><small>Fuente: Nominatim / OSM</small>`).openPopup();
+                    L.marker([lat, lon]).addTo(modalMapInstance).bindPopup(`<b>${data[0].display_name}</b>`).openPopup();
                 }
             } else {
                 alert("No se encontró la ubicación.");
@@ -1476,15 +1564,15 @@
         let alertaDeriva = "";
 
         if (d.viento > 20) {
-            alertaDeriva = `<br><span style="color:#ef4444; font-weight:bold;">⚠ ALERTA DE DERIVA:</span> Viento superior a 20 km/h. No realizar aplicaciones foliares ni pulverización.`;
+            alertaDeriva = `<br><span style="color:#ef4444; font-weight:bold;">⚠ ALERTA DE DERIVA:</span> Viento superior a 20 km/h. No realizar aplicaciones foliares.`;
         }
 
         if (d.temp < 12) {
-            recomendacionFertilizante = `Suelo/Ambiente frío (${d.temp}°C): Priorizar aplicación fosforada (Fosfatos) para estimular el enraizamiento inicial del cultivo de ${cultivoSeleccionado}.${alertaDeriva}`;
+            recomendacionFertilizante = `Suelo/Ambiente frío (${d.temp}°C): Priorizar aplicación fosforada (Fosfatos) para enraizamiento de ${cultivoSeleccionado}.${alertaDeriva}`;
         } else if (d.temp > 28) {
-            recomendacionFertilizante = `Temperatura elevada (${d.temp}°C): Alto riesgo de volatilización de Urea. Se recomienda fraccionar el nitrógeno y aplicarlo mediante fertirriego nocturno.${alertaDeriva}`;
+            recomendacionFertilizante = `Temperatura elevada (${d.temp}°C): Alto riesgo de volatilización de Urea. Aplicar vía fertirriego nocturno.${alertaDeriva}`;
         } else {
-            recomendacionFertilizante = `Condiciones estables (${d.temp}°C, ${d.viento} km/h): Apto para fertilización nitrogenada de cobertura o soporte radicular según demanda de ${cultivoSeleccionado}.${alertaDeriva}`;
+            recomendacionFertilizante = `Condiciones estables (${d.temp}°C, ${d.viento} km/h): Apto para fertilización de cobertura en ${cultivoSeleccionado}.${alertaDeriva}`;
         }
 
         panel.innerHTML = `
@@ -1499,7 +1587,7 @@
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
                 <div style="margin-bottom: 6px; font-size:0.7rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
                 <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
-                <b>Evaluación para ${cultivoSeleccionado}:</b> Condiciones óptimas de monitoreo.
+                <b>Evaluación para ${cultivoSeleccionado}:</b> Condiciones óptimas.
             </div>
 
             <div class="report-section-title">🧪 Recomendación Experta de Fertilización</div>
@@ -1538,12 +1626,8 @@
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
 
-        if (!capaActual) {
-            capaActual = capasBase.base;
-        }
-        if (!mapInstance.hasLayer(capaActual)) {
-            capaActual.addTo(mapInstance);
-        }
+        if (!capaActual) capaActual = capasBase.base;
+        if (!mapInstance.hasLayer(capaActual)) capaActual.addTo(mapInstance);
 
         if (tipo === 'base' || tipo === 'topo' || tipo === 'calles') {
             mapInstance.removeLayer(capaActual);
@@ -1551,49 +1635,32 @@
             capaActual.addTo(mapInstance);
             contenedorMapaDiv.classList.add("modo-oscuro-mapa");
 
-            if (tipo === 'base') {
-                btnBase.classList.add("active");
-                mapTitle.innerText = "🗺 Visor Geográfico Satelital";
-                actualizarIndicadorMapa("Capa Estándar", "#22c55e", "Fuente: OpenStreetMap Contributors");
-            } else if (tipo === 'topo') {
-                btnTopo.classList.add("active");
-                mapTitle.innerText = "⛰ Visor Topográfico";
-                actualizarIndicadorMapa("Capa Topo", "#22c55e", "Fuente: OpenTopoMap");
-            } else if (tipo === 'calles') {
-                if (btnCalles) btnCalles.classList.add("active");
-                mapTitle.innerText = "🛣 Red Vial";
-                actualizarIndicadorMapa("Capa Calles", "#22c55e", "Fuente: Esri World Street Map");
-            }
+            if (tipo === 'base') { btnBase.classList.add("active"); mapTitle.innerText = "🗺 Visor Geográfico Satelital"; }
+            else if (tipo === 'topo') { btnTopo.classList.add("active"); mapTitle.innerText = "⛰ Visor Topográfico"; }
+            else if (tipo === 'calles') { if (btnCalles) btnCalles.classList.add("active"); mapTitle.innerText = "🛣 Red Vial"; }
         } else if (tipo === 'fuego') {
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
             mapTitle.innerText = "🔥 Fuego (NASA FIRMS WMS)";
             contenedorMapaDiv.classList.add("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa NASA Activa", "#f59e0b", "Fuente: NASA LANCE FIRMS (VIIRS/MODIS)");
         } else if (tipo === 'lluvia') {
             await inicializarCapasEspeciales();
-            if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) {
-                capaLluviaRadar.addTo(mapInstance);
-            }
+            if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
             btnLluvia.classList.add("active");
             mapTitle.innerText = "🌧 Radar de Lluvia sobre Mapa";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Radar Lluvia", "#38bdf8", "Fuente: IEM Nexrad");
         } else if (tipo === 'satelite') {
             await inicializarCapasEspeciales();
-            if (capaSateliteGOES && !mapInstance.hasLayer(capaSateliteGOES)) {
-                capaSateliteGOES.addTo(mapInstance);
-            }
+            if (capaSateliteGOES && !mapInstance.hasLayer(capaSateliteGOES)) capaSateliteGOES.addTo(mapInstance);
             if (btnSatinfra) btnSatinfra.classList.add("active");
             mapTitle.innerText = "🛰️ Satélite NASA VIIRS";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
-            actualizarIndicadorMapa("Capa Satélite NASA", "#38bdf8", "Fuente: NASA GIBS / VIIRS SNPP");
         }
     }
 
     function centrarUbicacion() {
         if (navigator.geolocation) {
-            actualizarIndicadorMapa("Buscando GPS...", "#facc15", "Consultando geolocalización del dispositivo");
+            actualizarIndicadorMapa("Buscando GPS...", "#facc15", "Consultando geolocalización...");
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
                     currentLat = pos.coords.latitude;
@@ -1603,10 +1670,9 @@
                         mapInstance.setView([currentLat, currentLon], 15);
                         if (markerInstance) markerInstance.openPopup();
                     }
-                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS");
+                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS");
                 },
                 (error) => {
-                    actualizarIndicadorMapa("GPS no disponible", "#ef4444", "Usando ubicación por defecto (Godoy Cruz, Mendoza)");
                     usarUbicacionPorDefecto();
                 },
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
@@ -1711,8 +1777,8 @@
                 titulo.innerText = `¡Alerta Amarilla de Helada Agrícola (${tMin}°C)!`;
                 if (lblRiesgo) { lblRiesgo.innerText = "Precaución (0° - 3°C)"; lblRiesgo.style.color = "#facc15"; }
             }
-            let tipoHelada = vientoVel > 15 ? "Helada de Advección (masa de aire frío)." : "Helada Radiativa (suelo despejado sin viento).";
-            desc.innerText = `Punto de rocío estimado: ${td.toFixed(1)}°C. ${tipoHelada} Fuente: Open-Meteo.`;
+            let tipoHelada = vientoVel > 15 ? "Helada de Advección." : "Helada Radiativa.";
+            desc.innerText = `Punto de rocío: ${td.toFixed(1)}°C. ${tipoHelada} Fuente: Open-Meteo.`;
         } else {
             card.style.display = "none";
             if (lblRiesgo) { lblRiesgo.innerText = "Sin Riesgo"; lblRiesgo.style.color = "#22c55e"; }
@@ -2024,7 +2090,7 @@
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
         } else {
-            usarUbicacionPorDefecto();
+            usarUbicacionPorDefector();
         }
     }
 
