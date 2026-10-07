@@ -953,17 +953,21 @@
         </div>
     </div>
 
+    <!-- ALERTA DE CONTINGENCIA (VIENTOS FUERTES / HELADAS CON RECONOCIMIENTO Y ALARMERO) -->
     <div class="card" id="contingenciaAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <span id="contingenciaIcono" style="font-size: 2rem; flex-shrink: 0;">❄⚠</span>
-            <div style="min-width: 0; flex-grow: 1;">
-                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                    <span id="contingenciaBadge" style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Oficial</span>
-                    <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Open-Meteo API</small>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex-grow: 1;">
+                <span id="contingenciaIcono" style="font-size: 2rem; flex-shrink: 0;">💨⚠</span>
+                <div style="min-width: 0; flex-grow: 1;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span id="contingenciaBadge" style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Oficial</span>
+                        <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Open-Meteo API</small>
+                    </div>
+                    <h3 id="contingenciaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Alerta Climática!</h3>
+                    <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Condición extrema pronosticada.</p>
                 </div>
-                <h3 id="contingenciaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Alerta Climática!</h3>
-                <p id="contingenciaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Condición extrema pronosticada.</p>
             </div>
+            <button class="btn-reconocer" onclick="reconocerAlerta('contingencia')">✅ Reconocer / Silenciar</button>
         </div>
     </div>
 
@@ -1297,7 +1301,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <div>
                 <h3 style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🚨 Alarmero e Historial de Incidentes Reconocidos</h3>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Registro en tiempo real de alarmas atendidas por operadores (Sismos y Focos de Incendio).</small>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Registro en tiempo real de alarmas atendidas por operadores (Sismos, Focos de Incendio y Contingencias Climáticas).</small>
             </div>
             <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
         </div>
@@ -1433,11 +1437,13 @@
     setInterval(() => {
         const cardFuego = document.getElementById("fuegoAlertaCard");
         const cardSismo = document.getElementById("sismoAlertaCard");
+        const cardContingencia = document.getElementById("contingenciaAlertaCard");
         
         let fuegoActivo = cardFuego && cardFuego.style.display === "block" && cardFuego.dataset.reconocido !== "true";
         let sismoActivo = cardSismo && cardSismo.style.display === "block" && cardSismo.dataset.reconocido !== "true";
+        let contingenciaActiva = cardContingencia && cardContingencia.style.display === "block" && cardContingencia.dataset.reconocido !== "true";
 
-        if (fuegoActivo || sismoActivo) {
+        if (fuegoActivo || sismoActivo || contingenciaActiva) {
             reproducirAlertaSonora();
         }
     }, 60000);
@@ -1464,25 +1470,34 @@
                 tarjetaCard.classList.remove("alerta-activa-animacion");
                 tarjetaCard.style.borderLeftColor = "#22c55e";
             }
+        } else if (tipo === 'contingencia') {
+            tarjetaCard = document.getElementById("contingenciaAlertaCard");
+            let tituloActual = document.getElementById("contingenciaTitulo").innerText;
+            tituloIncidente = `Contingencia: ${tituloActual}`;
+            if (tarjetaCard) {
+                tarjetaCard.dataset.reconocido = "true";
+                tarjetaCard.classList.remove("alerta-activa-animacion");
+                tarjetaCard.style.borderLeftColor = "#22c55e";
+            }
         }
 
         if (tarjetaCard) {
-            // Ocultar botón de reconocer en la tarjeta para indicar que ya fue atendida
             const btn = tarjetaCard.querySelector(".btn-reconocer");
-            if (btn) btn.innerHTML = "✔ Atendido";
-            if (btn) btn.style.borderColor = "#22c55e";
-            if (btn) btn.style.color = "#22c55e";
-            if (btn) btn.style.cursor = "default";
+            if (btn) {
+                btn.innerHTML = "✔ Atendido";
+                btn.style.borderColor = "#22c55e";
+                btn.style.color = "#22c55e";
+                btn.style.cursor = "default";
+            }
         }
 
-        // Registrar en el Alarmero al pie de página (Almacenar en localStorage)
         let historial = JSON.parse(localStorage.getItem("alarmero_historial") || "[]");
         historial.unshift({
             tipo: tituloIncidente,
             hora: ahoraStr,
             fecha: new Date().toLocaleDateString("es-AR")
         });
-        if (historial.length > 10) historial.pop(); // Mantener últimos 10
+        if (historial.length > 10) historial.pop();
         localStorage.setItem("alarmero_historial", JSON.stringify(historial));
 
         renderizarAlarmero();
@@ -1501,7 +1516,7 @@
         contenedor.innerHTML = "";
         historial.forEach(item => {
             contenedor.innerHTML += `
-                <div class="sismo-mini-card" style="flex: 0 0 160px; text-align: left; background: var(--card-bg);">
+                <div class="sismo-mini-card" style="flex: 0 0 170px; text-align: left; background: var(--card-bg);">
                     <div style="font-size: 0.65rem; color: #22c55e; font-weight:800;">✔ RECONOCIDO</div>
                     <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-main); margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.tipo}">${item.tipo}</div>
                     <div style="font-size: 0.65rem; color: var(--text-muted);">${item.fecha} - ${item.hora}</div>
@@ -2143,16 +2158,19 @@
         const card = document.getElementById("contingenciaAlertaCard");
         const titulo = document.getElementById("contingenciaTitulo");
         const desc = document.getElementById("contingenciaDesc");
+        const icono = document.getElementById("contingenciaIcono");
         if (!card) return;
 
         if (minTemp <= 2.0) {
             card.style.display = "block";
-            card.classList.add("alerta-activa-animacion");
+            if (card.dataset.reconocido !== "true") card.classList.add("alerta-activa-animacion");
+            if (icono) icono.innerText = "❄⚠";
             titulo.innerText = `¡Alerta Helada (${minTemp}°C)!`;
             desc.innerText = `Descenso térmico crítico pronosticado. Fuente: Open-Meteo.`;
         } else if (maxViento >= 40) {
             card.style.display = "block";
-            card.classList.add("alerta-activa-animacion");
+            if (card.dataset.reconocido !== "true") card.classList.add("alerta-activa-animacion");
+            if (icono) icono.innerText = "💨⚠";
             titulo.innerText = `¡Ráfagas Severas (${maxViento} km/h)!`;
             desc.innerText = `Vientos intensos detectados. Fuente: Open-Meteo.`;
         } else {
@@ -2515,7 +2533,7 @@
     });
 
     setInterval(actualizarFechaYHoraDigital, 1000);
-    setInterval(dispararCargadeDatos, 300000);
+    setInterval(dispararCargaDeDatos, 300000);
 </script>
 
 </body>
