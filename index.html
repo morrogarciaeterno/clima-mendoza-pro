@@ -1302,7 +1302,7 @@
                 <textarea id="txtObservacionesArbol" placeholder="Ej: Raíces rompiendo vereda, fuste inclinado, ramas secas..." style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.8rem; outline: none; height: 60px; resize: none;"></textarea>
             </div>
 
-            <button onclick="guardarRegistroArbol()" style="background: #22c55e; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-top: 6px; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);">
+            <button type="button" id="btnGuardarCenso" style="background: #22c55e; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-top: 6px; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);">
                 💾 Guardar Censo en la Nube
             </button>
         </div>
@@ -1320,7 +1320,7 @@
         appId: "1:507365835185:web:3580bdad2d3c5b34d4bd90"
     };
 
-    // Inicializar Firebase
+    // Inicializar Firebase de forma segura
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
@@ -1486,44 +1486,31 @@
         if (modal) modal.style.display = "none";
     }
 
-    // Función de guardado con diagnóstico y respuesta inmediata asegurada
-   function guardarRegistroArbol() {
-    try {
-        const especieSelect = document.getElementById("selectEspecieArbol");
-        const estadoSelect = document.getElementById("selectEstadoArbol");
-        const obsTextarea = document.getElementById("txtObservacionesArbol");
-
-        const especie = especieSelect ? especieSelect.value : "Desconocida";
-        const estado = estadoSelect ? estadoSelect.value : "Sano";
-        const observaciones = obsTextarea ? obsTextarea.value : "";
+    // Función principal de guardado vinculada por ID y listener
+    function guardarRegistroArbol() {
+        const especie = document.getElementById("selectEspecieArbol").value;
+        const estado = document.getElementById("selectEstadoArbol").value;
+        const observaciones = document.getElementById("txtObservacionesArbol").value;
 
         const nuevoArbol = {
             especie,
             estado,
             observaciones: observaciones || "Sin observaciones",
-            lat: typeof currentLat !== 'undefined' ? currentLat : -32.92,
-            lon: typeof currentLon !== 'undefined' ? currentLon : -68.84,
+            lat: currentLat,
+            lon: currentLon,
             fecha: new Date().toLocaleDateString("es-AR")
         };
 
-        if (typeof db === 'undefined') {
-            alert("Error crítico: Firebase (db) no está inicializado.");
-            return;
-        }
-
         db.collection("arboles_censados").add(nuevoArbol)
             .then((docRef) => {
-                alert(`¡Éxito total! Árbol guardado en la nube con ID: ${docRef.id}`);
+                alert(`¡Éxito! Árbol (${especie}) guardado en Firebase con ID: ${docRef.id}`);
                 cerrarModalCensoForestal();
             })
             .catch((error) => {
-                alert("Error de Firebase al guardar: " + error.message);
+                alert("Error al conectar con Firebase: " + error.message);
             });
-
-    } catch (err) {
-        alert("Error crítico en la función: " + err.message);
     }
-}
+
     // Escucha en tiempo real los árboles de todos los colaboradores
     function escucharArbolesEnTiempoReal() {
         db.collection("arboles_censados").onSnapshot((snapshot) => {
@@ -2155,18 +2142,29 @@
         }
     }
 
+    // Listener seguro adjuntado al DOM para garantizar la reacción del botón
     document.addEventListener("DOMContentLoaded", function() {
-        const btnCampana = document.getElementById("btnCampanaNotif");
-        if (btnCampana) btnCampana.addEventListener("click", () => {
-            alert("Sistema Agrotech sincronizado con Firebase y APIs oficiales (Open-Meteo, NASA FIRMS, USGS).");
-        });
+        const btnGuardar = document.getElementById("btnGuardarCenso");
+        if (btnGuardar) {
+            btnGuardar.addEventListener("click", function(e) {
+                e.preventDefault();
+                guardarRegistroArbol();
+            });
+        }
         iniciarApp();
     });
 
     if (document.readyState === "complete" || document.readyState === "interactive") {
-        iniciarApp();
-    } else {
-        window.addEventListener("DOMContentLoaded", iniciarApp);
+        setTimeout(function() {
+            const btnGuardar = document.getElementById("btnGuardarCenso");
+            if (btnGuardar && !btnGuardar.hasAttribute("data-bound")) {
+                btnGuardar.setAttribute("data-bound", "true");
+                btnGuardar.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    guardarRegistroArbol();
+                });
+            }
+        }, 500);
     }
 
     setInterval(actualizarFechaYHoraDigital, 1000);
