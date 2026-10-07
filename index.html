@@ -1287,7 +1287,7 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">3. Evidencia Fotográfica (Cámara / Galería):</label>
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">3. Evidencia Fotográfica (Cámara Directa):</label>
                 <input type="file" id="inputFotoArbol" accept="image/*" capture="environment" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.75rem;">
             </div>
 
@@ -1469,7 +1469,7 @@
         const estado = document.getElementById("selectEstadoArbol").value;
         const observaciones = document.getElementById("txtObservacionesArbol").value;
 
-        let colorPin = "#22c55e"; // Sano
+        let colorPin = "#22c55e"; // Sano por defecto
         if (estado === "Regular") colorPin = "#facc15";
         if (estado === "Baja") colorPin = "#ef4444";
 
@@ -2090,7 +2090,7 @@
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
         } else {
-            usarUbicacionPorDefector();
+            usarUbicacionPorDefecto();
         }
     }
 
