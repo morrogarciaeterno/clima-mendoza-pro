@@ -1278,6 +1278,7 @@
                     <option value="Acacia Visco">Acacia Visco</option>
                     <option value="Aguaribay">Aguaribay (Schinus molle)</option>
                     <option value="Morera">Morera (Morus alba)</option>
+                    <option value="Manzano">Manzano</option>
                     <option value="Otro">Otro / No especificado</option>
                 </select>
             </div>
@@ -1320,7 +1321,9 @@
     };
 
     // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
     let currentLat = -32.92;
@@ -1397,7 +1400,7 @@
                 });
 
                 inicializarCapasEspeciales();
-                escucharArbolesEnTiempoReal(); // <--- Conecta con la nube Firebase en vivo
+                escucharArbolesEnTiempoReal();
                 actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, Firebase");
             }
 
@@ -1483,31 +1486,59 @@
         if (modal) modal.style.display = "none";
     }
 
-   function guardarRegistroArbol() {
-    const especie = document.getElementById("selectEspecieArbol").value;
-    const estado = document.getElementById("selectEstadoArbol").value;
-    const observaciones = document.getElementById("txtObservacionesArbol").value;
+    // Función de guardado con diagnóstico y respuesta inmediata asegurada
+    function guardarRegistroArbol() {
+        const especie = document.getElementById("selectEspecieArbol").value;
+        const estado = document.getElementById("selectEstadoArbol").value;
+        const observaciones = document.getElementById("txtObservacionesArbol").value;
 
-    const nuevoArbol = {
-        especie,
-        estado,
-        observaciones: observaciones || "Sin observaciones",
-        lat: currentLat,
-        lon: currentLon,
-        fecha: new Date().toLocaleDateString("es-AR")
-    };
+        const nuevoArbol = {
+            especie,
+            estado,
+            observaciones: observaciones || "Sin observaciones",
+            lat: currentLat,
+            lon: currentLon,
+            fecha: new Date().toLocaleDateString("es-AR")
+        };
 
-    // Guardado directo en Firestore con manejo de respuesta visible
-    db.collection("arboles_censados").add(nuevoArbol)
-        .then((docRef) => {
-            alert(`¡Éxito! Árbol (${especie}) guardado en la nube con ID: ${docRef.id}`);
-            cerrarModalCensoForestal();
-        })
-        .catch((error) => {
-            alert("Error al guardar en Firebase: " + error.message);
-            console.error("Error Firebase:", error);
+        db.collection("arboles_censados").add(nuevoArbol)
+            .then((docRef) => {
+                alert(`¡Éxito! Árbol (${especie}) guardado en Firebase con ID: ${docRef.id}`);
+                cerrarModalCensoForestal();
+            })
+            .catch((error) => {
+                alert("Error al conectar con Firebase: " + error.message);
+                console.error("Firebase Error:", error);
+            });
+    }
+
+    // Escucha en tiempo real los árboles de todos los colaboradores
+    function escucharArbolesEnTiempoReal() {
+        db.collection("arboles_censados").onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const arbol = change.doc.data();
+                    
+                    let colorPin = "#22c55e"; // Sano
+                    if (arbol.estado === "Regular") colorPin = "#facc15";
+                    if (arbol.estado === "Baja") colorPin = "#ef4444";
+
+                    let iconoArbol = L.divIcon({
+                        className: '',
+                        html: `<div style="background-color: ${colorPin}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0e1526; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌳</div>`,
+                        iconSize: [18, 18],
+                        iconAnchor: [9, 9]
+                    });
+
+                    if (mapInstance) {
+                        L.marker([arbol.lat, arbol.lon], { icon: iconoArbol }).addTo(mapInstance)
+                            .bindPopup(`<b>Árbol: ${arbol.especie}</b><br>Estado: <b>${arbol.estado}</b><br>Obs: ${arbol.observaciones || 'Sin observaciones'}<br><small>${arbol.fecha}</small>`);
+                    }
+                }
+            });
         });
-}
+    }
+
     async function buscarLugarModal() {
         const input = document.getElementById("modalSearchInput");
         if (!input || !input.value.trim()) return;
