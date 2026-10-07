@@ -570,7 +570,8 @@
         .leaflet-popup,
         .map-status-pill,
         .leaflet-draw,
-        .modal-overlay {
+        .modal-overlay,
+        .censo-banner-flotante {
             filter: none !important;
         }
 
@@ -592,6 +593,28 @@
             gap: 2px;
             pointer-events: none;
             backdrop-filter: blur(4px);
+            max-width: calc(100% - 24px);
+        }
+
+        .censo-banner-flotante {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(34, 197, 94, 0.95);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.5);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+            border: 1px solid #fff;
+            text-align: center;
             max-width: calc(100% - 24px);
         }
 
@@ -1213,10 +1236,14 @@
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
                 <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Satélite VIIRS</button>
                 <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 1;">📐 Lotes</button>
-                <button class="map-btn" onclick="abrirModalCensoForestal()" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e; grid-column: span 1;">🌳 Censo Árbol</button>
+                <button class="map-btn" id="btnModoCenso" onclick="alternarModoCensoMapa()" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e; grid-column: span 1;">🌳 Censo Árbol</button>
             </div>
 
             <div class="map-wrapper-container">
+                <div class="censo-banner-flotante" id="bannerModoCenso">
+                    <span>🌳 [MODO CENSO] Toca el mapa donde está el árbol</span>
+                    <button onclick="alternarModoCensoMapa()" style="background:#000; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">Salir</button>
+                </div>
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
                     <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: OSM, Open-Meteo, NASA FIRMS, USGS, Firebase</div>
@@ -1261,12 +1288,12 @@
 <div class="modal-overlay" id="modalCensoForestal">
     <div class="modal-content-box" style="max-width: 600px; height: auto; max-height: 90vh;">
         <div class="modal-header">
-            <h2>🌳 Censo Forestal Urbano (GPS & Foto)</h2>
+            <h2>🌳 Registrar Árbol Censado</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalCensoForestal()">✕</button>
         </div>
         <div class="modal-body" style="grid-template-columns: 1fr; gap: 10px;">
             <div class="recommendation-card">
-                <b>Ubicación GPS Capturada:</b> <span id="arbolGpsText" style="color: var(--accent);">Obteniendo coordenadas...</span>
+                <b>Coordenadas Seleccionadas:</b> <span id="arbolGpsText" style="color: var(--accent);">--</span>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 6px;">
@@ -1321,10 +1348,15 @@
     };
 
     // Inicializar Firebase de forma segura
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+    let db;
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.firestore();
+    } catch (e) {
+        console.error("Error inicializando Firebase:", e);
     }
-    const db = firebase.firestore();
 
     let currentLat = -32.92;
     let currentLon = -68.84;
@@ -1339,6 +1371,10 @@
     let drawnItemsModal = null;
     let loteHectareasGlobal = 1;
     let datosLoteActual = null;
+
+    let modoCensoActivo = false;
+    let latSeleccionadaCenso = null;
+    let lonSeleccionadaCenso = null;
 
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
     const listaCultivosDisponibles = ["Vid", "Cebolla", "Ajo", "Olivo", "Tomate", "Frutales (Manz/Pera/Cerez)", "Extensivos (Maíz/Soja)"];
@@ -1401,6 +1437,16 @@
 
                 inicializarCapasEspeciales();
                 escucharArbolesEnTiempoReal();
+
+                // Evento de clic en el mapa principal para capturar posición de censo si está activo
+                mapInstance.on('click', function(e) {
+                    if (modoCensoActivo) {
+                        latSeleccionadaCenso = e.latlng.lat;
+                        lonSeleccionadaCenso = e.latlng.lng;
+                        abrirModalCensoForestal(latSeleccionadaCenso, lonSeleccionadaCenso);
+                    }
+                });
+
                 actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: OSM, Open-Meteo, NASA FIRMS, Firebase");
             }
 
@@ -1414,12 +1460,34 @@
             });
 
             markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
-                .bindPopup("<b>Ubicación GPS Actual (Estación Virtual Open-Meteo)</b>")
+                .bindPopup("<b>Tu Ubicación GPS Actual</b>")
                 .openPopup();
 
             mapInstance.setView([lat, lon], 15);
         } catch (e) {
             actualizarIndicadorMapa("Error en mapa", "#ef4444", "Error cargando tiles");
+        }
+    }
+
+    function alternarModoCensoMapa() {
+        modoCensoActivo = !modoCensoActivo;
+        const btnCenso = document.getElementById("btnModoCenso");
+        const banner = document.getElementById("bannerModoCenso");
+
+        if (modoCensoActivo) {
+            if (btnCenso) {
+                btnCenso.classList.add("active");
+                btnCenso.style.background = "#22c55e";
+                btnCenso.style.color = "#000";
+            }
+            if (banner) banner.style.display = "flex";
+        } else {
+            if (btnCenso) {
+                btnCenso.classList.remove("active");
+                btnCenso.style.background = "rgba(34, 197, 94, 0.2)";
+                btnCenso.style.color = "#22c55e";
+            }
+            if (banner) banner.style.display = "none";
         }
     }
 
@@ -1473,11 +1541,13 @@
         if (modal) modal.style.display = "none";
     }
 
-    function abrirModalCensoForestal() {
+    function abrirModalCensoForestal(lat, lon) {
+        latSeleccionadaCenso = lat;
+        lonSeleccionadaCenso = lon;
         const modal = document.getElementById("modalCensoForestal");
         if (modal) {
             modal.style.display = "flex";
-            document.getElementById("arbolGpsText").innerText = `${currentLat.toFixed(5)}, ${currentLon.toFixed(5)}`;
+            document.getElementById("arbolGpsText").innerText = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
         }
     }
 
@@ -1486,44 +1556,76 @@
         if (modal) modal.style.display = "none";
     }
 
-    // Función principal de guardado vinculada por ID y listener
-   function guardarRegistroArbol() {
-    alert("1. Iniciando guardado...");
+    // Guardar registro de árbol con las coordenadas seleccionadas en el mapa
+    function guardarRegistroArbol() {
+        const especie = document.getElementById("selectEspecieArbol").value;
+        const estado = document.getElementById("selectEstadoArbol").value;
+        const observaciones = document.getElementById("txtObservacionesArbol").value;
+        const fileInput = document.getElementById("inputFotoArbol");
 
-    const especie = document.getElementById("selectEspecieArbol").value;
-    const estado = document.getElementById("selectEstadoArbol").value;
-    const observaciones = document.getElementById("txtObservacionesArbol").value;
+        if (!db) {
+            alert("Error crítico: Base de datos no inicializada.");
+            return;
+        }
 
-    const nuevoArbol = {
-        especie,
-        estado,
-        observaciones: observaciones || "Sin observaciones",
-        lat: currentLat,
-        lon: currentLon,
-        fecha: new Date().toLocaleDateString("es-AR")
-    };
+        const latFinal = latSeleccionadaCenso !== null ? latSeleccionadaCenso : currentLat;
+        const lonFinal = lonSeleccionadaCenso !== null ? lonSeleccionadaCenso : currentLon;
 
-    alert("2. Datos preparados. Intentando conectar con Firebase...");
+        const enviarAFirebase = (imagenBase64) => {
+            const nuevoArbol = {
+                especie,
+                estado,
+                observaciones: observaciones || "Sin observaciones",
+                lat: latFinal,
+                lon: lonFinal,
+                fecha: new Date().toLocaleDateString("es-AR"),
+                foto: imagenBase64 || ""
+            };
 
-    // Verificamos si db existe antes de intentar guardar
-    if (typeof db === 'undefined') {
-        alert("ERROR: La base de datos 'db' no está definida.");
-        return;
+            db.collection("arboles_censados").add(nuevoArbol)
+                .then((docRef) => {
+                    alert(`¡Árbol registrado con éxito en la nube! (ID: ${docRef.id})`);
+                    cerrarModalCensoForestal();
+                    alternarModoCensoMapa(); // Desactivar modo censo al completar
+                    // Limpiar formulario
+                    document.getElementById("txtObservacionesArbol").value = "";
+                    if (fileInput) fileInput.value = "";
+                })
+                .catch((error) => {
+                    alert("Error al guardar en Firebase: " + error.message);
+                });
+        };
+
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxWidth = 400;
+                    const scaleSize = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scaleSize;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const comprimidaBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    enviarAFirebase(comprimidaBase64);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            enviarAFirebase("");
+        }
     }
 
-    db.collection("arboles_censados").add(nuevoArbol)
-        .then((docRef) => {
-            alert(`¡3. GUARDADO EXITOSO! ID en la nube: ${docRef.id}`);
-            cerrarModalCensoForestal();
-        })
-        .catch((error) => {
-            alert("4. ERROR DE FIREBASE: " + error.message);
-        });
-}    // Escucha en tiempo real los árboles de todos los colaboradores
+    // Escucha en tiempo real los árboles de todos los colaboradores y dibuja los pines
     function escucharArbolesEnTiempoReal() {
+        if (!db) return;
         db.collection("arboles_censados").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
+                if (change.type === "added" || change.type === "modified") {
                     const arbol = change.doc.data();
                     
                     let colorPin = "#22c55e"; // Sano
@@ -1532,12 +1634,12 @@
 
                     let iconoArbol = L.divIcon({
                         className: '',
-                        html: `<div style="background-color: ${colorPin}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0e1526; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌳</div>`,
-                        iconSize: [18, 18],
-                        iconAnchor: [9, 9]
+                        html: `<div style="background-color: ${colorPin}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 12px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌳</div>`,
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
                     });
 
-                    if (mapInstance) {
+                    if (mapInstance && arbol.lat && arbol.lon) {
                         L.marker([arbol.lat, arbol.lon], { icon: iconoArbol }).addTo(mapInstance)
                             .bindPopup(`<b>Árbol: ${arbol.especie}</b><br>Estado: <b>${arbol.estado}</b><br>Obs: ${arbol.observaciones || 'Sin observaciones'}<br><small>${arbol.fecha}</small>`);
                     }
@@ -2150,7 +2252,7 @@
         }
     }
 
-    // Listener seguro adjuntado al DOM para garantizar la reacción del botón
+    // Listener seguro adjuntado al DOM para garantizar la reacción del botón de censo
     document.addEventListener("DOMContentLoaded", function() {
         const btnGuardar = document.getElementById("btnGuardarCenso");
         if (btnGuardar) {
@@ -2161,19 +2263,6 @@
         }
         iniciarApp();
     });
-
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-        setTimeout(function() {
-            const btnGuardar = document.getElementById("btnGuardarCenso");
-            if (btnGuardar && !btnGuardar.hasAttribute("data-bound")) {
-                btnGuardar.setAttribute("data-bound", "true");
-                btnGuardar.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    guardarRegistroArbol();
-                });
-            }
-        }, 500);
-    }
 
     setInterval(actualizarFechaYHoraDigital, 1000);
     setInterval(dispararCargaDeDatos, 300000);
