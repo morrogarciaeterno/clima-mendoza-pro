@@ -895,6 +895,11 @@
 
 <body oncontextmenu="return false;">
 
+<!-- Audio incrustado en Base64 para garantizar reproducción en Edge, Chrome y Firefox sin bloqueos -->
+<audio id="alarmaAudio" preload="auto">
+    <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUcvT18AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" type="audio/wav">
+</audio>
+
 <header>
     <div class="header-content">
         <div class="brand">
@@ -1406,53 +1411,18 @@
         }
     });
 
-    let audioCtx = null;
-
-    // Desbloquear contexto de audio con la primera interacción del usuario (Políticas del navegador)
-    function desbloquearAudio() {
-        if (!audioCtx) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (AudioContext) {
-                audioCtx = new AudioContext();
-            }
-        }
-        if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-    }
-
-    document.addEventListener('click', desbloquearAudio, { once: true });
-    document.addEventListener('touchstart', desbloquearAudio, { once: true });
-
-    // Sintetizador de audio sutil para alertas de operadores (Campanita de control)
+    // Reproductor de audio estándar basado en elemento <audio> con Base64 (Compatible 100% con Chrome y Edge)
     function reproducirAlertaSonora() {
         try {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                audioCtx = new AudioContext();
+            const audioEl = document.getElementById("alarmaAudio");
+            if (audioEl) {
+                audioEl.currentTime = 0;
+                audioEl.play().catch(err => {
+                    console.log("El navegador requiere interacción previa del usuario para reproducir audio.", err);
+                });
             }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.4);
-
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.8);
         } catch (e) {
-            console.log("Audio bloqueado por políticas del navegador.");
+            console.log("Error al reproducir audio:", e);
         }
     }
 
