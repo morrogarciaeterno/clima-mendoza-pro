@@ -874,6 +874,22 @@
         .alerta-activa-animacion {
             animation: alertaParpadeo 1.5s infinite ease-in-out;
         }
+
+        .btn-reconocer {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-reconocer:hover {
+            background: #22c55e;
+            color: #000;
+        }
     </style>
 </head>
 
@@ -903,6 +919,24 @@
 </header>
 
 <div class="container">
+
+    <!-- ALERTA SÍSMICA SUPERIOR (PERSISTENTE 1 HORA CON RECONOCIMIENTO) -->
+    <div class="card" id="sismoAlertaCard" style="display: none; border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #0e1526 0%, #261f0e 100%); margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex-grow: 1;">
+                <span style="font-size: 2rem; flex-shrink: 0;">🌋</span>
+                <div style="min-width: 0; flex-grow: 1;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span id="sismoBadge" style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Sísmica Regional</span>
+                        <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: USGS Global Feed</small>
+                    </div>
+                    <h3 id="sismoTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Movimiento Sísmico Relevante Detectado!</h3>
+                    <p id="sismoDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Analizando magnitud y distancia...</p>
+                </div>
+            </div>
+            <button class="btn-reconocer" onclick="reconocerAlerta('sismo')">✅ Reconocer / Silenciar</button>
+        </div>
+    </div>
 
     <!-- ALERTA DE HELADAS AVANZADA (REAL) -->
     <div class="card" id="heladaAlertaCard" style="display: none; border-left: 6px solid #38bdf8; background: linear-gradient(135deg, #0e1526 0%, #0d2137 100%); margin-bottom: 12px;">
@@ -978,18 +1012,21 @@
 
     <br>
 
-    <!-- ALERTA DE INCENDIOS NASA FIRMS (REAL) -->
+    <!-- ALERTA DE INCENDIOS NASA FIRMS (CON RECONOCIMIENTO Y SILENCIO) -->
     <div class="card" id="fuegoAlertaCard" style="display: none; border-left: 6px solid #ef4444; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.8rem; flex-shrink: 0;">🔥</span>
-            <div style="min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                    <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Fuego</span>
-                    <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: NASA FIRMS (VIIRS/MODIS)</small>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex-grow: 1;">
+                <span style="font-size: 1.8rem; flex-shrink: 0;">🔥</span>
+                <div style="min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Fuego</span>
+                        <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: NASA FIRMS (VIIRS/MODIS)</small>
+                    </div>
+                    <h3 id="fuegoAlertaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 2px; font-weight: 800;">¡Foco Activo Detectado!</h3>
+                    <p id="fuegoAlertaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Calculando distancia...</p>
                 </div>
-                <h3 id="fuegoAlertaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 2px; font-weight: 800;">¡Foco Activo Detectado!</h3>
-                <p id="fuegoAlertaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Calculando distancia...</p>
             </div>
+            <button class="btn-reconocer" onclick="reconocerAlerta('fuego')">✅ Reconocer / Silenciar</button>
         </div>
     </div>
 
@@ -1253,6 +1290,22 @@
         </div>
     </div>
 
+    <br>
+
+    <!-- ALARMERO E HISTORIAL DE INCIDENTES (PIE DE PÁGINA) -->
+    <div class="card" style="border-left: 6px solid var(--accent); background: linear-gradient(135deg, #0e1526 0%, #0d1e33 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+            <div>
+                <h3 style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🚨 Alarmero e Historial de Incidentes Reconocidos</h3>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Registro en tiempo real de alarmas atendidas por operadores (Sismos y Focos de Incendio).</small>
+            </div>
+            <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
+        </div>
+        <div id="alarmeroListaContainer" class="sismos-grid-horizontal" style="min-height: 60px; align-items: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; width: 100%; padding: 10px;">Sin alarmas reconocidas recientemente.</div>
+        </div>
+    </div>
+
 </div>
 
 <!-- VENTANA MODAL PARA LOTES Y REPORTE REAL -->
@@ -1349,6 +1402,119 @@
         }
     });
 
+    // Sintetizador de audio sutil para alertas de operadores (Campanita de control)
+    function reproducirAlertaSonora() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.4);
+
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.8);
+        } catch (e) {
+            console.log("Audio bloqueado por políticas del navegador.");
+        }
+    }
+
+    // Intervalo de aviso sonoro cada 60 segundos si hay una alerta crítica activa y NO ha sido reconocida
+    setInterval(() => {
+        const cardFuego = document.getElementById("fuegoAlertaCard");
+        const cardSismo = document.getElementById("sismoAlertaCard");
+        
+        let fuegoActivo = cardFuego && cardFuego.style.display === "block" && cardFuego.dataset.reconocido !== "true";
+        let sismoActivo = cardSismo && cardSismo.style.display === "block" && cardSismo.dataset.reconocido !== "true";
+
+        if (fuegoActivo || sismoActivo) {
+            reproducirAlertaSonora();
+        }
+    }, 60000);
+
+    // Función para reconocer / silenciar una alarma y registrarla en el alarmero inferior
+    function reconocerAlerta(tipo) {
+        const ahoraStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        let tituloIncidente = "";
+        let tarjetaCard = null;
+
+        if (tipo === 'fuego') {
+            tarjetaCard = document.getElementById("fuegoAlertaCard");
+            tituloIncidente = "Incendio / Foco Activo (NASA)";
+            if (tarjetaCard) {
+                tarjetaCard.dataset.reconocido = "true";
+                tarjetaCard.classList.remove("alerta-activa-animacion");
+                tarjetaCard.style.borderLeftColor = "#22c55e";
+            }
+        } else if (tipo === 'sismo') {
+            tarjetaCard = document.getElementById("sismoAlertaCard");
+            tituloIncidente = "Sismo Relevante (USGS)";
+            if (tarjetaCard) {
+                tarjetaCard.dataset.reconocido = "true";
+                tarjetaCard.classList.remove("alerta-activa-animacion");
+                tarjetaCard.style.borderLeftColor = "#22c55e";
+            }
+        }
+
+        if (tarjetaCard) {
+            // Ocultar botón de reconocer en la tarjeta para indicar que ya fue atendida
+            const btn = tarjetaCard.querySelector(".btn-reconocer");
+            if (btn) btn.innerHTML = "✔ Atendido";
+            if (btn) btn.style.borderColor = "#22c55e";
+            if (btn) btn.style.color = "#22c55e";
+            if (btn) btn.style.cursor = "default";
+        }
+
+        // Registrar en el Alarmero al pie de página (Almacenar en localStorage)
+        let historial = JSON.parse(localStorage.getItem("alarmero_historial") || "[]");
+        historial.unshift({
+            tipo: tituloIncidente,
+            hora: ahoraStr,
+            fecha: new Date().toLocaleDateString("es-AR")
+        });
+        if (historial.length > 10) historial.pop(); // Mantener últimos 10
+        localStorage.setItem("alarmero_historial", JSON.stringify(historial));
+
+        renderizarAlarmero();
+    }
+
+    function renderizarAlarmero() {
+        const contenedor = document.getElementById("alarmeroListaContainer");
+        if (!contenedor) return;
+
+        let historial = JSON.parse(localStorage.getItem("alarmero_historial") || "[]");
+        if (historial.length === 0) {
+            contenedor.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; width: 100%; padding: 10px;">Sin alarmas reconocidas recientemente.</div>`;
+            return;
+        }
+
+        contenedor.innerHTML = "";
+        historial.forEach(item => {
+            contenedor.innerHTML += `
+                <div class="sismo-mini-card" style="flex: 0 0 160px; text-align: left; background: var(--card-bg);">
+                    <div style="font-size: 0.65rem; color: #22c55e; font-weight:800;">✔ RECONOCIDO</div>
+                    <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-main); margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.tipo}">${item.tipo}</div>
+                    <div style="font-size: 0.65rem; color: var(--text-muted);">${item.fecha} - ${item.hora}</div>
+                </div>
+            `;
+        });
+    }
+
+    function borrarHistorialAlarmas() {
+        localStorage.removeItem("alarmero_historial");
+        renderizarAlarmero();
+    }
+
     // Configuración oficial de tu proyecto Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyBbQtPmOwpsADqzOE-MA_TRgmaHOIjJpsU",
@@ -1359,7 +1525,6 @@
         appId: "1:507365835185:web:3580bdad2d3c5b34d4bd90"
     };
 
-    // Inicializar Firebase de forma segura
     let db;
     try {
         if (!firebase.apps.length) {
@@ -1902,6 +2067,9 @@
                     let fLat = parseFloat(cols[idxLat]);
                     let fLon = parseFloat(cols[idxLon]);
                     if (!isNaN(fLat) && !isNaN(fLon)) {
+                        let distRefineria = calcularDistanciaKm(fLat, fLon, -33.04, -68.87);
+                        if (distRefineria < 3.0) continue;
+
                         let distancia = calcularDistanciaKm(lat, lon, fLat, fLon);
                         if (distancia < fuegoCercanoKm) fuegoCercanoKm = distancia;
                     }
@@ -1910,11 +2078,63 @@
 
             if (fuegoCercanoKm <= 100) {
                 card.style.display = "block";
-                card.classList.add("alerta-activa-animacion");
-                titulo.innerText = `¡Foco NASA a ${Math.round(fuegoCercanoKm)} km!`;
-                desc.innerText = `Actividad satelital detectada en la región. Fuente: NASA FIRMS.`;
+                if (card.dataset.reconocido !== "true") {
+                    card.classList.add("alerta-activa-animacion");
+                }
+                titulo.innerText = `¡Foco Forestal Real a ${Math.round(fuegoCercanoKm)} km!`;
+                desc.innerText = `Actividad térmica confirmada (excluyendo planta industrial). Fuente: NASA FIRMS.`;
             } else {
                 card.style.display = "none";
+            }
+        } catch (e) {}
+    }
+
+    async function verificarSismosRelevantes(lat, lon) {
+        const card = document.getElementById("sismoAlertaCard");
+        const titulo = document.getElementById("sismoTitulo");
+        const desc = document.getElementById("sismoDesc");
+        if (!card) return;
+
+        let alertaGuardada = sessionStorage.getItem("sismoActivoTimestamp");
+        let ahoraMs = Date.now();
+        if (alertaGuardada && (ahoraMs - parseInt(alertaGuardada)) < 3600000) {
+            card.style.display = "block";
+            if (card.dataset.reconocido !== "true") {
+                card.classList.add("alerta-activa-animacion");
+            }
+            return;
+        }
+
+        try {
+            const res = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson");
+            const data = await res.json();
+            if (data && data.features && data.features.length > 0) {
+                let sismoEncontrado = false;
+                for (let s of data.features) {
+                    let mag = s.properties.mag || 0;
+                    let coords = s.geometry.coordinates;
+                    let sLat = coords[1];
+                    let sLon = coords[0];
+                    let lugar = s.properties.place || "Zona cordillerana";
+
+                    let distancia = calcularDistanciaKm(lat, lon, sLat, sLon);
+
+                    if (mag >= 4.5 && distancia <= 300) {
+                        card.style.display = "block";
+                        if (card.dataset.reconocido !== "true") {
+                            card.classList.add("alerta-activa-animacion");
+                        }
+                        titulo.innerText = `¡Sismo Mag ${mag.toFixed(1)} a ${Math.round(distancia)} km!`;
+                        desc.innerText = `Epicentro: ${lugar}. Alerta activa por 1 hora. Fuente: USGS.`;
+                        
+                        sessionStorage.setItem("sismoActivoTimestamp", ahoraMs.toString());
+                        sismoEncontrado = true;
+                        break;
+                    }
+                }
+                if (!sismoEncontrado && !alertaGuardada) {
+                    card.style.display = "none";
+                }
             }
         } catch (e) {}
     }
@@ -2228,6 +2448,7 @@
         cargarPolen();
         cargarSismos();
         verificarProximidadIncendios(currentLat, currentLon);
+        verificarSismosRelevantes(currentLat, currentLon);
     }
 
     async function procesarUbicacionExitosa(lat, lon) {
@@ -2265,6 +2486,7 @@
     function iniciarApp() {
         actualizarFechaYHoraDigital();
         calcularFaseLunar();
+        renderizarAlarmero();
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -2293,7 +2515,7 @@
     });
 
     setInterval(actualizarFechaYHoraDigital, 1000);
-    setInterval(dispararCargaDeDatos, 300000);
+    setInterval(dispararCargadeDatos, 300000);
 </script>
 
 </body>
