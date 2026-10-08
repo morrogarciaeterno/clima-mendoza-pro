@@ -1418,7 +1418,7 @@
 
         </div>
 
-        <!-- MAPA PRINCIPAL -->
+        <!-- MAPA PRINCIPAL (GEOGRÁFICO SATELITAL) -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺 Visor Geográfico Satelital</h3>
             <div class="map-controls">
@@ -1449,23 +1449,17 @@
 
     <br>
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH ORIGINAL CON TUS ESTACIONES REALES Y MAPA AMPLIO -->
+    <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA (MAPA Y CONTROLES AL MISMO LADO) -->
     <div class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
                 <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🌊 Territoria - Mapa y Monitoreo Hídrico SNIH</h3>
-                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.7rem;">Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva a la derecha.</small>
+                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.7rem;">Hacé clic o arrastrá los puntos en el mapa, o cargá una estación nueva a la izquierda.</small>
             </div>
         </div>
         
-        <div class="hidro-layout-grid">
-            <!-- COLUMNA IZQUIERDA: MAPA GIGANTE DE HIDROMETRÍA -->
-            <div class="panel">
-                <h3 style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas (Mendoza)</h3>
-                <div id="map"></div>
-            </div>
-
-            <!-- COLUMNA DERECHA: FORMULARIO, SELECTOR Y RESULTADOS -->
+        <div class="hidro-layout-grid" style="grid-template-columns: 1fr 1.2fr;">
+            <!-- COLUMNA IZQUIERDA (CONTROLES Y SELECTOR DE HIDROMETRÍA) -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
                <div>
                     <div class="search-box">
@@ -1500,7 +1494,7 @@
                         </div>
                     </div>
 
-                    <!-- FORMULARIO A LA DERECHA -->
+                    <!-- FORMULARIO DE CARGA -->
                     <div class="form-manual">
                         <h4 id="formTitulo">➕ Cargar Estación Interactiva</h4>
                         <input id="nuevoId" placeholder="ID (ej: 19104)">
@@ -1523,6 +1517,12 @@
                         <pre id="json">// Respuesta JSON...</pre>
                     </div>
                 </div>
+            </div>
+
+            <!-- COLUMNA DERECHA (MAPA GIGANTE DE HIDROMETRÍA) -->
+            <div class="panel">
+                <h3 style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas (Mendoza)</h3>
+                <div id="map"></div>
             </div>
         </div>
     </div>
@@ -1947,7 +1947,7 @@
                 
                 document.getElementById("formTitulo").textContent = "➕ Cargar Estación Interactiva";
                 document.getElementById("btnCancelar").style.display = "none";
-                document.getElementById("instruccionMapa").textContent = "Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva a la derecha.";
+                document.getElementById("instruccionMapa").textContent = "Hacé clic o arrastrá los puntos en el mapa, o cargá una estación nueva a la izquierda.";
 
                 document.getElementById("nuevoId").value = "";
                 document.getElementById("nuevoNombre").value = "";
@@ -1980,9 +1980,16 @@
             select.appendChild(option);
 
             if (info.coords && map) {
+                // Verificamos si esta estación tiene una altura registrada en alerta (> 1.5 m)
+                const ultimaAltura = historialLecturas[id] !== undefined ? historialLecturas[id] : 0;
+                const enAlerta = ultimaAltura > 1.5;
+
+                const colorPunto = enAlerta ? "#ef4444" : "#38bdf8";
+                const boxShadowColor = enAlerta ? "0 0 16px #ef4444" : "0 0 12px #38bdf8";
+
                 const customIcon = L.divIcon({
                     className: 'custom-marker',
-                    html: `<div style="background: #38bdf8; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #000; box-shadow: 0 0 12px #38bdf8; cursor: grab;"></div>`,
+                    html: `<div style="background: ${colorPunto}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #000; box-shadow: ${boxShadowColor}; cursor: grab;"></div>`,
                     iconSize: [18, 18]
                 });
 
@@ -2050,7 +2057,7 @@
         document.getElementById("nuevoId").value = "";
         document.getElementById("nuevoNombre").value = "";
         document.getElementById("nuevaRed").value = "";
-        document.getElementById("instruccionMapa").textContent = "Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva a la derecha.";
+        document.getElementById("instruccionMapa").textContent = "Hacé clic o arrastrá los puntos en el mapa, o cargá una estación nueva a la izquierda.";
     }
 
     function toggleJson() {
@@ -2186,6 +2193,9 @@
                 badge.textContent = "Monitoreando";
                 badge.style.background = "#22c55e";
             }
+
+            // Actualizamos el mapa para reflejar el color rojo en el círculo si está en alerta
+            actualizarSelectYMapa();
 
         } catch(error){
             resultado.innerHTML = `
