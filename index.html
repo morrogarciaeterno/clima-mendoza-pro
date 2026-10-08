@@ -916,7 +916,7 @@
             color: #000;
         }
 
-        /* Estilos específicos para Hidrometría Integrada */
+        /* Estilos específicos para el módulo de Hidrometría original */
         .hidro-layout-grid {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
@@ -926,30 +926,36 @@
         @media(max-width: 900px) {
             .hidro-layout-grid { grid-template-columns: 1fr; }
         }
-        #mapaHidro { 
-            height: 450px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-            width: 100%; 
-            z-index: 10; 
+        #map {
+            height: 750px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            z-index: 10;
             cursor: crosshair;
+            width: 100%;
         }
-        .card.alerta-roja { 
-            border-color: #ef4444 !important; 
-            background: linear-gradient(135deg, #1f1115 0%, #162035 100%) !important; 
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
         }
-        .resumen-caudal { 
+        .card.alerta-roja {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #1f1115 0%, #162035 100%);
+        }
+        .resumen-caudal {
             margin-top: 15px;
             margin-bottom: 15px;
-            background: linear-gradient(135deg, #091325 0%, #111e38 100%); 
-            border: 1px solid #0284c7; 
-            border-radius: 12px; 
-            padding: 14px; 
-            transition: all 0.3s ease; 
+            background: linear-gradient(135deg, #091325 0%, #111e38 100%);
+            border: 1px solid #0284c7;
+            border-radius: 12px;
+            padding: 14px;
+            transition: all 0.3s ease;
         }
-        .resumen-caudal.alerta-activa { 
-            border-color: #ef4444; 
-            background: linear-gradient(135deg, #2a0f15 0%, #111e38 100%); 
+        .resumen-caudal.alerta-activa {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #2a0f15 0%, #111e38 100%);
         }
         .indicadores-grid {
             display: grid;
@@ -974,7 +980,66 @@
             border: 1px solid var(--border);
         }
         .form-manual h4 { font-size: 0.8rem; color: var(--accent); margin-bottom: 8px; }
-        .form-manual input { width: 100%; margin-bottom: 8px; padding: 10px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 0.78rem; outline: none; }
+        .form-manual input { width: 100%; margin-bottom: 8px; }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        select, input {
+            flex: 1;
+            padding: 10px 12px;
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+        }
+        select:focus, input:focus { border-color: var(--accent); }
+        button{
+            padding: 10px 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #000;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        button:hover{ opacity: 0.9; }
+        .btn-secundario {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            padding: 8px 14px;
+            margin-top: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-secundario:hover { border-color: var(--accent); color: var(--accent); }
+        .json-box{
+            display: none;
+            margin-top: 15px;
+            background: #02040a;
+            border: 1px solid var(--border);
+            color: #22c55e;
+            border-radius: 12px;
+            padding: 15px;
+            overflow: auto;
+            max-height: 150px;
+            font-family: monospace;
+            font-size: 0.7rem;
+        }
+        .loading{
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--accent);
+            padding: 20px;
+            grid-column: 1 / -1;
+        }
     </style>
 </head>
 
@@ -1064,7 +1129,6 @@
             <h3>Temperatura (Estación Virtual)</h3>
             <div class="temp-box">
                 <div class="metric" id="temp">--</div>
-                <!-- ÍCONO DINÁMICO -->
                 <div id="weatherIcon" style="font-size: 2.8rem; line-height: 1; filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));">☀</div>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
@@ -1105,7 +1169,7 @@
 
     <br>
 
-    <!-- ALERTA DE INCENDIOS NASA FIRMS (CON RECONOCIMIENTO Y SILENCIO) -->
+    <!-- ALERTA DE INCENDIOS NASA FIRMS -->
     <div class="card" id="fuegoAlertaCard" style="display: none; border-left: 6px solid #ef4444; margin-bottom: 12px;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex-grow: 1;">
@@ -1385,42 +1449,40 @@
 
     <br>
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH (CAUDALES) INTEGRADA CON DISEÑO LIMPIO -->
+    <!-- SECCIÓN DE HIDROMETRÍA SNIH ORIGINAL CON TUS ESTACIONES REALES Y MAPA AMPLIO -->
     <div class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
-                <h3 id="tituloModuloHidro" style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🌊 Monitoreo de Caudales & Red Hídrica SNIH</h3>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Control en tiempo real de estaciones hidrométricas y niveles críticos (Mendoza y Región).</small>
+                <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🌊 Territoria - Mapa y Monitoreo Hídrico SNIH</h3>
+                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.7rem;">Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva a la derecha.</small>
             </div>
         </div>
         
         <div class="hidro-layout-grid">
-            <!-- COLUMNA IZQUIERDA: MAPA HIDRO -->
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <h4 style="font-size: 0.8rem; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h4>
-                <div id="mapaHidro"></div>
-                <small id="instruccionMapaHidro" style="color: var(--text-muted); font-size: 0.7rem;">💡 Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva abajo.</small>
+            <!-- COLUMNA IZQUIERDA: MAPA GIGANTE DE HIDROMETRÍA -->
+            <div class="panel">
+                <h3 style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas (Mendoza)</h3>
+                <div id="map"></div>
             </div>
 
-            <!-- COLUMNA DERECHA: PANEL HIDRO -->
-            <div style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                    <div class="search-box" style="display: flex; gap: 8px; margin-bottom: 12px;">
-                        <select id="idHidro" onchange="consultarHidro()" style="flex: 1; padding: 10px; background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); font-size: 0.8rem; outline: none;"></select>
-                        <button onclick="consultarHidro()" style="padding: 10px 14px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: 800; cursor: pointer;">Actualizar</button>
-                        <button onclick="cargarEstacionParaEditarHidro()" style="background: #eab308; color: #000; border: none; padding: 10px 14px; border-radius: 10px; font-weight: 800; cursor: pointer;" title="Editar estación">✏️</button>
+            <!-- COLUMNA DERECHA: FORMULARIO, SELECTOR Y RESULTADOS -->
+            <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+               <div>
+                    <div class="search-box">
+                        <select id="id" onchange="consultar()">
+                            <!-- Se llena dinámicamente con tus estaciones -->
+                        </select>
+                        <button onclick="consultar()">Actualizar</button>
+                        <button onclick="cargarEstacionParaEditar()" style="background: #eab308; color: #000;" title="Editar estación seleccionada">✏️ Editar</button>
                     </div>
 
-                    <div id="infoDetalleHidro" style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 10px;">
-                        Información de red y ubicación...
+                    <div id="infoDetalle" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                        Información de la red y ubicación...
                     </div>
 
-                    <!-- RESUMEN CRÍTICO & TENDENCIA -->
+                    <!-- PANEL RESUMEN ESPECÍFICO CON TENDENCIA Y ALARMAS -->
                     <div id="panelResumenCaudal" class="resumen-caudal">
-                        <h4 style="color: #38bdf8; font-size: 0.8rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                            <span>💧 Resumen Crítico & Tendencia</span> 
-                            <span id="estadoCaudalBadge" style="font-size: 0.62rem; background: #64748b; padding: 2px 6px; border-radius: 4px; color: #fff;">Sin datos</span>
-                        </h4>
+                        <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.62rem; background: #64748b; padding: 2px 6px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
                         <div class="indicadores-grid">
                             <div class="ind-box">
                                 <div class="ind-label">Nivel / Altura</div>
@@ -1438,27 +1500,27 @@
                         </div>
                     </div>
 
-                    <!-- FORMULARIO CARGAR ESTACIÓN -->
+                    <!-- FORMULARIO A LA DERECHA -->
                     <div class="form-manual">
-                        <h4 id="formTituloHidro">➕ Cargar Estación Interactiva</h4>
-                        <input id="nuevoIdHidro" placeholder="ID (ej: 19104)">
-                        <input id="nuevoNombreHidro" placeholder="Nombre (ej: Paso Pehuenche)">
-                        <input id="nuevaRedHidro" placeholder="Red (ej: Río Grande, Mendoza)">
-                        <div style="display: flex; gap: 6px;">
-                            <button onclick="prepararModoUbicacionHidro()" style="flex: 2; background: #22c55e; color: #000; border: none; padding: 8px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 0.75rem;">1. Guardar y Ubicar en Mapa</button>
-                            <button onclick="cancelarEdicionHidro()" id="btnCancelarHidro" style="flex: 1; background: #ef4444; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 0.75rem; display:none;">Cancelar</button>
+                        <h4 id="formTitulo">➕ Cargar Estación Interactiva</h4>
+                        <input id="nuevoId" placeholder="ID (ej: 19104)">
+                        <input id="nuevoNombre" placeholder="Nombre (ej: Paso Pehuenche)">
+                        <input id="nuevaRed" placeholder="Ubicación / Red (ej: Río Grande, Mendoza)">
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="prepararModoUbicacion()" style="flex: 2; background: #22c55e; color: #000;">1. Guardar y Ubicar en Mapa</button>
+                            <button onclick="cancelarEdicion()" id="btnCancelar" style="flex: 1; background: #ef4444; color: #fff; display:none;">Cancelar</button>
                         </div>
                     </div>
 
-                    <div id="resultadoHidro" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: 12px;">
-                        <div style="text-align: center; font-size: 0.78rem; color: var(--accent); padding: 15px; grid-column: 1 / -1;">Seleccioná una estación.</div>
+                    <div id="resultado" class="cards">
+                        <div class="loading">Seleccioná una estación del mapa o del selector.</div>
                     </div>
                 </div>
 
-                <div style="margin-top: 15px;">
-                    <button onclick="toggleJsonHidro()" style="background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.7rem; padding: 6px; border-radius: 6px; cursor: pointer; width: 100%;">Ver / Ocultar Depuración JSON</button>
-                    <div id="jsonContainerHidro" style="display: none; margin-top: 8px; background: #02040a; border: 1px solid var(--border); color: #22c55e; border-radius: 8px; padding: 10px; max-height: 80px; overflow: auto; font-family: monospace; font-size: 0.65rem;">
-                        <pre id="jsonHidro">// Respuesta JSON...</pre>
+                <div>
+                    <button class="btn-secundario" onclick="toggleJson()">Ver / Ocultar Depuración JSON</button>
+                    <div id="jsonContainer" class="json-box">
+                        <pre id="json">// Respuesta JSON...</pre>
                     </div>
                 </div>
             </div>
@@ -1697,42 +1759,48 @@
     let latSeleccionadaCenso = null;
     let lonSeleccionadaCenso = null;
 
-    // Variables de Hidrometría SNIH con Alta Sensibilidad
-    const WORKER_HIDRO = "https://snih-proxy.elexpreso17.workers.dev";
-    const estacionesDefaultHidro = {
+    // Variables originales de Hidrometría SNIH con tus estaciones reales
+    const WORKER = "https://snih-proxy.elexpreso17.workers.dev";
+    const estacionesDefault = {
+        "12103": { nombre: "Estación 12103 - Pata Mora", red: "Río Colorado, Neuquén", coords: [-36.85, -69.30] },
+        "11425": { nombre: "Estación 11425 - Gendarmería", red: "Red Hidrológica Nacional, Mendoza", coords: [-32.85, -69.75] },
+        "11427": { nombre: "Estación 11427 - La Gotera", red: "Red Hidrológica Nacional, Mendoza", coords: [-32.90, -69.10] },
+        "11434": { nombre: "Estación 11434 - La Estrechura", red: "Red Hidrológica Nacional, Mendoza", coords: [-33.10, -69.20] },
+        "11446": { nombre: "Estación 11446 - Las Loicas", red: "Red Hidrológica Nacional, Mendoza", coords: [-35.95, -70.15] },
+        "11447": { nombre: "Estación 11447 - Valle Noble", red: "Red Hidrológica Nacional, Mendoza", coords: [-35.70, -70.05] },
+        "11452": { nombre: "Estación 11452 - Canalejas", red: "Red Hidrológica Nacional, Mendoza", coords: [-35.20, -67.80] },
+        "11457": { nombre: "Estación 11457 - Las Cañitas", red: "Red Hidrológica Nacional, Mendoza", coords: [-35.40, -68.50] },
+        "11485": { nombre: "Estación 11485 - Río A° Las Lágrimas", red: "Río A° Las Lágrimas, Mendoza", coords: [-35.30, -69.50] },
+        "11486": { nombre: "Estación 11486 - El Azufre", red: "Red Hidrológica Nacional, Mendoza", coords: [-35.25, -69.90] },
+        "11489": { nombre: "Estación 11489 - Yaucha", red: "Red Hidrológica Nacional, Mendoza", coords: [-33.80, -69.05] },
+        "11499": { nombre: "Estación 11499 - Túnel Internacional", red: "Red Hidrológica Nacional, Mendoza", coords: [-32.82, -69.90] },
+        "11500": { nombre: "Estación 11500 - Puntas Amarillas", red: "Red Hidrológica Nacional, Mendoza", coords: [-35.50, -70.10] },
+        "11507": { nombre: "Estación 11507 - Cerro Polleras", red: "Río Plomo, Mendoza", coords: [-32.60, -69.80] },
+        "11508": { nombre: "Estación 11508 - Picos de Barroso", red: "Red Hidrológica Nacional, Mendoza", coords: [-34.20, -69.80] },
+        "11605": { nombre: "Estación 11605 - Salto de la Tosca", red: "Red Hidrológica Nacional, Mendoza", coords: [-33.40, -69.10] },
+        "11685": { nombre: "Estación 11685 - Navia", red: "Red Hidrológica Nacional, Mendoza", coords: [-34.50, -67.50] },
+        "12001": { nombre: "Estación 12001 - Barrancas", red: "Red Hidrológica Nacional, Mendoza", coords: [-36.20, -69.40] },
+        "12002": { nombre: "Estación 12002 - Buta Ranquil", red: "Red Hidrológica Nacional, Mendoza", coords: [-37.00, -69.80] },
+        "12101": { nombre: "Estación 12101 - Laguna La Negra", red: "Red Hidrológica Nacional, Mendoza", coords: [-36.50, -69.60] },
         "1413": { nombre: "Estación 1413 - Guido", red: "Río Mendoza, Mendoza", coords: [-32.83, -69.30] },
-        "1507": { nombre: "Estación 1507 - Cerro Polleras", red: "Río Plomo, Mendoza", coords: [-32.60, -69.80] },
         "1421": { nombre: "Estación 1421 - Potrerillos", red: "Río Mendoza, Mendoza", coords: [-32.96, -69.18] },
         "1425": { nombre: "Estación 1425 - Uspallata", red: "Río Mendoza, Mendoza", coords: [-32.71, -69.35] },
         "1411": { nombre: "Estación 1411 - Punta de Vacas", red: "Río Mendoza, Mendoza", coords: [-32.85, -69.75] },
-        "1412": { nombre: "Estación 1412 - Las Cuevas", red: "Río Mendoza, Mendoza", coords: [-32.82, -69.90] },
         "1419": { nombre: "Estación 1419 - Valle de Uco", red: "Red Hidrológica Nacional, Mendoza", coords: [-33.60, -69.15] },
         "1417": { nombre: "Estación 1417 - Tunuyán Inferior", red: "Río Tunuyán, Mendoza", coords: [-33.58, -69.01] },
-        "1418": { nombre: "Estación 1418 - El Carrizal", red: "Río Tunuyán, Mendoza", coords: [-33.30, -68.65] },
-        "1422": { nombre: "Estación 1422 - Manzano Histórico", red: "Río Tunuyán Superior, Mendoza", coords: [-33.55, -69.40] },
-        "1437": { nombre: "Estación 1437 - El Nihuil", red: "Río Atuel, Mendoza", coords: [-35.03, -68.32] },
-        "1435": { nombre: "Estación 1435 - Loma Negra", red: "Río Atuel, Mendoza", coords: [-34.80, -68.50] },
-        "1442": { nombre: "Estación 1442 - San Rafael", red: "Cuenca Atuel-Diamante, Mendoza", coords: [-34.61, -68.33] },
-        "1430": { nombre: "Estación 1430 - Dique Agua del Toro", red: "Río Diamante, Mendoza", coords: [-34.65, -68.85] },
-        "1432": { nombre: "Estación 1432 - Los Reyunos", red: "Río Diamante, Mendoza", coords: [-34.58, -68.55] },
-        "1438": { nombre: "Estación 1438 - Alvear Oeste", red: "Cuenca Atuel, Mendoza", coords: [-35.02, -67.75] },
-        "19104": { nombre: "Estación 19104 - Paso Pehuenche", red: "Río Grande, Provincia de Mendoza", coords: [-35.95, -70.38] },
-        "1445": { nombre: "Estación 1445 - Bardas Blancas", red: "Río Grande, Mendoza", coords: [-35.80, -69.70] },
-        "1448": { nombre: "Estación 1448 - Malargüe", red: "Cuenca Malargüe, Mendoza", coords: [-35.47, -69.58] },
-        "1450": { nombre: "Estación 1450 - La Payunia", red: "Zona Sur, Mendoza", coords: [-36.40, -68.80] },
-        "1405": { nombre: "Estación 1405 - Lavalle", red: "Zona Norte, Mendoza", coords: [-32.75, -68.60] },
-        "1408": { nombre: "Estación 1408 - Lagunas de Guanacache", red: "Sistema Desaguadero, Mendoza", coords: [-32.30, -68.20] }
+        "1418": { nombre: "Estación 1418 - El Carrizal", red: "Río Tunuyán, Mendoza", coords: [-33.30, -68.65] }
     };
-    let savedDataHidro = JSON.parse(localStorage.getItem("territoria_estaciones_hidro"));
-    let estacionesDataHidro = (!savedDataHidro || Object.keys(savedDataHidro).length === 0) ? estacionesDefaultHidro : savedDataHidro;
-    let historialLecturasHidro = JSON.parse(localStorage.getItem("territoria_historial_hidro")) || {};
-    let mapaHidroInstance = null;
-    let markersHidroLayer = null;
-    let modoUbicacionHidroActivo = false;
-    let datosPendientesHidro = null;
-    let idEditandoOriginalHidro = null;
 
-    const unidadesHidro = {
+    let savedData = JSON.parse(localStorage.getItem("territoria_estaciones"));
+    let estacionesData = (!savedData || Object.keys(savedData).length === 0) ? estacionesDefault : savedData;
+    let historialLecturas = JSON.parse(localStorage.getItem("territoria_historial")) || {};
+    let map = null;
+    let markersLayer = null;
+    let modoUbicacionActivo = false;
+    let datosPendientes = null;
+    let idEditandoOriginal = null;
+
+    const unidades = {
         "Altura": "m", "Precipitación": "mm", "Precipitación acumulada diaria": "mm",
         "Precipitación acumulada mensual": "mm", "Precipitación instantánea": "mm",
         "Conductividad Eléctrica": "µS/cm", "Temperatura Bulbo Seco": "°C", "Temperatura": "°C",
@@ -1741,7 +1809,7 @@
         "Altura E.A.N. en Snow Pillow": "mm"
     };
 
-    const iconosMetricasHidro = {
+    const iconosMetricas = {
         "Altura": "📏", "Precipitación": "🌧️", "Precipitación acumulada diaria": "🌧️",
         "Precipitación acumulada mensual": "🌧️", "Precipitación instantánea": "🌦️",
         "Conductividad Eléctrica": "⚡", "Temperatura Bulbo Seco": "🌡️", "Temperatura": "🌡️",
@@ -1844,48 +1912,289 @@
         }
     }
 
-    // Inicializar el mapa de hidrometría fijo al cargar la página
-    function inicializarMapaHidroFijo() {
-        if (!mapaHidroInstance) {
-            mapaHidroInstance = L.map('mapaHidro').setView([-33.8, -68.8], 7);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap' }).addTo(mapaHidroInstance);
-            markersHidroLayer = L.layerGroup().addTo(mapaHidroInstance);
+    // Inicialización del mapa de hidrometría original con zoom y centro exacto (Cuyo / Mendoza)
+    function inicializarMapaHidroOriginal() {
+        if (!map) {
+            map = L.map('map', { zoomControl: true }).setView([-34.0, -69.0], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
 
-            mapaHidroInstance.on('click', function(e) {
-                if (!modoUbicacionHidroActivo || !datosPendientesHidro) return;
+            markersLayer = L.layerGroup().addTo(map);
+
+            map.on('click', function(e) {
+                if (!modoUbicacionActivo || !datosPendientes) return;
                 const latlng = e.latlng;
-                const { id, nombre, red } = datosPendientesHidro;
+                const { id, nombre, red } = datosPendientes;
 
-                if (idEditandoOriginalHidro && idEditandoOriginalHidro !== id) {
-                    delete estacionesDataHidro[idEditandoOriginalHidro];
+                if (idEditandoOriginal && idEditandoOriginal !== id) {
+                    delete estacionesData[idEditandoOriginal];
                 }
+
                 let nombreLimpio = nombre.replace(/^Estación \d+ - /, '');
-                estacionesDataHidro[id] = {
+                estacionesData[id] = {
                     nombre: `Estación ${id} - ${nombreLimpio}`,
                     red: red,
                     coords: [latlng.lat, latlng.lng]
                 };
-                localStorage.setItem("territoria_estaciones_hidro", JSON.stringify(estacionesDataHidro));
 
-                modoUbicacionHidroActivo = false;
-                datosPendientesHidro = null;
-                idEditandoOriginalHidro = null;
+                localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+
+                modoUbicacionActivo = false;
+                datosPendientes = null;
+                idEditandoOriginal = null;
                 
-                document.getElementById("formTituloHidro").textContent = "➕ Cargar Estación Interactiva";
-                document.getElementById("btnCancelarHidro").style.display = "none";
-                document.getElementById("instruccionMapaHidro").textContent = "💡 Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva abajo.";
+                document.getElementById("formTitulo").textContent = "➕ Cargar Estación Interactiva";
+                document.getElementById("btnCancelar").style.display = "none";
+                document.getElementById("instruccionMapa").textContent = "Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva a la derecha.";
 
-                document.getElementById("nuevoIdHidro").value = "";
-                document.getElementById("nuevoNombreHidro").value = "";
-                document.getElementById("nuevaRedHidro").value = "";
+                document.getElementById("nuevoId").value = "";
+                document.getElementById("nuevoNombre").value = "";
+                document.getElementById("nuevaRed").value = "";
 
-                actualizarSelectYMapaHidro();
-                document.getElementById("idHidro").value = id;
-                consultarHidro();
+                actualizarSelectYMapa();
+                document.getElementById("id").value = id;
+                consultar();
             });
         }
-        actualizarSelectYMapaHidro();
-        consultarHidro();
+        actualizarSelectYMapa();
+        consultar();
+
+        setTimeout(() => {
+            if (map) map.invalidateSize();
+        }, 300);
+    }
+
+    function actualizarSelectYMapa() {
+        const select = document.getElementById("id");
+        if (!select) return;
+        const valorActual = select.value;
+        select.innerHTML = "";
+        if (markersLayer) markersLayer.clearLayers();
+
+        for (const [id, info] of Object.entries(estacionesData)) {
+            const option = document.createElement("option");
+            option.value = id;
+            option.textContent = `${id} - ${info.nombre}`;
+            select.appendChild(option);
+
+            if (info.coords && map) {
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background: #38bdf8; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #000; box-shadow: 0 0 12px #38bdf8; cursor: grab;"></div>`,
+                    iconSize: [18, 18]
+                });
+
+                const marker = L.marker(info.coords, { icon: customIcon, draggable: true }).addTo(markersLayer);
+                marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span><br><small>💡 Arrastrá el punto para reubicarlo</small>`);
+                
+                marker.on('click', () => {
+                    select.value = id;
+                    consultar();
+                });
+
+                marker.on('dragend', function (event) {
+                    const nuevaPos = event.target.getLatLng();
+                    estacionesData[id].coords = [nuevaPos.lat, nuevaPos.lng];
+                    localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+                    select.value = id;
+                    consultar();
+                });
+            }
+        }
+        if (estacionesData[valorActual]) {
+            select.value = valorActual;
+        }
+    }
+
+    function prepararModoUbicacion() {
+        const id = document.getElementById("nuevoId").value.trim();
+        const nombreInput = document.getElementById("nuevoNombre").value.trim();
+        const red = document.getElementById("nuevaRed").value.trim();
+
+        if(!id || !nombreInput) {
+            alert("Por favor ingresá al menos el ID y el Nombre de la estación.");
+            return;
+        }
+
+        datosPendientes = { id, nombre: nombreInput, red: red || "Red Hidrológica Nacional, Mendoza" };
+        modoUbicacionActivo = true;
+        document.getElementById("instruccionMapa").innerHTML = `<span style="color: #22c55e; font-weight: bold;">👉 ¡Modo ubicación activo! Hacé clic en el mapa para posicionar "${nombreInput}".</span>`;
+    }
+
+    function cargarEstacionParaEditar() {
+        const select = document.getElementById("id");
+        const idSeleccionado = select.value;
+        const info = estacionesData[idSeleccionado];
+        if(!info) return;
+
+        idEditandoOriginal = idSeleccionado;
+        let nombreLimpio = info.nombre.replace(/^Estación \d+ - /, '');
+
+        document.getElementById("nuevoId").value = idSeleccionado;
+        document.getElementById("nuevoNombre").value = nombreLimpio;
+        document.getElementById("nuevaRed").value = info.red;
+
+        document.getElementById("formTitulo").textContent = "✏️ Editando Estación (" + idSeleccionado + ")";
+        document.getElementById("btnCancelar").style.display = "block";
+        document.getElementById("instruccionMapa").innerHTML = `<span style="color: #eab308; font-weight: bold;">👉 Modificá los datos o arrastrá el marcador en el mapa para cambiar su ubicación.</span>`;
+    }
+
+    function cancelarEdicion() {
+        idEditandoOriginal = null;
+        modoUbicacionActivo = false;
+        datosPendientes = null;
+        document.getElementById("formTitulo").textContent = "➕ Cargar Estación Interactiva";
+        document.getElementById("btnCancelar").style.display = "none";
+        document.getElementById("nuevoId").value = "";
+        document.getElementById("nuevoNombre").value = "";
+        document.getElementById("nuevaRed").value = "";
+        document.getElementById("instruccionMapa").textContent = "Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva a la derecha.";
+    }
+
+    function toggleJson() {
+        const box = document.getElementById("jsonContainer");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+    }
+
+    async function consultar(){
+        const selectElem = document.getElementById("id");
+        if(!selectElem) return;
+        const estacionId = selectElem.value;
+        if(!estacionId) return;
+
+        const info = estacionesData[estacionId] || { nombre: `Estación ID: ${estacionId}`, red: "Red Nacional" };
+        document.getElementById("tituloEstacion").textContent = `🌊 Monitoreo de Caudales: ${info.nombre}`;
+        document.getElementById("infoDetalle").innerHTML = `<b>Ubicación / Red:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
+        
+        document.getElementById("resumenAltura").textContent = "--";
+        document.getElementById("tendenciaAltura").textContent = "--";
+        document.getElementById("resumenPrecipitacion").textContent = "--";
+        document.getElementById("resumenTemperatura").textContent = "--";
+        document.getElementById("estadoCaudalBadge").textContent = "Sin datos";
+        document.getElementById("estadoCaudalBadge").style.background = "#64748b";
+        document.getElementById("panelResumenCaudal").classList.remove("alerta-activa");
+
+        const resultado = document.getElementById("resultado");
+        resultado.innerHTML = '<div class="loading">Consultando red nacional...</div>';
+
+        try{
+            const response = await fetch(WORKER, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ estacion: estacionId })
+            });
+
+            const data = await response.json();
+            document.getElementById("json").textContent = JSON.stringify(data, null, 2);
+            resultado.innerHTML = "";
+
+            const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
+
+            if(mediciones.length === 0) {
+                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">No hay mediciones activas para esta estación.</div>';
+                return;
+            }
+
+            let alturaValNum = null;
+            let alturaValStr = "--";
+            let precipVal = "--";
+            let tempVal = "--";
+
+            mediciones.forEach(m => {
+                if(m.NombreCodigo === "Altura" && m.Valor !== -999 && m.Valor !== "-999") {
+                    alturaValNum = Number(m.Valor);
+                }
+            });
+
+            let anteriorAltura = historialLecturas[estacionId] !== undefined ? historialLecturas[estacionId] : null;
+            let tendenciaTexto = "➖ Sin historial previo";
+            let tendenciaColor = "#94a3b8";
+            let huboCrecidaSensible = false;
+
+            if(alturaValNum !== null && anteriorAltura !== null) {
+                let diferencia = alturaValNum - anteriorAltura;
+                
+                if(diferencia > 0.005) {
+                    tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
+                    tendenciaColor = "#ef4444";
+                    huboCrecidaSensible = true;
+                } else if(diferencia < -0.005) {
+                    tendenciaTexto = `📉 Bajó (${diferencia.toFixed(3)} m)`;
+                    tendenciaColor = "#38bdf8";
+                } else {
+                    tendenciaTexto = `➖ Estable`;
+                    tendenciaColor = "#22c55e";
+                }
+            }
+
+            if(alturaValNum !== null) {
+                historialLecturas[estacionId] = alturaValNum;
+                localStorage.setItem("territoria_historial", JSON.stringify(historialLecturas));
+            }
+
+            mediciones.forEach(m => {
+                let valor = m.Valor;
+                let esAlertaTarjeta = false;
+
+                if(valor === -999 || valor === "-999"){
+                    valor = "N/D";
+                } else {
+                    let num = Number(valor);
+                    valor = isNaN(num) ? valor : num.toFixed(2);
+
+                    if(m.NombreCodigo === "Altura" && !isNaN(num)) {
+                        alturaValStr = num.toFixed(2) + " m";
+                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true; 
+                    }
+                    if(m.NombreCodigo.includes("Precipitación") && !isNaN(num)) precipVal = num.toFixed(1) + " mm";
+                    if(m.NombreCodigo.includes("Temperatura") && !isNaN(num)) tempVal = num.toFixed(1) + " °C";
+                }
+                
+                const unidad = unidades[m.NombreCodigo] || "";
+                const icono = iconosMetricas[m.NombreCodigo] || "📊";
+                let claseAlertaCard = esAlertaTarjeta ? "alerta-roja" : "";
+
+                resultado.innerHTML += `
+                    <div class="card ${claseAlertaCard}">
+                        <div class="nombre">${m.NombreCodigo}</div>
+                        <div class="valor">${valor}</div>
+                        <div class="unidad">${unidad}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById("resumenAltura").textContent = alturaValStr;
+            let tendElem = document.getElementById("tendenciaAltura");
+            tendElem.textContent = tendenciaTexto;
+            tendElem.style.color = tendenciaColor;
+
+            document.getElementById("resumenPrecipitacion").textContent = precipVal;
+            document.getElementById("resumenTemperatura").textContent = tempVal;
+
+            let badge = document.getElementById("estadoCaudalBadge");
+            let panelResumen = document.getElementById("panelResumenCaudal");
+
+            if((alturaValNum !== null && alturaValNum > 1.5) || huboCrecidaSensible) {
+                badge.textContent = huboCrecidaSensible ? "⚠️ ¡ALERTA: AUMENTO DETECTADO!" : "⚠️ ¡ALERTA NIVEL ALTO!";
+                badge.style.background = "#ef4444";
+                panelResumen.classList.add("alerta-activa");
+                
+                reconocerAlerta('hidro');
+            } else {
+                badge.textContent = "Monitoreando";
+                badge.style.background = "#22c55e";
+            }
+
+        } catch(error){
+            resultado.innerHTML = `
+                <div class="card" style="grid-column: 1 / -1; border-color: #ef4444;">
+                    <div style="color: #ef4444; font-weight: bold; text-align: center;">Error de conexión con la red SNIH.</div>
+                </div>
+            `;
+            console.error(error);
+        }
     }
 
     function alternarModoCensoMapa() {
@@ -1970,241 +2279,6 @@
     function cerrarModalLotes() {
         const modal = document.getElementById("modalLotes");
         if (modal) modal.style.display = "none";
-    }
-
-    // Funciones de Hidrometría con Alta Sensibilidad
-    function actualizarSelectYMapaHidro() {
-        const select = document.getElementById("idHidro");
-        if(!select) return;
-        const valorActual = select.value;
-        select.innerHTML = "";
-        if (markersHidroLayer) markersHidroLayer.clearLayers();
-
-        for (const [id, info] of Object.entries(estacionesDataHidro)) {
-            const option = document.createElement("option");
-            option.value = id;
-            option.textContent = `${id} - ${info.nombre}`;
-            select.appendChild(option);
-
-            if (info.coords && mapaHidroInstance) {
-                const customIcon = L.divIcon({
-                    className: 'custom-marker',
-                    html: `<div style="background: #38bdf8; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #000; box-shadow: 0 0 12px #38bdf8; cursor: grab;"></div>`,
-                    iconSize: [18, 18]
-                });
-
-                const marker = L.marker(info.coords, { icon: customIcon, draggable: true }).addTo(markersHidroLayer);
-                marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span><br><small>💡 Arrastrá el punto para reubicarlo</small>`);
-                
-                marker.on('click', () => {
-                    select.value = id;
-                    consultarHidro();
-                });
-
-                marker.on('dragend', function (event) {
-                    const nuevaPos = event.target.getLatLng();
-                    estacionesDataHidro[id].coords = [nuevaPos.lat, nuevaPos.lng];
-                    localStorage.setItem("territoria_estaciones_hidro", JSON.stringify(estacionesDataHidro));
-                    select.value = id;
-                    consultarHidro();
-                });
-            }
-        }
-        if (estacionesDataHidro[valorActual]) {
-            select.value = valorActual;
-        }
-    }
-
-    function prepararModoUbicacionHidro() {
-        const id = document.getElementById("nuevoIdHidro").value.trim();
-        const nombreInput = document.getElementById("nuevoNombreHidro").value.trim();
-        const red = document.getElementById("nuevaRedHidro").value.trim();
-
-        if(!id || !nombreInput) {
-            alert("Por favor ingresá al menos el ID y el Nombre de la estación.");
-            return;
-        }
-
-        datosPendientesHidro = { id, nombre: nombreInput, red: red || "Red Hidrológica Nacional, Mendoza" };
-        modoUbicacionHidroActivo = true;
-        document.getElementById("instruccionMapaHidro").innerHTML = `<span style="color: #22c55e; font-weight: bold;">👉 ¡Modo ubicación activo! Hacé clic en el mapa de hidrometría para posicionar "${nombreInput}".</span>`;
-    }
-
-    function cargarEstacionParaEditarHidro() {
-        const select = document.getElementById("idHidro");
-        const idSeleccionado = select.value;
-        const info = estacionesDataHidro[idSeleccionado];
-        if(!info) return;
-
-        idEditandoOriginalHidro = idSeleccionado;
-        let nombreLimpio = info.nombre.replace(/^Estación \d+ - /, '');
-
-        document.getElementById("nuevoIdHidro").value = idSeleccionado;
-        document.getElementById("nuevoNombreHidro").value = nombreLimpio;
-        document.getElementById("nuevaRedHidro").value = info.red;
-
-        document.getElementById("formTituloHidro").textContent = "✏️ Editando Estación (" + idSeleccionado + ")";
-        document.getElementById("btnCancelarHidro").style.display = "block";
-        document.getElementById("instruccionMapaHidro").innerHTML = `<span style="color: #eab308; font-weight: bold;">👉 Modificá los datos o arrastrá el marcador en el mapa para cambiar su ubicación.</span>`;
-    }
-
-    function cancelarEdicionHidro() {
-        idEditandoOriginalHidro = null;
-        modoUbicacionHidroActivo = false;
-        datosPendientesHidro = null;
-        document.getElementById("formTituloHidro").textContent = "➕ Cargar Estación Interactiva";
-        document.getElementById("btnCancelarHidro").style.display = "none";
-        document.getElementById("nuevoIdHidro").value = "";
-        document.getElementById("nuevoNombreHidro").value = "";
-        document.getElementById("nuevaRedHidro").value = "";
-        document.getElementById("instruccionMapaHidro").textContent = "💡 Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva abajo.";
-    }
-
-    function toggleJsonHidro() {
-        const box = document.getElementById("jsonContainerHidro");
-        box.style.display = box.style.display === "block" ? "none" : "block";
-    }
-
-    async function consultarHidro(){
-        const selectElem = document.getElementById("idHidro");
-        if(!selectElem) return;
-        const estacionId = selectElem.value;
-        if(!estacionId) return;
-
-        const info = estacionesDataHidro[estacionId] || { nombre: `Estación ID: ${estacionId}`, red: "Red Nacional" };
-        document.getElementById("tituloModuloHidro").textContent = `🌊 Monitoreo de Caudales: ${info.nombre}`;
-        document.getElementById("infoDetalleHidro").innerHTML = `<b>Ubicación / Red:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
-        
-        document.getElementById("resumenAltura").textContent = "--";
-        document.getElementById("tendenciaAltura").textContent = "--";
-        document.getElementById("resumenPrecipitacion").textContent = "--";
-        document.getElementById("resumenTemperatura").textContent = "--";
-        document.getElementById("estadoCaudalBadge").textContent = "Sin datos";
-        document.getElementById("estadoCaudalBadge").style.background = "#64748b";
-        document.getElementById("panelResumenCaudal").classList.remove("alerta-activa");
-
-        const resultado = document.getElementById("resultadoHidro");
-        resultado.innerHTML = '<div style="text-align: center; font-size: 0.8rem; color: var(--accent); padding: 20px; grid-column: 1 / -1;">Consultando red nacional...</div>';
-
-        try{
-            const response = await fetch(WORKER_HIDRO, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ estacion: estacionId })
-            });
-
-            const data = await response.json();
-            document.getElementById("jsonHidro").textContent = JSON.stringify(data, null, 2);
-            resultado.innerHTML = "";
-
-            const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
-
-            if(mediciones.length === 0) {
-                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">No hay mediciones activas para esta estación.</div>';
-                return;
-            }
-
-            let alturaValNum = null;
-            let alturaValStr = "--";
-            let precipVal = "--";
-            let tempVal = "--";
-
-            mediciones.forEach(m => {
-                if(m.NombreCodigo === "Altura" && m.Valor !== -999 && m.Valor !== "-999") {
-                    alturaValNum = Number(m.Valor);
-                }
-            });
-
-            let anteriorAltura = historialLecturasHidro[estacionId] !== undefined ? historialLecturasHidro[estacionId] : null;
-            let tendenciaTexto = "➖ Sin historial previo";
-            let tendenciaColor = "#94a3b8";
-            let huboCrecidaSensible = false;
-
-            if(alturaValNum !== null && anteriorAltura !== null) {
-                let diferencia = alturaValNum - anteriorAltura;
-                
-                if(diferencia > 0.005) {
-                    tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
-                    tendenciaColor = "#ef4444";
-                    huboCrecidaSensible = true;
-                } else if(diferencia < -0.005) {
-                    tendenciaTexto = `📉 Bajó (${diferencia.toFixed(3)} m)`;
-                    tendenciaColor = "#38bdf8";
-                } else {
-                    tendenciaTexto = `➖ Estable`;
-                    tendenciaColor = "#22c55e";
-                }
-            }
-
-            if(alturaValNum !== null) {
-                historialLecturasHidro[estacionId] = alturaValNum;
-                localStorage.setItem("territoria_historial_hidro", JSON.stringify(historialLecturasHidro));
-            }
-
-            mediciones.forEach(m => {
-                let valor = m.Valor;
-                let esAlertaTarjeta = false;
-
-                if(valor === -999 || valor === "-999"){
-                    valor = "N/D";
-                } else {
-                    let num = Number(valor);
-                    valor = isNaN(num) ? valor : num.toFixed(2);
-
-                    if(m.NombreCodigo === "Altura" && !isNaN(num)) {
-                        alturaValStr = num.toFixed(2) + " m";
-                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true; 
-                    }
-                    if(m.NombreCodigo.includes("Precipitación") && !isNaN(num)) precipVal = num.toFixed(1) + " mm";
-                    if(m.NombreCodigo.includes("Temperatura") && !isNaN(num)) tempVal = num.toFixed(1) + " °C";
-                }
-                
-                const unidad = unidadesHidro[m.NombreCodigo] || "";
-                const icono = iconosMetricasHidro[m.NombreCodigo] || "📊";
-                let claseAlertaCard = esAlertaTarjeta ? "alerta-roja" : "";
-
-                resultado.innerHTML += `
-                    <div class="card ${claseAlertaCard}" style="padding: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <div style="color: var(--text-muted); font-size: 0.62rem; font-weight: 700; text-transform: uppercase;">${m.NombreCodigo}</div>
-                            <div style="font-size: 1rem;">${icono}</div>
-                        </div>
-                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent);">${valor}</div>
-                        <div style="color: var(--text-muted); font-size: 0.62rem;">${unidad}</div>
-                    </div>
-                `;
-            });
-
-            document.getElementById("resumenAltura").textContent = alturaValStr;
-            let tendElem = document.getElementById("tendenciaAltura");
-            tendElem.textContent = tendenciaTexto;
-            tendElem.style.color = tendenciaColor;
-
-            document.getElementById("resumenPrecipitacion").textContent = precipVal;
-            document.getElementById("resumenTemperatura").textContent = tempVal;
-
-            let badge = document.getElementById("estadoCaudalBadge");
-            let panelResumen = document.getElementById("panelResumenCaudal");
-
-            if((alturaValNum !== null && alturaValNum > 1.5) || huboCrecidaSensible) {
-                badge.textContent = huboCrecidaSensible ? "⚠️ ¡ALERTA: AUMENTO DETECTADO!" : "⚠️ ¡ALERTA NIVEL ALTO!";
-                badge.style.background = "#ef4444";
-                panelResumen.classList.add("alerta-activa");
-                
-                reconocerAlerta('hidro');
-            } else {
-                badge.textContent = "Monitoreando";
-                badge.style.background = "#22c55e";
-            }
-
-        } catch(error){
-            resultado.innerHTML = `
-                <div class="card" style="grid-column: 1 / -1; border-color: #ef4444;">
-                    <div style="color: #ef4444; font-weight: bold; text-align: center;">Error de conexión con la red SNIH.</div>
-                </div>
-            `;
-            console.error(error);
-        }
     }
 
     function abrirModalCensoForestal(lat, lon) {
@@ -2999,7 +3073,7 @@
 
         document.getElementById("ubicacionTexto").innerText = nombreTextoFinal;
         inicializarMapaArgentina(currentLat, currentLon);
-        inicializarMapaHidroFijo();
+        inicializarMapaHidroOriginal();
         dispararCargaDeDatos();
     }
 
@@ -3008,7 +3082,7 @@
         currentLon = -68.84;
         document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
         inicializarMapaArgentina(currentLat, currentLon);
-        inicializarMapaHidroFijo();
+        inicializarMapaHidroOriginal();
         dispararCargaDeDatos();
     }
 
