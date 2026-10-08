@@ -917,7 +917,7 @@
         }
 
         /* Estilos específicos para Hidrometría */
-        #mapaHidro { height: 500px; border-radius: 10px; border: 1px solid var(--border); }
+        #mapaHidro { height: 420px; border-radius: 10px; border: 1px solid var(--border); width: 100%; z-index: 10; }
         .card.alerta-roja { border-color: #ef4444 !important; background: linear-gradient(135deg, #1f1115 0%, #162035 100%) !important; }
         .resumen-caudal { background: linear-gradient(135deg, #091325 0%, #111e38 100%); border: 1px solid #0284c7; border-radius: 12px; padding: 12px; margin-bottom: 12px; transition: all 0.3s ease; }
         .resumen-caudal.alerta-activa { border-color: #ef4444; background: linear-gradient(135deg, #2a0f15 0%, #111e38 100%); }
@@ -1332,7 +1332,7 @@
 
     <br>
 
-    <!-- ALARMERO E HISTORIAL DE INCIDENTES (PIE DE PÁGINA) -->
+    <!-- ALARERO E HISTORIAL DE INCIDENTES (PIE DE PÁGINA) -->
     <div class="card" style="border-left: 6px solid var(--accent); background: linear-gradient(135deg, #0e1526 0%, #0d1e33 100%);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <div>
@@ -2078,7 +2078,6 @@
             if(alturaValNum !== null && anteriorAltura !== null) {
                 let diferencia = alturaValNum - anteriorAltura;
                 
-                // Alta sensibilidad: detecta variaciones desde 0.005 m (medio centímetro)
                 if(diferencia > 0.005) {
                     tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
                     tendenciaColor = "#ef4444";
@@ -2107,7 +2106,6 @@
                     let num = Number(valor);
                     valor = isNaN(num) ? valor : num.toFixed(2);
 
-                    // Umbral crítico ajustado a alta sensibilidad: > 1.5 metros o aumento detectado
                     if(m.NombreCodigo === "Altura" && !isNaN(num)) {
                         alturaValStr = num.toFixed(2) + " m";
                         if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true; 
@@ -2148,7 +2146,6 @@
                 badge.style.background = "#ef4444";
                 panelResumen.classList.add("alerta-activa");
                 
-                // Registrar automáticamente en el Alarmero oficial de Territoria
                 reconocerAlerta('hidro');
             } else {
                 badge.textContent = "Monitoreando";
