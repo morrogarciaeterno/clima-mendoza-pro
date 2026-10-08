@@ -917,10 +917,64 @@
         }
 
         /* Estilos específicos para Hidrometría Integrada */
-        #mapaHidro { height: 350px; border-radius: 10px; border: 1px solid var(--border); width: 100%; z-index: 10; }
-        .card.alerta-roja { border-color: #ef4444 !important; background: linear-gradient(135deg, #1f1115 0%, #162035 100%) !important; }
-        .resumen-caudal { background: linear-gradient(135deg, #091325 0%, #111e38 100%); border: 1px solid #0284c7; border-radius: 12px; padding: 12px; margin-bottom: 12px; transition: all 0.3s ease; }
-        .resumen-caudal.alerta-activa { border-color: #ef4444; background: linear-gradient(135deg, #2a0f15 0%, #111e38 100%); }
+        .hidro-layout-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+        @media(max-width: 900px) {
+            .hidro-layout-grid { grid-template-columns: 1fr; }
+        }
+        #mapaHidro { 
+            height: 450px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            width: 100%; 
+            z-index: 10; 
+            cursor: crosshair;
+        }
+        .card.alerta-roja { 
+            border-color: #ef4444 !important; 
+            background: linear-gradient(135deg, #1f1115 0%, #162035 100%) !important; 
+        }
+        .resumen-caudal { 
+            margin-top: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #091325 0%, #111e38 100%); 
+            border: 1px solid #0284c7; 
+            border-radius: 12px; 
+            padding: 14px; 
+            transition: all 0.3s ease; 
+        }
+        .resumen-caudal.alerta-activa { 
+            border-color: #ef4444; 
+            background: linear-gradient(135deg, #2a0f15 0%, #111e38 100%); 
+        }
+        .indicadores-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+        .ind-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        .ind-label { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; }
+        .ind-val { font-size: 1rem; font-weight: 800; color: #fff; margin-top: 2px; }
+        .tendencia { font-size: 0.72rem; font-weight: bold; margin-top: 4px; }
+        .form-manual {
+            margin-top: 15px;
+            background: var(--card-inner);
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .form-manual h4 { font-size: 0.8rem; color: var(--accent); margin-bottom: 8px; }
+        .form-manual input { width: 100%; margin-bottom: 8px; padding: 10px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 0.78rem; outline: none; }
     </style>
 </head>
 
@@ -1331,7 +1385,7 @@
 
     <br>
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH (CAUDALES) INTEGRADA EN LA PÁGINA PRINCIPAL -->
+    <!-- SECCIÓN DE HIDROMETRÍA SNIH (CAUDALES) INTEGRADA CON DISEÑO LIMPIO -->
     <div class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
@@ -1339,33 +1393,20 @@
                 <small style="color: var(--text-muted); font-size: 0.7rem;">Control en tiempo real de estaciones hidrométricas y niveles críticos (Mendoza y Región).</small>
             </div>
         </div>
-
-        <div style="display: grid; grid-template-columns: 1fr; gap: 12px;" id="gridHidroPrincipal">
-            @media (min-width: 900px) {
-                grid-template-columns: 1.2fr 1fr;
-            }
-        </div>
         
-        <!-- Contenido interno de Hidrometría -->
-        <div style="display: grid; grid-template-columns: 1fr; gap: 12px;" class="hidro-layout-grid">
-            <style>
-                @media(min-width: 900px) {
-                    .hidro-layout-grid { grid-template-columns: 1.2fr 1fr !important; }
-                }
-            </style>
-            
-            <!-- MAPA HIDRO IZQUIERDA -->
+        <div class="hidro-layout-grid">
+            <!-- COLUMNA IZQUIERDA: MAPA HIDRO -->
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <h4 style="font-size: 0.8rem; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h4>
                 <div id="mapaHidro"></div>
                 <small id="instruccionMapaHidro" style="color: var(--text-muted); font-size: 0.7rem;">💡 Hacé clic o arrastrá los puntos celestes en el mapa, o cargá una estación nueva abajo.</small>
             </div>
 
-            <!-- PANEL DERECHO HIDRO -->
+            <!-- COLUMNA DERECHA: PANEL HIDRO -->
             <div style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                     <div class="search-box" style="display: flex; gap: 8px; margin-bottom: 12px;">
-                        <select id="idHidro" onchange="consultarHidro()" style="flex: 1; padding: 10px; background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); font-size: 0.8rem;"></select>
+                        <select id="idHidro" onchange="consultarHidro()" style="flex: 1; padding: 10px; background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); font-size: 0.8rem; outline: none;"></select>
                         <button onclick="consultarHidro()" style="padding: 10px 14px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: 800; cursor: pointer;">Actualizar</button>
                         <button onclick="cargarEstacionParaEditarHidro()" style="background: #eab308; color: #000; border: none; padding: 10px 14px; border-radius: 10px; font-weight: 800; cursor: pointer;" title="Editar estación">✏️</button>
                     </div>
@@ -1374,47 +1415,47 @@
                         Información de red y ubicación...
                     </div>
 
-                    <!-- RESUMEN CRÍTICO & TENDENCIA ALTA SENSIBILIDAD -->
+                    <!-- RESUMEN CRÍTICO & TENDENCIA -->
                     <div id="panelResumenCaudal" class="resumen-caudal">
-                        <h4 style="color: var(--accent); font-size: 0.8rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <h4 style="color: #38bdf8; font-size: 0.8rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                             <span>💧 Resumen Crítico & Tendencia</span> 
                             <span id="estadoCaudalBadge" style="font-size: 0.62rem; background: #64748b; padding: 2px 6px; border-radius: 4px; color: #fff;">Sin datos</span>
                         </h4>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center;">
-                            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 8px; border-radius: 8px;">
-                                <div style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Nivel / Altura</div>
-                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-top: 2px;" id="resumenAltura">--</div>
-                                <div id="tendenciaAltura" style="font-size: 0.7rem; font-weight: bold; margin-top: 4px;">--</div>
+                        <div class="indicadores-grid">
+                            <div class="ind-box">
+                                <div class="ind-label">Nivel / Altura</div>
+                                <div class="ind-val" id="resumenAltura">--</div>
+                                <div class="tendencia" id="tendenciaAltura">--</div>
                             </div>
-                            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 8px; border-radius: 8px;">
-                                <div style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Precipitación</div>
-                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-top: 2px;" id="resumenPrecipitacion">--</div>
+                            <div class="ind-box">
+                                <div class="ind-label">Precipitación</div>
+                                <div class="ind-val" id="resumenPrecipitacion">--</div>
                             </div>
-                            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 8px; border-radius: 8px;">
-                                <div style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Temperatura</div>
-                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-top: 2px;" id="resumenTemperatura">--</div>
+                            <div class="ind-box">
+                                <div class="ind-label">Temperatura</div>
+                                <div class="ind-val" id="resumenTemperatura">--</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- FORMULARIO CARGAR ESTACIÓN -->
-                    <div style="background: var(--card-inner); padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px;">
-                        <h4 id="formTituloHidro" style="font-size: 0.78rem; color: var(--accent); margin-bottom: 6px;">➕ Cargar Estación Interactiva</h4>
-                        <input id="nuevoIdHidro" placeholder="ID (ej: 19104)" style="width: 100%; padding: 8px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 0.78rem; margin-bottom: 6px;">
-                        <input id="nuevoNombreHidro" placeholder="Nombre (ej: Paso Pehuenche)" style="width: 100%; padding: 8px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 0.78rem; margin-bottom: 6px;">
-                        <input id="nuevaRedHidro" placeholder="Red (ej: Río Grande, Mendoza)" style="width: 100%; padding: 8px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 0.78rem; margin-bottom: 6px;">
+                    <div class="form-manual">
+                        <h4 id="formTituloHidro">➕ Cargar Estación Interactiva</h4>
+                        <input id="nuevoIdHidro" placeholder="ID (ej: 19104)">
+                        <input id="nuevoNombreHidro" placeholder="Nombre (ej: Paso Pehuenche)">
+                        <input id="nuevaRedHidro" placeholder="Red (ej: Río Grande, Mendoza)">
                         <div style="display: flex; gap: 6px;">
                             <button onclick="prepararModoUbicacionHidro()" style="flex: 2; background: #22c55e; color: #000; border: none; padding: 8px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 0.75rem;">1. Guardar y Ubicar en Mapa</button>
                             <button onclick="cancelarEdicionHidro()" id="btnCancelarHidro" style="flex: 1; background: #ef4444; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 0.75rem; display:none;">Cancelar</button>
                         </div>
                     </div>
 
-                    <div id="resultadoHidro" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+                    <div id="resultadoHidro" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: 12px;">
                         <div style="text-align: center; font-size: 0.78rem; color: var(--accent); padding: 15px; grid-column: 1 / -1;">Seleccioná una estación.</div>
                     </div>
                 </div>
 
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 15px;">
                     <button onclick="toggleJsonHidro()" style="background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.7rem; padding: 6px; border-radius: 6px; cursor: pointer; width: 100%;">Ver / Ocultar Depuración JSON</button>
                     <div id="jsonContainerHidro" style="display: none; margin-top: 8px; background: #02040a; border: 1px solid var(--border); color: #22c55e; border-radius: 8px; padding: 10px; max-height: 80px; overflow: auto; font-family: monospace; font-size: 0.65rem;">
                         <pre id="jsonHidro">// Respuesta JSON...</pre>
@@ -1931,7 +1972,7 @@
         if (modal) modal.style.display = "none";
     }
 
-    // Funciones de Hidrometría con Alta Sensibilidad (Fijas en pantalla)
+    // Funciones de Hidrometría con Alta Sensibilidad
     function actualizarSelectYMapaHidro() {
         const select = document.getElementById("idHidro");
         if(!select) return;
