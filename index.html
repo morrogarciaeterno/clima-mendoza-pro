@@ -1953,9 +1953,6 @@
                 
                 marker.on('click', () => {
                     select.value = id;
-                    // Forzamos el cambio y llamada a la consulta correctamente
-                    const event = new Event('change');
-                    select.dispatchEvent(event);
                     consultarHidro();
                 });
 
@@ -2081,6 +2078,7 @@
             if(alturaValNum !== null && anteriorAltura !== null) {
                 let diferencia = alturaValNum - anteriorAltura;
                 
+                // Alta sensibilidad: detecta variaciones desde 0.005 m (medio centímetro)
                 if(diferencia > 0.005) {
                     tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
                     tendenciaColor = "#ef4444";
@@ -2109,6 +2107,7 @@
                     let num = Number(valor);
                     valor = isNaN(num) ? valor : num.toFixed(2);
 
+                    // Umbral crítico ajustado a alta sensibilidad: > 1.5 metros o aumento detectado
                     if(m.NombreCodigo === "Altura" && !isNaN(num)) {
                         alturaValStr = num.toFixed(2) + " m";
                         if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true; 
@@ -2149,6 +2148,7 @@
                 badge.style.background = "#ef4444";
                 panelResumen.classList.add("alerta-activa");
                 
+                // Registrar automáticamente en el Alarmero oficial de Territoria
                 reconocerAlerta('hidro');
             } else {
                 badge.textContent = "Monitoreando";
@@ -2824,4 +2824,184 @@
             const presion = data.current.surface_pressure ?? 1013;
             const uv = data.current.uv_index ?? 0;
             const code = data.current.weather_code ?? 0;
-            const isDay = data.
+            const isDay = data.current.is_day ?? 1;
+            const rad = data.current.shortwave_radiation ?? 0;
+
+            document.getElementById("temp").innerText = Math.round(temp) + "°C";
+            document.getElementById("stTemp").innerText = "ST: " + st + "°C";
+            document.getElementById("headerTemp").textContent = Math.round(temp) + "°C";
+            document.getElementById("humedad").innerText = hum + "%";
+            document.getElementById("viento").innerText = Math.round(viento) + " km/h";
+            document.getElementById("vientoDir").innerText = `Dir: ${obtenerDireccionViento(dirV)}`;
+            document.getElementById("presion").innerText = Math.round(presion);
+            document.getElementById("uvIndex").innerText = uv.toFixed(1);
+
+            const elIconoPrincipal = document.getElementById("weatherIcon");
+            if (elIconoPrincipal) {
+                elIconoPrincipal.innerText = iconoClima(code, isDay);
+            }
+
+            document.getElementById("radiacionSolar").innerText = Math.round(rad) + " W/m²";
+            let tw = temp * 0.5 + hum * 0.1;
+            document.getElementById("bulboHumedad").innerText = tw.toFixed(1) + " °C";
+
+            const estres = document.getElementById("estresTermico");
+            if (temp >= 32) { estres.innerText = "Peligroso"; estres.style.color = "#ef4444"; }
+            else if (temp >= 28) { estres.innerText = "Moderado"; estres.style.color = "#facc15"; }
+            else { estres.innerText = "Confortable"; estres.style.color = "#22c55e"; }
+
+            if (data.daily) {
+                let minTempPronostico = data.daily.temperature_2m_min[0] ?? 5;
+                let maxRafagaPronostico = data.daily.wind_gusts_10m_max[0] ?? 10;
+                let precipitacionHoy = data.daily.precipitation_sum[0] ?? 0;
+                let et0Hoy = data.daily.et0_fao_evapotranspiration[0] ?? 4.5;
+                let tMaxHoy = data.daily.temperature_2m_max[0] ?? 25;
+                let tMinHoy = data.daily.temperature_2m_min[0] ?? 15;
+
+                verificarContingenciaClimatica(minTempPronostico, viento, rafagaActual, dirV, hum);
+                verificarRiesgoHeladaAvanzado(minTempPronostico, hum, viento);
+
+                let riegoNeto = Math.max(0, et0Hoy - precipitacionHoy);
+                document.getElementById("lluviaAcum").innerText = riegoNeto.toFixed(1) + " mm";
+
+                let gddHoy = Math.max(0, ((tMaxHoy + tMinHoy) / 2) - 10);
+                document.getElementById("gddAcum").innerText = Math.round(gddHoy) + " GDD";
+
+                let balanceNeto = precipitacionHoy - et0Hoy;
+                document.getElementById("balanceHidrico").innerText = balanceNeto.toFixed(1) + " mm";
+
+                document.getElementById("probLluvia").innerText = (data.daily.precipitation_probability_max[0] ?? 0) + "%";
+                document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
+                document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
+                document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
+                
+                actualizarCicloSolar(data.daily.sunrise[0], data.daily.sunset[0]);
+            }
+
+            if (data.hourly && data.hourly.temperature_2m) {
+                let horasFrioCount = 0;
+                let temps24 = data.hourly.temperature_2m.slice(0, 24);
+                temps24.forEach(t => {
+                    if (t >= 0 && t <= 7) horasFrioCount++;
+                });
+                document.getElementById("horasFrio").innerText = horasFrioCount + " hs";
+
+                let tActual = data.current.temperature_2m;
+                let rhActual = data.current.relative_humidity_2m;
+                let es = 0.61078 * Math.exp((17.27 * tActual) / (tActual + 237.3));
+                let ea = es * (rhActual / 100);
+                let vpdVal = es - ea;
+                document.getElementById("vpdAire").innerText = vpdVal.toFixed(2) + " kPa";
+            }
+
+            if (data.hourly && data.hourly.soil_moisture_0_to_1cm) {
+                let humSueloVal = (data.hourly.soil_moisture_0_to_1cm[0] * 100).toFixed(0);
+                document.getElementById("humSuelo").innerText = humSueloVal + " %";
+            }
+            if (data.hourly && data.hourly.soil_temperature_0cm) {
+                let tempSueloVal = data.hourly.soil_temperature_0cm[0].toFixed(1);
+                document.getElementById("tempSuelo").innerText = tempSueloVal + " °C";
+            }
+
+            const hourly = document.getElementById("hourlyForecast");
+            if (hourly && data.hourly) {
+                hourly.innerHTML = "";
+                let h = new Date().getHours();
+                for(let i = h; i < h + 12; i++) {
+                    if (data.hourly.temperature_2m[i] !== undefined) {
+                        hourly.innerHTML += `<div class="forecast-card"><div style="font-size:0.72rem; font-weight:700;">${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i], 1)}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
+                    }
+                }
+            }
+
+            const forecast = document.getElementById("forecast");
+            if (forecast && data.daily) {
+                forecast.innerHTML = "";
+                data.daily.time.forEach((t, i) => {
+                    let d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", {weekday: "short"});
+                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize; font-weight:700;">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i], 1)}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
+                });
+            }
+
+            gestionarAlertaSMN(code);
+        } catch(e) {}
+    }
+
+    function dispararCargaDeDatos() {
+        cargarClima();
+        cargarCalidadAire();
+        cargarPolen();
+        cargarSismos();
+        verificarProximidadIncendios(currentLat, currentLon);
+        verificarSismosRelevantes(currentLat, currentLon);
+    }
+
+    async function procesarUbicacionExitosa(lat, lon) {
+        currentLat = lat;
+        currentLon = lon;
+        let nombreTextoFinal = "Godoy Cruz, Mendoza";
+        try {
+            const res = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=12`)).json();
+            if (res && res.address) {
+                let localidad = res.address.city || res.address.town || res.address.village || res.address.suburb || res.address.municipality || "";
+                let provincia = res.address.state || "Mendoza";
+                if (localidad) {
+                    nombreTextoFinal = `${localidad}, ${provincia}`;
+                } else {
+                    nombreTextoFinal = provincia;
+                }
+            }
+        } catch(e) {
+            nombreTextoFinal = "Godoy Cruz, Mendoza";
+        }
+
+        document.getElementById("ubicacionTexto").innerText = nombreTextoFinal;
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
+    }
+
+    function usarUbicacionPorDefecto() {
+        currentLat = -32.92;
+        currentLon = -68.84;
+        document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
+    }
+
+    function iniciarApp() {
+        actualizarFechaYHoraDigital();
+        calcularFaseLunar();
+        renderizarAlarmero();
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    await procesarUbicacionExitosa(pos.coords.latitude, pos.coords.longitude);
+                },
+                (error) => {
+                    usarUbicacionPorDefecto();
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            );
+        } else {
+            usarUbicacionPorDefecto();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnGuardar = document.getElementById("btnGuardarCenso");
+        if (btnGuardar) {
+            btnGuardar.addEventListener("click", function(e) {
+                e.preventDefault();
+                guardarRegistroArbol();
+            });
+        }
+        iniciarApp();
+    });
+
+    setInterval(actualizarFechaYHoraDigital, 1000);
+    setInterval(dispararCargaDeDatos, 300000);
+</script>
+
+</body>
+</html>
