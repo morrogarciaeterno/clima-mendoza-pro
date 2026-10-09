@@ -1073,6 +1073,24 @@
 
 <div class="container">
 
+    <!-- TARJETA DE ALERTA DE CAUDAL / CRECIDA (NUEVA - EN EL DASHBOARD PRINCIPAL) -->
+    <div class="card" id="hidroAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex-grow: 1;">
+                <span style="font-size: 2rem; flex-shrink: 0;">🌊⚠</span>
+                <div style="min-width: 0; flex-grow: 1;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Hidrológica</span>
+                        <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Red SNIH Oficial</small>
+                    </div>
+                    <h3 id="hidroAlertaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Crecida o Nivel Crítico Detectado!</h3>
+                    <p id="hidroAlertaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Estación monitoreada en estado de alerta.</p>
+                </div>
+            </div>
+            <button class="btn-reconocer" onclick="reconocerAlerta('hidro')">✅ Reconocer / Silenciar</button>
+        </div>
+    </div>
+
     <!-- ALERTA SÍSMICA SUPERIOR (PERSISTENTE 1 HORA CON RECONOCIMIENTO) -->
     <div class="card" id="sismoAlertaCard" style="display: none; border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #0e1526 0%, #261f0e 100%); margin-bottom: 12px;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
@@ -1534,7 +1552,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <div>
                 <h3 style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🚨 Alarmero e Historial de Incidentes Reconocidos</h3>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Registro en tiempo real de alarmas atendidas por operadores (Sismos, Focos de Incendio, Contingencias Climáticas y Crecidas).</small>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Registro en tiempo real de alarmas atendidas por operadores (Sismos, Focos de Incendio, Contingencias Climáticas, Crecidas Hídricas).</small>
             </div>
             <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
         </div>
@@ -1669,7 +1687,14 @@
                 tarjetaCard.style.borderLeftColor = "#22c55e";
             }
         } else if (tipo === 'hidro') {
-            tituloIncidente = "Alerta Crecida / Aumento Hídrico SNIH";
+            tarjetaCard = document.getElementById("hidroAlertaCard");
+            let tituloActual = document.getElementById("hidroAlertaTitulo").innerText;
+            tituloIncidente = `Alerta Hidrológica: ${tituloActual}`;
+            if (tarjetaCard) {
+                tarjetaCard.dataset.reconocido = "true";
+                tarjetaCard.classList.remove("alerta-activa-animacion");
+                tarjetaCard.style.borderLeftColor = "#22c55e";
+            }
         }
 
         if (tarjetaCard) {
@@ -1912,7 +1937,6 @@
         }
     }
 
-    // Inicialización del mapa de hidrometría original con zoom y centro exacto (Cuyo / Mendoza)
     function inicializarMapaHidroOriginal() {
         if (!map) {
             map = L.map('map', { zoomControl: true }).setView([-34.0, -69.0], 6);
@@ -1980,7 +2004,6 @@
             select.appendChild(option);
 
             if (info.coords && map) {
-                // Verificamos si esta estación tiene una altura registrada en alerta (> 1.5 m)
                 const ultimaAltura = historialLecturas[id] !== undefined ? historialLecturas[id] : 0;
                 const enAlerta = ultimaAltura > 1.5;
 
@@ -2188,13 +2211,23 @@
                 badge.style.background = "#ef4444";
                 panelResumen.classList.add("alerta-activa");
                 
-                reconocerAlerta('hidro');
+                // Activación de la tarjeta principal superior en el Dashboard
+                const hidroCard = document.getElementById("hidroAlertaCard");
+                const hidroTitulo = document.getElementById("hidroAlertaTitulo");
+                const hidroDesc = document.getElementById("hidroAlertaDesc");
+                if (hidroCard) {
+                    hidroCard.style.display = "block";
+                    if (hidroCard.dataset.reconocido !== "true") {
+                        hidroCard.classList.add("alerta-activa-animacion");
+                    }
+                    hidroTitulo.innerText = `¡Alerta Caudal / Crecida en ${info.nombre}!`;
+                    hidroDesc.innerText = `Nivel registrado: ${alturaValStr}. ${tendenciaTexto}. Fuente: Red SNIH Oficial.`;
+                }
             } else {
                 badge.textContent = "Monitoreando";
                 badge.style.background = "#22c55e";
             }
 
-            // Actualizamos el mapa para reflejar el color rojo en el círculo si está en alerta
             actualizarSelectYMapa();
 
         } catch(error){
