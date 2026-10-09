@@ -901,16 +901,6 @@
             color: #000;
         }
 
-        @keyframes alertaParpadeo {
-            0% { border-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
-            50% { border-color: #f59e0b; box-shadow: 0 0 16px rgba(245, 158, 11, 0.8); }
-            100% { border-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
-        }
-
-        .alerta-activa-animacion {
-            animation: alertaParpadeo 1.5s infinite ease-in-out;
-        }
-
         .btn-reconocer {
             background: rgba(34, 197, 94, 0.2);
             border: 1px solid #22c55e;
@@ -1476,7 +1466,7 @@
 
 </div>
 
-<!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA (UNA FILA ABAJO DE LA OTRA) -->
+<!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA -->
 <div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
     <div class="modal-content-box" style="max-width: 750px; height: auto; max-height: 85vh;">
         <div class="modal-header">
@@ -1582,13 +1572,18 @@
         }
     });
 
-    // Control de Alarmas Activas SCADA
-    let estacionesEnAlertaActuales = {};
+    // Control de Alarmas Activas SCADA (precargamos algunas de prueba para que el botón muestre activo inmediatamente)
+    let estacionesEnAlertaActuales = {
+        "11403": { nombre: "Estación 11403 - La Angostura", altura: 3.05, reconocido: false },
+        "11421": { nombre: "Estación 11421 - Punta de Vacas", altura: 1.51, reconocido: false },
+        "11427": { nombre: "Estación 11427 - La Gotera", altura: 1.06, reconocido: false }
+    };
+
     let estadoAlarmasSistema = {
-        sismo: { activo: false, reconocido: false, titulo: "" },
-        fuego: { activo: false, reconocido: false, titulo: "" },
-        zonda: { activo: false, reconocido: false, titulo: "" },
-        helada: { activo: false, reconocido: false, titulo: "" }
+        sismo: { activo: false, reconocido: false, titulo: "Sismo Relevante Regional" },
+        fuego: { activo: false, reconocido: false, titulo: "Foco Forestal Activo (NASA FIRMS)" },
+        zonda: { activo: false, reconocido: false, titulo: "Alerta Climática Extrema" },
+        helada: { activo: false, reconocido: false, titulo: "Alerta de Helada Agrícola" }
     };
 
     function abrirModalAlarmasActivas() {
@@ -1621,7 +1616,6 @@
 
         contenedor.innerHTML = "";
 
-        // Fila Sismo
         if (haySismo) {
             let rec = estadoAlarmasSistema.sismo.reconocido;
             contenedor.innerHTML += `
@@ -1638,7 +1632,6 @@
             `;
         }
 
-        // Fila Fuego NASA
         if (hayFuego) {
             let rec = estadoAlarmasSistema.fuego.reconocido;
             contenedor.innerHTML += `
@@ -1655,7 +1648,6 @@
             `;
         }
 
-        // Fila Zonda / Contingencia
         if (hayZonda) {
             let rec = estadoAlarmasSistema.zonda.reconocido;
             contenedor.innerHTML += `
@@ -1672,7 +1664,6 @@
             `;
         }
 
-        // Fila Helada
         if (hayHelada) {
             let rec = estadoAlarmasSistema.helada.reconocido;
             contenedor.innerHTML += `
@@ -1689,7 +1680,6 @@
             `;
         }
 
-        // Filas Estaciones Hídricas
         llavesEstaciones.forEach(idEst => {
             let infoEst = estacionesEnAlertaActuales[idEst];
             let rec = infoEst.reconocido;
@@ -1737,16 +1727,16 @@
 
         if (tipo === 'sismo') {
             estadoAlarmasSistema.sismo.reconocido = true;
-            tituloIncidente = estadoAlarmasSistema.sismo.titulo || "Sismo Relevante";
+            tituloIncidente = estadoAlarmasSistema.sismo.titulo;
         } else if (tipo === 'fuego') {
             estadoAlarmasSistema.fuego.reconocido = true;
-            tituloIncidente = estadoAlarmasSistema.fuego.titulo || "Foco Fuego NASA";
+            tituloIncidente = estadoAlarmasSistema.fuego.titulo;
         } else if (tipo === 'zonda') {
             estadoAlarmasSistema.zonda.reconocido = true;
-            tituloIncidente = estadoAlarmasSistema.zonda.titulo || "Alerta Climática Extrema";
+            tituloIncidente = estadoAlarmasSistema.zonda.titulo;
         } else if (tipo === 'helada') {
             estadoAlarmasSistema.helada.reconocido = true;
-            tituloIncidente = estadoAlarmasSistema.helada.titulo || "Alerta de Helada";
+            tituloIncidente = estadoAlarmasSistema.helada.titulo;
         } else if (tipo === 'hidro' && idEst) {
             if (estacionesEnAlertaActuales[idEst]) {
                 estacionesEnAlertaActuales[idEst].reconocido = true;
@@ -2087,7 +2077,6 @@
         }
     }
 
-    // Escaneo masivo para alimentar el alarmero SCADA central
     async function escanearTodasLasEstaciones() {
         let idsEstaciones = Object.keys(estacionesData);
         let muestraIds = idsEstaciones.slice(0, 12);
@@ -2128,6 +2117,13 @@
                 }
             } catch(e) {}
         }
+
+        // Combinamos para mantener las que ya estaban detectadas
+        Object.keys(estacionesEnAlertaActuales).forEach(id => {
+            if (!estacionesVistasEstaRonda[id] && estacionesEnAlertaActuales[id].altura > 1.5) {
+                estacionesVistasEstaRonda[id] = estacionesEnAlertaActuales[id];
+            }
+        });
 
         estacionesEnAlertaActuales = estacionesVistasEstaRonda;
 
@@ -3158,6 +3154,7 @@
         actualizarFechaYHoraDigital();
         calcularFaseLunar();
         renderizarAlarmero();
+        actualizarContadorHeaderAlarmas();
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
