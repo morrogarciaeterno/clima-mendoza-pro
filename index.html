@@ -51,8 +51,8 @@
         header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
-            padding: 8px 14px;
-            padding-top: max(10px, env(safe-area-inset-top));
+            padding: 8px 12px;
+            padding-top: max(8px, env(safe-area-inset-top));
             position: sticky;
             top: 0;
             z-index: 100;
@@ -67,7 +67,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .brand {
@@ -79,8 +79,8 @@
         }
 
         .brand-logo {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             border-radius: 50%;
             background: #ffffff;
@@ -96,7 +96,7 @@
         }
 
         .brand h1 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             white-space: nowrap;
@@ -107,7 +107,7 @@
         }
 
         .brand p {
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             color: var(--accent);
             font-weight: 600;
             white-space: nowrap;
@@ -120,7 +120,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
         }
 
@@ -132,7 +132,7 @@
         }
 
         #fecha {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
             color: var(--text-main);
             text-transform: capitalize;
@@ -148,7 +148,7 @@
         }
 
         #digitalFallback {
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             color: var(--accent);
             font-variant-numeric: tabular-nums;
             font-weight: 600;
@@ -156,7 +156,7 @@
         }
 
         #headerTemp {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 800;
             color: var(--accent);
             line-height: 1.1;
@@ -166,30 +166,30 @@
         .scada-banner-container {
             background: linear-gradient(90deg, #1e1115 0%, #0e1526 50%, #1e1115 100%);
             border-bottom: 2px solid #ef4444;
-            padding: 6px 14px;
+            padding: 6px 12px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 8px;
             box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.2);
             position: sticky;
-            top: 57px;
+            top: 51px;
             z-index: 99;
         }
 
         .scada-banner-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
 
         .scada-badge-blink {
             background: #ef4444;
             color: #fff;
-            font-size: 0.65rem;
-            padding: 2px 8px;
+            font-size: 0.6rem;
+            padding: 2px 6px;
             border-radius: 4px;
             font-weight: 900;
             letter-spacing: 0.5px;
@@ -214,9 +214,9 @@
 
         .scada-ticker-content {
             display: inline-flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             color: var(--text-main);
             animation: marqueeScroll 25s linear infinite;
@@ -234,10 +234,10 @@
         .scada-alert-item {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid rgba(239, 68, 68, 0.5);
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 6px;
             cursor: pointer;
         }
@@ -250,9 +250,9 @@
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid var(--accent);
             color: var(--accent);
-            padding: 3px 10px;
+            padding: 3px 8px;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 800;
             cursor: pointer;
             white-space: nowrap;
@@ -268,45 +268,57 @@
             width: 100%;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 12px 12px 50px 12px;
+            padding: 8px 8px 40px 8px;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 8px;
             width: 100%;
         }
 
         @media (min-width: 768px) {
             .grid {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 12px;
             }
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 14px;
+            border-radius: 12px;
+            padding: 10px;
             width: 100%;
             min-width: 0;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                border-radius: 16px;
+                padding: 14px;
+            }
         }
 
         .card h3 {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             font-weight: 600;
             letter-spacing: 0.3px;
         }
 
         .metric {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--text-main);
-            margin-top: 4px;
+            margin-top: 2px;
+        }
+
+        @media (min-width: 768px) {
+            .metric { font-size: 1.8rem; margin-top: 4px; }
         }
 
         .card-temp-main {
@@ -320,12 +332,15 @@
         }
 
         .card-temp-main .metric {
-            font-size: 2.8rem !important;
+            font-size: 2.2rem !important;
             font-weight: 900 !important;
             color: #ffffff !important;
             line-height: 0.95;
-            margin-top: 4px;
+            margin-top: 2px;
             text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+        @media (min-width: 768px) {
+            .card-temp-main .metric { font-size: 2.8rem !important; }
         }
 
         .temp-box {
@@ -337,64 +352,70 @@
         .forecast-cards {
             display: flex;
             justify-content: flex-start;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 8px;
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
 
         .forecast-card {
-            flex: 0 0 72px;
+            flex: 0 0 64px;
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 4px;
+            border-radius: 10px;
+            padding: 8px 4px;
             text-align: center;
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
         }
+        @media (min-width: 768px) {
+            .forecast-card { flex: 0 0 72px; padding: 10px 4px; }
+        }
 
         .forecast-card .icon {
-            font-size: 1.3rem;
-            margin: 4px 0;
+            font-size: 1.1rem;
+            margin: 2px 0;
         }
 
         .forecast-card .max {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 800;
             color: var(--accent);
         }
 
         .forecast-card .min {
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
         }
 
         .sismos-grid-horizontal {
             display: flex;
             justify-content: flex-start;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 8px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             width: 100%;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
 
         .sismo-mini-card {
-            flex: 0 0 140px;
+            flex: 0 0 120px;
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
+            border-radius: 10px;
+            padding: 8px;
             text-align: center;
+        }
+        @media (min-width: 768px) {
+            .sismo-mini-card { flex: 0 0 140px; padding: 10px; }
         }
 
         .sismo-mini-mag {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 800;
-            margin: 3px 0;
+            margin: 2px 0;
         }
 
         .sismo-mendoza {
@@ -409,13 +430,14 @@
         .dashboard-row {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
         }
 
         @media (min-width: 768px) {
             .dashboard-row {
                 grid-template-columns: 1fr 1fr;
+                gap: 12px;
             }
         }
 
@@ -429,19 +451,19 @@
 
         .solar-arc {
             position: relative;
-            width: 120px;
-            height: 60px;
+            width: 110px;
+            height: 55px;
             border: 2px dashed #334155;
             border-bottom: 2px solid #334155;
-            border-radius: 60px 60px 0 0;
-            margin-top: 8px;
+            border-radius: 55px 55px 0 0;
+            margin-top: 6px;
             overflow: visible;
         }
 
         .sun-pivot {
             position: absolute;
-            width: 120px;
-            height: 60px;
+            width: 110px;
+            height: 55px;
             bottom: 0;
             left: 0;
             transform-origin: bottom center;
@@ -451,25 +473,25 @@
 
         .sun-icon {
             position: absolute;
-            left: 54px;
+            left: 48px;
             top: -10px;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .solar-times {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 180px;
-            margin-top: 8px;
-            font-size: 0.72rem;
+            max-width: 160px;
+            margin-top: 6px;
+            font-size: 0.68rem;
             color: var(--text-muted);
         }
 
         .solar-times strong {
             color: var(--text-main);
             display: block;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
         }
 
         .lunar-container {
@@ -481,21 +503,21 @@
         }
 
         .moon-display {
-            font-size: 2.4rem;
+            font-size: 2rem;
             line-height: 1;
-            margin: 4px 0;
+            margin: 2px 0;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.25));
         }
 
         .moon-phase-title {
-            font-size: 0.82rem;
+            font-size: 0.75rem;
             font-weight: 800;
             color: var(--text-main);
             text-align: center;
         }
 
         .moon-illumination {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--accent);
             font-weight: 800;
             margin-top: 2px;
@@ -504,8 +526,8 @@
         .polen-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 8px;
             width: 100%;
         }
 
@@ -517,8 +539,8 @@
 
         .polen-card {
             background: var(--card-inner);
-            border-radius: 12px;
-            padding: 12px;
+            border-radius: 10px;
+            padding: 10px;
             text-align: left;
             border: 1px solid var(--border);
             width: 100%;
@@ -531,18 +553,18 @@
         .polen-header-box {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 6px;
+            margin-bottom: 6px;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
 
         .polen-icon {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
         }
 
         .polen-title {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 800;
             color: var(--text-main);
         }
@@ -550,8 +572,8 @@
         .polen-dias {
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            font-size: 0.72rem;
+            gap: 4px;
+            font-size: 0.68rem;
         }
 
         .polen-item {
@@ -559,8 +581,8 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(0,0,0,0.15);
-            padding: 4px 6px;
-            border-radius: 6px;
+            padding: 3px 5px;
+            border-radius: 5px;
         }
 
         .dot-nivel {
@@ -581,13 +603,14 @@
         .dual-section {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
         }
 
         @media (min-width: 900px) {
             .dual-section {
                 grid-template-columns: 1.2fr 1fr;
+                gap: 12px;
             }
         }
 
@@ -616,8 +639,8 @@
         .glosario-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 6px;
+            margin-top: 6px;
             width: 100%;
         }
 
@@ -631,19 +654,19 @@
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 8px;
+            padding: 6px 8px;
             width: 100%;
         }
 
         .glosario-titulo {
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 800;
             color: var(--accent);
             margin-bottom: 2px;
         }
 
         .glosario-desc {
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             color: var(--text-muted);
             line-height: 1.3;
         }
@@ -654,18 +677,24 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            margin-top: 8px;
-            min-height: 350px;
+            margin-top: 6px;
+            min-height: 280px;
+        }
+        @media(min-width: 768px) {
+            .map-wrapper-container { min-height: 350px; }
         }
 
         #mapaArgentina {
             width: 100%;
             height: 100%;
-            min-height: 350px;
-            border-radius: 12px;
+            min-height: 280px;
+            border-radius: 10px;
             z-index: 1;
             border: 2px solid var(--border);
             background-color: #070a14 !important;
+        }
+        @media(min-width: 768px) {
+            #mapaArgentina { min-height: 350px; }
         }
 
         .modo-oscuro-mapa .leaflet-tile-pane {
@@ -688,15 +717,15 @@
 
         .map-status-pill {
             position: absolute;
-            bottom: 12px;
-            left: 12px;
+            bottom: 10px;
+            left: 10px;
             z-index: 1000;
             background: rgba(14, 21, 38, 0.95);
             border: 1px solid var(--accent);
             color: var(--text-main);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.68rem;
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 0.62rem;
             font-weight: 700;
             box-shadow: 0 4px 12px rgba(0,0,0,0.6);
             display: flex;
@@ -704,29 +733,29 @@
             gap: 2px;
             pointer-events: none;
             backdrop-filter: blur(4px);
-            max-width: calc(100% - 24px);
+            max-width: calc(100% - 20px);
         }
 
         .censo-banner-flotante {
             position: absolute;
-            top: 12px;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
             background: rgba(34, 197, 94, 0.95);
             color: #000;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.7rem;
             font-weight: 800;
             box-shadow: 0 4px 16px rgba(34, 197, 94, 0.5);
             display: none;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             backdrop-filter: blur(4px);
             border: 1px solid #fff;
             text-align: center;
-            max-width: calc(100% - 24px);
+            max-width: calc(100% - 20px);
         }
 
         .pulse-dot {
@@ -749,8 +778,8 @@
         .map-controls {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            margin-top: 8px;
+            gap: 5px;
+            margin-top: 6px;
             width: 100%;
         }
 
@@ -764,9 +793,9 @@
             background: var(--card-inner);
             color: var(--text-main);
             border: 1px solid var(--border);
-            padding: 8px 6px;
-            border-radius: 8px;
-            font-size: 0.68rem;
+            padding: 6px 4px;
+            border-radius: 6px;
+            font-size: 0.62rem;
             font-weight: 800;
             cursor: pointer;
             text-align: center;
@@ -802,16 +831,16 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(8px);
-            padding: 6px;
+            padding: 4px;
         }
 
         .modal-content-box {
             background: var(--card-bg);
             border: 1px solid var(--accent);
-            border-radius: 16px;
+            border-radius: 14px;
             width: 100%;
             max-width: 1300px;
-            height: 96vh;
+            height: 94vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -819,7 +848,7 @@
         }
 
         .modal-header {
-            padding: 10px 16px;
+            padding: 8px 12px;
             background: var(--card-inner);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -828,7 +857,7 @@
         }
 
         .modal-header h2 {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: var(--text-main);
             display: flex;
             align-items: center;
@@ -843,11 +872,11 @@
             background: #ef4444;
             color: white;
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -858,10 +887,10 @@
 
         .modal-body {
             flex-grow: 1;
-            padding: 12px;
+            padding: 8px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             overflow-y: auto;
             width: 100%;
         }
@@ -869,6 +898,8 @@
         @media (min-width: 900px) {
             .modal-body {
                 grid-template-columns: 1fr 1.15fr;
+                padding: 12px;
+                gap: 12px;
             }
         }
 
@@ -876,7 +907,7 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            min-height: 300px;
+            min-height: 250px;
             width: 100%;
         }
 
@@ -892,9 +923,9 @@
             background: var(--card-inner);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             outline: none;
             min-width: 0;
         }
@@ -907,9 +938,9 @@
             background: var(--accent-glow);
             border: 1px solid var(--accent);
             color: var(--accent);
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 800;
             cursor: pointer;
             flex-shrink: 0;
@@ -921,17 +952,17 @@
             border-radius: 10px;
             border: 2px solid var(--border);
             background-color: #070a14 !important;
-            min-height: 280px;
+            min-height: 240px;
         }
 
         .modal-report-panel {
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
+            border-radius: 10px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             overflow-y: auto;
             max-height: 100%;
             width: 100%;
@@ -939,20 +970,20 @@
         }
 
         .report-section-title {
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             font-weight: 800;
             color: var(--accent);
             border-bottom: 1px solid var(--border);
             padding-bottom: 4px;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .recommendation-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 10px;
-            font-size: 0.76rem;
+            padding: 8px;
+            font-size: 0.7rem;
             line-height: 1.4;
             width: 100%;
             overflow-x: auto;
@@ -963,11 +994,11 @@
             background: var(--accent-glow);
             border: 1px solid var(--accent);
             color: var(--accent);
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
             font-weight: 800;
-            margin: 3px;
-            font-size: 0.72rem;
+            margin: 2px;
+            font-size: 0.68rem;
             cursor: pointer;
         }
 
@@ -980,9 +1011,9 @@
             background: rgba(34, 197, 94, 0.2);
             border: 1px solid #22c55e;
             color: #22c55e;
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s;
@@ -996,38 +1027,41 @@
         /* Estilos específicos para el módulo de Hidrometría original */
         .hidro-layout-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 12px;
             width: 100%;
         }
-        @media(max-width: 900px) {
-            .hidro-layout-grid { grid-template-columns: 1fr; }
+        @media(min-width: 900px) {
+            .hidro-layout-grid { grid-template-columns: 1.2fr 1fr; gap: 16px; }
         }
         #map {
-            height: 750px;
-            border-radius: 12px;
+            height: 320px;
+            border-radius: 10px;
             border: 1px solid var(--border);
             z-index: 10;
             cursor: crosshair;
             width: 100%;
         }
+        @media(min-width: 768px) {
+            #map { height: 500px; }
+        }
         .cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
         }
         .card.alerta-roja {
             border-color: #ef4444;
             background: linear-gradient(135deg, #1f1115 0%, #162035 100%);
         }
         .resumen-caudal {
-            margin-top: 15px;
-            margin-bottom: 15px;
+            margin-top: 10px;
+            margin-bottom: 10px;
             background: linear-gradient(135deg, #091325 0%, #111e38 100%);
             border: 1px solid #0284c7;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 10px;
+            padding: 10px;
             transition: all 0.3s ease;
         }
         .resumen-caudal.alerta-activa {
@@ -1037,84 +1071,84 @@
         .indicadores-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 6px;
             text-align: center;
         }
         .ind-box {
             background: rgba(0,0,0,0.3);
             border: 1px solid var(--border);
-            padding: 8px;
-            border-radius: 8px;
+            padding: 6px;
+            border-radius: 6px;
         }
-        .ind-label { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; }
-        .ind-val { font-size: 1rem; font-weight: 800; color: #fff; margin-top: 2px; }
-        .tendencia { font-size: 0.72rem; font-weight: bold; margin-top: 4px; }
+        .ind-label { font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; }
+        .ind-val { font-size: 0.9rem; font-weight: 800; color: #fff; margin-top: 2px; }
+        .tendencia { font-size: 0.65rem; font-weight: bold; margin-top: 2px; }
         .form-manual {
-            margin-top: 15px;
+            margin-top: 10px;
             background: var(--card-inner);
-            padding: 14px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             border: 1px solid var(--border);
         }
-        .form-manual h4 { font-size: 0.8rem; color: var(--accent); margin-bottom: 8px; }
-        .form-manual input { width: 100%; margin-bottom: 8px; }
+        .form-manual h4 { font-size: 0.75rem; color: var(--accent); margin-bottom: 6px; }
+        .form-manual input { width: 100%; margin-bottom: 6px; }
         .search-box {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 10px;
         }
         select, input {
             flex: 1;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text-main);
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             outline: none;
         }
         select:focus, input:focus { border-color: var(--accent); }
         button{
-            padding: 10px 16px;
+            padding: 8px 12px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             background: var(--accent);
             color: #000;
             font-weight: 800;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         button:hover{ opacity: 0.9; }
         .btn-secundario {
             background: transparent;
             border: 1px solid var(--border);
             color: var(--text-muted);
-            font-size: 0.75rem;
-            padding: 8px 14px;
-            margin-top: 15px;
-            border-radius: 8px;
+            font-size: 0.7rem;
+            padding: 6px 10px;
+            margin-top: 10px;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
         }
         .btn-secundario:hover { border-color: var(--accent); color: var(--accent); }
         .json-box{
             display: none;
-            margin-top: 15px;
+            margin-top: 10px;
             background: #02040a;
             border: 1px solid var(--border);
             color: #22c55e;
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 10px;
             overflow: auto;
-            max-height: 150px;
+            max-height: 120px;
             font-family: monospace;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
         .loading{
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--accent);
-            padding: 20px;
+            padding: 15px;
             grid-column: 1 / -1;
         }
     </style>
@@ -1147,7 +1181,7 @@
 <!-- CINTA DE ALARMAS SCADA (BANNER HORIZONTAL) -->
 <div class="scada-banner-container">
     <div class="scada-banner-left">
-        <span class="scada-badge-blink">🚨 SCADA ALERTS</span>
+        <span class="scada-badge-blink">🚨 SCADA</span>
     </div>
     <div class="scada-ticker-wrapper">
         <div class="scada-ticker-content" id="scadaTickerContent">
@@ -1155,7 +1189,7 @@
         </div>
     </div>
     <button type="button" class="btn-abrir-alarmero-modal" onclick="abrirModalAlarmasActivas()">
-        Ver Alarmero 📋
+        Alarmero 📋
     </button>
 </div>
 
@@ -1166,11 +1200,11 @@
             <h3>Temperatura (Estación Virtual)</h3>
             <div class="temp-box">
                 <div class="metric" id="temp">--</div>
-                <div id="weatherIcon" style="font-size: 2.8rem; line-height: 1; filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));">☀</div>
+                <div id="weatherIcon" style="font-size: 2.2rem; line-height: 1; filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));">☀</div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-                <small id="tempDesc" style="color:var(--text-muted); font-size:0.75rem;">Cargando...</small>
-                <small id="stTemp" style="color:var(--accent); font-weight: 800; font-size:0.75rem;">ST: --°C</small>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <small id="tempDesc" style="color:var(--text-muted); font-size:0.68rem;">Cargando...</small>
+                <small id="stTemp" style="color:var(--accent); font-weight: 800; font-size:0.68rem;">ST: --°C</small>
             </div>
         </div>
 
@@ -1182,25 +1216,25 @@
         <div class="card">
             <h3>Viento</h3>
             <div class="metric" id="viento">--</div>
-            <small id="vientoDir" style="color:var(--text-muted); font-size:0.72rem;">Dir: --</small>
+            <small id="vientoDir" style="color:var(--text-muted); font-size:0.68rem;">Dir: --</small>
         </div>
 
         <div class="card">
             <h3>Índice UV</h3>
             <div class="metric" id="uvIndex">--</div>
-            <small id="uvEstado" style="color:var(--text-muted); font-size:0.72rem;">Cargando...</small>
+            <small id="uvEstado" style="color:var(--text-muted); font-size:0.68rem;">Cargando...</small>
         </div>
 
         <div class="card">
             <h3>Presión Atmosférica</h3>
             <div class="metric" id="presion">--</div>
-            <small id="presionTendencia" style="color:var(--accent); font-weight:800; font-size:0.7rem;">Hectopascales</small>
+            <small id="presionTendencia" style="color:var(--accent); font-weight:800; font-size:0.65rem;">Hectopascales</small>
         </div>
 
         <div class="card">
             <h3>Calidad del Aire</h3>
             <div class="metric" id="aire">--</div>
-            <small id="aireEstado" style="color:var(--text-muted); font-size:0.72rem;">Cargando AQI...</small>
+            <small id="aireEstado" style="color:var(--text-muted); font-size:0.68rem;">Cargando AQI...</small>
         </div>
     </div>
 
@@ -1215,15 +1249,15 @@
 
     <div class="dashboard-row">
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <h3 style="margin-bottom: 6px;">🌅 Astronomía & Ciclo Solar</h3>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; padding: 6px 0;">
+            <h3 style="margin-bottom: 4px;">🌅 Astronomía & Ciclo Solar</h3>
+            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; padding: 4px 0;">
                 <div class="solar-container" style="padding-top:0;">
-                    <div class="solar-arc" style="margin: 4px auto;">
+                    <div class="solar-arc" style="margin: 2px auto;">
                         <div class="sun-pivot" id="sunPivot">
                             <div class="sun-icon" id="sunIcon">☀</div>
                         </div>
                     </div>
-                    <div class="solar-times" style="margin: 6px auto 0 auto;">
+                    <div class="solar-times" style="margin: 4px auto 0 auto;">
                         <div>Amanecer<strong id="amanecerTime">--:--</strong></div>
                         <div style="text-align:right">Atardecer<strong id="atardecerTime">--:--</strong></div>
                     </div>
@@ -1239,7 +1273,7 @@
 
         <div class="card">
             <h3>🌱 Desglose de Polen & Alérgenos</h3>
-            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px;">
+            <p style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; margin-bottom: 4px;">
                 Previsión oficial satelital de alérgenos (Fuente: Open-Meteo Air Quality).
             </p>
             <div class="polen-grid">
@@ -1294,111 +1328,111 @@
                 <div id="forecast" class="forecast-cards"></div>
             </div>
 
-            <div class="card" style="margin-top: 12px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 8px;">⚡ Confort Térmico & Radiación</h3>
+            <div class="card" style="margin-top: 10px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 6px;">⚡ Confort Térmico & Radiación</h3>
                 <div class="grid-confort-termico">
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Bulbo Húmedo</small>
-                        <strong id="bulboHumedad" style="font-size: 0.85rem; color: var(--text-main);">-- °C</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">🌡</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Bulbo Húmedo</small>
+                        <strong id="bulboHumedad" style="font-size: 0.78rem; color: var(--text-main);">-- °C</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Radiación</small>
-                        <strong id="radiacionSolar" style="font-size: 0.85rem; color: var(--text-main);">-- W/m²</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">☀</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Radiación</small>
+                        <strong id="radiacionSolar" style="font-size: 0.78rem; color: var(--text-main);">-- W/m²</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">⚡</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Estrés Térmico</small>
-                        <strong id="estresTermico" style="font-size: 0.85rem; color: #22c55e;">Confortable</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">⚡</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Estrés Térmico</small>
+                        <strong id="estresTermico" style="font-size: 0.78rem; color: #22c55e;">Confortable</strong>
                     </div>
 
                 </div>
             </div>
 
-            <div class="card" style="margin-top: 12px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 8px;">🌾 Resumen Agrometeorológico Local</h3>
+            <div class="card" style="margin-top: 10px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 6px;">🌾 Resumen Agrometeorológico Local</h3>
                 <div class="grid-agricola">
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Prob. Lluvia</small>
-                        <strong id="probLluvia" style="font-size: 0.85rem; color: var(--text-main);">--%</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">🌧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Prob. Lluvia</small>
+                        <strong id="probLluvia" style="font-size: 0.78rem; color: var(--text-main);">--%</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Riego Neto</small>
-                        <strong id="lluviaAcum" style="font-size: 0.85rem; color: var(--accent);">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Riego Neto</small>
+                        <strong id="lluviaAcum" style="font-size: 0.78rem; color: var(--accent);">-- mm</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">☀</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Horas de Sol</small>
-                        <strong id="horasSol" style="font-size: 0.85rem; color: var(--text-main);">-- hs</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">☀</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Horas de Sol</small>
+                        <strong id="horasSol" style="font-size: 0.78rem; color: var(--text-main);">-- hs</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">💨</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Ráfagas Máx.</small>
-                        <strong id="rafagasMax" style="font-size: 0.85rem; color: var(--text-main);">-- km/h</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">💨</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Ráfagas Máx.</small>
+                        <strong id="rafagasMax" style="font-size: 0.78rem; color: var(--text-main);">-- km/h</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌱</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Humedad Suelo</small>
-                        <strong id="humSuelo" style="font-size: 0.85rem; color: var(--text-main);">-- %</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">🌱</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Humedad Suelo</small>
+                        <strong id="humSuelo" style="font-size: 0.78rem; color: var(--text-main);">-- %</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">🌡</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Temp. Suelo</small>
-                        <strong id="tempSuelo" style="font-size: 0.85rem; color: var(--text-main);">-- °C</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">🌡</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Temp. Suelo</small>
+                        <strong id="tempSuelo" style="font-size: 0.78rem; color: var(--text-main);">-- °C</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Horas de Frío</small>
-                        <strong id="horasFrio" style="font-size: 0.85rem; color: var(--accent);">-- hs</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">❄</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Horas de Frío</small>
+                        <strong id="horasFrio" style="font-size: 0.78rem; color: var(--accent);">-- hs</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">📈</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">GDD (Acum.)</small>
-                        <strong id="gddAcum" style="font-size: 0.85rem; color: var(--accent);">-- GDD</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">📈</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">GDD (Acum.)</small>
+                        <strong id="gddAcum" style="font-size: 0.78rem; color: var(--accent);">-- GDD</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">VPD (Aire)</small>
-                        <strong id="vpdAire" style="font-size: 0.85rem; color: var(--text-main);">-- kPa</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">VPD (Aire)</small>
+                        <strong id="vpdAire" style="font-size: 0.78rem; color: var(--text-main);">-- kPa</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">⚖</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Balance Hídrico</small>
-                        <strong id="balanceHidrico" style="font-size: 0.85rem; color: var(--text-main);">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">⚖</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Balance Hídrico</small>
+                        <strong id="balanceHidrico" style="font-size: 0.78rem; color: var(--text-main);">-- mm</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">❄</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Riesgo Helada</small>
-                        <strong id="riesgoHelada" style="font-size: 0.85rem; color:#22c55e;">Sin Riesgo</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">❄</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Riesgo Helada</small>
+                        <strong id="riesgoHelada" style="font-size: 0.78rem; color:#22c55e;">Sin Riesgo</strong>
                     </div>
 
-                    <div style="background: var(--card-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-                        <span style="font-size: 1.2rem;">💧</span>
-                        <small style="display: block; color: var(--text-muted); font-size: 0.65rem; margin-top: 2px;">Evapotransp.</small>
-                        <strong id="etoDiario" style="font-size: 0.85rem; color: var(--text-main);">-- mm</strong>
+                    <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="font-size: 1rem;">💧</span>
+                        <small style="display: block; color: var(--text-muted); font-size: 0.6rem; margin-top: 2px;">Evapotransp.</small>
+                        <strong id="etoDiario" style="font-size: 0.78rem; color: var(--text-main);">-- mm</strong>
                     </div>
 
                 </div>
 
-                <div style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px;">
-                    <h4 style="font-size: 0.8rem; color: var(--accent); margin-bottom: 6px;">📖 Glosario Técnico</h4>
+                <div style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px;">
+                    <h4 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 4px;">📖 Glosario Técnico</h4>
                     <div class="glosario-grid">
                         <div class="glosario-item">
                             <div class="glosario-titulo">📈 GDD (Grados Día)</div>
@@ -1434,18 +1468,18 @@
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
                 <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Satélite VIIRS</button>
-                <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); grid-column: span 1.5;">📐 Lotes</button>
-                <button class="map-btn" id="btnModoCenso" onclick="alternarModoCensoMapa()" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e; grid-column: span 1.5;">🌳 Censo Árbol</button>
+                <button class="map-btn" onclick="abrirModalLotes()" style="background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent);">📐 Lotes</button>
+                <button class="map-btn" id="btnModoCenso" onclick="alternarModoCensoMapa()" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e;">🌳 Censo Árbol</button>
             </div>
 
             <div class="map-wrapper-container">
                 <div class="censo-banner-flotante" id="bannerModoCenso">
-                    <span>🌳 [MODO CENSO] Toca el mapa donde está el árbol</span>
-                    <button onclick="alternarModoCensoMapa()" style="background:#000; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">Salir</button>
+                    <span>🌳 [MODO CENSO] Toca el mapa</span>
+                    <button onclick="alternarModoCensoMapa()" style="background:#000; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:0.65rem; cursor:pointer;">Salir</button>
                 </div>
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.58rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, OSM, Open-Meteo, NASA FIRMS, Firebase</div>
+                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, OSM, Open-Meteo, NASA FIRMS, Firebase</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -1455,16 +1489,16 @@
     <br>
 
     <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA -->
-    <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+    <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
-                <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🌊 Territoria - Mapa y Monitoreo Hídrico SNIH</h3>
-                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.7rem;">Seleccioná una estación del selector o consultá su estado en la red.</small>
+                <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🌊 Territoria - Monitoreo Hídrico SNIH</h3>
+                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Seleccioná una estación del selector o consultá su estado.</small>
             </div>
-            <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">🔍 Escanear Todas las Estaciones</button>
+            <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
         </div>
         
-        <div class="hidro-layout-grid" style="grid-template-columns: 1fr 1.2fr;">
+        <div class="hidro-layout-grid">
             <!-- COLUMNA IZQUIERDA -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
                <div>
@@ -1475,13 +1509,13 @@
                         <button onclick="consultar()">Actualizar</button>
                     </div>
 
-                    <div id="infoDetalle" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                    <div id="infoDetalle" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">
                         Información de la red y ubicación...
                     </div>
 
                     <!-- PANEL RESUMEN ESPECÍFICO -->
                     <div id="panelResumenCaudal" class="resumen-caudal">
-                        <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.62rem; background: #64748b; padding: 2px 6px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
+                        <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.58rem; background: #64748b; padding: 2px 5px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
                         <div class="indicadores-grid">
                             <div class="ind-box">
                                 <div class="ind-label">Nivel / Altura</div>
@@ -1514,7 +1548,7 @@
 
             <!-- COLUMNA DERECHA -->
             <div class="panel">
-                <h3 style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas (Mendoza)</h3>
+                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h3>
                 <div id="map"></div>
             </div>
         </div>
@@ -1522,18 +1556,17 @@
 
     <br>
 
-    <!-- ALARMERO E HISTORIAL DE INCIDENTES (CON HORA DE DISPARO Y RECONOCIMIENTO) -->
+    <!-- ALARMERO E HISTORIAL DE INCIDENTES -->
     <div class="card" style="border-left: 6px solid var(--accent); background: linear-gradient(135deg, #0e1526 0%, #0d1e33 100%);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
-                <h3 style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🚨 Alarmero SCADA e Historial de Incidentes Reconocidos</h3>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Hacé clic en cualquier registro hídrico para ver sus datos de caudal en detalle.</small>
+                <h3 style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🚨 Alarmero SCADA e Historial</h3>
+                <small style="color: var(--text-muted); font-size: 0.65rem;">Hacé clic en cualquier registro para ver sus datos de caudal.</small>
             </div>
-            <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
+            <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
         </div>
-        <!-- CONTENEDOR TIPO EXCEL COMPACTO CON SCROLL VERTICAL -->
-        <div id="alarmeroListaContainer" style="display: flex; flex-direction: column; gap: 4px; width: 100%; max-height: 220px; overflow-y: auto; padding-right: 4px;">
-            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; width: 100%; padding: 10px;">Sin alarmas reconocidas recientemente.</div>
+        <div id="alarmeroListaContainer" style="display: flex; flex-direction: column; gap: 4px; width: 100%; max-height: 200px; overflow-y: auto; padding-right: 2px;">
+            <div style="font-size: 0.7rem; color: var(--text-muted); text-align: center; width: 100%; padding: 10px;">Sin alarmas reconocidas recientemente.</div>
         </div>
     </div>
 
@@ -1541,13 +1574,13 @@
 
 <!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA -->
 <div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
-    <div class="modal-content-box" style="max-width: 750px; height: auto; max-height: 85vh;">
+    <div class="modal-content-box" style="max-width: 700px; height: auto; max-height: 85vh;">
         <div class="modal-header">
-            <h2>🚨 Centro de Alarmero SCADA - Alarmas Activas</h2>
+            <h2>🚨 Centro de Alarmero SCADA</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalAlarmasActivas()">✕</button>
         </div>
-        <div class="modal-body" style="grid-template-columns: 1fr; gap: 8px; overflow-y: auto;" id="contenedorListaAlarmasPopup">
-            <!-- Se llena dinámicamente con filas de alarmas -->
+        <div class="modal-body" style="grid-template-columns: 1fr; gap: 6px; overflow-y: auto;" id="contenedorListaAlarmasPopup">
+            <!-- Se llena dinámicamente -->
         </div>
     </div>
 </div>
@@ -1562,10 +1595,10 @@
         <div class="modal-body">
             <div class="modal-map-container">
                 <div class="modal-search-box">
-                    <input type="text" id="modalSearchInput" class="modal-search-input" placeholder="Buscar zona (ej: Godoy Cruz)..." onkeypress="if(event.key === 'Enter') buscarLugarModal()">
+                    <input type="text" id="modalSearchInput" class="modal-search-input" placeholder="Buscar zona..." onkeypress="if(event.key === 'Enter') buscarLugarModal()">
                     <button class="modal-search-btn" onclick="buscarLugarModal()">Buscar</button>
                 </div>
-                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;">
+                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">
                     Dibuja el polígono de tu lote en el mapa. Fuente: Open-Meteo & OpenStreetMap.
                 </p>
                 <div id="mapaModalDibujo"></div>
@@ -1573,7 +1606,7 @@
 
             <div class="modal-report-panel" id="reporteLotePanel">
                 <div class="report-section-title">📊 Reporte de Finca / Lote</div>
-                <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 25px 10px;">
+                <div class="recommendation-card" style="color: var(--text-muted); text-align: center; padding: 20px 10px;">
                     👈 Dibuja un polígono en el mapa con la herramienta superior derecha para procesar las hectáreas y el balance hídrico real.
                 </div>
             </div>
@@ -1583,19 +1616,19 @@
 
 <!-- VENTANA MODAL PARA CENSO FORESTAL URBANO (ÁRBOL) -->
 <div class="modal-overlay" id="modalCensoForestal">
-    <div class="modal-content-box" style="max-width: 600px; height: auto; max-height: 90vh;">
+    <div class="modal-content-box" style="max-width: 500px; height: auto; max-height: 90vh;">
         <div class="modal-header">
             <h2>🌳 Registrar Árbol Censado</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalCensoForestal()">✕</button>
         </div>
-        <div class="modal-body" style="grid-template-columns: 1fr; gap: 10px;">
+        <div class="modal-body" style="grid-template-columns: 1fr; gap: 8px;">
             <div class="recommendation-card">
                 <b>Coordenadas Seleccionadas:</b> <span id="arbolGpsText" style="color: var(--accent);">--</span>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">1. Especie de Árbol Frecuente (Mendoza):</label>
-                <select id="selectEspecieArbol" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.8rem; outline: none;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">1. Especie de Árbol Frecuente (Mendoza):</label>
+                <select id="selectEspecieArbol" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 6px; border-radius: 8px; font-size: 0.75rem; outline: none;">
                     <option value="Plátano">Plátano (Platanus acerifolia)</option>
                     <option value="Fresno">Fresno (Fraxinus)</option>
                     <option value="Paraíso">Paraíso (Melia azedarach)</option>
@@ -1607,26 +1640,26 @@
                 </select>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">2. Estado Sanitario / Diagnóstico:</label>
-                <select id="selectEstadoArbol" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.8rem; outline: none;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">2. Estado Sanitario / Diagnóstico:</label>
+                <select id="selectEstadoArbol" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 6px; border-radius: 8px; font-size: 0.75rem; outline: none;">
                     <option value="Sano">🟢 Buen Estado (Sano)</option>
                     <option value="Regular">🟡 Regular (Daño parcial / Intervención)</option>
                     <option value="Baja">🔴 Para Dar de Baja / Extracción (Peligro)</option>
                 </select>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">3. Evidencia Fotográfica (Cámara Directa):</label>
-                <input type="file" id="inputFotoArbol" accept="image/*" capture="environment" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.75rem;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">3. Evidencia Fotográfica (Cámara Directa):</label>
+                <input type="file" id="inputFotoArbol" accept="image/*" capture="environment" style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 6px; border-radius: 8px; font-size: 0.7rem;">
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">4. Observaciones de Campo:</label>
-                <textarea id="txtObservacionesArbol" placeholder="Ej: Raíces rompiendo vereda, fuste inclinado, ramas secas..." style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.8rem; outline: none; height: 60px; resize: none;"></textarea>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">4. Observaciones de Campo:</label>
+                <textarea id="txtObservacionesArbol" placeholder="Ej: Raíces rompiendo vereda, ramas secas..." style="background: var(--card-inner); color: var(--text-main); border: 1px solid var(--border); padding: 6px; border-radius: 8px; font-size: 0.75rem; outline: none; height: 50px; resize: none;"></textarea>
             </div>
 
-            <button type="button" id="btnGuardarCenso" style="background: #22c55e; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-top: 6px; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);">
+            <button type="button" id="btnGuardarCenso" style="background: #22c55e; color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; margin-top: 4px; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);">
                 💾 Guardar Censo en la Nube
             </button>
         </div>
@@ -1691,7 +1724,7 @@
         let hayHelada = estadoAlarmasSistema.helada.activo;
 
         if (llavesEstaciones.length === 0 && !haySismo && !hayFuego && !hayZonda && !hayHelada) {
-            contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 30px;">✔ Sistema Normal. No hay alarmas activas en el alarmero.</div>`;
+            contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 0.75rem;">✔ Sistema Normal. No hay alarmas activas en el alarmero.</div>`;
             return;
         }
 
@@ -1700,15 +1733,15 @@
         if (haySismo) {
             let rec = estadoAlarmasSistema.sismo.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#f59e0b'}; border-left: 6px solid ${rec ? '#22c55e' : '#f59e0b'}; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                        <span style="font-size: 1.4rem;">🌋</span>
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#f59e0b'}; border-left: 6px solid ${rec ? '#22c55e' : '#f59e0b'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                        <span style="font-size: 1.2rem;">🌋</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#f59e0b'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</div>
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.sismo.titulo}</div>
+                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#f59e0b'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.sismo.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('sismo')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('sismo')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1716,15 +1749,15 @@
         if (hayFuego) {
             let rec = estadoAlarmasSistema.fuego.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                        <span style="font-size: 1.4rem;">🔥</span>
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                        <span style="font-size: 1.2rem;">🔥</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.fuego.horaDisparo})</div>
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.fuego.titulo}</div>
+                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.fuego.horaDisparo})</div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.fuego.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('fuego')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('fuego')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1732,15 +1765,15 @@
         if (hayZonda) {
             let rec = estadoAlarmasSistema.zonda.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                        <span style="font-size: 1.4rem;">💨⚠</span>
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                        <span style="font-size: 1.2rem;">💨⚠</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.zonda.horaDisparo})</div>
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.zonda.titulo}</div>
+                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.zonda.horaDisparo})</div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.zonda.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('zonda')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('zonda')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1748,15 +1781,15 @@
         if (hayHelada) {
             let rec = estadoAlarmasSistema.helada.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#38bdf8'}; border-left: 6px solid ${rec ? '#22c55e' : '#38bdf8'}; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                        <span style="font-size: 1.4rem;">❄️</span>
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#38bdf8'}; border-left: 6px solid ${rec ? '#22c55e' : '#38bdf8'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                        <span style="font-size: 1.2rem;">❄️</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#38bdf8'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.helada.horaDisparo})</div>
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.helada.titulo}</div>
+                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#38bdf8'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.helada.horaDisparo})</div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.helada.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('helada')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('helada')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1765,15 +1798,15 @@
             let infoEst = estacionesEnAlertaActuales[idEst];
             let rec = infoEst.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer;" onclick="irAEstacionHidroDetalle('${idEst}')" title="Clic para abrir detalle de estación">
-                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                        <span style="font-size: 1.4rem;">🌊</span>
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer;" onclick="irAEstacionHidroDetalle('${idEst}')" title="Clic para abrir detalle de estación">
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                        <span style="font-size: 1.2rem;">🌊</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${infoEst.horaDisparo})</div>
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main); text-decoration: underline;">${infoEst.nombre} - Nivel: ${infoEst.altura.toFixed(2)}m (Ver Detalle 🔍)</div>
+                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${infoEst.horaDisparo})</div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main); text-decoration: underline;">${infoEst.nombre} - ${infoEst.altura.toFixed(2)}m (Ver Detalle 🔍)</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="event.stopPropagation(); reconocerAlarmaScada('hidro', '${idEst}')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="event.stopPropagation(); reconocerAlarmaScada('hidro', '${idEst}')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         });
@@ -1794,22 +1827,22 @@
         if (haySismo) {
             let rec = estadoAlarmasSistema.sismo.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
-            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[SISMO]</b> ${estadoAlarmasSistema.sismo.titulo} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</span>`;
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[SISMO]</b> ${estadoAlarmasSistema.sismo.titulo}</span>`;
         }
         if (hayFuego) {
             let rec = estadoAlarmasSistema.fuego.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
-            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[FUEGO]</b> ${estadoAlarmasSistema.fuego.titulo} (Disparo: ${estadoAlarmasSistema.fuego.horaDisparo})</span>`;
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[FUEGO]</b> ${estadoAlarmasSistema.fuego.titulo}</span>`;
         }
         if (hayZonda) {
             let rec = estadoAlarmasSistema.zonda.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
-            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[CLIMA]</b> ${estadoAlarmasSistema.zonda.titulo} (Disparo: ${estadoAlarmasSistema.zonda.horaDisparo})</span>`;
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[CLIMA]</b> ${estadoAlarmasSistema.zonda.titulo}</span>`;
         }
         if (hayHelada) {
             let rec = estadoAlarmasSistema.helada.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
-            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[HELADA]</b> ${estadoAlarmasSistema.helada.titulo} (Disparo: ${estadoAlarmasSistema.helada.horaDisparo})</span>`;
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[HELADA]</b> ${estadoAlarmasSistema.helada.titulo}</span>`;
         }
 
         llavesEstaciones.forEach(idEst => {
@@ -1860,7 +1893,7 @@
         let historial = JSON.parse(localStorage.getItem("alarmero_historial") || "[]");
         historial.unshift({
             tipo: tituloIncidente,
-            estacionId: idEstacionAsociada, // Guardamos el ID para poder enlazarlo
+            estacionId: idEstacionAsociada,
             horaDisparo: horaDisparoStr,
             horaReconocido: horaActualStr,
             fecha: new Date().toLocaleDateString("es-AR")
@@ -1879,7 +1912,7 @@
 
         let historial = JSON.parse(localStorage.getItem("alarmero_historial") || "[]");
         if (historial.length === 0) {
-            contenedor.innerHTML = `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; width: 100%; padding: 8px;">Sin alarmas reconocidas recientemente.</div>`;
+            contenedor.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); text-align: center; width: 100%; padding: 6px;">Sin alarmas reconocidas recientemente.</div>`;
             return;
         }
 
@@ -1888,7 +1921,6 @@
             let disparo = item.horaDisparo || "--:--";
             let reconocido = item.horaReconocido || item.hora || "--:--";
             
-            // Verificamos si el item tiene una estación hídrica asociada en su ID o extrayendo el número
             let idEstacionExtraido = item.estacionId;
             if (!idEstacionExtraido && item.tipo) {
                 let match = item.tipo.match(/Estación\s+(\d+)/i);
@@ -1899,20 +1931,20 @@
 
             let esClickable = idEstacionExtraido && estacionesData[idEstacionExtraido];
             let estiloFila = esClickable ? "cursor: pointer; border-left: 3px solid #22c55e;" : "border-left: 3px solid #64748b;";
-            let onclickAttr = esClickable ? `onclick="irAEstacionHidroDetalle('${idEstacionExtraido}')" title="Clic para ver detalle de caudal de la estación"` : "";
-            let textoExtra = esClickable ? ` <span style="color:var(--accent); font-size:0.65rem; text-decoration:underline;">(Ver Caudal 🔍)</span>` : "";
+            let onclickAttr = esClickable ? `onclick="irAEstacionHidroDetalle('${idEstacionExtraido}')" title="Clic para ver detalle de caudal"` : "";
+            let textoExtra = esClickable ? ` <span style="color:var(--accent); font-size:0.6rem; text-decoration:underline;">(Ver Caudal 🔍)</span>` : "";
 
             contenedor.innerHTML += `
-                <div style="background: var(--card-bg); border: 1px solid var(--border); ${estiloFila} padding: 6px 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; font-size: 0.75rem; transition: background 0.2s;" ${onclickAttr} onmouseover="if(this.style.cursor=='pointer')this.style.background='#162035'" onmouseout="this.style.background='var(--card-bg)'">
-                    <div style="display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden;">
-                        <span style="color: #22c55e; font-weight: bold; font-size: 0.8rem;">✔</span>
-                        <span style="color: #22c55e; font-weight: 700; font-size: 0.6rem; text-transform: uppercase; white-space: nowrap;">RECONOCIDO</span>
+                <div style="background: var(--card-bg); border: 1px solid var(--border); ${estiloFila} padding: 5px 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; font-size: 0.7rem; transition: background 0.2s;" ${onclickAttr} onmouseover="if(this.style.cursor=='pointer')this.style.background='#162035'" onmouseout="this.style.background='var(--card-bg)'">
+                    <div style="display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden;">
+                        <span style="color: #22c55e; font-weight: bold; font-size: 0.75rem;">✔</span>
+                        <span style="color: #22c55e; font-weight: 700; font-size: 0.58rem; text-transform: uppercase; white-space: nowrap;">REC</span>
                         <span style="color: var(--text-main); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.tipo}">${item.tipo}${textoExtra}</span>
                     </div>
-                    <div style="display: flex; gap: 12px; color: var(--text-muted); flex-shrink: 0; font-size: 0.68rem; font-variant-numeric: tabular-nums; align-items: center;">
-                        <span>📅 ${item.fecha}</span>
-                        <span title="Hora en que se disparó la alarma" style="color: #f59e0b;">⚡ ${disparo}</span>
-                        <span title="Hora en que el operador reconoció la alarma" style="color: #22c55e;">👤 ${reconocido}</span>
+                    <div style="display: flex; gap: 8px; color: var(--text-muted); flex-shrink: 0; font-size: 0.62rem; font-variant-numeric: tabular-nums; align-items: center;">
+                        <span title="Fecha">📅 ${item.fecha}</span>
+                        <span title="Disparo" style="color: #f59e0b;">⚡ ${disparo}</span>
+                        <span title="Reconocido" style="color: #22c55e;">👤 ${reconocido}</span>
                     </div>
                 </div>
             `;
@@ -2008,15 +2040,6 @@
         "Altura E.A.N. en Snow Pillow": "mm"
     };
 
-    const iconosMetricas = {
-        "Altura": "📏", "Precipitación": "🌧️", "Precipitación acumulada diaria": "🌧️",
-        "Precipitación acumulada mensual": "🌧️", "Precipitación instantánea": "🌦️",
-        "Conductividad Eléctrica": "⚡", "Temperatura Bulbo Seco": "🌡️", "Temperatura": "🌡️",
-        "Humedad": "💧", "Velocidad del Viento": "💨", "Dirección del Viento": "🧭",
-        "Presión Atmosférica [mBar]": "⏱️", "Radiacion Solar": "☀️", "Equivalente de agua en nieve": "❄️",
-        "Altura E.A.N. en Snow Pillow": "❄️"
-    };
-
     const MAP_KEY_FIRMS = "77a9490b2a337c7055de7a2e5948c836";
     const listaCultivosDisponibles = ["Vid", "Cebolla", "Ajo", "Olivo", "Tomate", "Frutales (Manz/Pera/Cerez)", "Extensivos (Maíz/Soja)"];
 
@@ -2096,9 +2119,9 @@
 
             const iconoLimpio = L.divIcon({
                 className: '',
-                html: '<div style="background-color: #38bdf8; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"></div>',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
+                html: '<div style="background-color: #38bdf8; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"></div>',
+                iconSize: [18, 18],
+                iconAnchor: [9, 9]
             });
 
             markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
@@ -2152,11 +2175,10 @@
 
                 const customIcon = L.divIcon({
                     className: 'custom-marker',
-                    html: `<div style="background: ${colorPunto}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #000; box-shadow: ${boxShadowColor};"></div>`,
-                    iconSize: [18, 18]
+                    html: `<div style="background: ${colorPunto}; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #000; box-shadow: ${boxShadowColor};"></div>`,
+                    iconSize: [16, 16]
                 });
 
-                // draggable: false bloquea totalmente el movimiento de los puntos en el mapa
                 const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
                 marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span>`);
                 
@@ -2233,8 +2255,8 @@
         if(!estacionId) return;
 
         const info = estacionesData[estacionId] || { nombre: `Estación ID: ${estacionId}`, red: "Red Nacional" };
-        document.getElementById("tituloEstacion").textContent = `🌊 Monitoreo de Caudales: ${info.nombre}`;
-        document.getElementById("infoDetalle").innerHTML = `<b>Ubicación / Red:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
+        document.getElementById("tituloEstacion").textContent = `🌊 Monitoreo: ${info.nombre}`;
+        document.getElementById("infoDetalle").innerHTML = `<b>Ubicación:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
         
         document.getElementById("resumenAltura").textContent = "--";
         document.getElementById("tendenciaAltura").textContent = "--";
@@ -2261,7 +2283,7 @@
             const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
 
             if(mediciones.length === 0) {
-                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">No hay mediciones activas para esta estación.</div>';
+                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">No hay mediciones activas.</div>';
                 return;
             }
 
@@ -2277,7 +2299,7 @@
             });
 
             let anteriorAltura = historialLecturas[estacionId] !== undefined ? historialLecturas[estacionId] : null;
-            let tendenciaTexto = "➖ Sin historial previo";
+            let tendenciaTexto = "➖ Estable";
             let tendenciaColor = "#94a3b8";
             let huboCrecidaSensible = false;
 
@@ -2321,14 +2343,13 @@
                 }
                 
                 const unidad = unidades[m.NombreCodigo] || "";
-                const icono = iconosMetricas[m.NombreCodigo] || "📊";
                 let claseAlertaCard = esAlertaTarjeta ? "alerta-roja" : "";
 
                 resultado.innerHTML += `
                     <div class="card ${claseAlertaCard}">
-                        <div class="nombre">${m.NombreCodigo}</div>
-                        <div class="valor">${valor}</div>
-                        <div class="unidad">${unidad}</div>
+                        <div class="nombre" style="font-size:0.68rem;">${m.NombreCodigo}</div>
+                        <div class="valor" style="font-size:1.2rem; font-weight:800;">${valor}</div>
+                        <div class="unidad" style="font-size:0.6rem; color:var(--text-muted);">${unidad}</div>
                     </div>
                 `;
             });
@@ -2345,11 +2366,11 @@
             let panelResumen = document.getElementById("panelResumenCaudal");
 
             if((alturaValNum !== null && alturaValNum > 1.5) || huboCrecidaSensible) {
-                badge.textContent = huboCrecidaSensible ? "⚠️ ¡ALERTA: AUMENTO DETECTADO!" : "⚠️ ¡ALERTA NIVEL ALTO!";
+                badge.textContent = huboCrecidaSensible ? "⚠️ ¡ALERTA!" : "⚠️ ¡ALTO!";
                 badge.style.background = "#ef4444";
                 panelResumen.classList.add("alerta-activa");
             } else {
-                badge.textContent = "Monitoreando";
+                badge.textContent = "Normal";
                 badge.style.background = "#22c55e";
             }
 
@@ -2358,10 +2379,9 @@
         } catch(error){
             resultado.innerHTML = `
                 <div class="card" style="grid-column: 1 / -1; border-color: #ef4444;">
-                    <div style="color: #ef4444; font-weight: bold; text-align: center;">Error de conexión con la red SNIH.</div>
+                    <div style="color: #ef4444; font-weight: bold; text-align: center; font-size:0.75rem;">Error de conexión con la red SNIH.</div>
                 </div>
             `;
-            console.error(error);
         }
     }
 
@@ -2491,14 +2511,14 @@
 
             db.collection("arboles_censados").add(nuevoArbol)
                 .then((docRef) => {
-                    alert(`¡Árbol registrado con éxito en la nube! (ID: ${docRef.id})`);
+                    alert(`¡Árbol registrado con éxito!`);
                     cerrarModalCensoForestal();
                     alternarModoCensoMapa();
                     document.getElementById("txtObservacionesArbol").value = "";
                     if (fileInput) fileInput.value = "";
                 })
                 .catch((error) => {
-                    alert("Error al guardar en Firebase: " + error.message);
+                    alert("Error al guardar: " + error.message);
                 });
         };
 
@@ -2518,9 +2538,7 @@
                     const comprimidaBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     enviarAFirebase(comprimidaBase64);
                 };
-                img.onerror = function() {
-                    enviarAFirebase("");
-                };
+                img.onerror = function() { enviarAFirebase(""); };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(fileInput.files[0]);
@@ -2545,15 +2563,15 @@
 
                     let iconoArbol = L.divIcon({
                         className: '',
-                        html: `<div style="background-color: ${colorPin}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 12px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌳</div>`,
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
+                        html: `<div style="background-color: ${colorPin}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0e1526; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 9px;">🌳</div>`,
+                        iconSize: [18, 18],
+                        iconAnchor: [9, 9]
                     });
 
                     if (capaCapaArboles && arbol.lat && arbol.lon) {
-                        let htmlPopup = `<b>Árbol: ${arbol.especie}</b><br>Estado: <b>${arbol.estado}</b><br>Obs: ${arbol.observaciones || 'Sin observaciones'}<br><small>${arbol.fecha}</small>`;
+                        let htmlPopup = `<b>Árbol: ${arbol.especie}</b><br>Estado: <b>${arbol.estado}</b><br>Obs: ${arbol.observaciones || 'Sin obs'}<br><small>${arbol.fecha}</small>`;
                         if (arbol.foto && arbol.foto.length > 20) {
-                            htmlPopup += `<br><img src="${arbol.foto}" style="width: 100%; max-width: 160px; border-radius: 6px; margin-top: 6px; display: block;">`;
+                            htmlPopup += `<br><img src="${arbol.foto}" style="width: 100%; max-width: 140px; border-radius: 6px; margin-top: 4px; display: block;">`;
                         }
 
                         L.marker([arbol.lat, arbol.lon], { icon: iconoArbol })
@@ -2592,7 +2610,7 @@
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
 
-        panel.innerHTML = `<div class="report-section-title">📊 Procesando (${hectareas} ha)...</div><div style="text-align:center; padding: 25px; color:var(--accent);">Consultando Open-Meteo API...</div>`;
+        panel.innerHTML = `<div class="report-section-title">📊 Procesando (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent); font-size:0.75rem;">Consultando Open-Meteo...</div>`;
 
         let nombreLugar = `Lote Agrícola GPS`;
         let provinciaZona = "Mendoza";
@@ -2639,15 +2657,15 @@
         let alertaDeriva = "";
 
         if (d.viento > 20) {
-            alertaDeriva = `<br><span style="color:#ef4444; font-weight:bold;">⚠ ALERTA DE DERIVA:</span> Viento superior a 20 km/h. No realizar aplicaciones foliares.`;
+            alertaDeriva = `<br><span style="color:#ef4444; font-weight:bold;">⚠ ALERTA DE DERIVA:</span> Viento fuerte. No aplicar foliares.`;
         }
 
         if (d.temp < 12) {
-            recomendacionFertilizante = `Suelo/Ambiente frío (${d.temp}°C): Priorizar aplicación fosforada (Fosfatos) para enraizamiento de ${cultivoSeleccionado}.${alertaDeriva}`;
+            recomendacionFertilizante = `Suelo frío (${d.temp}°C): Priorizar aplicación fosforada para enraizar ${cultivoSeleccionado}.${alertaDeriva}`;
         } else if (d.temp > 28) {
-            recomendacionFertilizante = `Temperatura elevada (${d.temp}°C): Alto riesgo de volatilización de Urea. Aplicar vía fertirriego nocturno.${alertaDeriva}`;
+            recomendacionFertilizante = `Temp elevada (${d.temp}°C): Riesgo de volatilización. Aplicar por fertirriego nocturno.${alertaDeriva}`;
         } else {
-            recomendacionFertilizante = `Condiciones estables (${d.temp}°C, ${d.viento} km/h): Apto para fertilización de cobertura en ${cultivoSeleccionado}.${alertaDeriva}`;
+            recomendacionFertilizante = `Condiciones estables (${d.temp}°C, ${d.viento} km/h): Apto para fertilización en ${cultivoSeleccionado}.${alertaDeriva}`;
         }
 
         panel.innerHTML = `
@@ -2655,25 +2673,25 @@
             
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} ha</span><br>
-                <b>In situ (Open-Meteo):</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
+                <b>Condiciones:</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
             </div>
 
-            <div class="report-section-title">🌱 Aptitud y Cultivo</div>
+            <div class="report-section-title">🌱 Cultivo</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
-                <div style="margin-bottom: 6px; font-size:0.7rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
-                <div style="margin-bottom: 8px;">${listaCultivosHtml}</div>
-                <b>Evaluación para ${cultivoSeleccionado}:</b> Condiciones óptimas.
+                <div style="margin-bottom: 4px; font-size:0.65rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
+                <div style="margin-bottom: 6px;">${listaCultivosHtml}</div>
+                <b>Evaluación para ${cultivoSeleccionado}:</b> Óptima.
             </div>
 
-            <div class="report-section-title">🧪 Recomendación Experta de Fertilización</div>
+            <div class="report-section-title">🧪 Recomendación Experta</div>
             <div class="recommendation-card" style="border-left: 4px solid #22c55e;">
                 ${recomendacionFertilizante}
             </div>
 
-            <div class="report-section-title">💧 Balance Hídrico (Fuente: Open-Meteo API)</div>
+            <div class="report-section-title">💧 Balance Hídrico</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
-                <b>Precipitación:</b> ${d.lluvia} mm | <b>ET0:</b> ${d.et0} mm/día<br>
-                <b>Déficit Neto:</b> ${(d.lluvia - d.et0).toFixed(1)} mm
+                <b>Precipitación:</b> ${d.lluvia} mm | <b>ET0:</b> ${d.et0} mm/d<br>
+                <b>Déficit:</b> ${(d.lluvia - d.et0).toFixed(1)} mm
             </div>
         `;
     }
@@ -2716,13 +2734,13 @@
         } else if (tipo === 'fuego') {
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
-            mapTitle.innerText = "🔥 Fuego (NASA FIRMS WMS)";
+            mapTitle.innerText = "🔥 Fuego (NASA FIRMS)";
             contenedorMapaDiv.classList.add("modo-oscuro-mapa");
         } else if (tipo === 'lluvia') {
             await inicializarCapasEspeciales();
             if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
             btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧 Radar de Lluvia sobre Mapa";
+            mapTitle.innerText = "🌧 Radar de Lluvia";
             contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
         } else if (tipo === 'satelite') {
             await inicializarCapasEspeciales();
@@ -2747,9 +2765,7 @@
                     }
                     actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: Territoria, OSM, Open-Meteo, Firebase");
                 },
-                (error) => {
-                    usarUbicacionPorDefecto();
-                },
+                (error) => { usarUbicacionPorDefecto(); },
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
         } else {
@@ -2991,7 +3007,7 @@
             const elAire = document.getElementById("aire");
             if (elAire) { elAire.innerText = aqi; elAire.style.color = color; }
             const elEstado = document.getElementById("aireEstado");
-            if (elEstado) elEstado.innerText = estado + " (Open-Meteo)";
+            if (elEstado) elEstado.innerText = estado;
         } catch (e) {}
     }
 
@@ -3010,14 +3026,14 @@
 
             let htmlA = "", htmlC = "", htmlM = "";
             [12, 36, 60].forEach((idx, i) => {
-                let d = i === 0 ? "Hoy" : (i === 1 ? "Mañana" : "Pas.");
+                let d = i === 0 ? "Hoy" : (i === 1 ? "Mañ" : "Pas");
                 let nA = evalNivel((data.hourly.alder_pollen[idx] || 0));
                 let nC = evalNivel(data.hourly.grass_pollen[idx] || 0);
                 let nM = evalNivel(data.hourly.ragweed_pollen[idx] || 0);
 
-                htmlA += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:4px;">${nA.t}</span><span class="dot-nivel ${nA.c}"></span></div></div>`;
-                htmlC += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:4px;">${nC.t}</span><span class="dot-nivel ${nC.c}"></span></div></div>`;
-                htmlM += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:4px;">${nM.t}</span><span class="dot-nivel ${nM.c}"></span></div></div>`;
+                htmlA += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:3px;">${nA.t}</span><span class="dot-nivel ${nA.c}"></span></div></div>`;
+                htmlC += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:3px;">${nC.t}</span><span class="dot-nivel ${nC.c}"></span></div></div>`;
+                htmlM += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:3px;">${nM.t}</span><span class="dot-nivel ${nM.c}"></span></div></div>`;
             });
 
             document.getElementById("polenArboles").innerHTML = htmlA;
@@ -3030,11 +3046,11 @@
         const contenedor = document.getElementById("sismosListaContainer");
         if (!contenedor) return;
         try {
-            const res = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson");
+            const res = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson");
             const data = await res.json();
             if (data && data.features && data.features.length > 0) {
                 contenedor.innerHTML = "";
-                data.features.slice(0, 4).forEach(s => {
+                data.features.slice(0, 12).forEach(s => {
                     let p = s.properties;
                     let fechaObj = new Date(p.time);
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit' });
@@ -3044,17 +3060,17 @@
                     
                     contenedor.innerHTML += `
                         <div class="sismo-mini-card">
-                            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight:600;">${horaStr}</div>
+                            <div style="font-size: 0.62rem; color: var(--text-muted); font-weight:600;">${horaStr}</div>
                             <div class="sismo-mini-mag ${arg ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
-                            <div style="font-size: 0.68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.place}">${lugarCorto}</div>
+                            <div style="font-size: 0.62rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.place}">${lugarCorto}</div>
                         </div>
                     `;
                 });
             } else {
-                contenedor.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); text-align:center; padding:10px;">Sin sismos recientes</div>`;
+                contenedor.innerHTML = `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px;">Sin sismos recientes</div>`;
             }
         } catch (e) {
-            contenedor.innerHTML = `<div style="font-size:0.72rem; color:#ef4444; text-align:center; padding:10px;">Error USGS</div>`;
+            contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px;">Error USGS</div>`;
         }
     }
 
@@ -3158,7 +3174,7 @@
                 let h = new Date().getHours();
                 for(let i = h; i < h + 12; i++) {
                     if (data.hourly.temperature_2m[i] !== undefined) {
-                        hourly.innerHTML += `<div class="forecast-card"><div style="font-size:0.72rem; font-weight:700;">${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i], 1)}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
+                        hourly.innerHTML += `<div class="forecast-card"><div style="font-size:0.65rem; font-weight:700;">${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i], 1)}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
                     }
                 }
             }
@@ -3168,7 +3184,7 @@
                 forecast.innerHTML = "";
                 data.daily.time.forEach((t, i) => {
                     let d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", {weekday: "short"});
-                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize; font-weight:700;">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i], 1)}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
+                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize; font-weight:700; font-size:0.65rem;">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i], 1)}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
                 });
             }
         } catch(e) {}
@@ -3229,9 +3245,7 @@
                 async (pos) => {
                     await procesarUbicacionExitosa(pos.coords.latitude, pos.coords.longitude);
                 },
-                (error) => {
-                    usarUbicacionPorDefecto();
-                },
+                (error) => { usarUbicacionPorDefecto(); },
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
         } else {
