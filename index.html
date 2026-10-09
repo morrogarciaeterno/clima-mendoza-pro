@@ -1527,7 +1527,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <div>
                 <h3 style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🚨 Alarmero SCADA e Historial de Incidentes Reconocidos</h3>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Tabla compacta con hora de disparo y hora de reconocimiento del operador.</small>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Hacé clic en cualquier registro hídrico para ver sus datos de caudal en detalle.</small>
             </div>
             <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
         </div>
@@ -1830,6 +1830,7 @@
         const horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
         let tituloIncidente = "";
         let horaDisparoStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        let idEstacionAsociada = null;
 
         if (tipo === 'sismo') {
             estadoAlarmasSistema.sismo.reconocido = true;
@@ -1852,12 +1853,14 @@
                 estacionesEnAlertaActuales[idEst].reconocido = true;
                 tituloIncidente = `Crecida Hídrica (${estacionesEnAlertaActuales[idEst].nombre})`;
                 horaDisparoStr = estacionesEnAlertaActuales[idEst].horaDisparo || horaActualStr;
+                idEstacionAsociada = idEst;
             }
         }
 
         let historial = JSON.parse(localStorage.getItem("alarmero_historial") || "[]");
         historial.unshift({
             tipo: tituloIncidente,
+            estacionId: idEstacionAsociada, // Guardamos el ID para poder enlazarlo
             horaDisparo: horaDisparoStr,
             horaReconocido: horaActualStr,
             fecha: new Date().toLocaleDateString("es-AR")
@@ -1884,13 +1887,27 @@
         historial.forEach(item => {
             let disparo = item.horaDisparo || "--:--";
             let reconocido = item.horaReconocido || item.hora || "--:--";
+            
+            // Verificamos si el item tiene una estación hídrica asociada en su ID o extrayendo el número
+            let idEstacionExtraido = item.estacionId;
+            if (!idEstacionExtraido && item.tipo) {
+                let match = item.tipo.match(/Estación\s+(\d+)/i);
+                if (match && match[1]) {
+                    idEstacionExtraido = match[1];
+                }
+            }
+
+            let esClickable = idEstacionExtraido && estacionesData[idEstacionExtraido];
+            let estiloFila = esClickable ? "cursor: pointer; border-left: 3px solid #22c55e;" : "border-left: 3px solid #64748b;";
+            let onclickAttr = esClickable ? `onclick="irAEstacionHidroDetalle('${idEstacionExtraido}')" title="Clic para ver detalle de caudal de la estación"` : "";
+            let textoExtra = esClickable ? ` <span style="color:var(--accent); font-size:0.65rem; text-decoration:underline;">(Ver Caudal 🔍)</span>` : "";
 
             contenedor.innerHTML += `
-                <div style="background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid #22c55e; padding: 5px 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; font-size: 0.75rem;">
+                <div style="background: var(--card-bg); border: 1px solid var(--border); ${estiloFila} padding: 6px 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; font-size: 0.75rem; transition: background 0.2s;" ${onclickAttr} onmouseover="if(this.style.cursor=='pointer')this.style.background='#162035'" onmouseout="this.style.background='var(--card-bg)'">
                     <div style="display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden;">
                         <span style="color: #22c55e; font-weight: bold; font-size: 0.8rem;">✔</span>
                         <span style="color: #22c55e; font-weight: 700; font-size: 0.6rem; text-transform: uppercase; white-space: nowrap;">RECONOCIDO</span>
-                        <span style="color: var(--text-main); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.tipo}">${item.tipo}</span>
+                        <span style="color: var(--text-main); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.tipo}">${item.tipo}${textoExtra}</span>
                     </div>
                     <div style="display: flex; gap: 12px; color: var(--text-muted); flex-shrink: 0; font-size: 0.68rem; font-variant-numeric: tabular-nums; align-items: center;">
                         <span>📅 ${item.fecha}</span>
