@@ -1073,23 +1073,8 @@
 
 <div class="container">
 
-    <!-- TARJETA DE ALERTA DE CAUDAL / CRECIDA (NUEVA - EN EL DASHBOARD PRINCIPAL) -->
-    <div class="card" id="hidroAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex-grow: 1;">
-                <span style="font-size: 2rem; flex-shrink: 0;">🌊⚠</span>
-                <div style="min-width: 0; flex-grow: 1;">
-                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                        <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Hidrológica</span>
-                        <small style="color: var(--text-muted); font-size: 0.68rem;">Fuente: Red SNIH Oficial</small>
-                    </div>
-                    <h3 id="hidroAlertaTitulo" style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Crecida o Nivel Crítico Detectado!</h3>
-                    <p id="hidroAlertaDesc" style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Estación monitoreada en estado de alerta.</p>
-                </div>
-            </div>
-            <button class="btn-reconocer" onclick="reconocerAlerta('hidro')">✅ Reconocer / Silenciar</button>
-        </div>
-    </div>
+    <!-- CONTENEDOR DINÁMICO DE TARJETAS DE ALERTA DE CAUDAL (MÚLTIPLES ESTACIONES) -->
+    <div id="contenedorAlertasHidroDinamicas"></div>
 
     <!-- ALERTA SÍSMICA SUPERIOR (PERSISTENTE 1 HORA CON RECONOCIMIENTO) -->
     <div class="card" id="sismoAlertaCard" style="display: none; border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #0e1526 0%, #261f0e 100%); margin-bottom: 12px;">
@@ -1474,6 +1459,7 @@
                 <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🌊 Territoria - Mapa y Monitoreo Hídrico SNIH</h3>
                 <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.7rem;">Hacé clic o arrastrá los puntos en el mapa, o cargá una estación nueva a la izquierda.</small>
             </div>
+            <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">🔍 Escanear Todas las Estaciones</button>
         </div>
         
         <div class="hidro-layout-grid" style="grid-template-columns: 1fr 1.2fr;">
@@ -1656,7 +1642,10 @@
         }
     });
 
-    function reconocerAlerta(tipo) {
+    // Objeto para llevar registro de estaciones en alerta reconocidas
+    let estacionesReconocidas = JSON.parse(localStorage.getItem("territoria_estaciones_reconocidas") || "{}");
+
+    function reconocerAlerta(tipo, estId = null) {
         const ahoraStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
         let tituloIncidente = "";
         let tarjetaCard = null;
@@ -1687,17 +1676,24 @@
                 tarjetaCard.style.borderLeftColor = "#22c55e";
             }
         } else if (tipo === 'hidro') {
-            tarjetaCard = document.getElementById("hidroAlertaCard");
-            let tituloActual = document.getElementById("hidroAlertaTitulo").innerText;
-            tituloIncidente = `Alerta Hidrológica: ${tituloActual}`;
+            estacionesReconocidas[estId] = true;
+            localStorage.setItem("territoria_estaciones_reconocidas", JSON.stringify(estacionesReconocidas));
+            tituloIncidente = `Alerta Crecida / Nivel Alto (Estación ${estId})`;
+            tarjetaCard = document.getElementById(`hidroAlertaCard_${estId}`);
             if (tarjetaCard) {
-                tarjetaCard.dataset.reconocido = "true";
                 tarjetaCard.classList.remove("alerta-activa-animacion");
                 tarjetaCard.style.borderLeftColor = "#22c55e";
+                const btn = tarjetaCard.querySelector(".btn-reconocer");
+                if (btn) {
+                    btn.innerHTML = "✔ Atendido";
+                    btn.style.borderColor = "#22c55e";
+                    btn.style.color = "#22c55e";
+                    btn.style.cursor = "default";
+                }
             }
         }
 
-        if (tarjetaCard) {
+        if (tarjetaCard && tipo !== 'hidro') {
             const btn = tarjetaCard.querySelector(".btn-reconocer");
             if (btn) {
                 btn.innerHTML = "✔ Atendido";
@@ -1713,7 +1709,7 @@
             hora: ahoraStr,
             fecha: new Date().toLocaleDateString("es-AR")
         });
-        if (historial.length > 10) historial.pop();
+        if (historial.length > 15) historial.pop();
         localStorage.setItem("alarmero_historial", JSON.stringify(historial));
 
         renderizarAlarmero();
@@ -1743,6 +1739,8 @@
 
     function borrarHistorialAlarmas() {
         localStorage.removeItem("alarmero_historial");
+        localStorage.removeItem("territoria_estaciones_reconocidas");
+        estacionesReconocidas = {};
         renderizarAlarmero();
     }
 
@@ -1784,7 +1782,6 @@
     let latSeleccionadaCenso = null;
     let lonSeleccionadaCenso = null;
 
-    // Variables originales de Hidrometría SNIH con tus estaciones reales
     const WORKER = "https://snih-proxy.elexpreso17.workers.dev";
     const estacionesDefault = {
         "12103": { nombre: "Estación 12103 - Pata Mora", red: "Río Colorado, Neuquén", coords: [-36.85, -69.30] },
@@ -1984,6 +1981,7 @@
         }
         actualizarSelectYMapa();
         consultar();
+        escanearTodasLasEstaciones();
 
         setTimeout(() => {
             if (map) map.invalidateSize();
@@ -2036,6 +2034,78 @@
         if (estacionesData[valorActual]) {
             select.value = valorActual;
         }
+    }
+
+    // Función de escaneo masivo para todas las estaciones simultáneamente
+    async function escanearTodasLasEstaciones() {
+        const contenedorAlertas = document.getElementById("contenedorAlertasHidroDinamicas");
+        if (!contenedorAlertas) return;
+
+        let idsEstaciones = Object.keys(estacionesData);
+        // Escaneamos las primeras 10 o las principales para optimizar rendimiento web
+        let muestraIds = idsEstaciones.slice(0, 12);
+
+        for (let idEst of muestraIds) {
+            try {
+                const response = await fetch(WORKER, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ estacion: idEst })
+                });
+                const data = await response.json();
+                const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
+
+                let alturaValNum = null;
+                mediciones.forEach(m => {
+                    if(m.NombreCodigo === "Altura" && m.Valor !== -999 && m.Valor !== "-999") {
+                        alturaValNum = Number(m.Valor);
+                    }
+                });
+
+                if (alturaValNum !== null) {
+                    let anterior = historialLecturas[idEst];
+                    let huboCrecida = (anterior !== undefined && (alturaValNum - anterior) > 0.005);
+                    historialLecturas[idEst] = alturaValNum;
+
+                    if (alturaValNum > 1.5 || huboCrecida) {
+                        const infoEst = estacionesData[idEst];
+                        let cardId = `hidroAlertaCard_${idEst}`;
+                        let tarjetaExistente = document.getElementById(cardId);
+                        let yaAtendido = estacionesReconocidas[idEst];
+
+                        if (!tarjetaExistente) {
+                            let nuevaCard = document.createElement("div");
+                            nuevaCard.className = "card";
+                            nuevaCard.id = cardId;
+                            nuevaCard.style.cssText = `border-left: 6px solid ${yaAtendido ? '#22c55e' : '#ef4444'}; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;`;
+                            
+                            nuevaCard.innerHTML = `
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex-grow: 1;">
+                                        <span style="font-size: 2rem; flex-shrink: 0;">🌊⚠</span>
+                                        <div style="min-width: 0; flex-grow: 1;">
+                                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                                <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Hidrológica</span>
+                                                <small style="color: var(--text-muted); font-size: 0.68rem;">ID: ${idEst} | Red SNIH</small>
+                                            </div>
+                                            <h3 style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Crecida o Nivel Alto en ${infoEst ? infoEst.nombre : idEst}!</h3>
+                                            <p style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Nivel registrado: ${alturaValNum.toFixed(2)} m. Estado crítico activo.</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn-reconocer" style="${yaAtendido ? 'border-color: #22c55e; color: #22c55e; cursor: default;' : ''}" onclick="reconocerAlerta('hidro', '${idEst}')">${yaAtendido ? '✔ Atendido' : '✅ Reconocer / Silenciar'}</button>
+                                </div>
+                            `;
+                            if (!yaAtendido) {
+                                nuevaCard.classList.add("alerta-activa-animacion");
+                            }
+                            contenedorAlertas.appendChild(nuevaCard);
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+        localStorage.setItem("territoria_historial", JSON.stringify(historialLecturas));
+        actualizarSelectYMapa();
     }
 
     function prepararModoUbicacion() {
@@ -2210,25 +2280,12 @@
                 badge.textContent = huboCrecidaSensible ? "⚠️ ¡ALERTA: AUMENTO DETECTADO!" : "⚠️ ¡ALERTA NIVEL ALTO!";
                 badge.style.background = "#ef4444";
                 panelResumen.classList.add("alerta-activa");
-                
-                // Activación de la tarjeta principal superior en el Dashboard
-                const hidroCard = document.getElementById("hidroAlertaCard");
-                const hidroTitulo = document.getElementById("hidroAlertaTitulo");
-                const hidroDesc = document.getElementById("hidroAlertaDesc");
-                if (hidroCard) {
-                    hidroCard.style.display = "block";
-                    if (hidroCard.dataset.reconocido !== "true") {
-                        hidroCard.classList.add("alerta-activa-animacion");
-                    }
-                    hidroTitulo.innerText = `¡Alerta Caudal / Crecida en ${info.nombre}!`;
-                    hidroDesc.innerText = `Nivel registrado: ${alturaValStr}. ${tendenciaTexto}. Fuente: Red SNIH Oficial.`;
-                }
             } else {
                 badge.textContent = "Monitoreando";
                 badge.style.background = "#22c55e";
             }
 
-            actualizarSelectYMapa();
+            escanearTodasLasEstaciones();
 
         } catch(error){
             resultado.innerHTML = `
@@ -3093,6 +3150,7 @@
         cargarSismos();
         verificarProximidadIncendios(currentLat, currentLon);
         verificarSismosRelevantes(currentLat, currentLon);
+        escanearTodasLasEstaciones();
     }
 
     async function procesarUbicacionExitosa(lat, lon) {
