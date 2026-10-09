@@ -389,31 +389,38 @@
             color: var(--text-muted);
         }
 
+        /* GRILLA ADAPTATIVA PARA SISMOS (SIN SCROLL HORIZONTAL) */
         .sismos-grid-horizontal {
-            display: flex;
-            justify-content: flex-start;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 6px;
             margin-top: 8px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
             width: 100%;
-            padding-bottom: 4px;
+        }
+        @media (min-width: 500px) {
+            .sismos-grid-horizontal {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (min-width: 900px) {
+            .sismos-grid-horizontal {
+                grid-template-columns: repeat(6, 1fr);
+            }
         }
 
         .sismo-mini-card {
-            flex: 0 0 120px;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 8px;
             text-align: center;
-        }
-        @media (min-width: 768px) {
-            .sismo-mini-card { flex: 0 0 140px; padding: 10px; }
+            width: 100%;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .sismo-mini-mag {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
             margin: 2px 0;
         }
@@ -1178,7 +1185,7 @@
     </div>
 </header>
 
-<!-- CINTA DE ALARMAS SCADA (BANNER HORIZONTAL) -->
+<!-- CINTA DE ALARMAS SCADA (BANNER SUPERIOR) -->
 <div class="scada-banner-container">
     <div class="scada-banner-left">
         <span class="scada-badge-blink">🚨 SCADA</span>
@@ -3050,7 +3057,7 @@
             const data = await res.json();
             if (data && data.features && data.features.length > 0) {
                 contenedor.innerHTML = "";
-                data.features.slice(0, 12).forEach(s => {
+                data.features.slice(0, 6).forEach(s => {
                     let p = s.properties;
                     let fechaObj = new Date(p.time);
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit' });
@@ -3067,10 +3074,10 @@
                     `;
                 });
             } else {
-                contenedor.innerHTML = `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px;">Sin sismos recientes</div>`;
+                contenedor.innerHTML = `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; grid-column: 1 / -1;">Sin sismos recientes</div>`;
             }
         } catch (e) {
-            contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px;">Error USGS</div>`;
+            contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; grid-column: 1 / -1;">Error USGS</div>`;
         }
     }
 
