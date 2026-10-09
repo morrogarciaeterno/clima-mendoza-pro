@@ -166,16 +166,27 @@
             background: var(--accent-glow);
             border: 1px solid var(--accent);
             color: var(--accent);
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
+            padding: 6px 12px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
             cursor: pointer;
             flex-shrink: 0;
             box-shadow: 0 0 10px var(--accent-glow);
+            position: relative;
+        }
+
+        .badge-contador-alarmas {
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 1px 5px;
+            border-radius: 10px;
+            font-weight: 900;
+            display: none;
         }
 
         .container {
@@ -1056,8 +1067,9 @@
         </div>
 
         <div class="header-right">
-            <button type="button" class="btn-notif-header" id="btnCampanaNotif" title="Verificar Estado de Alertas">
-                🔔
+            <!-- BOTÓN ALARMAS CON CONTADOR EN LA CABECERA -->
+            <button type="button" class="btn-notif-header" id="btnCampanaNotif" onclick="abrirModalAlarmasActivas()">
+                🚨 Alarmas <span id="contadorAlarmasHeader" class="badge-contador-alarmas">0</span>
             </button>
 
             <div class="date-display">
@@ -1072,9 +1084,6 @@
 </header>
 
 <div class="container">
-
-    <!-- CONTENEDOR DINÁMICO DE TARJETAS DE ALERTA DE CAUDAL (MÚLTIPLES ESTACIONES) -->
-    <div id="contenedorAlertasHidroDinamicas"></div>
 
     <!-- ALERTA SÍSMICA SUPERIOR (PERSISTENTE 1 HORA CON RECONOCIMIENTO) -->
     <div class="card" id="sismoAlertaCard" style="display: none; border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #0e1526 0%, #261f0e 100%); margin-bottom: 12px;">
@@ -1109,7 +1118,7 @@
         </div>
     </div>
 
-    <!-- ALERTA DE CONTINGENCIA (VIENTOS FUERTES, ZONDA / HELADAS CON RECONOCIMIENTO Y ALARMERO) -->
+    <!-- ALERTA DE CONTINGENCIA -->
     <div class="card" id="contingenciaAlertaCard" style="display: none; border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex-grow: 1;">
@@ -1452,7 +1461,7 @@
 
     <br>
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA (MAPA Y CONTROLES AL MISMO LADO) -->
+    <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA -->
     <div class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
@@ -1463,12 +1472,12 @@
         </div>
         
         <div class="hidro-layout-grid" style="grid-template-columns: 1fr 1.2fr;">
-            <!-- COLUMNA IZQUIERDA (CONTROLES Y SELECTOR DE HIDROMETRÍA) -->
+            <!-- COLUMNA IZQUIERDA -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
                <div>
                     <div class="search-box">
                         <select id="id" onchange="consultar()">
-                            <!-- Se llena dinámicamente con tus estaciones -->
+                            <!-- Se llena dinámicamente -->
                         </select>
                         <button onclick="consultar()">Actualizar</button>
                         <button onclick="cargarEstacionParaEditar()" style="background: #eab308; color: #000;" title="Editar estación seleccionada">✏️ Editar</button>
@@ -1478,7 +1487,7 @@
                         Información de la red y ubicación...
                     </div>
 
-                    <!-- PANEL RESUMEN ESPECÍFICO CON TENDENCIA Y ALARMAS -->
+                    <!-- PANEL RESUMEN ESPECÍFICO -->
                     <div id="panelResumenCaudal" class="resumen-caudal">
                         <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.62rem; background: #64748b; padding: 2px 6px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
                         <div class="indicadores-grid">
@@ -1523,7 +1532,7 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA (MAPA GIGANTE DE HIDROMETRÍA) -->
+            <!-- COLUMNA DERECHA -->
             <div class="panel">
                 <h3 style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas (Mendoza)</h3>
                 <div id="map"></div>
@@ -1547,6 +1556,19 @@
         </div>
     </div>
 
+</div>
+
+<!-- VENTANA MODAL PARA POPUP DE ALARMAS ACTIVAS (UNA ABAJO DE LA OTRA) -->
+<div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
+    <div class="modal-content-box" style="max-width: 650px; height: auto; max-height: 85vh;">
+        <div class="modal-header">
+            <h2>🚨 Centro de Alarmas Activas en Tiempo Real</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarModalAlarmasActivas()">✕</button>
+        </div>
+        <div class="modal-body" style="grid-template-columns: 1fr; gap: 10px; overflow-y: auto;" id="contenedorListaAlarmasPopup">
+            <!-- Se llena dinámicamente con las alarmas activas -->
+        </div>
+    </div>
 </div>
 
 <!-- VENTANA MODAL PARA LOTES Y REPORTE REAL -->
@@ -1642,65 +1664,142 @@
         }
     });
 
-    // Objeto para llevar registro de estaciones en alerta reconocidas
-    let estacionesReconocidas = JSON.parse(localStorage.getItem("territoria_estaciones_reconocidas") || "{}");
+    // Almacén dinámico de estaciones en alerta activa hídrica
+    let estacionesEnAlertaActuales = {};
+
+    function abrirModalAlarmasActivas() {
+        const modal = document.getElementById("modalAlarmasActivas");
+        if (modal) {
+            modal.style.display = "flex";
+            renderizarListaAlarmasPopup();
+        }
+    }
+
+    function cerrarModalAlarmasActivas() {
+        const modal = document.getElementById("modalAlarmasActivas");
+        if (modal) modal.style.display = "none";
+    }
+
+    function renderizarListaAlarmasPopup() {
+        const contenedor = document.getElementById("contenedorListaAlarmasPopup");
+        if (!contenedor) return;
+
+        let llavesAlertas = Object.keys(estacionesEnAlertaActuales);
+        
+        // Verificamos también si hay sismo o fuego activos
+        let haySismoActivo = document.getElementById("sismoAlertaCard").style.display === "block";
+        let hayFuegoActivo = document.getElementById("fuegoAlertaCard").style.display === "block";
+        let hayContingenciaActiva = document.getElementById("contingenciaAlertaCard").style.display === "block";
+
+        if (llavesAlertas.length === 0 && !haySismoActivo && !hayFuegoActivo && !hayContingenciaActiva) {
+            contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 30px;">✔ No hay alarmas críticas activas en este momento.</div>`;
+            return;
+        }
+
+        contenedor.innerHTML = "";
+
+        // Renderizar Sismo si está activo
+        if (haySismoActivo) {
+            let tituloSismo = document.getElementById("sismoTitulo").innerText;
+            contenedor.innerHTML += `
+                <div class="card" style="border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #0e1526 0%, #261f0e 100%); margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <span style="background: #f59e0b; color: #000; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; text-transform: uppercase;">Sismo Regional</span>
+                            <h4 style="color: var(--text-main); font-size: 0.85rem; margin-top: 2px; font-weight: 800;">${tituloSismo}</h4>
+                        </div>
+                        <button class="btn-reconocer" onclick="reconocerAlerta('sismo'); renderizarListaAlarmasPopup();">✅ Reconocer</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderizar Fuego si está activo
+        if (hayFuegoActivo) {
+            let tituloFuego = document.getElementById("fuegoAlertaTitulo").innerText;
+            contenedor.innerHTML += `
+                <div class="card" style="border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; text-transform: uppercase;">Alerta Fuego</span>
+                            <h4 style="color: var(--text-main); font-size: 0.85rem; margin-top: 2px; font-weight: 800;">${tituloFuego}</h4>
+                        </div>
+                        <button class="btn-reconocer" onclick="reconocerAlerta('fuego'); renderizarListaAlarmasPopup();">✅ Reconocer</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderizar Contingencia si está activa
+        if (hayContingenciaActiva) {
+            let tituloCont = document.getElementById("contingenciaTitulo").innerText;
+            contenedor.innerHTML += `
+                <div class="card" style="border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; text-transform: uppercase;">Alerta Climática</span>
+                            <h4 style="color: var(--text-main); font-size: 0.85rem; margin-top: 2px; font-weight: 800;">${tituloCont}</h4>
+                        </div>
+                        <button class="btn-reconocer" onclick="reconocerAlerta('contingencia'); renderizarListaAlarmasPopup();">✅ Reconocer</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderizar Estaciones de Caudal en Alerta una abajo de la otra
+        llavesAlertas.forEach(idEst => {
+            let infoEst = estacionesEnAlertaActuales[idEst];
+            contenedor.innerHTML += `
+                <div class="card" style="border-left: 6px solid #ef4444; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; text-transform: uppercase;">Alerta Hidrológica (ID: ${idEst})</span>
+                            <h4 style="color: var(--text-main); font-size: 0.85rem; margin-top: 2px; font-weight: 800;">${infoEst.nombre}</h4>
+                            <p style="color: var(--text-muted); font-size: 0.7rem; margin-top: 1px;">Nivel registrado: ${infoEst.altura.toFixed(2)} m. Estado crítico activo.</p>
+                        </div>
+                        <button class="btn-reconocer" onclick="reconocerAlerta('hidro', '${idEst}'); renderizarListaAlarmasPopup();">✅ Reconocer</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function actualizarContadorHeaderAlarmas() {
+        let totalAlarmas = Object.keys(estacionesEnAlertaActuales).length;
+        if (document.getElementById("sismoAlertaCard").style.display === "block") totalAlarmas++;
+        if (document.getElementById("fuegoAlertaCard").style.display === "block") totalAlarmas++;
+        if (document.getElementById("contingenciaAlertaCard").style.display === "block") totalAlarmas++;
+
+        const badge = document.getElementById("contadorAlarmasHeader");
+        if (badge) {
+            if (totalAlarmas > 0) {
+                badge.style.display = "inline-block";
+                badge.innerText = totalAlarmas;
+            } else {
+                badge.style.display = "none";
+            }
+        }
+    }
 
     function reconocerAlerta(tipo, estId = null) {
         const ahoraStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
         let tituloIncidente = "";
-        let tarjetaCard = null;
 
         if (tipo === 'fuego') {
-            tarjetaCard = document.getElementById("fuegoAlertaCard");
+            const card = document.getElementById("fuegoAlertaCard");
+            if (card) card.style.display = "none";
             tituloIncidente = "Incendio / Foco Activo (NASA)";
-            if (tarjetaCard) {
-                tarjetaCard.dataset.reconocido = "true";
-                tarjetaCard.classList.remove("alerta-activa-animacion");
-                tarjetaCard.style.borderLeftColor = "#22c55e";
-            }
         } else if (tipo === 'sismo') {
-            tarjetaCard = document.getElementById("sismoAlertaCard");
+            const card = document.getElementById("sismoAlertaCard");
+            if (card) card.style.display = "none";
             tituloIncidente = "Sismo Relevante (USGS)";
-            if (tarjetaCard) {
-                tarjetaCard.dataset.reconocido = "true";
-                tarjetaCard.classList.remove("alerta-activa-animacion");
-                tarjetaCard.style.borderLeftColor = "#22c55e";
-            }
         } else if (tipo === 'contingencia') {
-            tarjetaCard = document.getElementById("contingenciaAlertaCard");
-            let tituloActual = document.getElementById("contingenciaTitulo").innerText;
-            tituloIncidente = `Contingencia: ${tituloActual}`;
-            if (tarjetaCard) {
-                tarjetaCard.dataset.reconocido = "true";
-                tarjetaCard.classList.remove("alerta-activa-animacion");
-                tarjetaCard.style.borderLeftColor = "#22c55e";
-            }
+            const card = document.getElementById("contingenciaAlertaCard");
+            if (card) card.style.display = "none";
+            tituloIncidente = "Contingencia Climática Extrema";
         } else if (tipo === 'hidro') {
-            estacionesReconocidas[estId] = true;
-            localStorage.setItem("territoria_estaciones_reconocidas", JSON.stringify(estacionesReconocidas));
+            delete estacionesEnAlertaActuales[estId];
             tituloIncidente = `Alerta Crecida / Nivel Alto (Estación ${estId})`;
-            tarjetaCard = document.getElementById(`hidroAlertaCard_${estId}`);
-            if (tarjetaCard) {
-                tarjetaCard.classList.remove("alerta-activa-animacion");
-                tarjetaCard.style.borderLeftColor = "#22c55e";
-                const btn = tarjetaCard.querySelector(".btn-reconocer");
-                if (btn) {
-                    btn.innerHTML = "✔ Atendido";
-                    btn.style.borderColor = "#22c55e";
-                    btn.style.color = "#22c55e";
-                    btn.style.cursor = "default";
-                }
-            }
-        }
-
-        if (tarjetaCard && tipo !== 'hidro') {
-            const btn = tarjetaCard.querySelector(".btn-reconocer");
-            if (btn) {
-                btn.innerHTML = "✔ Atendido";
-                btn.style.borderColor = "#22c55e";
-                btn.style.color = "#22c55e";
-                btn.style.cursor = "default";
-            }
         }
 
         let historial = JSON.parse(localStorage.getItem("alarmero_historial") || "[]");
@@ -1713,6 +1812,7 @@
         localStorage.setItem("alarmero_historial", JSON.stringify(historial));
 
         renderizarAlarmero();
+        actualizarContadorHeaderAlarmas();
     }
 
     function renderizarAlarmero() {
@@ -1739,8 +1839,6 @@
 
     function borrarHistorialAlarmas() {
         localStorage.removeItem("alarmero_historial");
-        localStorage.removeItem("territoria_estaciones_reconocidas");
-        estacionesReconocidas = {};
         renderizarAlarmero();
     }
 
@@ -2036,14 +2134,13 @@
         }
     }
 
-    // Función de escaneo masivo para todas las estaciones simultáneamente
+    // Escaneo masivo para registrar automáticamente las estaciones en alerta y alimentar el popup
     async function escanearTodasLasEstaciones() {
-        const contenedorAlertas = document.getElementById("contenedorAlertasHidroDinamicas");
-        if (!contenedorAlertas) return;
-
         let idsEstaciones = Object.keys(estacionesData);
-        // Escaneamos las primeras 10 o las principales para optimizar rendimiento web
         let muestraIds = idsEstaciones.slice(0, 12);
+
+        // Limpiamos las que ya no están en alerta antes de re-escanear
+        let estacionesVistasEstaRonda = {};
 
         for (let idEst of muestraIds) {
             try {
@@ -2069,43 +2166,21 @@
 
                     if (alturaValNum > 1.5 || huboCrecida) {
                         const infoEst = estacionesData[idEst];
-                        let cardId = `hidroAlertaCard_${idEst}`;
-                        let tarjetaExistente = document.getElementById(cardId);
-                        let yaAtendido = estacionesReconocidas[idEst];
-
-                        if (!tarjetaExistente) {
-                            let nuevaCard = document.createElement("div");
-                            nuevaCard.className = "card";
-                            nuevaCard.id = cardId;
-                            nuevaCard.style.cssText = `border-left: 6px solid ${yaAtendido ? '#22c55e' : '#ef4444'}; background: linear-gradient(135deg, #0e1526 0%, #261118 100%); margin-bottom: 12px;`;
-                            
-                            nuevaCard.innerHTML = `
-                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                                    <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex-grow: 1;">
-                                        <span style="font-size: 2rem; flex-shrink: 0;">🌊⚠</span>
-                                        <div style="min-width: 0; flex-grow: 1;">
-                                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                                <span style="background: #ef4444; color: #fff; font-weight: 800; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; text-transform: uppercase;">Alerta Hidrológica</span>
-                                                <small style="color: var(--text-muted); font-size: 0.68rem;">ID: ${idEst} | Red SNIH</small>
-                                            </div>
-                                            <h3 style="color: var(--text-main); font-size: 0.9rem; margin-top: 3px; font-weight: 800;">¡Crecida o Nivel Alto en ${infoEst ? infoEst.nombre : idEst}!</h3>
-                                            <p style="color: var(--text-muted); font-size: 0.74rem; margin-top: 2px;">Nivel registrado: ${alturaValNum.toFixed(2)} m. Estado crítico activo.</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn-reconocer" style="${yaAtendido ? 'border-color: #22c55e; color: #22c55e; cursor: default;' : ''}" onclick="reconocerAlerta('hidro', '${idEst}')">${yaAtendido ? '✔ Atendido' : '✅ Reconocer / Silenciar'}</button>
-                                </div>
-                            `;
-                            if (!yaAtendido) {
-                                nuevaCard.classList.add("alerta-activa-animacion");
-                            }
-                            contenedorAlertas.appendChild(nuevaCard);
-                        }
+                        estacionesVistasEstaRonda[idEst] = {
+                            nombre: infoEst ? infoEst.nombre : `Estación ${idEst}`,
+                            altura: alturaValNum
+                        };
                     }
                 }
             } catch(e) {}
         }
+
+        // Actualizamos nuestro objeto de alertas activas
+        estacionesEnAlertaActuales = estacionesVistasEstaRonda;
+
         localStorage.setItem("territoria_historial", JSON.stringify(historialLecturas));
         actualizarSelectYMapa();
+        actualizarContadorHeaderAlarmas();
     }
 
     function prepararModoUbicacion() {
@@ -2733,14 +2808,12 @@
 
             if (fuegoCercanoKm <= 100) {
                 card.style.display = "block";
-                if (card.dataset.reconocido !== "true") {
-                    card.classList.add("alerta-activa-animacion");
-                }
                 titulo.innerText = `¡Foco Forestal Real a ${Math.round(fuegoCercanoKm)} km!`;
                 desc.innerText = `Actividad térmica confirmada (excluyendo planta industrial). Fuente: NASA FIRMS.`;
             } else {
                 card.style.display = "none";
             }
+            actualizarContadorHeaderAlarmas();
         } catch (e) {}
     }
 
@@ -2754,9 +2827,7 @@
         let ahoraMs = Date.now();
         if (alertaGuardada && (ahoraMs - parseInt(alertaGuardada)) < 3600000) {
             card.style.display = "block";
-            if (card.dataset.reconocido !== "true") {
-                card.classList.add("alerta-activa-animacion");
-            }
+            actualizarContadorHeaderAlarmas();
             return;
         }
 
@@ -2776,9 +2847,6 @@
 
                     if (mag >= 4.5 && distancia <= 300) {
                         card.style.display = "block";
-                        if (card.dataset.reconocido !== "true") {
-                            card.classList.add("alerta-activa-animacion");
-                        }
                         titulo.innerText = `¡Sismo Mag ${mag.toFixed(1)} a ${Math.round(distancia)} km!`;
                         desc.innerText = `Epicentro: ${lugar}. Alerta activa por 1 hora. Fuente: USGS.`;
                         
@@ -2790,6 +2858,7 @@
                 if (!sismoEncontrado && !alertaGuardada) {
                     card.style.display = "none";
                 }
+                actualizarContadorHeaderAlarmas();
             }
         } catch (e) {}
     }
@@ -2806,28 +2875,23 @@
 
         if (minTemp <= 2.0) {
             card.style.display = "block";
-            if (card.dataset.reconocido !== "true") card.classList.add("alerta-activa-animacion");
             if (icono) icono.innerText = "❄⚠";
             titulo.innerText = `¡Alerta Helada (${minTemp}°C)!`;
             desc.innerText = `Descenso térmico crítico pronosticado. Fuente: Open-Meteo.`;
         } else if (esZonda) {
             card.style.display = "block";
-            if (card.dataset.reconocido !== "true") card.classList.add("alerta-activa-animacion");
             if (icono) icono.innerText = "🔥💨";
             titulo.innerText = `¡ALERTA DE VIENTO ZONDA (${Math.round(rafagasActual)} km/h)!`;
             desc.innerText = `Condiciones críticas: Ráfagas del oeste con humedad extrema del ${humedadActual}%. Fuente: Open-Meteo.`;
         } else if (vientoActual >= umbralVientoComun || rafagaActual >= umbralVientoComun) {
             card.style.display = "block";
-            if (card.dataset.reconocido !== "true") {
-                card.classList.add("alerta-activa-animacion");
-            }
             if (icono) icono.innerText = "💨⚠";
             titulo.innerText = `¡Ráfagas Severas (${Math.round(Math.max(vientoActual, rafagaActual))} km/h)!`;
             desc.innerText = `Vientos intensos detectados en tiempo real. Fuente: Open-Meteo.`;
         } else {
             card.style.display = "none";
-            card.dataset.reconocido = "false";
         }
+        actualizarContadorHeaderAlarmas();
     }
 
     function verificarRiesgoHeladaAvanzado(tMin, humedadRelativa, vientoVel) {
@@ -2939,7 +3003,6 @@
 
         if (code >= 95) {
             card.style.display = "block";
-            card.classList.add("alerta-activa-animacion");
             if (titulo) titulo.innerText = "¡Tormentas Severas! (Open-Meteo)";
         } else {
             card.style.display = "none";
