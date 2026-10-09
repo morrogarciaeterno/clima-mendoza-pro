@@ -1455,7 +1455,7 @@
     <br>
 
     <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA -->
-    <div class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 12px;">
+    <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
                 <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.95rem; font-weight: 800;">🌊 Territoria - Mapa y Monitoreo Hídrico SNIH</h3>
@@ -1658,11 +1658,7 @@
         }
     });
 
-    let estacionesEnAlertaActuales = {
-        "11403": { nombre: "Estación 11403 - La Angostura", altura: 3.05, reconocido: false, horaDisparo: "10:45:12" },
-        "11421": { nombre: "Estación 11421 - Punta de Vacas", altura: 1.51, reconocido: false, horaDisparo: "10:46:00" },
-        "11427": { nombre: "Estación 11427 - La Gotera", altura: 1.06, reconocido: false, horaDisparo: "10:48:30" }
-    };
+    let estacionesEnAlertaActuales = {};
 
     let estadoAlarmasSistema = {
         sismo: { activo: false, reconocido: false, titulo: "Sismo Relevante Regional", horaDisparo: "" },
@@ -1682,6 +1678,19 @@
     function cerrarModalAlarmasActivas() {
         const modal = document.getElementById("modalAlarmasActivas");
         if (modal) modal.style.display = "none";
+    }
+
+    function irAEstacionHidroDetalle(idEst) {
+        cerrarModalAlarmasActivas();
+        const selectElem = document.getElementById("id");
+        if (selectElem) {
+            selectElem.value = idEst;
+            consultar();
+        }
+        const seccion = document.getElementById("seccionHidrometriaModulo");
+        if (seccion) {
+            seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 
     function renderizarListaAlarmasPopup() {
@@ -1708,11 +1717,11 @@
                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                         <span style="font-size: 1.4rem;">🌋</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#f59e0b'}; font-weight: 800;">${rec ? 'RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</div>
+                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#f59e0b'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</div>
                             <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.sismo.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('sismo')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">Silenciado</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('sismo')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1724,11 +1733,11 @@
                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                         <span style="font-size: 1.4rem;">🔥</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? 'RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.fuego.horaDisparo})</div>
+                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.fuego.horaDisparo})</div>
                             <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.fuego.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('fuego')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">Silenciado</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('fuego')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1740,11 +1749,11 @@
                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                         <span style="font-size: 1.4rem;">💨⚠</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? 'RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.zonda.horaDisparo})</div>
+                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.zonda.horaDisparo})</div>
                             <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.zonda.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('zonda')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">Silenciado</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('zonda')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1756,11 +1765,11 @@
                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                         <span style="font-size: 1.4rem;">❄️</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#38bdf8'}; font-weight: 800;">${rec ? 'RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.helada.horaDisparo})</div>
+                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#38bdf8'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.helada.horaDisparo})</div>
                             <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.helada.titulo}</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('helada')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">Silenciado</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('helada')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         }
@@ -1769,15 +1778,15 @@
             let infoEst = estacionesEnAlertaActuales[idEst];
             let rec = infoEst.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer;" onclick="irAEstacionHidroDetalle('${idEst}')" title="Clic para abrir detalle de estación">
                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                         <span style="font-size: 1.4rem;">🌊</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? 'RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${infoEst.horaDisparo})</div>
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${infoEst.nombre} - Nivel: ${infoEst.altura.toFixed(2)}m</div>
+                            <div style="font-size: 0.65rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${infoEst.horaDisparo})</div>
+                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main); text-decoration: underline;">${infoEst.nombre} - Nivel: ${infoEst.altura.toFixed(2)}m (Ver Detalle 🔍)</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('hidro', '${idEst}')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">Silenciado</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="event.stopPropagation(); reconocerAlarmaScada('hidro', '${idEst}')">✅ Reconocer</button>` : `<span style="font-size: 0.75rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
         });
@@ -1788,37 +1797,45 @@
         if (!ticker) return;
 
         let llavesEstaciones = Object.keys(estacionesEnAlertaActuales);
-        let haySismo = estadoAlarmasSistema.sismo.activo && !estadoAlarmasSistema.sismo.reconocido;
-        let hayFuego = estadoAlarmasSistema.fuego.activo && !estadoAlarmasSistema.fuego.reconocido;
-        let hayZonda = estadoAlarmasSistema.zonda.activo && !estadoAlarmasSistema.zonda.reconocido;
-        let hayHelada = estadoAlarmasSistema.helada.activo && !estadoAlarmasSistema.helada.reconocido;
+        let haySismo = estadoAlarmasSistema.sismo.activo;
+        let hayFuego = estadoAlarmasSistema.fuego.activo;
+        let hayZonda = estadoAlarmasSistema.zonda.activo;
+        let hayHelada = estadoAlarmasSistema.helada.activo;
 
-        let alertasPendientesHtml = "";
+        let alertasHtml = "";
 
         if (haySismo) {
-            alertasPendientesHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">🌋 <b>[SISMO]</b> ${estadoAlarmasSistema.sismo.titulo} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</span>`;
+            let rec = estadoAlarmasSistema.sismo.reconocido;
+            let iconoEstado = rec ? "✔ [REC]" : "🚨";
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[SISMO]</b> ${estadoAlarmasSistema.sismo.titulo} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</span>`;
         }
         if (hayFuego) {
-            alertasPendientesHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">🔥 <b>[FUEGO]</b> ${estadoAlarmasSistema.fuego.titulo} (Disparo: ${estadoAlarmasSistema.fuego.horaDisparo})</span>`;
+            let rec = estadoAlarmasSistema.fuego.reconocido;
+            let iconoEstado = rec ? "✔ [REC]" : "🚨";
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[FUEGO]</b> ${estadoAlarmasSistema.fuego.titulo} (Disparo: ${estadoAlarmasSistema.fuego.horaDisparo})</span>`;
         }
         if (hayZonda) {
-            alertasPendientesHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">💨 <b>[CLIMA]</b> ${estadoAlarmasSistema.zonda.titulo} (Disparo: ${estadoAlarmasSistema.zonda.horaDisparo})</span>`;
+            let rec = estadoAlarmasSistema.zonda.reconocido;
+            let iconoEstado = rec ? "✔ [REC]" : "🚨";
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[CLIMA]</b> ${estadoAlarmasSistema.zonda.titulo} (Disparo: ${estadoAlarmasSistema.zonda.horaDisparo})</span>`;
         }
         if (hayHelada) {
-            alertasPendientesHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">❄️ <b>[HELADA]</b> ${estadoAlarmasSistema.helada.titulo} (Disparo: ${estadoAlarmasSistema.helada.horaDisparo})</span>`;
+            let rec = estadoAlarmasSistema.helada.reconocido;
+            let iconoEstado = rec ? "✔ [REC]" : "🚨";
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[HELADA]</b> ${estadoAlarmasSistema.helada.titulo} (Disparo: ${estadoAlarmasSistema.helada.horaDisparo})</span>`;
         }
 
         llavesEstaciones.forEach(idEst => {
             let infoEst = estacionesEnAlertaActuales[idEst];
-            if (!infoEst.reconocido) {
-                alertasPendientesHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">🌊 <b>[HIDRO]</b> ${infoEst.nombre} (${infoEst.altura.toFixed(2)}m) (Disparo: ${infoEst.horaDisparo})</span>`;
-            }
+            let rec = infoEst.reconocido;
+            let iconoEstado = rec ? "✔ [REC]" : "🚨";
+            alertasHtml += `<span class="scada-alert-item" onclick="irAEstacionHidroDetalle('${idEst}')" title="Clic para abrir detalle">${iconoEstado} <b>[HIDRO]</b> ${infoEst.nombre} (${infoEst.altura.toFixed(2)}m)</span>`;
         });
 
-        if (alertasPendientesHtml === "") {
-            ticker.innerHTML = `<span>✔ Sistema Normal: Sin alarmas pendientes en el alarmero industrial SCADA. Operación estable.</span>`;
+        if (alertasHtml === "") {
+            ticker.innerHTML = `<span>✔ Sistema Normal: Sin alarmas activas en la red. Operación estable.</span>`;
         } else {
-            ticker.innerHTML = alertasPendientesHtml + " &nbsp;&nbsp;|&nbsp;&nbsp; " + alertasPendientesHtml;
+            ticker.innerHTML = alertasHtml + " &nbsp;&nbsp;|&nbsp;&nbsp; " + alertasHtml;
         }
     }
 
@@ -2237,12 +2254,6 @@
                 }
             } catch(e) {}
         }
-
-        Object.keys(estacionesEnAlertaActuales).forEach(id => {
-            if (!estacionesVistasEstaRonda[id] && estacionesEnAlertaActuales[id].altura > 1.5) {
-                estacionesVistasEstaRonda[id] = estacionesEnAlertaActuales[id];
-            }
-        });
 
         estacionesEnAlertaActuales = estacionesVistasEstaRonda;
 
@@ -2871,9 +2882,12 @@
 
             let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
             if (fuegoCercanoKm <= 100) {
-                estadoAlarmasSistema.fuego.activo = true;
+                if (!estadoAlarmasSistema.fuego.activo) {
+                    estadoAlarmasSistema.fuego.activo = true;
+                    estadoAlarmasSistema.fuego.reconocido = false;
+                    estadoAlarmasSistema.fuego.horaDisparo = horaActualStr;
+                }
                 estadoAlarmasSistema.fuego.titulo = `Foco Forestal Real a ${Math.round(fuegoCercanoKm)} km (NASA FIRMS)`;
-                if (!estadoAlarmasSistema.fuego.horaDisparo) estadoAlarmasSistema.fuego.horaDisparo = horaActualStr;
             } else {
                 estadoAlarmasSistema.fuego.activo = false;
                 estadoAlarmasSistema.fuego.reconocido = false;
@@ -2884,16 +2898,7 @@
     }
 
     async function verificarSismosRelevantes(lat, lon) {
-        let alertaGuardada = sessionStorage.getItem("sismoActivoTimestamp");
-        let ahoraMs = Date.now();
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
-
-        if (alertaGuardada && (ahoraMs - parseInt(alertaGuardada)) < 3600000) {
-            estadoAlarmasSistema.sismo.activo = true;
-            if (!estadoAlarmasSistema.sismo.horaDisparo) estadoAlarmasSistema.sismo.horaDisparo = horaActualStr;
-            actualizarCintaTickerScada();
-            return;
-        }
 
         try {
             const res = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson");
@@ -2910,15 +2915,17 @@
                     let distancia = calcularDistanciaKm(lat, lon, sLat, sLon);
 
                     if (mag >= 4.5 && distancia <= 300) {
-                        estadoAlarmasSistema.sismo.activo = true;
+                        if (!estadoAlarmasSistema.sismo.activo) {
+                            estadoAlarmasSistema.sismo.activo = true;
+                            estadoAlarmasSistema.sismo.reconocido = false;
+                            estadoAlarmasSistema.sismo.horaDisparo = horaActualStr;
+                        }
                         estadoAlarmasSistema.sismo.titulo = `Sismo Mag ${mag.toFixed(1)} a ${Math.round(distancia)} km (${lugar})`;
-                        if (!estadoAlarmasSistema.sismo.horaDisparo) estadoAlarmasSistema.sismo.horaDisparo = horaActualStr;
-                        sessionStorage.setItem("sismoActivoTimestamp", ahoraMs.toString());
                         sismoEncontrado = true;
                         break;
                     }
                 }
-                if (!sismoEncontrado && !alertaGuardada) {
+                if (!sismoEncontrado) {
                     estadoAlarmasSistema.sismo.activo = false;
                     estadoAlarmasSistema.sismo.reconocido = false;
                     estadoAlarmasSistema.sismo.horaDisparo = "";
@@ -2934,17 +2941,26 @@
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
 
         if (minTemp <= 2.0) {
-            estadoAlarmasSistema.zonda.activo = true;
+            if (!estadoAlarmasSistema.zonda.activo) {
+                estadoAlarmasSistema.zonda.activo = true;
+                estadoAlarmasSistema.zonda.reconocido = false;
+                estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
+            }
             estadoAlarmasSistema.zonda.titulo = `Alerta Helada Extrema (${minTemp}°C)`;
-            if (!estadoAlarmasSistema.zonda.horaDisparo) estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
         } else if (esZonda) {
-            estadoAlarmasSistema.zonda.activo = true;
+            if (!estadoAlarmasSistema.zonda.activo) {
+                estadoAlarmasSistema.zonda.activo = true;
+                estadoAlarmasSistema.zonda.reconocido = false;
+                estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
+            }
             estadoAlarmasSistema.zonda.titulo = `Alerta Viento Zonda (${Math.round(rafagasActual)} km/h)`;
-            if (!estadoAlarmasSistema.zonda.horaDisparo) estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
         } else if (vientoActual >= umbralVientoComun || rafagaActual >= umbralVientoComun) {
-            estadoAlarmasSistema.zonda.activo = true;
+            if (!estadoAlarmasSistema.zonda.activo) {
+                estadoAlarmasSistema.zonda.activo = true;
+                estadoAlarmasSistema.zonda.reconocido = false;
+                estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
+            }
             estadoAlarmasSistema.zonda.titulo = `Ráfagas Severas (${Math.round(Math.max(vientoActual, rafagaActual))} km/h)`;
-            if (!estadoAlarmasSistema.zonda.horaDisparo) estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
         } else {
             estadoAlarmasSistema.zonda.activo = false;
             estadoAlarmasSistema.zonda.reconocido = false;
@@ -2958,8 +2974,11 @@
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
 
         if (tMin <= 3.0) {
-            estadoAlarmasSistema.helada.activo = true;
-            if (!estadoAlarmasSistema.helada.horaDisparo) estadoAlarmasSistema.helada.horaDisparo = horaActualStr;
+            if (!estadoAlarmasSistema.helada.activo) {
+                estadoAlarmasSistema.helada.activo = true;
+                estadoAlarmasSistema.helada.reconocido = false;
+                estadoAlarmasSistema.helada.horaDisparo = horaActualStr;
+            }
             if (tMin <= 0) {
                 estadoAlarmasSistema.helada.titulo = `Alerta Helada Severa Crítica (${tMin}°C)`;
                 if (lblRiesgo) { lblRiesgo.innerText = "¡CRÍTICO (≤ 0°C)!"; lblRiesgo.style.color = "#ef4444"; }
