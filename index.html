@@ -358,10 +358,10 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             padding-bottom: 4px;
-            scrollbar-width: none; /* Oculta scroll en Firefox */
+            scrollbar-width: none;
         }
         .forecast-cards::-webkit-scrollbar {
-            display: none; /* Oculta scroll en Chrome, Safari y Edge */
+            display: none;
         }
 
         .forecast-card {
@@ -403,10 +403,10 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             padding-bottom: 4px;
-            scrollbar-width: none; /* Oculta scroll en Firefox */
+            scrollbar-width: none;
         }
         .sismos-cinta-horizontal::-webkit-scrollbar {
-            display: none; /* Oculta scroll en Chrome, Safari y Edge */
+            display: none;
         }
 
         .sismo-mini-card {
@@ -1891,9 +1891,9 @@
     }
 
     function reconocerAlarmaScada(tipo, idEst = null) {
-        const horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        const horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
         let tituloIncidente = "";
-        let horaDisparoStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        let horaDisparoStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
         let idEstacionAsociada = null;
 
         if (tipo === 'sismo') {
@@ -2229,7 +2229,7 @@
         let muestraIds = idsEstaciones.slice(0, 12);
 
         let estacionesVistasEstaRonda = {};
-        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
         for (let idEst of muestraIds) {
             try {
@@ -2478,7 +2478,7 @@
             }
 
             contenedor.innerHTML = htmlCinta;
-            document.getElementById("inpres-estado").innerHTML = "Actualizado (Últimas 48hs): " + new Date().toLocaleTimeString("es-AR");
+            document.getElementById("inpres-estado").innerHTML = "Actualizado (Últimas 48hs): " + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
         } catch(error) {
             console.error(error);
@@ -2912,7 +2912,7 @@
                 }
             }
 
-            let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+            let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
             if (fuegoCercanoKm <= 100) {
                 if (!estadoAlarmasSistema.fuego.activo) {
                     estadoAlarmasSistema.fuego.activo = true;
@@ -2930,7 +2930,7 @@
     }
 
     async function cargarSismosInternacionalesUsgs(lat, lon) {
-        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
         const contenedor = document.getElementById("sismosListaContainer");
 
         try {
@@ -2941,13 +2941,16 @@
                 contenedor.innerHTML = "";
                 let sismoAlarmaEncontrado = false;
 
-                dataUSGS.features.slice(0, 10).forEach(s => {
+                dataUSGS.features.slice(0, 15).forEach(s => {
                     let p = s.properties;
                     let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
-                    let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit' });
+                    
+                    // Formato idéntico al INPRES (DD/MM y HH:MM en 24hs)
+                    let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                    let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
-                    let lugarCorto = (p.place || "Desconocido").split(',').pop();
+                    let lugarCorto = (p.place || "Desconocido").split(',').pop().trim();
                     
                     let distancia = calcularDistanciaKm(lat, lon, coords[1], coords[0]);
 
@@ -2963,7 +2966,7 @@
 
                     contenedor.innerHTML += `
                         <div class="sismo-mini-card" title="${p.place}">
-                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaObj.toLocaleDateString("es-AR", {day:'2-digit', month:'2-digit'})}</div>
+                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr}</div>
                             <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
                             <div class="sismo-mini-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
                             <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${lugarCorto}</div>
@@ -2988,7 +2991,7 @@
     function verificarContingenciaClimatica(minTemp, vientoActual, rafagaActual, dirViento, humedadActual) {
         const esZonda = (dirViento >= 220 && dirViento <= 290) && (rafagasActual >= 45) && (humedadActual <= 20);
         const umbralVientoComun = 40;
-        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
         if (minTemp <= 2.0) {
             if (!estadoAlarmasSistema.zonda.activo) {
@@ -3021,7 +3024,7 @@
 
     function verificarRiesgoHeladaAvanzado(tMin, humedadRelativa, vientoVel) {
         const lblRiesgo = document.getElementById("riesgoHelada");
-        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
         if (tMin <= 3.0) {
             if (!estadoAlarmasSistema.helada.activo) {
@@ -3051,7 +3054,7 @@
             const elFecha = document.getElementById("fecha");
             const elClock = document.getElementById("digitalFallback");
             if (elFecha) elFecha.innerText = ahora.toLocaleDateString("es-AR", { weekday: 'short', day: 'numeric', month: 'short' });
-            if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR");
+            if (elClock) elClock.innerText = ahora.toLocaleTimeString("es-AR", { hour12: false });
         } catch(e) {}
     }
 
@@ -3097,8 +3100,8 @@
             const amanecer = new Date(amanecerIso);
             const atardecer = new Date(atardecerIso);
 
-            document.getElementById("amanecerTime").innerText = amanecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
-            document.getElementById("atardecerTime").innerText = atardecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit'});
+            document.getElementById("amanecerTime").innerText = amanecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit', hour12: false});
+            document.getElementById("atardecerTime").innerText = atardecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit', hour12: false});
 
             let totalDiaMs = atardecer - amanecer;
             let transcurridoMs = ahora - amanecer;
