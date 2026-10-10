@@ -358,6 +358,10 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             padding-bottom: 4px;
+            scrollbar-width: none; /* Oculta scroll en Firefox */
+        }
+        .forecast-cards::-webkit-scrollbar {
+            display: none; /* Oculta scroll en Chrome, Safari y Edge */
         }
 
         .forecast-card {
@@ -389,38 +393,38 @@
             color: var(--text-muted);
         }
 
-        /* GRILLA ADAPTATIVA PARA SISMOS (SIN SCROLL HORIZONTAL) */
-        .sismos-grid-horizontal {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+        /* CINTA HORIZONTAL DESLIZANTE SIN SCROLL VISIBLE PARA SISMOS */
+        .sismos-cinta-horizontal {
+            display: flex;
+            justify-content: flex-start;
             gap: 6px;
             margin-top: 8px;
             width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            scrollbar-width: none; /* Oculta scroll en Firefox */
         }
-        @media (min-width: 500px) {
-            .sismos-grid-horizontal {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (min-width: 900px) {
-            .sismos-grid-horizontal {
-                grid-template-columns: repeat(6, 1fr);
-            }
+        .sismos-cinta-horizontal::-webkit-scrollbar {
+            display: none; /* Oculta scroll en Chrome, Safari y Edge */
         }
 
         .sismo-mini-card {
+            flex: 0 0 78px;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 8px;
+            padding: 8px 4px;
             text-align: center;
-            width: 100%;
-            min-width: 0;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
             overflow: hidden;
+        }
+        @media (min-width: 768px) {
+            .sismo-mini-card { flex: 0 0 88px; padding: 10px 4px; }
         }
 
         .sismo-mini-mag {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 800;
             margin: 2px 0;
         }
@@ -432,6 +436,12 @@
 
         .sismo-normal {
             color: var(--accent);
+        }
+
+        #inpres-estado {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
         .dashboard-row {
@@ -1319,10 +1329,24 @@
 
     <br>
 
+    <!-- BLOQUE 1: SISMOS INTERNACIONALES (USGS) -->
     <div class="card">
-        <h3>🌋 Últimos Sismos Registrados (Fuente: USGS Global Feed)</h3>
-        <div id="sismosListaContainer" class="sismos-grid-horizontal">
-            Cargando sismos en vivo...
+        <h3>🌋 Sismos Internacionales Recientes (Fuente: USGS Global Feed)</h3>
+        <div id="sismosListaContainer" class="sismos-cinta-horizontal">
+            Cargando sismos internacionales...
+        </div>
+    </div>
+
+    <br>
+
+    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - ÚLTIMAS 48HS EN CINTA HORIZONTAL SIN SCROLL) -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <h3>🌋 Sismos Oficiales de Argentina - Últimas 48hs (Fuente: INPRES)</h3>
+            <span id="inpres-estado" style="font-size: 0.62rem; color: var(--text-muted);">Cargando...</span>
+        </div>
+        <div id="inpres-contenedor" class="sismos-cinta-horizontal">
+            Cargando sismos de Argentina...
         </div>
     </div>
 
@@ -1486,7 +1510,7 @@
                 </div>
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, OSM, Open-Meteo, NASA FIRMS, Firebase</div>
+                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, INPRES, Open-Meteo, NASA FIRMS, Firebase</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -2056,7 +2080,7 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
-    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, OSM, Open-Meteo, NASA FIRMS, Firebase") {
+    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, INPRES, Open-Meteo, NASA FIRMS, Firebase") {
         const textEl = document.getElementById("mapStatusText");
         const sourceEl = document.getElementById("mapSourceText");
         const dotEl = document.querySelector(".pulse-dot");
@@ -2119,7 +2143,7 @@
                     }
                 });
 
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, OSM, Open-Meteo, NASA FIRMS, Firebase");
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, Open-Meteo, NASA FIRMS, Firebase");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -2389,6 +2413,77 @@
                     <div style="color: #ef4444; font-weight: bold; text-align: center; font-size:0.75rem;">Error de conexión con la red SNIH.</div>
                 </div>
             `;
+        }
+    }
+
+    const INPRES_API_URL = ["https://", "inpres-proxy", ".elexpreso17.workers.dev"].join("");
+
+    async function cargarSismosInpres() {
+        try {
+            const response = await fetch(INPRES_API_URL);
+            if (!response.ok) {
+                throw new Error("HTTP " + response.status);
+            }
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlText, "text/xml");
+            const items = xml.querySelectorAll("item");
+
+            const contenedor = document.getElementById("inpres-contenedor");
+            if (!contenedor) return;
+            contenedor.innerHTML = "";
+
+            let htmlCinta = '';
+            let contadorMostrados = 0;
+            const ahoraMs = new Date().getTime();
+            const limite48hsMs = 48 * 60 * 60 * 1000;
+
+            items.forEach(item => {
+                const provincia = item.querySelector("prov")?.textContent || "";
+                const fechaStr = item.querySelector("fecha")?.textContent || "";
+                const horaStr = item.querySelector("hora")?.textContent || "";
+                const magnitud = item.querySelector("mg")?.textContent || "";
+                const profundidad = item.querySelector("prof")?.textContent || "";
+
+                try {
+                    let partesFecha = fechaStr.split(/[-/]/);
+                    let anio = partesFecha[0].length === 4 ? partesFecha[0] : partesFecha[2];
+                    let mes = partesFecha[1];
+                    let dia = partesFecha[0].length === 4 ? partesFecha[2] : partesFecha[0];
+                    let sismoFechaObj = new Date(`${anio}-${mes}-${dia}T${horaStr}`);
+                    
+                    if (!isNaN(sismoFechaObj.getTime())) {
+                        if ((ahoraMs - sismoFechaObj.getTime()) > limite48hsMs) {
+                            return; 
+                        }
+                    }
+                } catch(e) {}
+
+                contadorMostrados++;
+                const esMendoza = provincia.includes("MENDOZA");
+                const claseMag = esMendoza ? "sismo-mendoza" : "sismo-normal";
+
+                htmlCinta += `
+                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km">
+                        <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr.slice(0,5)}</div>
+                        <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
+                        <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud}</div>
+                        <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${provincia}</div>
+                    </div>
+                `;
+            });
+
+            if (contadorMostrados === 0) {
+                htmlCinta += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; width: 100%;">Sin sismos en las últimas 48hs.</div>`;
+            }
+
+            contenedor.innerHTML = htmlCinta;
+            document.getElementById("inpres-estado").innerHTML = "Actualizado (Últimas 48hs): " + new Date().toLocaleTimeString("es-AR");
+
+        } catch(error) {
+            console.error(error);
+            document.getElementById("inpres-estado").innerHTML = "Error";
+            document.getElementById("inpres-contenedor").innerHTML = "<div style='font-size:0.68rem; color:#ef4444; text-align:center;'>No fue posible conectar con el servicio INPRES.</div>";
         }
     }
 
@@ -2770,7 +2865,7 @@
                         mapInstance.setView([currentLat, currentLon], 15);
                         if (markerInstance) markerInstance.openPopup();
                     }
-                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: Territoria, OSM, Open-Meteo, Firebase");
+                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: Territoria, INPRES, Open-Meteo, Firebase");
                 },
                 (error) => { usarUbicacionPorDefecto(); },
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
@@ -2834,42 +2929,60 @@
         } catch (e) {}
     }
 
-    async function verificarSismosRelevantes(lat, lon) {
+    async function cargarSismosInternacionalesUsgs(lat, lon) {
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        const contenedor = document.getElementById("sismosListaContainer");
 
         try {
-            const res = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson");
-            const data = await res.json();
-            if (data && data.features && data.features.length > 0) {
-                let sismoEncontrado = false;
-                for (let s of data.features) {
-                    let mag = s.properties.mag || 0;
+            const resUSGS = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson");
+            const dataUSGS = await resUSGS.json();
+
+            if (dataUSGS && dataUSGS.features && contenedor) {
+                contenedor.innerHTML = "";
+                let sismoAlarmaEncontrado = false;
+
+                dataUSGS.features.slice(0, 10).forEach(s => {
+                    let p = s.properties;
                     let coords = s.geometry.coordinates;
-                    let sLat = coords[1];
-                    let sLon = coords[0];
-                    let lugar = s.properties.place || "Zona cordillerana";
+                    let fechaObj = new Date(p.time);
+                    let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit' });
+                    let mag = p.mag ? p.mag.toFixed(1) : "--";
+                    let lugarCorto = (p.place || "Desconocido").split(',').pop();
+                    
+                    let distancia = calcularDistanciaKm(lat, lon, coords[1], coords[0]);
 
-                    let distancia = calcularDistanciaKm(lat, lon, sLat, sLon);
-
-                    if (mag >= 4.5 && distancia <= 300) {
+                    if (p.mag >= 4.5 && distancia <= 400) {
                         if (!estadoAlarmasSistema.sismo.activo) {
                             estadoAlarmasSistema.sismo.activo = true;
                             estadoAlarmasSistema.sismo.reconocido = false;
                             estadoAlarmasSistema.sismo.horaDisparo = horaActualStr;
                         }
-                        estadoAlarmasSistema.sismo.titulo = `Sismo Mag ${mag.toFixed(1)} a ${Math.round(distancia)} km (${lugar})`;
-                        sismoEncontrado = true;
-                        break;
+                        estadoAlarmasSistema.sismo.titulo = `Sismo Global Mag ${mag} a ${Math.round(distancia)} km (${lugarCorto})`;
+                        sismoAlarmaEncontrado = true;
                     }
-                }
-                if (!sismoEncontrado) {
+
+                    contenedor.innerHTML += `
+                        <div class="sismo-mini-card" title="${p.place}">
+                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaObj.toLocaleDateString("es-AR", {day:'2-digit', month:'2-digit'})}</div>
+                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
+                            <div class="sismo-mini-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
+                            <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${lugarCorto}</div>
+                        </div>
+                    `;
+                });
+
+                if (!sismoAlarmaEncontrado) {
                     estadoAlarmasSistema.sismo.activo = false;
                     estadoAlarmasSistema.sismo.reconocido = false;
                     estadoAlarmasSistema.sismo.horaDisparo = "";
                 }
                 actualizarCintaTickerScada();
             }
-        } catch (e) {}
+        } catch (e) {
+            if (contenedor) {
+                contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; width: 100%;">Error USGS</div>`;
+            }
+        }
     }
 
     function verificarContingenciaClimatica(minTemp, vientoActual, rafagaActual, dirViento, humedadActual) {
@@ -3049,38 +3162,6 @@
         } catch (e) {}
     }
 
-    async function cargarSismos() {
-        const contenedor = document.getElementById("sismosListaContainer");
-        if (!contenedor) return;
-        try {
-            const res = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson");
-            const data = await res.json();
-            if (data && data.features && data.features.length > 0) {
-                contenedor.innerHTML = "";
-                data.features.slice(0, 6).forEach(s => {
-                    let p = s.properties;
-                    let fechaObj = new Date(p.time);
-                    let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit' });
-                    let mag = p.mag ? p.mag.toFixed(1) : "--";
-                    let lugarCorto = (p.place || "Desconocido").split(',').pop();
-                    let arg = lugarCorto.toUpperCase().includes("ARGENTINA") || lugarCorto.toUpperCase().includes("MENDOZA") || lugarCorto.toUpperCase().includes("CHILE");
-                    
-                    contenedor.innerHTML += `
-                        <div class="sismo-mini-card">
-                            <div style="font-size: 0.62rem; color: var(--text-muted); font-weight:600;">${horaStr}</div>
-                            <div class="sismo-mini-mag ${arg ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
-                            <div style="font-size: 0.62rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.place}">${lugarCorto}</div>
-                        </div>
-                    `;
-                });
-            } else {
-                contenedor.innerHTML = `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; grid-column: 1 / -1;">Sin sismos recientes</div>`;
-            }
-        } catch (e) {
-            contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; grid-column: 1 / -1;">Error USGS</div>`;
-        }
-    }
-
     async function cargarClima() {
         try {
             const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,shortwave_radiation,is_day&hourly=temperature_2m,relative_humidity_2m,surface_pressure,weather_code,soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
@@ -3201,9 +3282,9 @@
         cargarClima();
         cargarCalidadAire();
         cargarPolen();
-        cargarSismos();
+        cargarSismosInternacionalesUsgs(currentLat, currentLon);
+        cargarSismosInpres();
         verificarProximidadIncendios(currentLat, currentLon);
-        verificarSismosRelevantes(currentLat, currentLon);
         escanearTodasLasEstaciones();
     }
 
