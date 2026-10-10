@@ -1745,19 +1745,45 @@
         }
     }
 
+    let marcadorSismoActual = null;
+    let circuloSismoActual = null;
+
     function centrarMapaEnSismo(lat, lon, descripcion, magnitud) {
         cerrarModalAlarmasActivas();
-        if (mapInstance && !isNaN(lat) && !isNaN(lon) && (lat !== 0 || lon !== 0)) {
-            mapInstance.setView([lat, lon], 8);
-            L.circleMarker([lat, lon], {
-                radius: 14,
-                color: '#ef4444',
-                fillColor: '#ef4444',
-                fillOpacity: 0.7
+        
+        let parsedLat = parseFloat(lat);
+        let parsedLon = parseFloat(lon);
+
+        if (mapInstance && !isNaN(parsedLat) && !isNaN(parsedLon) && (parsedLat !== 0 || parsedLon !== 0)) {
+            // Limpiar marcadores de sismo anteriores si existen
+            if (marcadorSismoActual) mapInstance.removeLayer(marcadorSismoActual);
+            if (circuloSismoActual) mapInstance.removeLayer(circuloSismoActual);
+
+            // Crear círculo naranja destacado para el epicentro
+            circuloSismoActual = L.circle([parsedLat, parsedLon], {
+                radius: Math.max(magnitud * 15000, 30000), // Radio proporcional a la magnitud
+                color: '#f97316', // Naranja vibrante
+                fillColor: '#fb923c',
+                fillOpacity: 0.4,
+                weight: 3
+            }).addTo(mapInstance);
+
+            marcadorSismoActual = L.marker([parsedLat, parsedLon], {
+                icon: L.divIcon({
+                    className: '',
+                    html: '<div style="background-color: #f97316; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 16px #f97316; display: flex; align-items: center; justify-content: center; font-size: 11px;">🌋</div>',
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                })
             }).addTo(mapInstance)
-              .bindPopup(`<b>Epicentro Sísmico</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b>`)
+              .bindPopup(`<div style="color:#000;"><b>Epicentro Sísmico</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b><br><small>Lat: ${parsedLat}, Lon: ${parsedLon}</small></div>`)
               .openPopup();
+
+            mapInstance.setView([parsedLat, parsedLon], 7);
+        } else {
+            alert("No se dispone de coordenadas válidas para este sismo.");
         }
+
         const seccionMapa = document.getElementById("mapaArgentina");
         if (seccionMapa) {
             seccionMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2484,7 +2510,7 @@
                 }
 
                 htmlCinta += `
-                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Clic para ubicar)" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia}', ${magnitud})">
+                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Clic para ubicar)" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia.replace(/'/g, "")}', ${magnitud})">
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr.slice(0,5)}</div>
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
                         <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud.toFixed(1)}</div>
