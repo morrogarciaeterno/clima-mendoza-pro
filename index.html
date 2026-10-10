@@ -393,7 +393,6 @@
             color: var(--text-muted);
         }
 
-        /* CINTA HORIZONTAL DESLIZANTE SIN SCROLL VISIBLE PARA SISMOS */
         .sismos-cinta-horizontal {
             display: flex;
             justify-content: flex-start;
@@ -1496,6 +1495,7 @@
                 <button class="map-btn active" id="btnBase" onclick="cambiarCapaMapa('base')">🌍 Estándar</button>
                 <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣 Calles</button>
+                <button class="map-btn" id="btnPasos" onclick="cambiarCapaMapa('pasos')" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #f59e0b;">🚧 Pasos API</button>
                 <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
@@ -1712,6 +1712,54 @@
 
     let estacionesEnAlertaActuales = {};
     let sismosInpresEnAlertaActuales = {};
+    let capaPasosFronterizosDinamicos = null;
+    const PASOS_API_URL = ["https://", "pasos-proxy", ".elexpreso17.workers.dev"].join("");
+
+    async function cargarPasosFronterizosDinamicos() {
+        if (!capaPasosFronterizosDinamicos) {
+            capaPasosFronterizosDinamicos = L.layerGroup();
+        } else {
+            capaPasosFronterizosDinamicos.clearLayers();
+        }
+
+        try {
+            const response = await fetch(PASOS_API_URL);
+            const pasos = await response.json();
+
+            pasos.forEach(paso => {
+                let lat = parseFloat(paso.latitud);
+                let lon = parseFloat(paso.longitud);
+
+                if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
+                    const esAbierto = paso.estado_prioridad === "ABIERTO";
+                    const colorPin = esAbierto ? "#16a34a" : "#dc2626";
+                    const iconoEmoji = esAbierto ? "🟢" : "🔴";
+
+                    let iconoPaso = L.divIcon({
+                        className: '',
+                        html: `<div style="background-color: ${colorPin}; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 12px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 11px;">🚧</div>`,
+                        iconSize: [22, 22], iconAnchor: [11, 11]
+                    });
+
+                    let popupHtml = `
+                        <div style="color: #000; font-size: 0.75rem; line-height: 1.3;">
+                            <b>${paso.nombre_paso}</b><br>
+                            Estado: <b style="color: ${colorPin};">${iconoEmoji} ${paso.estado_prioridad}</b><br>
+                            Provincia: ${paso.provincia || 'N/D'}<br>
+                            País: ${paso.pais || 'Argentina / Chile'}<br>
+                            <small>Lat: ${lat.toFixed(3)}, Lon: ${lon.toFixed(3)}</small>
+                        </div>
+                    `;
+
+                    L.marker([lat, lon], { icon: iconoPaso })
+                      .bindPopup(popupHtml)
+                      .addTo(capaPasosFronterizosDinamicos);
+                }
+            });
+        } catch (error) {
+            console.error("Error al cargar pasos fronterizos:", error);
+        }
+    }
 
     let estadoAlarmasSistema = {
         fuego: { activo: false, reconocido: false, titulo: "Foco Forestal Activo (NASA FIRMS)", horaDisparo: "" },
@@ -2146,7 +2194,7 @@
 
     const capasBase = {
         base: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, minZoom: 4, attribution: '&copy; OpenStreetMap', subdomains: 'abc' }),
-        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap', subdomains: 'abc' }),
+        topo: L.tileLayer('https://{s}.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 4, attribution: '&copy; OpenTopoMap', subdomains: 'abc' }),
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
@@ -2515,11 +2563,9 @@
                 const magnitud = parseFloat(item.querySelector("mg")?.textContent || "0");
                 const profundidad = item.querySelector("prof")?.textContent || "";
                 
-                // EXTRACCIÓN DIRECTA Y EXACTA DE COORDENADAS DESDE EL XML DEL INPRES
                 let latSismo = parseFloat(item.querySelector("lat")?.textContent);
                 let lonSismo = parseFloat(item.querySelector("long")?.textContent);
 
-                // Respaldo de seguridad en caso de venir vacías
                 if (isNaN(latSismo) || isNaN(lonSismo) || (latSismo === 0 && lonSismo === 0)) {
                     let provUp = provincia.toUpperCase();
                     for (let [pKey, coords] of Object.entries(centrosProvincias)) {
@@ -2929,6 +2975,7 @@
         const btnFuego = document.getElementById("btnFuego");
         const btnLluvia = document.getElementById("btnLluvia");
         const btnSatinfra = document.getElementById("btnSatinfra");
+        const btnPasos = document.getElementById("btnPasos");
         const mapTitle = document.getElementById("mapTitle");
         const contenedorMapaDiv = document.getElementById("mapaArgentina");
 
@@ -2940,10 +2987,12 @@
         btnFuego.classList.remove("active");
         btnLluvia.classList.remove("active");
         if (btnSatinfra) btnSatinfra.classList.remove("active");
+        if (btnPasos) btnPasos.classList.remove("active");
 
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
+        if (capaPasosFronterizosDinamicos && mapInstance.hasLayer(capaPasosFronterizosDinamicos)) mapInstance.removeLayer(capaPasosFronterizosDinamicos);
 
         if (!capaActual) capaActual = capasBase.base;
         if (!mapInstance.hasLayer(capaActual)) capaActual.addTo(mapInstance);
@@ -2957,6 +3006,14 @@
             if (tipo === 'base') { btnBase.classList.add("active"); mapTitle.innerText = "🗺 Visor Geográfico Satelital"; }
             else if (tipo === 'topo') { btnTopo.classList.add("active"); mapTitle.innerText = "⛰ Visor Topográfico"; }
             else if (tipo === 'calles') { if (btnCalles) btnCalles.classList.add("active"); mapTitle.innerText = "🛣 Red Vial"; }
+        } else if (tipo === 'pasos') {
+            await cargarPasosFronterizosDinamicos();
+            if (capaPasosFronterizosDinamicos) {
+                capaPasosFronterizosDinamicos.addTo(mapInstance);
+                if (btnPasos) btnPasos.classList.add("active");
+                mapTitle.innerText = "🚧 Pasos Fronterizos Oficiales";
+                contenedorMapaDiv.classList.add("modo-oscuro-mapa");
+            }
         } else if (tipo === 'fuego') {
             if (!mapInstance.hasLayer(capaFuegosFIRMS)) capaFuegosFIRMS.addTo(mapInstance);
             btnFuego.classList.add("active");
