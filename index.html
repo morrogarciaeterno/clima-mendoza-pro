@@ -1339,10 +1339,10 @@
 
     <br>
 
-    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - ÚLTIMAS 48HS EN CINTA HORIZONTAL SIN SCROLL) -->
+    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - TODOS EN CINTA HORIZONTAL) -->
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <h3>🌋 Sismos Oficiales de Argentina - Últimas 48hs (Fuente: INPRES)</h3>
+            <h3>🌋 Sismos Oficiales de Argentina - INPRES (Todos los Registros)</h3>
             <span id="inpres-estado" style="font-size: 0.62rem; color: var(--text-muted);">Cargando...</span>
         </div>
         <div id="inpres-contenedor" class="sismos-cinta-horizontal">
@@ -1592,7 +1592,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
                 <h3 style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🚨 Alarmero SCADA e Historial</h3>
-                <small style="color: var(--text-muted); font-size: 0.65rem;">Hacé clic en cualquier registro para ver sus datos de caudal.</small>
+                <small style="color: var(--text-muted); font-size: 0.65rem;">Hacé clic en cualquier registro para ubicarlo en el mapa.</small>
             </div>
             <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
         </div>
@@ -1710,9 +1710,9 @@
     });
 
     let estacionesEnAlertaActuales = {};
+    let sismosInpresEnAlertaActuales = {};
 
     let estadoAlarmasSistema = {
-        sismo: { activo: false, reconocido: false, titulo: "Sismo Relevante Regional", horaDisparo: "" },
         fuego: { activo: false, reconocido: false, titulo: "Foco Forestal Activo (NASA FIRMS)", horaDisparo: "" },
         zonda: { activo: false, reconocido: false, titulo: "Alerta Climática Extrema", horaDisparo: "" },
         helada: { activo: false, reconocido: false, titulo: "Alerta de Helada Agrícola", horaDisparo: "" }
@@ -1744,38 +1744,58 @@
         }
     }
 
+    function centrarMapaEnSismo(lat, lon, descripcion, magnitud) {
+        cerrarModalAlarmasActivas();
+        if (mapInstance && !isNaN(lat) && !isNaN(lon) && (lat !== 0 || lon !== 0)) {
+            mapInstance.setView([lat, lon], 8);
+            L.circleMarker([lat, lon], {
+                radius: 14,
+                color: '#ef4444',
+                fillColor: '#ef4444',
+                fillOpacity: 0.7
+            }).addTo(mapInstance)
+              .bindPopup(`<b>Epicentro Sísmico INPRES</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b>`)
+              .openPopup();
+        }
+        const seccionMapa = document.getElementById("mapaArgentina");
+        if (seccionMapa) {
+            seccionMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
     function renderizarListaAlarmasPopup() {
         const contenedor = document.getElementById("contenedorListaAlarmasPopup");
         if (!contenedor) return;
 
         let llavesEstaciones = Object.keys(estacionesEnAlertaActuales);
-        let haySismo = estadoAlarmasSistema.sismo.activo;
+        let llavesSismos = Object.keys(sismosInpresEnAlertaActuales);
         let hayFuego = estadoAlarmasSistema.fuego.activo;
         let hayZonda = estadoAlarmasSistema.zonda.activo;
         let hayHelada = estadoAlarmasSistema.helada.activo;
 
-        if (llavesEstaciones.length === 0 && !haySismo && !hayFuego && !hayZonda && !hayHelada) {
+        if (llavesEstaciones.length === 0 && llavesSismos.length === 0 && !hayFuego && !hayZonda && !hayHelada) {
             contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 0.75rem;">✔ Sistema Normal. No hay alarmas activas en el alarmero.</div>`;
             return;
         }
 
         contenedor.innerHTML = "";
 
-        if (haySismo) {
-            let rec = estadoAlarmasSistema.sismo.reconocido;
+        llavesSismos.forEach(idSismo => {
+            let sInfo = sismosInpresEnAlertaActuales[idSismo];
+            let rec = sInfo.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#f59e0b'}; border-left: 6px solid ${rec ? '#22c55e' : '#f59e0b'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer;" onclick="centrarMapaEnSismo(${sInfo.lat}, ${sInfo.lon}, '${sInfo.titulo}', ${sInfo.magnitud})" title="Clic para ubicar en el mapa">
                     <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
                         <span style="font-size: 1.2rem;">🌋</span>
                         <div style="min-width: 0;">
-                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#f59e0b'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.sismo.horaDisparo})</div>
-                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.sismo.titulo}</div>
+                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${sInfo.horaDisparo})</div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main); text-decoration: underline;">${sInfo.titulo} (Ver en Mapa 🔍)</div>
                         </div>
                     </div>
-                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('sismo')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
+                    ${!rec ? `<button class="btn-reconocer" onclick="event.stopPropagation(); reconocerAlarmaScada('sismo', '${idSismo}')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
                 </div>
             `;
-        }
+        });
 
         if (hayFuego) {
             let rec = estadoAlarmasSistema.fuego.reconocido;
@@ -1848,18 +1868,20 @@
         if (!ticker) return;
 
         let llavesEstaciones = Object.keys(estacionesEnAlertaActuales);
-        let haySismo = estadoAlarmasSistema.sismo.activo;
+        let llavesSismos = Object.keys(sismosInpresEnAlertaActuales);
         let hayFuego = estadoAlarmasSistema.fuego.activo;
         let hayZonda = estadoAlarmasSistema.zonda.activo;
         let hayHelada = estadoAlarmasSistema.helada.activo;
 
         let alertasHtml = "";
 
-        if (haySismo) {
-            let rec = estadoAlarmasSistema.sismo.reconocido;
+        llavesSismos.forEach(idSismo => {
+            let sInfo = sismosInpresEnAlertaActuales[idSismo];
+            let rec = sInfo.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
-            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[SISMO]</b> ${estadoAlarmasSistema.sismo.titulo}</span>`;
-        }
+            alertasHtml += `<span class="scada-alert-item" onclick="centrarMapaEnSismo(${sInfo.lat}, ${sInfo.lon}, '${sInfo.titulo}', ${sInfo.magnitud})" title="Clic para ubicar">${iconoEstado} <b>[SISMO INPRES]</b> ${sInfo.titulo}</span>`;
+        });
+
         if (hayFuego) {
             let rec = estadoAlarmasSistema.fuego.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
@@ -1890,16 +1912,18 @@
         }
     }
 
-    function reconocerAlarmaScada(tipo, idEst = null) {
+    function reconocerAlarmaScada(tipo, idRef = null) {
         const horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
         let tituloIncidente = "";
         let horaDisparoStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
         let idEstacionAsociada = null;
 
-        if (tipo === 'sismo') {
-            estadoAlarmasSistema.sismo.reconocido = true;
-            tituloIncidente = estadoAlarmasSistema.sismo.titulo;
-            horaDisparoStr = estadoAlarmasSistema.sismo.horaDisparo || horaActualStr;
+        if (tipo === 'sismo' && idRef) {
+            if (sismosInpresEnAlertaActuales[idRef]) {
+                sismosInpresEnAlertaActuales[idRef].reconocido = true;
+                tituloIncidente = sismosInpresEnAlertaActuales[idRef].titulo;
+                horaDisparoStr = sismosInpresEnAlertaActuales[idRef].horaDisparo || horaActualStr;
+            }
         } else if (tipo === 'fuego') {
             estadoAlarmasSistema.fuego.reconocido = true;
             tituloIncidente = estadoAlarmasSistema.fuego.titulo;
@@ -1912,12 +1936,12 @@
             estadoAlarmasSistema.helada.reconocido = true;
             tituloIncidente = estadoAlarmasSistema.helada.titulo;
             horaDisparoStr = estadoAlarmasSistema.helada.horaDisparo || horaActualStr;
-        } else if (tipo === 'hidro' && idEst) {
-            if (estacionesEnAlertaActuales[idEst]) {
-                estacionesEnAlertaActuales[idEst].reconocido = true;
-                tituloIncidente = `Crecida Hídrica (${estacionesEnAlertaActuales[idEst].nombre})`;
-                horaDisparoStr = estacionesEnAlertaActuales[idEst].horaDisparo || horaActualStr;
-                idEstacionAsociada = idEst;
+        } else if (tipo === 'hidro' && idRef) {
+            if (estacionesEnAlertaActuales[idRef]) {
+                estacionesEnAlertaActuales[idRef].reconocido = true;
+                tituloIncidente = `Crecida Hídrica (${estacionesEnAlertaActuales[idRef].nombre})`;
+                horaDisparoStr = estacionesEnAlertaActuales[idRef].horaDisparo || horaActualStr;
+                idEstacionAsociada = idRef;
             }
         }
 
@@ -1953,20 +1977,13 @@
             let reconocido = item.horaReconocido || item.hora || "--:--";
             
             let idEstacionExtraido = item.estacionId;
-            if (!idEstacionExtraido && item.tipo) {
-                let match = item.tipo.match(/Estación\s+(\d+)/i);
-                if (match && match[1]) {
-                    idEstacionExtraido = match[1];
-                }
-            }
-
             let esClickable = idEstacionExtraido && estacionesData[idEstacionExtraido];
-            let estiloFila = esClickable ? "cursor: pointer; border-left: 3px solid #22c55e;" : "border-left: 3px solid #64748b;";
+            let estiloFila = "border-left: 3px solid #22c55e;";
             let onclickAttr = esClickable ? `onclick="irAEstacionHidroDetalle('${idEstacionExtraido}')" title="Clic para ver detalle de caudal"` : "";
             let textoExtra = esClickable ? ` <span style="color:var(--accent); font-size:0.6rem; text-decoration:underline;">(Ver Caudal 🔍)</span>` : "";
 
             contenedor.innerHTML += `
-                <div style="background: var(--card-bg); border: 1px solid var(--border); ${estiloFila} padding: 5px 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; font-size: 0.7rem; transition: background 0.2s;" ${onclickAttr} onmouseover="if(this.style.cursor=='pointer')this.style.background='#162035'" onmouseout="this.style.background='var(--card-bg)'">
+                <div style="background: var(--card-bg); border: 1px solid var(--border); ${estiloFila} padding: 5px 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; font-size: 0.7rem;" ${onclickAttr}>
                     <div style="display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden;">
                         <span style="color: #22c55e; font-weight: bold; font-size: 0.75rem;">✔</span>
                         <span style="color: #22c55e; font-weight: 700; font-size: 0.58rem; text-transform: uppercase; white-space: nowrap;">REC</span>
@@ -2435,50 +2452,56 @@
 
             let htmlCinta = '';
             let contadorMostrados = 0;
-            const ahoraMs = new Date().getTime();
-            const limite48hsMs = 48 * 60 * 60 * 1000;
+            let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
+            let sismosVistosRonda = {};
 
-            items.forEach(item => {
-                const provincia = item.querySelector("prov")?.textContent || "";
+            items.forEach((item, index) => {
+                const provincia = item.querySelector("prov")?.textContent || "Argentina";
                 const fechaStr = item.querySelector("fecha")?.textContent || "";
                 const horaStr = item.querySelector("hora")?.textContent || "";
-                const magnitud = item.querySelector("mg")?.textContent || "";
+                const magnitud = parseFloat(item.querySelector("mg")?.textContent || "0");
                 const profundidad = item.querySelector("prof")?.textContent || "";
-
-                try {
-                    let partesFecha = fechaStr.split(/[-/]/);
-                    let anio = partesFecha[0].length === 4 ? partesFecha[0] : partesFecha[2];
-                    let mes = partesFecha[1];
-                    let dia = partesFecha[0].length === 4 ? partesFecha[2] : partesFecha[0];
-                    let sismoFechaObj = new Date(`${anio}-${mes}-${dia}T${horaStr}`);
-                    
-                    if (!isNaN(sismoFechaObj.getTime())) {
-                        if ((ahoraMs - sismoFechaObj.getTime()) > limite48hsMs) {
-                            return; 
-                        }
-                    }
-                } catch(e) {}
+                
+                const latSismo = parseFloat(item.querySelector("lat")?.textContent || "0");
+                const lonSismo = parseFloat(item.querySelector("long")?.textContent || "0");
 
                 contadorMostrados++;
                 const esMendoza = provincia.includes("MENDOZA");
                 const claseMag = esMendoza ? "sismo-mendoza" : "sismo-normal";
 
+                // Criterio de alerta: Si ocurre en Mendoza con Mag >= 3.5 o en general con Mag >= 4.5
+                if ((esMendoza && magnitud >= 3.5) || magnitud >= 4.5) {
+                    let sismoIdKey = `inpres_${index}_${fechaStr}_${horaStr}`;
+                    let yaExistia = sismosInpresEnAlertaActuales[sismoIdKey];
+                    sismosVistosRonda[sismoIdKey] = {
+                        titulo: `Sismo [${provincia}] Mag ${magnitud.toFixed(1)}`,
+                        magnitud: magnitud,
+                        lat: latSismo,
+                        lon: lonSismo,
+                        reconocido: yaExistia ? yaExistia.reconocido : false,
+                        horaDisparo: yaExistia ? yaExistia.horaDisparo : horaActualStr
+                    };
+                }
+
                 htmlCinta += `
-                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km">
+                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Clic para ubicar)" style="cursor: pointer;" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia}', ${magnitud})">
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr.slice(0,5)}</div>
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
-                        <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud}</div>
-                        <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${provincia}</div>
+                        <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud.toFixed(1)}</div>
+                        <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;" title="${provincia}">${provincia}</div>
                     </div>
                 `;
             });
 
+            sismosInpresEnAlertaActuales = sismosVistosRonda;
+
             if (contadorMostrados === 0) {
-                htmlCinta += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; width: 100%;">Sin sismos en las últimas 48hs.</div>`;
+                htmlCinta += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; width: 100%;">Sin registros sísmicos disponibles.</div>`;
             }
 
             contenedor.innerHTML = htmlCinta;
-            document.getElementById("inpres-estado").innerHTML = "Actualizado (Últimas 48hs): " + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
+            document.getElementById("inpres-estado").innerHTML = `Actualizado (${contadorMostrados} sismos): ` + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
+            actualizarCintaTickerScada();
 
         } catch(error) {
             console.error(error);
@@ -2930,42 +2953,25 @@
     }
 
     async function cargarSismosInternacionalesUsgs(lat, lon) {
-        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
         const contenedor = document.getElementById("sismosListaContainer");
-
         try {
             const resUSGS = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson");
             const dataUSGS = await resUSGS.json();
 
             if (dataUSGS && dataUSGS.features && contenedor) {
                 contenedor.innerHTML = "";
-                let sismoAlarmaEncontrado = false;
-
                 dataUSGS.features.slice(0, 15).forEach(s => {
                     let p = s.properties;
                     let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
                     
-                    // Formato idéntico al INPRES (DD/MM y HH:MM en 24hs)
                     let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
                     let lugarCorto = (p.place || "Desconocido").split(',').pop().trim();
-                    
-                    let distancia = calcularDistanciaKm(lat, lon, coords[1], coords[0]);
-
-                    if (p.mag >= 4.5 && distancia <= 400) {
-                        if (!estadoAlarmasSistema.sismo.activo) {
-                            estadoAlarmasSistema.sismo.activo = true;
-                            estadoAlarmasSistema.sismo.reconocido = false;
-                            estadoAlarmasSistema.sismo.horaDisparo = horaActualStr;
-                        }
-                        estadoAlarmasSistema.sismo.titulo = `Sismo Global Mag ${mag} a ${Math.round(distancia)} km (${lugarCorto})`;
-                        sismoAlarmaEncontrado = true;
-                    }
 
                     contenedor.innerHTML += `
-                        <div class="sismo-mini-card" title="${p.place}">
+                        <div class="sismo-mini-card" title="${p.place} (Clic para ubicar)" style="cursor: pointer;" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
                             <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr}</div>
                             <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
                             <div class="sismo-mini-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
@@ -2973,13 +2979,6 @@
                         </div>
                     `;
                 });
-
-                if (!sismoAlarmaEncontrado) {
-                    estadoAlarmasSistema.sismo.activo = false;
-                    estadoAlarmasSistema.sismo.reconocido = false;
-                    estadoAlarmasSistema.sismo.horaDisparo = "";
-                }
-                actualizarCintaTickerScada();
             }
         } catch (e) {
             if (contenedor) {
