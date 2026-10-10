@@ -418,6 +418,7 @@
             text-align: center;
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
             overflow: hidden;
+            cursor: pointer;
         }
         @media (min-width: 768px) {
             .sismo-mini-card { flex: 0 0 88px; padding: 10px 4px; }
@@ -1339,7 +1340,7 @@
 
     <br>
 
-    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - TODOS EN CINTA HORIZONTAL) -->
+    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - TODOS) -->
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <h3>🌋 Sismos Oficiales de Argentina - INPRES (Todos los Registros)</h3>
@@ -1510,7 +1511,7 @@
                 </div>
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, INPRES, Open-Meteo, NASA FIRMS, Firebase</div>
+                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -1592,7 +1593,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
                 <h3 style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🚨 Alarmero SCADA e Historial</h3>
-                <small style="color: var(--text-muted); font-size: 0.65rem;">Hacé clic en cualquier registro para ubicarlo en el mapa.</small>
+                <small style="color: var(--text-muted); font-size: 0.65rem;">Hacé clic en cualquier registro para ver su detalle.</small>
             </div>
             <button onclick="borrarHistorialAlarmas()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; cursor: pointer;">🗑 Borrar Historial</button>
         </div>
@@ -1754,7 +1755,7 @@
                 fillColor: '#ef4444',
                 fillOpacity: 0.7
             }).addTo(mapInstance)
-              .bindPopup(`<b>Epicentro Sísmico INPRES</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b>`)
+              .bindPopup(`<b>Epicentro Sísmico</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b>`)
               .openPopup();
         }
         const seccionMapa = document.getElementById("mapaArgentina");
@@ -2097,7 +2098,7 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
-    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, INPRES, Open-Meteo, NASA FIRMS, Firebase") {
+    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase") {
         const textEl = document.getElementById("mapStatusText");
         const sourceEl = document.getElementById("mapSourceText");
         const dotEl = document.querySelector(".pulse-dot");
@@ -2160,7 +2161,7 @@
                     }
                 });
 
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, Open-Meteo, NASA FIRMS, Firebase");
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -2469,7 +2470,6 @@
                 const esMendoza = provincia.includes("MENDOZA");
                 const claseMag = esMendoza ? "sismo-mendoza" : "sismo-normal";
 
-                // Criterio de alerta: Si ocurre en Mendoza con Mag >= 3.5 o en general con Mag >= 4.5
                 if ((esMendoza && magnitud >= 3.5) || magnitud >= 4.5) {
                     let sismoIdKey = `inpres_${index}_${fechaStr}_${horaStr}`;
                     let yaExistia = sismosInpresEnAlertaActuales[sismoIdKey];
@@ -2484,7 +2484,7 @@
                 }
 
                 htmlCinta += `
-                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Clic para ubicar)" style="cursor: pointer;" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia}', ${magnitud})">
+                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Clic para ubicar)" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia}', ${magnitud})">
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr.slice(0,5)}</div>
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
                         <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud.toFixed(1)}</div>
@@ -2507,6 +2507,41 @@
             console.error(error);
             document.getElementById("inpres-estado").innerHTML = "Error";
             document.getElementById("inpres-contenedor").innerHTML = "<div style='font-size:0.68rem; color:#ef4444; text-align:center;'>No fue posible conectar con el servicio INPRES.</div>";
+        }
+    }
+
+    async function cargarSismosInternacionalesUsgs(lat, lon) {
+        const contenedor = document.getElementById("sismosListaContainer");
+        try {
+            const resUSGS = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson");
+            const dataUSGS = await resUSGS.json();
+
+            if (dataUSGS && dataUSGS.features && contenedor) {
+                contenedor.innerHTML = "";
+                dataUSGS.features.slice(0, 15).forEach(s => {
+                    let p = s.properties;
+                    let coords = s.geometry.coordinates; // coords[0] = lon, coords[1] = lat
+                    let fechaObj = new Date(p.time);
+                    
+                    let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
+                    let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
+                    let mag = p.mag ? p.mag.toFixed(1) : "--";
+                    let lugarCorto = (p.place || "Desconocido").split(',').pop().trim();
+
+                    contenedor.innerHTML += `
+                        <div class="sismo-mini-card" title="${p.place} (Clic para ubicar)" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
+                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr}</div>
+                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
+                            <div class="sismo-mini-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
+                            <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${lugarCorto}</div>
+                        </div>
+                    `;
+                });
+            }
+        } catch (e) {
+            if (contenedor) {
+                contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; width: 100%;">Error USGS</div>`;
+            }
         }
     }
 
@@ -2888,7 +2923,7 @@
                         mapInstance.setView([currentLat, currentLon], 15);
                         if (markerInstance) markerInstance.openPopup();
                     }
-                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: Territoria, INPRES, Open-Meteo, Firebase");
+                    actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Firebase");
                 },
                 (error) => { usarUbicacionPorDefecto(); },
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
@@ -2950,41 +2985,6 @@
             }
             actualizarCintaTickerScada();
         } catch (e) {}
-    }
-
-    async function cargarSismosInternacionalesUsgs(lat, lon) {
-        const contenedor = document.getElementById("sismosListaContainer");
-        try {
-            const resUSGS = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson");
-            const dataUSGS = await resUSGS.json();
-
-            if (dataUSGS && dataUSGS.features && contenedor) {
-                contenedor.innerHTML = "";
-                dataUSGS.features.slice(0, 15).forEach(s => {
-                    let p = s.properties;
-                    let coords = s.geometry.coordinates;
-                    let fechaObj = new Date(p.time);
-                    
-                    let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
-                    let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
-                    let mag = p.mag ? p.mag.toFixed(1) : "--";
-                    let lugarCorto = (p.place || "Desconocido").split(',').pop().trim();
-
-                    contenedor.innerHTML += `
-                        <div class="sismo-mini-card" title="${p.place} (Clic para ubicar)" style="cursor: pointer;" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
-                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr}</div>
-                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
-                            <div class="sismo-mini-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
-                            <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${lugarCorto}</div>
-                        </div>
-                    `;
-                });
-            }
-        } catch (e) {
-            if (contenedor) {
-                contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; width: 100%;">Error USGS</div>`;
-            }
-        }
     }
 
     function verificarContingenciaClimatica(minTemp, vientoActual, rafagaActual, dirViento, humedadActual) {
