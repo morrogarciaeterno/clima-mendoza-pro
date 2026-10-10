@@ -2510,7 +2510,7 @@
         }
     }
 
-    async function cargarSismosInternacionalesUsgs(lat, lon) {
+    async function cargarSismosInternacionalesUsgs() {
         const contenedor = document.getElementById("sismosListaContainer");
         try {
             const resUSGS = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson");
@@ -2526,7 +2526,7 @@
                     let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
-                    let lugarCorto = (p.place || "Desconocido").split(',').pop().trim();
+                    let lugarCorto = (p.place || "Desconocido").split(',').pop().trim().replace(/'/g, "");
 
                     contenedor.innerHTML += `
                         <div class="sismo-mini-card" title="${p.place} (Clic para ubicar)" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
@@ -3284,7 +3284,7 @@
         cargarClima();
         cargarCalidadAire();
         cargarPolen();
-        cargarSismosInternacionalesUsgs(currentLat, currentLon);
+        cargarSismosInternacionalesUsgs();
         cargarSismosInpres();
         verificarProximidadIncendios(currentLat, currentLon);
         escanearTodasLasEstaciones();
