@@ -1748,40 +1748,69 @@
     let marcadorSismoActual = null;
     let circuloSismoActual = null;
 
+    // Coordenadas aproximadas de respaldo por provincia para cuando el XML no trae lat/long numéricas directas
+    const centrosProvincias = {
+        "MENDOZA": [-32.89, -68.84],
+        "SAN JUAN": [-31.53, -68.53],
+        "SAN LUIS": [-33.30, -66.33],
+        "JUJUY": [-24.18, -65.29],
+        "SALTA": [-24.78, -65.41],
+        "TUCUMAN": [-26.80, -65.21],
+        "CATAMARCA": [-28.46, -65.77],
+        "LA RIOJA": [-29.41, -66.85],
+        "NEUQUEN": [-38.95, -68.05],
+        "RIO NEGRO": [-40.81, -63.00],
+        "CHUBUT": [-43.30, -65.10],
+        "TIERRA DEL FUEGO": [-54.80, -68.30]
+    };
+
     function centrarMapaEnSismo(lat, lon, descripcion, magnitud) {
         cerrarModalAlarmasActivas();
         
         let parsedLat = parseFloat(lat);
         let parsedLon = parseFloat(lon);
 
-        if (mapInstance && !isNaN(parsedLat) && !isNaN(parsedLon) && (parsedLat !== 0 || parsedLon !== 0)) {
-            // Limpiar marcadores de sismo anteriores si existen
+        // Si la lat/lon viene en 0 o vacía, buscar el centro de la provincia mencionada en la descripción
+        if (isNaN(parsedLat) || isNaN(parsedLon) || (parsedLat === 0 && parsedLon === 0)) {
+            let descUpper = descripcion.toUpperCase();
+            for (let [prov, coords] of Object.entries(centrosProvincias)) {
+                if (descUpper.includes(prov)) {
+                    parsedLat = coords[0];
+                    parsedLon = coords[1];
+                    break;
+                }
+            }
+            if (isNaN(parsedLat) || (parsedLat === 0 && parsedLon === 0)) {
+                parsedLat = -31.53; // Default San Juan / Cuyo
+                parsedLon = -68.53;
+            }
+        }
+
+        if (mapInstance) {
             if (marcadorSismoActual) mapInstance.removeLayer(marcadorSismoActual);
             if (circuloSismoActual) mapInstance.removeLayer(circuloSismoActual);
 
-            // Crear círculo naranja destacado para el epicentro
+            // Círculo naranja destacado para el epicentro
             circuloSismoActual = L.circle([parsedLat, parsedLon], {
-                radius: Math.max(magnitud * 15000, 30000), // Radio proporcional a la magnitud
+                radius: Math.max(magnitud * 18000, 35000), // Radio proporcional a la magnitud
                 color: '#f97316', // Naranja vibrante
                 fillColor: '#fb923c',
-                fillOpacity: 0.4,
+                fillOpacity: 0.45,
                 weight: 3
             }).addTo(mapInstance);
 
             marcadorSismoActual = L.marker([parsedLat, parsedLon], {
                 icon: L.divIcon({
                     className: '',
-                    html: '<div style="background-color: #f97316; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 16px #f97316; display: flex; align-items: center; justify-content: center; font-size: 11px;">🌋</div>',
-                    iconSize: [22, 22],
-                    iconAnchor: [11, 11]
+                    html: '<div style="background-color: #f97316; width: 24px; height: 24px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 16px #f97316; display: flex; align-items: center; justify-content: center; font-size: 11px;">🌋</div>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
                 })
             }).addTo(mapInstance)
-              .bindPopup(`<div style="color:#000;"><b>Epicentro Sísmico</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b><br><small>Lat: ${parsedLat}, Lon: ${parsedLon}</small></div>`)
+              .bindPopup(`<div style="color:#000;"><b>Epicentro Sísmico INPRES</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b><br><small>Lat: ${parsedLat.toFixed(2)}, Lon: ${parsedLon.toFixed(2)}</small></div>`)
               .openPopup();
 
             mapInstance.setView([parsedLat, parsedLon], 7);
-        } else {
-            alert("No se dispone de coordenadas válidas para este sismo.");
         }
 
         const seccionMapa = document.getElementById("mapaArgentina");
@@ -2489,8 +2518,21 @@
                 const magnitud = parseFloat(item.querySelector("mg")?.textContent || "0");
                 const profundidad = item.querySelector("prof")?.textContent || "";
                 
-                const latSismo = parseFloat(item.querySelector("lat")?.textContent || "0");
-                const lonSismo = parseFloat(item.querySelector("long")?.textContent || "0");
+                let latSismo = parseFloat(item.querySelector("lat")?.textContent || "0");
+                let lonSismo = parseFloat(item.querySelector("long")?.textContent || "0");
+
+                // Si el XML no trae lat/long o vienen en 0, calcular centro por provincia
+                if (isNaN(latSismo) || latSismo === 0) {
+                    let provUp = provincia.toUpperCase();
+                    for (let [pKey, coords] of Object.entries(centrosProvincias)) {
+                        if (provUp.includes(pKey)) {
+                            latSismo = coords[0];
+                            lonSismo = coords[1];
+                            break;
+                        }
+                    }
+                    if (latSismo === 0) { latSismo = -31.53; lonSismo = -68.53; }
+                }
 
                 contadorMostrados++;
                 const esMendoza = provincia.includes("MENDOZA");
