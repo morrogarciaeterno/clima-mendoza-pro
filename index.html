@@ -1748,7 +1748,6 @@
     let marcadorSismoActual = null;
     let circuloSismoActual = null;
 
-    // Coordenadas aproximadas de respaldo por provincia para cuando el XML no trae lat/long numéricas directas
     const centrosProvincias = {
         "MENDOZA": [-32.89, -68.84],
         "SAN JUAN": [-31.53, -68.53],
@@ -1770,7 +1769,6 @@
         let parsedLat = parseFloat(lat);
         let parsedLon = parseFloat(lon);
 
-        // Si la lat/lon viene en 0 o vacía, buscar el centro de la provincia mencionada en la descripción
         if (isNaN(parsedLat) || isNaN(parsedLon) || (parsedLat === 0 && parsedLon === 0)) {
             let descUpper = descripcion.toUpperCase();
             for (let [prov, coords] of Object.entries(centrosProvincias)) {
@@ -1781,7 +1779,7 @@
                 }
             }
             if (isNaN(parsedLat) || (parsedLat === 0 && parsedLon === 0)) {
-                parsedLat = -31.53; // Default San Juan / Cuyo
+                parsedLat = -31.53;
                 parsedLon = -68.53;
             }
         }
@@ -1790,10 +1788,9 @@
             if (marcadorSismoActual) mapInstance.removeLayer(marcadorSismoActual);
             if (circuloSismoActual) mapInstance.removeLayer(circuloSismoActual);
 
-            // Círculo naranja destacado para el epicentro
             circuloSismoActual = L.circle([parsedLat, parsedLon], {
-                radius: Math.max(magnitud * 18000, 35000), // Radio proporcional a la magnitud
-                color: '#f97316', // Naranja vibrante
+                radius: Math.max(magnitud * 18000, 35000),
+                color: '#f97316',
                 fillColor: '#fb923c',
                 fillOpacity: 0.45,
                 weight: 3
@@ -1807,7 +1804,7 @@
                     iconAnchor: [12, 12]
                 })
             }).addTo(mapInstance)
-              .bindPopup(`<div style="color:#000;"><b>Epicentro Sísmico INPRES</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b><br><small>Lat: ${parsedLat.toFixed(2)}, Lon: ${parsedLon.toFixed(2)}</small></div>`)
+              .bindPopup(`<div style="color:#000;"><b>Epicentro Sísmico INPRES</b><br>${descripcion}<br>Magnitud: <b>${magnitud}</b><br><small>Lat: ${parsedLat.toFixed(3)}, Lon: ${parsedLon.toFixed(3)}</small></div>`)
               .openPopup();
 
             mapInstance.setView([parsedLat, parsedLon], 7);
@@ -2518,11 +2515,12 @@
                 const magnitud = parseFloat(item.querySelector("mg")?.textContent || "0");
                 const profundidad = item.querySelector("prof")?.textContent || "";
                 
-                let latSismo = parseFloat(item.querySelector("lat")?.textContent || "0");
-                let lonSismo = parseFloat(item.querySelector("long")?.textContent || "0");
+                // EXTRACCIÓN DIRECTA Y EXACTA DE COORDENADAS DESDE EL XML DEL INPRES
+                let latSismo = parseFloat(item.querySelector("lat")?.textContent);
+                let lonSismo = parseFloat(item.querySelector("long")?.textContent);
 
-                // Si el XML no trae lat/long o vienen en 0, calcular centro por provincia
-                if (isNaN(latSismo) || latSismo === 0) {
+                // Respaldo de seguridad en caso de venir vacías
+                if (isNaN(latSismo) || isNaN(lonSismo) || (latSismo === 0 && lonSismo === 0)) {
                     let provUp = provincia.toUpperCase();
                     for (let [pKey, coords] of Object.entries(centrosProvincias)) {
                         if (provUp.includes(pKey)) {
@@ -2531,7 +2529,7 @@
                             break;
                         }
                     }
-                    if (latSismo === 0) { latSismo = -31.53; lonSismo = -68.53; }
+                    if (isNaN(latSismo)) { latSismo = -31.53; lonSismo = -68.53; }
                 }
 
                 contadorMostrados++;
@@ -2552,7 +2550,7 @@
                 }
 
                 htmlCinta += `
-                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Clic para ubicar)" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia.replace(/'/g, "")}', ${magnitud})">
+                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Lat: ${latSismo}, Lon: ${lonSismo})" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia.replace(/'/g, "")} (Mag ${magnitud.toFixed(1)})', ${magnitud})">
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr.slice(0,5)}</div>
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
                         <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud.toFixed(1)}</div>
@@ -2588,7 +2586,7 @@
                 contenedor.innerHTML = "";
                 dataUSGS.features.slice(0, 15).forEach(s => {
                     let p = s.properties;
-                    let coords = s.geometry.coordinates; // coords[0] = lon, coords[1] = lat
+                    let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
                     
                     let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
