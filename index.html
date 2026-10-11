@@ -67,26 +67,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             min-width: 0;
             flex-grow: 1;
         }
 
         .brand-logo {
-            width: 32px;
-            height: 32px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
             border-radius: 50%;
             background: #ffffff;
             padding: 2px;
             flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
         }
 
         .brand-text-container {
@@ -96,7 +96,7 @@
         }
 
         .brand h1 {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             white-space: nowrap;
@@ -174,7 +174,7 @@
             gap: 8px;
             box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.2);
             position: sticky;
-            top: 51px;
+            top: 59px;
             z-index: 99;
         }
 
@@ -1176,10 +1176,11 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <img src="territoria-logo.png" alt="Territoria" class="brand-logo" onerror="this.style.display='none'">
+            <!-- LOGOTIPO OFICIAL DE TERRITORIA (EMBEBIDO BASE64) -->
+            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy4xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
             <div class="brand-text-container">
-                <h1>Territoria</h1>
-                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Obteniendo localidad GPS...</p>
+                <h1>TERRITORIA</h1>
+                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Plataforma Inteligente de Gestión Territorial</p>
             </div>
         </div>
 
