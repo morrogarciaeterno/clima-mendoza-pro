@@ -1551,6 +1551,7 @@
                             <!-- Se llena dinámicamente -->
                         </select>
                         <button onclick="consultar()">Actualizar</button>
+                        <button onclick="prepararModoNuevo()" style="background: #22c55e; color: #000;" title="Agregar nueva estación">➕ Agregar</button>
                         <button onclick="cargarEstacionParaEditar()" style="background: #eab308; color: #000;" title="Editar estación seleccionada">✏️ Editar</button>
                         <button onclick="borrarEstacionActual()" style="background: #ef4444; color: #fff;" title="Borrar estación seleccionada">🗑️ Borrar</button>
                     </div>
@@ -2439,6 +2440,16 @@
             map.setView(latLng, 13, { animate: true });
             marker.openPopup();
         }
+    }
+
+    function prepararModoNuevo() {
+        idEditandoHidro = null;
+        document.getElementById("nuevoId").value = "";
+        document.getElementById("nuevoNombre").value = "";
+        document.getElementById("nuevaRed").value = "";
+        document.getElementById("formTitulo").textContent = "➕ Cargar Nueva Estación";
+        document.getElementById("btnCancelarEdicion").style.display = "block";
+        document.getElementById("instruccionMapa").textContent = "Completá los datos y hacé clic en '1. Guardar y Ubicar en Mapa'.";
     }
 
     function prepararModoUbicacion() {
