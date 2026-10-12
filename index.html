@@ -1352,12 +1352,12 @@
 
     <br>
 
-    <!-- NUEVO BLOQUE: DIRECTORIO COMPLETO DE PASOS FRONTERIZOS ARGENTINA-CHILE -->
+    <!-- DIRECTORIO COMPLETO DE PASOS FRONTERIZOS NACIONALES -->
     <div class="card" style="border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #18120d 0%, #0e1526 100%);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
-                <h3 style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🚧 Directorio Oficial Completo de Pasos Fronterizos (Arg. - Chile)</h3>
-                <small style="color: var(--text-muted); font-size: 0.65rem;">Listado maestro completo georreferenciado de corredores cordilleranos.</small>
+                <h3 style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🚧 Directorio Oficial Completo de Pasos Fronterizos (Todo el Territorio Nacional)</h3>
+                <small style="color: var(--text-muted); font-size: 0.65rem;">Corredores internacionales con Chile, Bolivia, Paraguay, Brasil y Uruguay.</small>
             </div>
             <button onclick="abrirModalPasosDirectorio()" style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">📂 Ver Listado Maestro Completo</button>
         </div>
@@ -1543,7 +1543,10 @@
                 <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🌊 Territoria - Monitoreo Hídrico SNIH</h3>
                 <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Seleccioná una estación del selector o consultá su estado.</small>
             </div>
-            <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
+            <div style="display: flex; gap: 6px;">
+                <button onclick="abrirModalGestionEstaciones()" style="background: rgba(56, 189, 248, 0.2); border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🛠️ Gestionar / Agregar Puntos</button>
+                <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
+            </div>
         </div>
 
         <div class="hidro-layout-grid">
@@ -1596,7 +1599,7 @@
 
             <!-- COLUMNA DERECHA -->
             <div class="panel">
-                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h3>
+                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas <span style="font-size:0.6rem; color:var(--accent); font-weight:normal;">(Clic en marcador para reubicar)</span></h3>
                 <div id="map"></div>
             </div>
         </div>
@@ -1620,6 +1623,37 @@
 
 </div>
 
+<!-- VENTANA MODAL GESTIÓN Y ALTA DE ESTACIONES HÍDRICAS -->
+<div class="modal-overlay" id="modalGestionEstaciones" style="display: none;">
+    <div class="modal-content-box" style="max-width: 800px; height: 85vh;">
+        <div class="modal-header">
+            <h2>🛠️ Gestión, Alta y Reubicación de Estaciones Hídricas</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarModalGestionEstaciones()">✕</button>
+        </div>
+        <div class="modal-body" style="grid-template-columns: 1fr; gap: 10px; overflow-y: auto;">
+            <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
+                <b>Agregar nueva estación de medición SNIH:</b>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px;">
+                    <input type="text" id="nuevoIdEstacion" class="modal-search-input" placeholder="ID Estación (Ej: 1422)">
+                    <input type="text" id="nuevoNombreEstacion" class="modal-search-input" placeholder="Nombre (Ej: Estación Cacheuta)">
+                    <input type="text" id="nuevaRedEstacion" class="modal-search-input" placeholder="Red / Cuenca (Ej: Río Mendoza)">
+                    <div style="display: flex; gap: 4px;">
+                        <input type="number" step="any" id="nuevaLatEstacion" class="modal-search-input" placeholder="Latitud">
+                        <input type="number" step="any" id="nuevaLonEstacion" class="modal-search-input" placeholder="Longitud">
+                    </div>
+                </div>
+                <button onclick="agregarNuevaEstacionManual()" style="margin-top: 6px; width: 100%; background: var(--accent); color: #000; font-weight: 800; padding: 6px; border-radius: 6px; cursor: pointer;">➕ Guardar / Agregar Estación</button>
+            </div>
+
+            <div class="report-section-title">📋 Listado Actual de Estaciones Monitoreadas</div>
+            <div id="listaEstacionesGestionContainer" style="display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto;">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <button onclick="restaurarEstacionesOriginales()" class="btn-secundario" style="color: #ef4444; border-color: #ef4444;">🔄 Restaurar Listado por Defecto</button>
+        </div>
+    </div>
+</div>
+
 <!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA -->
 <div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
     <div class="modal-content-box" style="max-width: 700px; height: auto; max-height: 85vh;">
@@ -1633,16 +1667,16 @@
     </div>
 </div>
 
-<!-- VENTANA MODAL LISTADO MAESTRO DE PASOS FRONTERIZOS -->
+<!-- VENTANA MODAL LISTADO MAESTRO DE PASOS FRONTERIZOS NACIONALES -->
 <div class="modal-overlay" id="modalPasosDirectorio" style="display: none;">
     <div class="modal-content-box" style="max-width: 900px; height: 85vh;">
         <div class="modal-header">
-            <h2>🚧 Directorio Maestro Oficial - Pasos Fronterizos (Arg. - Chile)</h2>
+            <h2>🚧 Directorio Maestro Oficial - Pasos Fronterizos (Todo el Territorio)</h2>
             <button class="btn-cerrar-modal" onclick="cerrarModalPasosDirectorio()">✕</button>
         </div>
         <div class="modal-body" style="grid-template-columns: 1fr; gap: 8px; overflow-y: auto;">
             <div class="modal-search-box">
-                <input type="text" id="inputFiltroPasos" class="modal-search-input" placeholder="Filtrar por nombre, provincia o país..." oninput="filtrarDirectorioPasos()">
+                <input type="text" id="inputFiltroPasos" class="modal-search-input" placeholder="Filtrar por nombre, provincia, país limítrofe..." oninput="filtrarDirectorioPasos()">
             </div>
             <div id="tablaPasosContenedor" style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
                 <!-- Se llena dinámicamente -->
@@ -1768,7 +1802,8 @@
                 let lat = parseFloat(paso.latitud);
                 let lon = parseFloat(paso.longitud);
 
-                if (!isNaN(lat) && !isNaN(lon) && lat < -20 && lat > -56 && lon > -76 && lon < -53) {
+                // Validación ampliada para incluir todo el territorio argentino y fronteras limítrofes
+                if (!isNaN(lat) && !isNaN(lon) && lat < 5 && lat > -56 && lon > -76 && lon < -50) {
                     const esAbierto = paso.estado_prioridad === "ABIERTO";
                     const colorPin = esAbierto ? "#16a34a" : "#dc2626";
                     const iconoEmoji = esAbierto ? "🟢" : "🔴";
@@ -1784,7 +1819,7 @@
                             <b>${paso.nombre_paso}</b><br>
                             Estado: <b style="color: ${colorPin};">${iconoEmoji} ${paso.estado_prioridad}</b><br>
                             Provincia: ${paso.provincia || 'N/D'}<br>
-                            País: ${paso.pais || 'Argentina / Chile'}<br>
+                            País Limítrofe: ${paso.pais || 'Argentina / Limítrofe'}<br>
                             <small>Lat: ${lat.toFixed(3)}, Lon: ${lon.toFixed(3)}</small>
                         </div>
                     `;
@@ -1795,7 +1830,7 @@
                 }
             });
         } catch (error) {
-            console.error("Error al cargar pasos fronterizos:", error);
+            console.error("Error al cargar pasos fronterizos nacionales:", error);
         }
     }
 
@@ -1804,7 +1839,7 @@
         if (!contenedor) return;
         contenedor.innerHTML = "";
 
-        pasos.slice(0, 25).forEach(paso => {
+        pasos.forEach(paso => {
             let lat = parseFloat(paso.latitud);
             let lon = parseFloat(paso.longitud);
             const esAbierto = paso.estado_prioridad === "ABIERTO";
@@ -1846,7 +1881,7 @@
         if (!contenedor) return;
 
         if (!pasos || pasos.length === 0) {
-            contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando pasos fronterizos...</div>`;
+            contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando pasos fronterizos nacionales...</div>`;
             return;
         }
 
@@ -1858,7 +1893,7 @@
                 <div style="background: var(--card-inner); border: 1px solid var(--border); border-left: 5px solid ${colorEstado}; padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; cursor: pointer;" onclick="cerrarModalPasosDirectorio(); centrarMapaEnPasoFronterizo(${p.latitud}, ${p.longitud}, '${p.nombre_paso}')" title="Clic para ubicar en el mapa">
                     <div style="min-width: 0;">
                         <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${p.nombre_paso}</div>
-                        <div style="font-size: 0.62rem; color: var(--text-muted);">Provincia: <b>${p.provincia || 'N/D'}</b> | País: ${p.pais || 'Argentina / Chile'}</div>
+                        <div style="font-size: 0.62rem; color: var(--text-muted);">Provincia: <b>${p.provincia || 'N/D'}</b> | País: ${p.pais || 'Argentina / Limítrofe'}</div>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;">
                         <span style="font-size: 0.65rem; font-weight: 900; color: ${colorEstado}; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${p.estado_prioridad}</span>
@@ -1926,7 +1961,13 @@
         "NEUQUEN": [-38.95, -68.05],
         "RIO NEGRO": [-40.81, -63.00],
         "CHUBUT": [-43.30, -65.10],
-        "TIERRA DEL FUEGO": [-54.80, -68.30]
+        "TIERRA DEL FUEGO": [-54.80, -68.30],
+        "MISIONES": [-26.87, -54.65],
+        "CORRIENTES": [-27.48, -58.83],
+        "ENTRE RIOS": [-31.74, -60.53],
+        "BUENOS AIRES": [-36.67, -60.55],
+        "CORDOBA": [-31.42, -64.18],
+        "SANTA FE": [-31.63, -60.70]
     };
 
     function centrarMapaEnSismo(lat, lon, descripcion, magnitud) {
@@ -2403,13 +2444,27 @@
 
     function inicializarMapaHidroOriginal() {
         if (!map) {
-            map = L.map('map', { zoomControl: true }).setView([-34.0, -69.0], 6);
+            map = L.map('map', { zoomControl: true }).setView([-34.0, -64.0], 5);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
             markersLayer = L.layerGroup().addTo(map);
+
+            map.on('click', function(e) {
+                const select = document.getElementById("id");
+                if (!select || !select.value) return;
+                const idActivo = select.value;
+
+                if (estacionesData[idActivo]) {
+                    estacionesData[idActivo].coords = [e.latlng.lat, e.latlng.lng];
+                    localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+                    actualizarSelectYMapa();
+                    consultar();
+                    alert(`✅ Estación ${idActivo} reubicada en: Lat ${e.latlng.lat.toFixed(4)}, Lon ${e.latlng.lng.toFixed(4)}`);
+                }
+            });
         }
         actualizarSelectYMapa();
         consultar();
@@ -2442,12 +2497,21 @@
 
                 const customIcon = L.divIcon({
                     className: 'custom-marker',
-                    html: `<div style="background: ${colorPunto}; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #000; box-shadow: ${boxShadowColor};"></div>`,
+                    html: `<div style="background: ${colorPunto}; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #000; box-shadow: ${boxShadowColor};" title="Clic en el mapa para mover esta estación"></div>`,
                     iconSize: [16, 16]
                 });
 
-                const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
-                marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span>`);
+                const marker = L.marker(info.coords, { icon: customIcon, draggable: true }).addTo(markersLayer);
+                marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span><br><small style="color:#0284c7;">Arrastrá el marcador o hacé clic en el mapa para reubicarlo</small>`);
+
+                marker.on('dragend', function(event) {
+                    const nuevaPos = event.target.getLatLng();
+                    estacionesData[id].coords = [nuevaPos.lat, nuevaPos.lng];
+                    localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+                    select.value = id;
+                    consultar();
+                    alert(`✅ Estación ${id} reubicada correctamente.`);
+                });
 
                 marker.on('click', () => {
                     select.value = id;
@@ -2457,6 +2521,110 @@
         }
         if (estacionesData[valorActual]) {
             select.value = valorActual;
+        }
+    }
+
+    function abrirModalGestionEstaciones() {
+        const modal = document.getElementById("modalGestionEstaciones");
+        if (modal) {
+            modal.style.display = "flex";
+            renderizarListaGestionEstaciones();
+        }
+    }
+
+    function cerrarModalGestionEstaciones() {
+        const modal = document.getElementById("modalGestionEstaciones");
+        if (modal) modal.style.display = "none";
+    }
+
+    function renderizarListaGestionEstaciones() {
+        const contenedor = document.getElementById("listaEstacionesGestionContainer");
+        if (!contenedor) return;
+
+        contenedor.innerHTML = "";
+        for (const [id, info] of Object.entries(estacionesData)) {
+            let latStr = info.coords ? info.coords[0].toFixed(4) : "-";
+            let lonStr = info.coords ? info.coords[1].toFixed(4) : "-";
+            contenedor.innerHTML += `
+                <div style="background: var(--card-bg); border: 1px solid var(--border); padding: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${id} - ${info.nombre}</div>
+                        <div style="font-size: 0.62rem; color: var(--text-muted);">${info.red} | Lat: ${latStr}, Lon: ${lonStr}</div>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button onclick="centrarEstacionEnMapa('${id}')" style="background: rgba(56, 189, 248, 0.2); border: 1px solid var(--accent); color: var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 0.62rem; cursor: pointer;">🔍 Ver</button>
+                        <button onclick="eliminarEstacionCustom('${id}')" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 0.62rem; cursor: pointer;">🗑️ Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function centrarEstacionEnMapa(id) {
+        cerrarModalGestionEstaciones();
+        const est = estacionesData[id];
+        if (est && est.coords && map) {
+            map.setView(est.coords, 10);
+            const select = document.getElementById("id");
+            if (select) {
+                select.value = id;
+                consultar();
+            }
+        }
+    }
+
+    function eliminarEstacionCustom(id) {
+        if (confirm(`¿Estás seguro de eliminar la estación ${id}?`)) {
+            delete estacionesData[id];
+            localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+            actualizarSelectYMapa();
+            renderizarListaGestionEstaciones();
+        }
+    }
+
+    function agregarNuevaEstacionManual() {
+        const idInput = document.getElementById("nuevoIdEstacion").value.trim();
+        const nombreInput = document.getElementById("nuevoNombreEstacion").value.trim();
+        const redInput = document.getElementById("nuevaRedEstacion").value.trim();
+        const latInput = parseFloat(document.getElementById("nuevaLatEstacion").value);
+        const lonInput = parseFloat(document.getElementById("nuevaLonEstacion").value);
+
+        if (!idInput || !nombreInput) {
+            alert("Por favor ingresa al menos el ID y el nombre de la estación.");
+            return;
+        }
+
+        let latFinal = !isNaN(latInput) ? latInput : currentLat;
+        let lonFinal = !isNaN(lonInput) ? lonInput : currentLon;
+
+        estacionesData[idInput] = {
+            nombre: nombreInput,
+            red: redInput || "Red Personalizada",
+            coords: [latFinal, lonFinal]
+        };
+
+        localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+        actualizarSelectYMapa();
+        renderizarListaGestionEstaciones();
+
+        document.getElementById("nuevoIdEstacion").value = "";
+        document.getElementById("nuevoNombreEstacion").value = "";
+        document.getElementById("nuevaRedEstacion").value = "";
+        document.getElementById("nuevaLatEstacion").value = "";
+        document.getElementById("nuevaLonEstacion").value = "";
+
+        alert(`✅ Estación ${idInput} agregada con éxito.`);
+        const select = document.getElementById("id");
+        if(select) { select.value = idInput; consultar(); }
+    }
+
+    function restaurarEstacionesOriginales() {
+        if (confirm("¿Restaurar todas las estaciones por defecto de la red? Se perderán las modificaciones locales.")) {
+            estacionesData = JSON.parse(JSON.stringify(estacionesDefault));
+            localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+            actualizarSelectYMapa();
+            renderizarListaGestionEstaciones();
+            alert("✔ Estaciones restauradas.");
         }
     }
 
