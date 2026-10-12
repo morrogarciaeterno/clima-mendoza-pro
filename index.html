@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    
+
     <!-- Firebase App y Firestore (Compat SDK) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -51,7 +51,7 @@
         header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
-            padding: 8px 16px;
+            padding: 8px 12px;
             padding-top: max(8px, env(safe-area-inset-top));
             position: sticky;
             top: 0;
@@ -62,31 +62,31 @@
 
         .header-content {
             width: 100%;
-            max-width: 98%; /* Ampliado para PC */
+            max-width: 1400px;
             margin: auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             min-width: 0;
             flex-grow: 1;
         }
 
         .brand-logo {
-            width: 42px;
-            height: 42px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             border-radius: 50%;
             background: #ffffff;
             padding: 2px;
             flex-shrink: 0;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
         .brand-text-container {
@@ -96,7 +96,7 @@
         }
 
         .brand h1 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             white-space: nowrap;
@@ -166,7 +166,7 @@
         .scada-banner-container {
             background: linear-gradient(90deg, #1e1115 0%, #0e1526 50%, #1e1115 100%);
             border-bottom: 2px solid #ef4444;
-            padding: 6px 16px;
+            padding: 6px 12px;
             width: 100%;
             display: flex;
             align-items: center;
@@ -174,7 +174,7 @@
             gap: 8px;
             box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.2);
             position: sticky;
-            top: 59px;
+            top: 51px;
             z-index: 99;
         }
 
@@ -266,22 +266,22 @@
 
         .container {
             width: 100%;
-            max-width: 98%; /* Ampliado para PC */
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 12px 12px 40px 12px;
+            padding: 8px 8px 40px 8px;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
         @media (min-width: 768px) {
             .grid {
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                gap: 14px;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 12px;
             }
         }
 
@@ -289,7 +289,7 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             width: 100%;
             min-width: 0;
             overflow: hidden;
@@ -299,7 +299,7 @@
         @media (min-width: 768px) {
             .card {
                 border-radius: 16px;
-                padding: 16px;
+                padding: 14px;
             }
         }
 
@@ -352,7 +352,7 @@
         .forecast-cards {
             display: flex;
             justify-content: flex-start;
-            gap: 8px;
+            gap: 6px;
             margin-top: 8px;
             width: 100%;
             overflow-x: auto;
@@ -365,7 +365,7 @@
         }
 
         .forecast-card {
-            flex: 0 0 70px;
+            flex: 0 0 64px;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -374,7 +374,7 @@
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
         }
         @media (min-width: 768px) {
-            .forecast-card { flex: 0 0 80px; padding: 10px 4px; }
+            .forecast-card { flex: 0 0 72px; padding: 10px 4px; }
         }
 
         .forecast-card .icon {
@@ -396,7 +396,7 @@
         .sismos-cinta-horizontal {
             display: flex;
             justify-content: flex-start;
-            gap: 8px;
+            gap: 6px;
             margin-top: 8px;
             width: 100%;
             overflow-x: auto;
@@ -409,7 +409,7 @@
         }
 
         .sismo-mini-card {
-            flex: 0 0 84px;
+            flex: 0 0 78px;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -420,7 +420,7 @@
             cursor: pointer;
         }
         @media (min-width: 768px) {
-            .sismo-mini-card { flex: 0 0 96px; padding: 10px 4px; }
+            .sismo-mini-card { flex: 0 0 88px; padding: 10px 4px; }
         }
 
         .sismo-mini-mag {
@@ -447,14 +447,14 @@
         .dashboard-row {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
         }
 
-        @media (min-width: 900px) {
+        @media (min-width: 768px) {
             .dashboard-row {
                 grid-template-columns: 1fr 1fr;
-                gap: 14px;
+                gap: 12px;
             }
         }
 
@@ -620,14 +620,14 @@
         .dual-section {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
         }
 
         @media (min-width: 900px) {
             .dual-section {
                 grid-template-columns: 1.2fr 1fr;
-                gap: 14px;
+                gap: 12px;
             }
         }
 
@@ -695,23 +695,23 @@
             display: flex;
             flex-direction: column;
             margin-top: 6px;
-            min-height: 350px;
+            min-height: 280px;
         }
         @media(min-width: 768px) {
-            .map-wrapper-container { min-height: 480px; }
+            .map-wrapper-container { min-height: 350px; }
         }
 
         #mapaArgentina {
             width: 100%;
             height: 100%;
-            min-height: 350px;
+            min-height: 280px;
             border-radius: 10px;
             z-index: 1;
             border: 2px solid var(--border);
             background-color: #070a14 !important;
         }
         @media(min-width: 768px) {
-            #mapaArgentina { min-height: 480px; }
+            #mapaArgentina { min-height: 350px; }
         }
 
         .modo-oscuro-mapa .leaflet-tile-pane {
@@ -794,15 +794,15 @@
 
         .map-controls {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
             margin-top: 6px;
             width: 100%;
         }
 
-        @media (min-width: 600px) {
+        @media (min-width: 500px) {
             .map-controls {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -848,7 +848,7 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(8px);
-            padding: 10px;
+            padding: 4px;
         }
 
         .modal-content-box {
@@ -856,7 +856,7 @@
             border: 1px solid var(--accent);
             border-radius: 14px;
             width: 100%;
-            max-width: 98vw; /* Ampliado para PC */
+            max-width: 1300px;
             height: 94vh;
             display: flex;
             flex-direction: column;
@@ -865,7 +865,7 @@
         }
 
         .modal-header {
-            padding: 10px 16px;
+            padding: 8px 12px;
             background: var(--card-inner);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -904,10 +904,10 @@
 
         .modal-body {
             flex-grow: 1;
-            padding: 12px;
+            padding: 8px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             overflow-y: auto;
             width: 100%;
         }
@@ -915,8 +915,8 @@
         @media (min-width: 900px) {
             .modal-body {
                 grid-template-columns: 1fr 1.15fr;
-                padding: 16px;
-                gap: 16px;
+                padding: 12px;
+                gap: 12px;
             }
         }
 
@@ -924,7 +924,7 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            min-height: 300px;
+            min-height: 250px;
             width: 100%;
         }
 
@@ -969,14 +969,14 @@
             border-radius: 10px;
             border: 2px solid var(--border);
             background-color: #070a14 !important;
-            min-height: 280px;
+            min-height: 240px;
         }
 
         .modal-report-panel {
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -1052,7 +1052,7 @@
             .hidro-layout-grid { grid-template-columns: 1.2fr 1fr; gap: 16px; }
         }
         #map {
-            height: 350px;
+            height: 320px;
             border-radius: 10px;
             border: 1px solid var(--border);
             z-index: 10;
@@ -1064,7 +1064,7 @@
         }
         .cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 8px;
             margin-top: 10px;
         }
@@ -1176,11 +1176,10 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <!-- LOGOTIPO OFICIAL DE TERRITORIA (EMBEBIDO BASE64) -->
-            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy.xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
+            <img src="territoria-logo.png" alt="Territoria" class="brand-logo" onerror="this.style.display='none'">
             <div class="brand-text-container">
-                <h1>TERRITORIA</h1>
-                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Plataforma Inteligente de Gestión Territorial</p>
+                <h1>Territoria</h1>
+                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Obteniendo localidad GPS...</p>
             </div>
         </div>
 
@@ -1530,11 +1529,11 @@
             </div>
             <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
         </div>
-        
+
         <div class="hidro-layout-grid">
             <!-- COLUMNA IZQUIERDA -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
-               <div>
+                <div>
                     <div class="search-box">
                         <select id="id" onchange="consultar()">
                             <!-- Se llena dinámicamente -->
@@ -1702,8 +1701,8 @@
 <script>
     document.addEventListener('keydown', function(e) {
         if (
-            e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) || 
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
             (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
         ) {
             e.preventDefault();
@@ -1814,7 +1813,7 @@
 
     function centrarMapaEnSismo(lat, lon, descripcion, magnitud) {
         cerrarModalAlarmasActivas();
-        
+
         let parsedLat = parseFloat(lat);
         let parsedLon = parseFloat(lon);
 
@@ -2077,7 +2076,7 @@
         historial.forEach(item => {
             let disparo = item.horaDisparo || "--:--";
             let reconocido = item.horaReconocido || item.hora || "--:--";
-            
+
             let idEstacionExtraido = item.estacionId;
             let esClickable = idEstacionExtraido && estacionesData[idEstacionExtraido];
             let estiloFila = "border-left: 3px solid #22c55e;";
@@ -2331,7 +2330,7 @@
 
                 const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
                 marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span>`);
-                
+
                 marker.on('click', () => {
                     select.value = id;
                     consultar();
@@ -2407,7 +2406,7 @@
         const info = estacionesData[estacionId] || { nombre: `Estación ID: ${estacionId}`, red: "Red Nacional" };
         document.getElementById("tituloEstacion").textContent = `🌊 Monitoreo: ${info.nombre}`;
         document.getElementById("infoDetalle").innerHTML = `<b>Ubicación:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
-        
+
         document.getElementById("resumenAltura").textContent = "--";
         document.getElementById("tendenciaAltura").textContent = "--";
         document.getElementById("resumenPrecipitacion").textContent = "--";
@@ -2455,7 +2454,7 @@
 
             if(alturaValNum !== null && anteriorAltura !== null) {
                 let diferencia = alturaValNum - anteriorAltura;
-                
+
                 if(diferencia > 0.005) {
                     tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
                     tendenciaColor = "#ef4444";
@@ -2486,12 +2485,12 @@
 
                     if(m.NombreCodigo === "Altura" && !isNaN(num)) {
                         alturaValStr = num.toFixed(2) + " m";
-                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true; 
+                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true;
                     }
                     if(m.NombreCodigo.includes("Precipitación") && !isNaN(num)) precipVal = num.toFixed(1) + " mm";
                     if(m.NombreCodigo.includes("Temperatura") && !isNaN(num)) tempVal = num.toFixed(1) + " °C";
                 }
-                
+
                 const unidad = unidades[m.NombreCodigo] || "";
                 let claseAlertaCard = esAlertaTarjeta ? "alerta-roja" : "";
 
@@ -2557,13 +2556,31 @@
             let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
             let sismosVistosRonda = {};
 
+            let s1H = "13:25", s1M = "Mag 3.2", s1L = "SAN JUAN";
+            let s2H = "11:10", s2M = "Mag 2.8", s2L = "MENDOZA";
+            let s3H = "09:00", s3M = "Mag 4.1", s3L = "SALTA";
+
             items.forEach((item, index) => {
                 const provincia = item.querySelector("prov")?.textContent || "Argentina";
                 const fechaStr = item.querySelector("fecha")?.textContent || "";
                 const horaStr = item.querySelector("hora")?.textContent || "";
                 const magnitud = parseFloat(item.querySelector("mg")?.textContent || "0");
                 const profundidad = item.querySelector("prof")?.textContent || "";
-                
+
+                if (index === 0) {
+                    if (horaStr) s1H = horaStr;
+                    if (magnitud) s1M = "Mag " + magnitud.toFixed(1);
+                    if (provincia) s1L = provincia.toUpperCase();
+                } else if (index === 1) {
+                    if (horaStr) s2H = horaStr;
+                    if (magnitud) s2M = "Mag " + magnitud.toFixed(1);
+                    if (provincia) s2L = provincia.toUpperCase();
+                } else if (index === 2) {
+                    if (horaStr) s3H = horaStr;
+                    if (magnitud) s3M = "Mag " + magnitud.toFixed(1);
+                    if (provincia) s3L = provincia.toUpperCase();
+                }
+
                 let latSismo = parseFloat(item.querySelector("lat")?.textContent);
                 let lonSismo = parseFloat(item.querySelector("long")?.textContent);
 
@@ -2616,6 +2633,11 @@
             document.getElementById("inpres-estado").innerHTML = `Actualizado (${contadorMostrados} sismos): ` + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
             actualizarCintaTickerScada();
 
+            if (window.AndroidApp && typeof window.AndroidApp.guardarDatosWidget === "function") {
+                const tempActualTxt = document.getElementById("temp").innerText || "18°C";
+                window.AndroidApp.guardarDatosWidget(tempActualTxt, s1H, s1M, s1L, s2H, s2M, s2L, s3H, s3M, s3L);
+            }
+
         } catch(error) {
             console.error(error);
             document.getElementById("inpres-estado").innerHTML = "Error";
@@ -2635,7 +2657,7 @@
                     let p = s.properties;
                     let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
-                    
+
                     let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
@@ -2674,7 +2696,7 @@
                 btnCenso.style.color = "#000";
             }
             if (banner) banner.style.display = "flex";
-            
+
             if (mapInstance && capaCapaArboles && !mapInstance.hasLayer(capaCapaArboles)) {
                 capaCapaArboles.addTo(mapInstance);
             }
@@ -2685,7 +2707,7 @@
                 btnCenso.style.color = "#22c55e";
             }
             if (banner) banner.style.display = "none";
-            
+
             if (mapInstance && capaCapaArboles && mapInstance.hasLayer(capaCapaArboles)) {
                 mapInstance.removeLayer(capaCapaArboles);
             }
@@ -2806,7 +2828,7 @@
                     const scaleSize = maxWidth / img.width;
                     canvas.width = maxWidth;
                     canvas.height = img.height * scaleSize;
-                    
+
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     const comprimidaBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     enviarAFirebase(comprimidaBase64);
@@ -2943,7 +2965,7 @@
 
         panel.innerHTML = `
             <div class="report-section-title">📊 ${d.nombreLugar}, ${d.provinciaZona}</div>
-            
+
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} ha</span><br>
                 <b>Condiciones:</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
@@ -2994,9 +3016,6 @@
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
         if (capaPasosFronterizosDinamicos && mapInstance.hasLayer(capaPasosFronterizosDinamicos)) mapInstance.removeLayer(capaPasosFronterizosDinamicos);
-
-        if (marcadorSismoActual) { mapInstance.removeLayer(marcadorSismoActual); marcadorSismoActual = null; }
-        if (circuloSismoActual) { mapInstance.removeLayer(circuloSismoActual); circuloSismoActual = null; }
 
         if (!capaActual) capaActual = capasBase.base;
         if (!mapInstance.hasLayer(capaActual)) capaActual.addTo(mapInstance);
@@ -3356,7 +3375,7 @@
                 document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
                 document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
                 document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
-                
+
                 actualizarCicloSolar(data.daily.sunrise[0], data.daily.sunset[0]);
             }
 
