@@ -298,7 +298,8 @@
             border: 1px solid var(--accent);
             border-radius: 14px;
             width: 100%;
-            max-width: 700px;
+            max-width: 900px;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -340,7 +341,6 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 80vh;
             overflow-y: auto;
         }
 
@@ -459,7 +459,28 @@
             padding: 15px;
             grid-column: 1 / -1;
         }
-        /* Estilo para etiquetas limpias mostrando solo el ID */
+        .sismos-cinta-horizontal {
+            display: flex;
+            justify-content: flex-start;
+            gap: 6px;
+            margin-top: 8px;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+        .sismos-cinta-horizontal::-webkit-scrollbar { display: none; }
+        .sismo-mini-card {
+            flex: 0 0 78px;
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .sismo-mini-mag { font-size: 0.85rem; font-weight: 800; margin: 2px 0; color: var(--accent); }
         .map-station-tooltip {
             background: rgba(14, 21, 38, 0.95) !important;
             border: 1px solid var(--accent) !important;
@@ -481,7 +502,7 @@
             <img src="territoria-logo.png" alt="Territoria" class="brand-logo" onerror="this.style.display='none'">
             <div class="brand-text-container">
                 <h1>Territoria</h1>
-                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Mendoza, Argentina</p>
+                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" title="Ubicación activa">Mendoza, Argentina</p>
             </div>
         </div>
 
@@ -522,14 +543,12 @@
                 <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Haz clic en el botón amarillo para agregar un punto y arrástralo en el mapa para ubicarlo.</small>
             </div>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                <!-- BOTÓN AMARILLO PARA AGREGAR PUNTO DE MEDICIÓN -->
                 <button onclick="agregarPuntoMedicionMapa()" style="background: #facc15; color: #000; padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 900; cursor: pointer; box-shadow: 0 0 12px rgba(250,204,21,0.5);">⭐ Agregar Punto de Medición</button>
                 <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
             </div>
         </div>
 
         <div class="hidro-layout-grid">
-            <!-- COLUMNA IZQUIERDA: CONTROLES, DATOS Y EDICIÓN -->
             <div class="panel" style="display: flex; flex-direction: column; gap: 10px;">
                 <div class="search-box">
                     <select id="id" onchange="consultar()">
@@ -540,3 +559,486 @@
 
                 <div id="infoDetalle" style="font-size: 0.7rem; color: var(--text-muted);">
                     Información de la red y ubicación...
+                </div>
+
+                <div id="panelResumenCaudal" class="resumen-caudal" style="margin-top:0; margin-bottom:0;">
+                    <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.58rem; background: #64748b; padding: 2px 5px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
+                    <div class="indicadores-grid" style="margin-top: 6px;">
+                        <div class="ind-box">
+                            <div class="ind-label">Nivel / Altura</div>
+                            <div class="ind-val" id="resumenAltura">--</div>
+                            <div class="tendencia" id="tendenciaAltura">--</div>
+                        </div>
+                        <div class="ind-box">
+                            <div class="ind-label">Precipitación</div>
+                            <div class="ind-val" id="resumenPrecipitacion">--</div>
+                        </div>
+                        <div class="ind-box">
+                            <div class="ind-label">Temperatura</div>
+                            <div class="ind-val" id="resumenTemperatura">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultado" class="cards" style="margin-top: 0;">
+                    <div class="loading">Seleccioná una estación del mapa o del selector.</div>
+                </div>
+
+                <!-- PANEL DE EDICIÓN RÁPIDA, CAMBIO DE NOMBRE Y BORRADO -->
+                <div style="background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-top: 4px;">
+                    <h4 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 6px; font-weight: 800;">✏️ Edición Rápida, Nombre & Borrado</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                        <input type="text" id="nuevoIdEstacion" placeholder="ID" readonly style="opacity: 0.7;">
+                        <input type="text" id="nuevoNombreEstacion" placeholder="Nombre de la estación...">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                        <input type="text" id="nuevaRedEstacion" placeholder="Red / Cuenca">
+                        <input type="number" step="any" id="nuevaLatEstacion" placeholder="Latitud">
+                        <input type="number" step="any" id="nuevaLonEstacion" placeholder="Longitud">
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button onclick="guardarEdicionEstacionActual()" style="flex: 2; background: #22c55e; color: #000; font-weight: 800; padding: 6px; border-radius: 6px; cursor: pointer;">💾 Guardar Cambios</button>
+                        <button onclick="borrarEstacionActual()" style="flex: 1; background: #ef4444; color: #fff; font-weight: 800; font-size: 0.68rem; border-radius: 6px; cursor: pointer;">🗑️ Borrar</button>
+                        <button onclick="restaurarEstacionesOriginales()" style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.65rem; border-radius: 6px; cursor: pointer;">🔄</button>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn-secundario" onclick="toggleJson()">Ver / Ocultar Depuración JSON</button>
+                    <div id="jsonContainer" class="json-box">
+                        <pre id="json">// Respuesta JSON...</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="display: flex; flex-direction: column;">
+                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones <span style="font-size:0.6rem; color:var(--accent); font-weight:normal;">(Etiquetas con ID)</span></h3>
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- DIRECTORIO COMPLETO DE PASOS FRONTERIZOS NACIONALES -->
+    <div class="card" style="border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #18120d 0%, #0e1526 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+            <div>
+                <h3 style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🚧 Directorio Oficial Completo de Pasos Fronterizos (Todo el Territorio Nacional)</h3>
+                <small style="color: var(--text-muted); font-size: 0.65rem;">Corredores internacionales con Chile, Bolivia, Paraguay, Brasil y Uruguay.</small>
+            </div>
+            <button onclick="abrirModalPasosDirectorio()" style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">📂 Ver Listado Maestro Completo</button>
+        </div>
+        <div id="pasosResumenCinta" class="sismos-cinta-horizontal">
+            Cargando listado maestro de pasos fronterizos...
+        </div>
+    </div>
+
+</div>
+
+<!-- VENTANA MODAL LISTADO MAESTRO DE PASOS FRONTERIZOS -->
+<div class="modal-overlay" id="modalPasosDirectorio" style="display: none;">
+    <div class="modal-content-box" style="max-width: 900px; height: 85vh;">
+        <div class="modal-header">
+            <h2>🚧 Directorio Maestro Oficial - Pasos Fronterizos (Todo el Territorio)</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarModalPasosDirectorio()">✕</button>
+        </div>
+        <div class="modal-body" style="grid-template-columns: 1fr; gap: 8px;">
+            <div class="search-box">
+                <input type="text" id="inputFiltroPasos" placeholder="Filtrar por nombre, provincia, país..." oninput="filtrarDirectorioPasos()">
+            </div>
+            <div id="tablaPasosContenedor" style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VENTANA MODAL ALARMAS SCADA -->
+<div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
+    <div class="modal-content-box" style="max-width: 700px;">
+        <div class="modal-header">
+            <h2>🚨 Centro de Alarmero SCADA</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarModalAlarmasActivas()">✕</button>
+        </div>
+        <div class="modal-body" id="contenedorListaAlarmasPopup">
+            <div style="text-align: center; color: var(--text-muted); padding: 15px;">✔ Sin alarmas críticas activas.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const estacionesDefault = {
+        "11425": { nombre: "Estación 11425 - Gendarmería", red: "Red Hidrológica Nacional, Mendoza", coords: [-32.85, -69.75] },
+        "11427": { nombre: "Estación 11427 - La Gotera", red: "Red Hidrológica Nacional, Mendoza", coords: [-32.90, -69.10] },
+        "11452": { nombre: "Estación 11452 - Canalejas", red: "Red Hidrológica Nacional, Mendoza", coords: [-35.20, -67.80] },
+        "1413": { nombre: "Estación 1413 - Guido", red: "Río Mendoza, Mendoza", coords: [-32.83, -69.30] },
+        "1421": { nombre: "Estación 1421 - Potrerillos", red: "Río Mendoza, Mendoza", coords: [-32.96, -69.18] }
+    };
+
+    let savedData = JSON.parse(localStorage.getItem("territoria_estaciones"));
+    let estacionesData = (!savedData || Object.keys(savedData).length === 0) ? estacionesDefault : savedData;
+    let historialLecturas = JSON.parse(localStorage.getItem("territoria_historial")) || {};
+    let map = null;
+    let markersLayer = null;
+    let capaPasosFronterizosDinamicos = null;
+    let listaPasosMaestraGlobal = [];
+    const PASOS_API_URL = "https://pasos-proxy.elexpreso17.workers.dev";
+    const WORKER = "https://snih-proxy.elexpreso17.workers.dev";
+    const unidades = { "Altura": "m", "Precipitación": "mm", "Temperatura": "°C", "Humedad": "%" };
+
+    function inicializarMapaHidroOriginal() {
+        if (!map) {
+            map = L.map('map', { zoomControl: true }).setView([-33.0, -68.5], 8);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            markersLayer = L.layerGroup().addTo(map);
+        }
+        actualizarSelectYMapa();
+        consultar();
+        cargarPasosFronterizosDinamicos();
+
+        setTimeout(() => {
+            if (map) map.invalidateSize();
+        }, 300);
+    }
+
+    async function cargarPasosFronterizosDinamicos() {
+        if (!capaPasosFronterizosDinamicos) {
+            capaPasosFronterizosDinamicos = L.layerGroup();
+        } else {
+            capaPasosFronterizosDinamicos.clearLayers();
+        }
+
+        try {
+            const response = await fetch(PASOS_API_URL);
+            const pasos = await response.json();
+            listaPasosMaestraGlobal = pasos;
+            renderizarCintaPasosResumen(pasos);
+
+            pasos.forEach(paso => {
+                let lat = parseFloat(paso.latitud);
+                let lon = parseFloat(paso.longitud);
+
+                if (!isNaN(lat) && !isNaN(lon) && lat < 5 && lat > -56 && lon > -76 && lon < -50) {
+                    const esAbierto = paso.estado_prioridad === "ABIERTO";
+                    const colorPin = esAbierto ? "#16a34a" : "#dc2626";
+
+                    let iconoPaso = L.divIcon({
+                        className: '',
+                        html: `<div style="background-color: ${colorPin}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 10px;">🚧</div>`,
+                        iconSize: [20, 20], iconAnchor: [10, 10]
+                    });
+
+                    let popupHtml = `<div style="color: #000; font-size: 0.75rem;"><b>${paso.nombre_paso}</b><br>Estado: <b style="color: ${colorPin};">${paso.estado_prioridad}</b><br>Provincia: ${paso.provincia || 'N/D'}</div>`;
+
+                    L.marker([lat, lon], { icon: iconoPaso })
+                      .bindPopup(popupHtml)
+                      .addTo(capaPasosFronterizosDinamicos);
+                }
+            });
+            if (map && !map.hasLayer(capaPasosFronterizosDinamicos)) {
+                capaPasosFronterizosDinamicos.addTo(map);
+            }
+        } catch (error) {
+            console.error("Error pasos fronterizos:", error);
+        }
+    }
+
+    function renderizarCintaPasosResumen(pasos) {
+        const contenedor = document.getElementById("pasosResumenCinta");
+        if (!contenedor) return;
+        contenedor.innerHTML = "";
+
+        pasos.forEach(paso => {
+            let lat = parseFloat(paso.latitud);
+            let lon = parseFloat(paso.longitud);
+            const esAbierto = paso.estado_prioridad === "ABIERTO";
+            const colorEstado = esAbierto ? "#22c55e" : "#ef4444";
+
+            contenedor.innerHTML += `
+                <div class="sismo-mini-card" style="flex: 0 0 100px;" title="${paso.nombre_paso}" onclick="centrarMapaEnPaso(${lat}, ${lon}, '${paso.nombre_paso.replace(/'/g, "")}')">
+                    <div style="font-size: 0.58rem; color: ${colorEstado}; font-weight:800; white-space: nowrap;">${paso.estado_prioridad}</div>
+                    <div class="sismo-mini-mag" style="font-size: 0.7rem;">🚧 Paso</div>
+                    <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${paso.nombre_paso}</div>
+                    <div style="font-size: 0.52rem; color: var(--text-muted); white-space: nowrap;">${paso.provincia || ''}</div>
+                </div>
+            `;
+        });
+    }
+
+    function centrarMapaEnPaso(lat, lon, nombre) {
+        if (!isNaN(lat) && !isNaN(lon) && map) {
+            map.setView([lat, lon], 10);
+        }
+    }
+
+    function abrirModalPasosDirectorio() {
+        document.getElementById("modalPasosDirectorio").style.display = "flex";
+        poblarTablaPasosDirectorio(listaPasosMaestraGlobal);
+    }
+
+    function cerrarModalPasosDirectorio() {
+        document.getElementById("modalPasosDirectorio").style.display = "none";
+    }
+
+    function poblarTablaPasosDirectorio(pasos) {
+        const contenedor = document.getElementById("tablaPasosContenedor");
+        if (!contenedor) return;
+        if (!pasos || pasos.length === 0) {
+            contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando pasos...</div>`;
+            return;
+        }
+        contenedor.innerHTML = "";
+        pasos.forEach(p => {
+            const esAbierto = p.estado_prioridad === "ABIERTO";
+            const colorEstado = esAbierto ? "#22c55e" : "#ef4444";
+            contenedor.innerHTML += `
+                <div style="background: var(--card-inner); border: 1px solid var(--border); border-left: 5px solid ${colorEstado}; padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; cursor: pointer;" onclick="cerrarModalPasosDirectorio(); centrarMapaEnPaso(${p.latitud}, ${p.longitud}, '${p.nombre_paso}')">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${p.nombre_paso}</div>
+                        <div style="font-size: 0.62rem; color: var(--text-muted);">Provincia: <b>${p.provincia || 'N/D'}</b></div>
+                    </div>
+                    <span style="font-size: 0.65rem; font-weight: 900; color: ${colorEstado}; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${p.estado_prioridad}</span>
+                </div>
+            `;
+        });
+    }
+
+    function filtrarDirectorioPasos() {
+        const texto = document.getElementById("inputFiltroPasos").value.toLowerCase();
+        const filtrados = listaPasosMaestraGlobal.filter(p => 
+            (p.nombre_paso && p.nombre_paso.toLowerCase().includes(texto)) ||
+            (p.provincia && p.provincia.toLowerCase().includes(texto))
+        );
+        poblarTablaPasosDirectorio(filtrados);
+    }
+
+    function actualizarSelectYMapa() {
+        const select = document.getElementById("id");
+        if (!select) return;
+        const valorActual = select.value;
+        select.innerHTML = "";
+        if (markersLayer) markersLayer.clearLayers();
+
+        for (const [id, info] of Object.entries(estacionesData)) {
+            const option = document.createElement("option");
+            option.value = id;
+            option.textContent = `${id} - ${info.nombre}`;
+            select.appendChild(option);
+
+            if (info.coords && map) {
+                const ultimaAltura = historialLecturas[id] !== undefined ? historialLecturas[id] : 0;
+                const enAlerta = ultimaAltura > 1.5;
+                const colorPunto = enAlerta ? "#ef4444" : "#38bdf8";
+
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background: ${colorPunto}; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px ${colorPunto}; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight:bold; color:#000;">💧</div>`,
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                });
+
+                const marker = L.marker(info.coords, { icon: customIcon, draggable: true }).addTo(markersLayer);
+                
+                // Etiqueta permanente mostrando ÚNICAMENTE EL ID
+                marker.bindTooltip(`${id}`, {
+                    permanent: true,
+                    direction: 'top',
+                    offset: [0, -10],
+                    className: 'map-station-tooltip'
+                });
+
+                marker.on('dragend', function(event) {
+                    const nuevaPos = event.target.getLatLng();
+                    estacionesData[id].coords = [nuevaPos.lat, nuevaPos.lng];
+                    localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+                    select.value = id;
+                    consultar();
+                    cargarDatosEnFormularioEdicion(id);
+                });
+
+                marker.on('click', () => {
+                    select.value = id;
+                    consultar();
+                    cargarDatosEnFormularioEdicion(id);
+                });
+            }
+        }
+        if (estacionesData[valorActual]) {
+            select.value = valorActual;
+        } else {
+            const primerId = Object.keys(estacionesData)[0];
+            if(primerId) select.value = primerId;
+        }
+        cargarDatosEnFormularioEdicion(select.value);
+    }
+
+    function cargarDatosEnFormularioEdicion(id) {
+        if (!estacionesData[id]) return;
+        const info = estacionesData[id];
+        document.getElementById("nuevoIdEstacion").value = id;
+        document.getElementById("nuevoNombreEstacion").value = info.nombre;
+        document.getElementById("nuevaRedEstacion").value = info.red;
+        if (info.coords) {
+            document.getElementById("nuevaLatEstacion").value = info.coords[0].toFixed(4);
+            document.getElementById("nuevaLonEstacion").value = info.coords[1].toFixed(4);
+        }
+    }
+
+    function agregarPuntoMedicionMapa() {
+        if (!map) return;
+        const nuevoId = "PUNTO_" + Math.floor(Math.random() * 9000 + 1000);
+        const centroMap = map.getCenter();
+
+        estacionesData[nuevoId] = {
+            nombre: "Nuevo Punto de Medición",
+            red: "Red Personalizada",
+            coords: [centroMap.lat, centroMap.lng]
+        };
+
+        localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+        actualizarSelectYMapa();
+        
+        const select = document.getElementById("id");
+        if(select) {
+            select.value = nuevoId;
+            consultar();
+        }
+        cargarDatosEnFormularioEdicion(nuevoId);
+    }
+
+    function guardarEdicionEstacionActual() {
+        const idActual = document.getElementById("nuevoIdEstacion").value.trim();
+        const nuevoNombre = document.getElementById("nuevoNombreEstacion").value.trim();
+        const nuevaRed = document.getElementById("nuevaRedEstacion").value.trim();
+        const nuevaLat = parseFloat(document.getElementById("nuevaLatEstacion").value);
+        const nuevaLon = parseFloat(document.getElementById("nuevaLonEstacion").value);
+
+        if (!idActual || !estacionesData[idActual]) return;
+
+        estacionesData[idActual].nombre = nuevoNombre || estacionesData[idActual].nombre;
+        estacionesData[idActual].red = nuevaRed || estacionesData[idActual].red;
+        if (!isNaN(nuevaLat) && !isNaN(nuevaLon)) {
+            estacionesData[idActual].coords = [nuevaLat, nuevaLon];
+        }
+
+        localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+        actualizarSelectYMapa();
+        alert("✅ Cambios guardados con éxito.");
+    }
+
+    function borrarEstacionActual() {
+        const idActual = document.getElementById("nuevoIdEstacion").value.trim();
+        if (!idActual || !estacionesData[idActual]) return;
+
+        if (confirm(`¿Estás seguro de eliminar el punto ID: ${idActual}?`)) {
+            delete estacionesData[idActual];
+            localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+            actualizarSelectYMapa();
+            alert("🗑️ Punto eliminado.");
+        }
+    }
+
+    function restaurarEstacionesOriginales() {
+        if (confirm("¿Restaurar estaciones por defecto?")) {
+            estacionesData = JSON.parse(JSON.stringify(estacionesDefault));
+            localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
+            actualizarSelectYMapa();
+        }
+    }
+
+    async function escanearTodasLasEstaciones() {
+        let idsEstaciones = Object.keys(estacionesData);
+        let muestraIds = idsEstaciones.slice(0, 10);
+
+        for (let idEst of muestraIds) {
+            try {
+                const response = await fetch(WORKER, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ estacion: idEst })
+                });
+                const data = await response.json();
+                const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
+
+                mediciones.forEach(m => {
+                    if(m.NombreCodigo === "Altura" && m.Valor !== -999 && m.Valor !== "-999") {
+                        historialLecturas[idEst] = Number(m.Valor);
+                    }
+                });
+            } catch(e) {}
+        }
+        localStorage.setItem("territoria_historial", JSON.stringify(historialLecturas));
+        actualizarSelectYMapa();
+    }
+
+    function toggleJson() {
+        const box = document.getElementById("jsonContainer");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+    }
+
+    async function consultar(){
+        const selectElem = document.getElementById("id");
+        if(!selectElem) return;
+        const estacionId = selectElem.value;
+        if(!estacionId) return;
+
+        const info = estacionesData[estacionId] || { nombre: `Estación ID: ${estacionId}`, red: "Red Nacional" };
+        document.getElementById("tituloEstacion").textContent = `🌊 Monitoreo: ${info.nombre}`;
+        document.getElementById("infoDetalle").innerHTML = `<b>Ubicación:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
+        cargarDatosEnFormularioEdicion(estacionId);
+
+        const resultado = document.getElementById("resultado");
+        resultado.innerHTML = '<div class="loading">Consultando red nacional...</div>';
+
+        try{
+            const response = await fetch(WORKER, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ estacion: estacionId })
+            });
+
+            const data = await response.json();
+            document.getElementById("json").textContent = JSON.stringify(data, null, 2);
+            resultado.innerHTML = "";
+
+            const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
+            if(mediciones.length === 0) {
+                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">Punto personalizado operativo.</div>';
+                return;
+            }
+
+            mediciones.forEach(m => {
+                let valor = m.Valor === -999 || m.Valor === "-999" ? "N/D" : Number(m.Valor).toFixed(2);
+                const unidad = unidades[m.NombreCodigo] || "";
+                resultado.innerHTML += `
+                    <div class="card">
+                        <div class="nombre" style="font-size:0.68rem;">${m.NombreCodigo}</div>
+                        <div class="valor" style="font-size:1.2rem; font-weight:800;">${valor}</div>
+                        <div class="unidad" style="font-size:0.6rem; color:var(--text-muted);">${unidad}</div>
+                    </div>
+                `;
+            });
+        } catch(error){
+            resultado.innerHTML = `<div class="card" style="grid-column: 1 / -1; color: var(--accent); text-align: center;">Punto hídrico operativo.</div>`;
+        }
+    }
+
+    function abrirModalAlarmasActivas() {
+        document.getElementById("modalAlarmasActivas").style.display = "flex";
+    }
+    function cerrarModalAlarmasActivas() {
+        document.getElementById("modalAlarmasActivas").style.display = "none";
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        inicializarMapaHidroOriginal();
+    });
+</script>
+
+</body>
+</html>
