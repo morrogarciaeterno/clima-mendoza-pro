@@ -1574,7 +1574,7 @@
                         <div class="loading">Seleccioná una estación del mapa o del selector.</div>
                     </div>
 
-                    <!-- PANEL DE EDICIÓN RÁPIDA, CAMBIO DE NOMBRE Y BORRADO -->
+                    <!-- PANEL DE EDICIÓN RÁPIDA, CAMBIO DE NOMBRE Y BORRADO (CORREGIDO PARA LIBRE EDICIÓN) -->
                     <div style="background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-top: 8px;">
                         <h4 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 6px; font-weight: 800;">✏️ Edición Rápida, Nombre & Borrado</h4>
                         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 6px; margin-bottom: 6px;">
@@ -1583,8 +1583,8 @@
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px;">
                             <input type="text" id="nuevaRedEstacion" placeholder="Red / Cuenca">
-                            <input type="number" step="any" id="nuevaLatEstacion" placeholder="Latitud">
-                            <input type="number" step="any" id="nuevaLonEstacion" placeholder="Longitud">
+                            <input type="text" inputmode="decimal" id="nuevaLatEstacion" placeholder="Latitud">
+                            <input type="text" inputmode="decimal" id="nuevaLonEstacion" placeholder="Longitud">
                         </div>
                         <div style="display: flex; gap: 6px;">
                             <button onclick="guardarEdicionEstacionActual()" style="flex: 2; background: #22c55e; color: #000; font-weight: 800; padding: 6px; border-radius: 6px; cursor: pointer;">💾 Guardar Cambios</button>
@@ -2397,14 +2397,13 @@
 
         if (elId) elId.value = id;
         if (elNombre) {
-            // Limpia prefijos redundantes para que el input sea totalmente editable y limpio
             let nombreLimpio = info.nombre.replace(new RegExp(`^Estación\\s*${id}\\s*-\\s*`, 'i'), '');
             elNombre.value = nombreLimpio;
         }
         if (elRed) elRed.value = info.red;
         if (info.coords && elLat && elLon) {
-            elLat.value = info.coords[0].toFixed(4);
-            elLon.value = info.coords[1].toFixed(4);
+            elLat.value = info.coords[0];
+            elLon.value = info.coords[1];
         }
     }
 
@@ -2434,15 +2433,14 @@
         const idActual = document.getElementById("nuevoIdEstacion").value.trim();
         const textoNombreIngresado = document.getElementById("nuevoNombreEstacion").value.trim();
         const nuevaRed = document.getElementById("nuevaRedEstacion").value.trim();
-        const nuevaLat = parseFloat(document.getElementById("nuevaLatEstacion").value);
-        const nuevaLon = parseFloat(document.getElementById("nuevaLonEstacion").value);
+        const nuevaLat = parseFloat(document.getElementById("nuevaLatEstacion").value.replace(',', '.'));
+        const nuevaLon = parseFloat(document.getElementById("nuevaLonEstacion").value.replace(',', '.'));
 
         if (!idActual || !estacionesData[idActual]) {
             alert("Selecciona o agrega un punto válido para editar.");
             return;
         }
 
-        // Armamos el nombre formal de la estación manteniendo el prefijo del ID para el selector y título
         let nombreFormateado = textoNombreIngresado.startsWith(`Estación ${idActual}`) 
             ? textoNombreIngresado 
             : `Estación ${idActual} - ${textoNombreIngresado}`;
