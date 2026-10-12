@@ -1352,6 +1352,22 @@
 
     <br>
 
+    <!-- NUEVO BLOQUE: DIRECTORIO COMPLETO DE PASOS FRONTERIZOS ARGENTINA-CHILE -->
+    <div class="card" style="border-left: 6px solid #f59e0b; background: linear-gradient(135deg, #18120d 0%, #0e1526 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+            <div>
+                <h3 style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🚧 Directorio Oficial Completo de Pasos Fronterizos (Arg. - Chile)</h3>
+                <small style="color: var(--text-muted); font-size: 0.65rem;">Listado maestro completo georreferenciado de corredores cordilleranos.</small>
+            </div>
+            <button onclick="abrirModalPasosDirectorio()" style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">📂 Ver Listado Maestro Completo</button>
+        </div>
+        <div id="pasosResumenCinta" class="sismos-cinta-horizontal">
+            Cargando listado maestro de pasos fronterizos...
+        </div>
+    </div>
+
+    <br>
+
     <div class="dual-section">
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
@@ -1617,6 +1633,24 @@
     </div>
 </div>
 
+<!-- VENTANA MODAL LISTADO MAESTRO DE PASOS FRONTERIZOS -->
+<div class="modal-overlay" id="modalPasosDirectorio" style="display: none;">
+    <div class="modal-content-box" style="max-width: 900px; height: 85vh;">
+        <div class="modal-header">
+            <h2>🚧 Directorio Maestro Oficial - Pasos Fronterizos (Arg. - Chile)</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarModalPasosDirectorio()">✕</button>
+        </div>
+        <div class="modal-body" style="grid-template-columns: 1fr; gap: 8px; overflow-y: auto;">
+            <div class="modal-search-box">
+                <input type="text" id="inputFiltroPasos" class="modal-search-input" placeholder="Filtrar por nombre, provincia o país..." oninput="filtrarDirectorioPasos()">
+            </div>
+            <div id="tablaPasosContenedor" style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- VENTANA MODAL PARA LOTES Y REPORTE REAL -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
@@ -1713,6 +1747,7 @@
     let estacionesEnAlertaActuales = {};
     let sismosInpresEnAlertaActuales = {};
     let capaPasosFronterizosDinamicos = null;
+    let listaPasosMaestraGlobal = [];
     const PASOS_API_URL = ["https://", "pasos-proxy", ".elexpreso17.workers.dev"].join("");
 
     async function cargarPasosFronterizosDinamicos() {
@@ -1725,12 +1760,15 @@
         try {
             const response = await fetch(PASOS_API_URL);
             const pasos = await response.json();
+            listaPasosMaestraGlobal = pasos;
+
+            renderizarCintaPasosResumen(pasos);
 
             pasos.forEach(paso => {
                 let lat = parseFloat(paso.latitud);
                 let lon = parseFloat(paso.longitud);
 
-                if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
+                if (!isNaN(lat) && !isNaN(lon) && lat < -20 && lat > -56 && lon > -76 && lon < -53) {
                     const esAbierto = paso.estado_prioridad === "ABIERTO";
                     const colorPin = esAbierto ? "#16a34a" : "#dc2626";
                     const iconoEmoji = esAbierto ? "🟢" : "🔴";
@@ -1759,6 +1797,86 @@
         } catch (error) {
             console.error("Error al cargar pasos fronterizos:", error);
         }
+    }
+
+    function renderizarCintaPasosResumen(pasos) {
+        const contenedor = document.getElementById("pasosResumenCinta");
+        if (!contenedor) return;
+        contenedor.innerHTML = "";
+
+        pasos.slice(0, 25).forEach(paso => {
+            let lat = parseFloat(paso.latitud);
+            let lon = parseFloat(paso.longitud);
+            const esAbierto = paso.estado_prioridad === "ABIERTO";
+            const colorEstado = esAbierto ? "#22c55e" : "#ef4444";
+
+            contenedor.innerHTML += `
+                <div class="sismo-mini-card" style="flex: 0 0 100px;" title="${paso.nombre_paso} - ${paso.provincia}" onclick="centrarMapaEnPasoFronterizo(${lat}, ${lon}, '${paso.nombre_paso.replace(/'/g, "")}')">
+                    <div style="font-size: 0.58rem; color: ${colorEstado}; font-weight:800; white-space: nowrap;">${paso.estado_prioridad}</div>
+                    <div class="sismo-mini-mag" style="font-size: 0.7rem; color: var(--accent);">🚧 Paso</div>
+                    <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;" title="${paso.nombre_paso}">${paso.nombre_paso}</div>
+                    <div style="font-size: 0.52rem; color: var(--text-muted); white-space: nowrap;">${paso.provincia || ''}</div>
+                </div>
+            `;
+        });
+    }
+
+    function centrarMapaEnPasoFronterizo(lat, lon, nombre) {
+        if (!isNaN(lat) && !isNaN(lon) && mapInstance) {
+            mapInstance.setView([lat, lon], 9);
+            cambiarCapaMapa('pasos');
+        }
+    }
+
+    function abrirModalPasosDirectorio() {
+        const modal = document.getElementById("modalPasosDirectorio");
+        if (modal) {
+            modal.style.display = "flex";
+            poblarTablaPasosDirectorio(listaPasosMaestraGlobal);
+        }
+    }
+
+    function cerrarModalPasosDirectorio() {
+        const modal = document.getElementById("modalPasosDirectorio");
+        if (modal) modal.style.display = "none";
+    }
+
+    function poblarTablaPasosDirectorio(pasos) {
+        const contenedor = document.getElementById("tablaPasosContenedor");
+        if (!contenedor) return;
+
+        if (!pasos || pasos.length === 0) {
+            contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando pasos fronterizos...</div>`;
+            return;
+        }
+
+        contenedor.innerHTML = "";
+        pasos.forEach(p => {
+            const esAbierto = p.estado_prioridad === "ABIERTO";
+            const colorEstado = esAbierto ? "#22c55e" : "#ef4444";
+            contenedor.innerHTML += `
+                <div style="background: var(--card-inner); border: 1px solid var(--border); border-left: 5px solid ${colorEstado}; padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; cursor: pointer;" onclick="cerrarModalPasosDirectorio(); centrarMapaEnPasoFronterizo(${p.latitud}, ${p.longitud}, '${p.nombre_paso}')" title="Clic para ubicar en el mapa">
+                    <div style="min-width: 0;">
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${p.nombre_paso}</div>
+                        <div style="font-size: 0.62rem; color: var(--text-muted);">Provincia: <b>${p.provincia || 'N/D'}</b> | País: ${p.pais || 'Argentina / Chile'}</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;">
+                        <span style="font-size: 0.65rem; font-weight: 900; color: ${colorEstado}; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${p.estado_prioridad}</span>
+                        <span style="font-size: 0.55rem; color: var(--accent); text-decoration: underline;">Ver en mapa 🔍</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function filtrarDirectorioPasos() {
+        const texto = document.getElementById("inputFiltroPasos").value.toLowerCase();
+        const filtrados = listaPasosMaestraGlobal.filter(p => 
+            (p.nombre_paso && p.nombre_paso.toLowerCase().includes(texto)) ||
+            (p.provincia && p.provincia.toLowerCase().includes(texto)) ||
+            (p.pais && p.pais.toLowerCase().includes(texto))
+        );
+        poblarTablaPasosDirectorio(filtrados);
     }
 
     let estadoAlarmasSistema = {
@@ -3434,6 +3552,7 @@
         cargarSismosInpres();
         verificarProximidadIncendios(currentLat, currentLon);
         escanearTodasLasEstaciones();
+        cargarPasosFronterizosDinamicos();
     }
 
     async function procesarUbicacionExitosa(lat, lon) {
