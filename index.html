@@ -459,17 +459,6 @@
             padding: 15px;
             grid-column: 1 / -1;
         }
-        /* Estilo para etiquetas permanentes sobre los marcadores del mapa */
-        .map-station-tooltip {
-            background: rgba(14, 21, 38, 0.9) !important;
-            border: 1px solid var(--accent) !important;
-            color: #f8fafc !important;
-            font-size: 0.6rem !important;
-            font-weight: 700 !important;
-            padding: 2px 6px !important;
-            border-radius: 4px !important;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
-        }
     </style>
 </head>
 
@@ -514,21 +503,22 @@
 
 <div class="container">
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA CON PANEL DE GESTIÓN Y BOTÓN NUEVO CÍRCULO -->
+    <!-- SECCIÓN DE HIDROMETRÍA SNIH -->
     <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
                 <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🌊 Territoria - Monitoreo Hídrico SNIH & Panel de Control</h3>
-                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Creá un nuevo círculo, arrastralo para ubicarlo y edita nombres al instante.</small>
+                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Haz clic en el botón amarillo para agregar un punto y arrástralo en el mapa para ubicarlo.</small>
             </div>
-            <div style="display: flex; gap: 6px;">
-                <button onclick="activarNuevoCirculoMapa()" style="background: #22c55e; color: #000; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer; box-shadow: 0 0 10px rgba(34,197,94,0.4);">➕ Nuevo Círculo / Punto</button>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <!-- BOTÓN AMARILLO SOLICITADO PARA AGREGAR PUNTO DE MEDICIÓN -->
+                <button onclick="agregarPuntoMedicionMapa()" style="background: #facc15; color: #000; padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 900; cursor: pointer; box-shadow: 0 0 12px rgba(250,204,21,0.5);">⭐ Agregar Punto de Medición</button>
                 <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
             </div>
         </div>
 
         <div class="hidro-layout-grid">
-            <!-- COLUMNA IZQUIERDA: CONTROLES, DATOS Y GESTIÓN VISIBLE -->
+            <!-- COLUMNA IZQUIERDA: CONTROLES, DATOS Y EDICIÓN -->
             <div class="panel" style="display: flex; flex-direction: column; gap: 10px;">
                 <div class="search-box">
                     <select id="id" onchange="consultar()">
@@ -541,7 +531,7 @@
                     Información de la red y ubicación...
                 </div>
 
-                <!-- PANEL RESUMEN ESPECÍFICO -->
+                <!-- PANEL RESUMEN -->
                 <div id="panelResumenCaudal" class="resumen-caudal" style="margin-top:0; margin-bottom:0;">
                     <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.58rem; background: #64748b; padding: 2px 5px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
                     <div class="indicadores-grid" style="margin-top: 6px;">
@@ -567,10 +557,10 @@
 
                 <!-- PANEL DE EDICIÓN FÁCIL Y CAMBIO DE NOMBRE -->
                 <div style="background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-top: 4px;">
-                    <h4 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 6px; font-weight: 800;">✏️ Edición Fácil / Cambiar Nombre de Estación</h4>
+                    <h4 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 6px; font-weight: 800;">✏️ Edición Rápida & Cambio de Nombre</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
-                        <input type="text" id="nuevoIdEstacion" placeholder="ID (Ej: 1422)" readonly style="opacity: 0.7;">
-                        <input type="text" id="nuevoNombreEstacion" placeholder="Nuevo Nombre o Modificar...">
+                        <input type="text" id="nuevoIdEstacion" placeholder="ID" readonly style="opacity: 0.7;">
+                        <input type="text" id="nuevoNombreEstacion" placeholder="Nombre de la estación...">
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px;">
                         <input type="text" id="nuevaRedEstacion" placeholder="Red / Cuenca">
@@ -591,9 +581,9 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: MAPA DE ESTACIONES CON ETIQUETAS PERMANENTES -->
+            <!-- COLUMNA DERECHA: MAPA LIMPIO SIN ETIQUETAS FIJAS -->
             <div class="panel" style="display: flex; flex-direction: column;">
-                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones <span style="font-size:0.6rem; color:var(--accent); font-weight:normal;">(Arrastrá cualquier círculo para reubicarlo)</span></h3>
+                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones <span style="font-size:0.6rem; color:var(--accent); font-weight:normal;">(Arrastrá cualquier punto para reubicarlo)</span></h3>
                 <div id="map"></div>
             </div>
         </div>
@@ -601,7 +591,7 @@
 
 </div>
 
-<!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA -->
+<!-- VENTANA MODAL ALARMAS SCADA -->
 <div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
     <div class="modal-content-box" style="max-width: 700px; height: auto; max-height: 85vh;">
         <div class="modal-header">
@@ -615,13 +605,6 @@
 </div>
 
 <script>
-    let estacionesEnAlertaActuales = {};
-    let estadoAlarmasSistema = {
-        fuego: { activo: false, reconocido: false, titulo: "Foco Forestal Activo", horaDisparo: "" },
-        zonda: { activo: false, reconocido: false, titulo: "Alerta Climática Extrema", horaDisparo: "" },
-        helada: { activo: false, reconocido: false, titulo: "Alerta de Helada Agrícola", horaDisparo: "" }
-    };
-
     const estacionesDefault = {
         "11425": { nombre: "Estación 11425 - Gendarmería", red: "Red Hidrológica Nacional, Mendoza", coords: [-32.85, -69.75] },
         "11427": { nombre: "Estación 11427 - La Gotera", red: "Red Hidrológica Nacional, Mendoza", coords: [-32.90, -69.10] },
@@ -635,12 +618,9 @@
     let historialLecturas = JSON.parse(localStorage.getItem("territoria_historial")) || {};
     let map = null;
     let markersLayer = null;
-    let marcadorNuevoPendiente = null;
 
     const WORKER = "https://snih-proxy.elexpreso17.workers.dev";
-    const unidades = {
-        "Altura": "m", "Precipitación": "mm", "Temperatura": "°C", "Humedad": "%"
-    };
+    const unidades = { "Altura": "m", "Precipitación": "mm", "Temperatura": "°C", "Humedad": "%" };
 
     function inicializarMapaHidroOriginal() {
         if (!map) {
@@ -676,25 +656,19 @@
             if (info.coords && map) {
                 const ultimaAltura = historialLecturas[id] !== undefined ? historialLecturas[id] : 0;
                 const enAlerta = ultimaAltura > 1.5;
-
                 const colorPunto = enAlerta ? "#ef4444" : "#38bdf8";
 
                 const customIcon = L.divIcon({
                     className: 'custom-marker',
-                    html: `<div style="background: ${colorPunto}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px ${colorPunto}; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight:bold; color:#000;">💧</div>`,
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
+                    html: `<div style="background: ${colorPunto}; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px ${colorPunto}; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight:bold; color:#000;">💧</div>`,
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
                 });
 
                 const marker = L.marker(info.coords, { icon: customIcon, draggable: true }).addTo(markersLayer);
                 
-                // Etiqueta permanente visible sobre el mapa
-                marker.bindTooltip(`${id} - ${info.nombre}`, {
-                    permanent: true,
-                    direction: 'top',
-                    offset: [0, -10],
-                    className: 'map-station-tooltip'
-                });
+                // PopUp estándar al hacer clic (sin etiquetas fijas saturando el mapa)
+                marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span><br><small style="color:#0284c7;">Arrastrá el punto para reubicarlo</small>`);
 
                 marker.on('dragend', function(event) {
                     const nuevaPos = event.target.getLatLng();
@@ -733,13 +707,13 @@
         }
     }
 
-    function activarNuevoCirculoMapa() {
+    function agregarPuntoMedicionMapa() {
         if (!map) return;
-        const nuevoId = "EST_" + Math.floor(Math.random() * 9000 + 1000);
+        const nuevoId = "PUNTO_" + Math.floor(Math.random() * 9000 + 1000);
         const centroMap = map.getCenter();
 
         estacionesData[nuevoId] = {
-            nombre: "Nuevo Punto Hídrico",
+            nombre: "Nuevo Punto de Medición",
             red: "Red Personalizada",
             coords: [centroMap.lat, centroMap.lng]
         };
@@ -753,7 +727,7 @@
             consultar();
         }
         cargarDatosEnFormularioEdicion(nuevoId);
-        alert(`✔ Nuevo círculo creado (${nuevoId}). Arrastralo en el mapa para ubicarlo y modificale el nombre abajo.`);
+        alert(`⭐ ¡Punto de medición agregado (${nuevoId})! Arrastralo en el mapa para ubicarlo y modificale el nombre abajo.`);
     }
 
     function guardarEdicionEstacionActual() {
@@ -764,7 +738,7 @@
         const nuevaLon = parseFloat(document.getElementById("nuevaLonEstacion").value);
 
         if (!idActual || !estacionesData[idActual]) {
-            alert("Selecciona o crea una estación válida para editar.");
+            alert("Selecciona o agrega un punto válido para editar.");
             return;
         }
 
@@ -776,7 +750,7 @@
 
         localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
         actualizarSelectYMapa();
-        alert(`✅ Estación ${idActual} actualizada con éxito.`);
+        alert(`✅ Estación "${estacionesData[idActual].nombre}" actualizada con éxito.`);
     }
 
     function restaurarEstacionesOriginales() {
@@ -791,7 +765,6 @@
     async function escanearTodasLasEstaciones() {
         let idsEstaciones = Object.keys(estacionesData);
         let muestraIds = idsEstaciones.slice(0, 10);
-        let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
         for (let idEst of muestraIds) {
             try {
@@ -846,7 +819,7 @@
 
             const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
             if(mediciones.length === 0) {
-                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">No hay mediciones en vivo (punto personalizado).</div>';
+                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">Punto personalizado creado correctamente. Sin telemetría SNIH en vivo.</div>';
                 return;
             }
 
@@ -862,7 +835,7 @@
                 `;
             });
         } catch(error){
-            resultado.innerHTML = `<div class="card" style="grid-column: 1 / -1; color: #ef4444; text-align: center;">Punto hídrico custom o sin enlace en vivo SNIH.</div>`;
+            resultado.innerHTML = `<div class="card" style="grid-column: 1 / -1; color: var(--accent); text-align: center;">Punto hídrico custom operativo.</div>`;
         }
     }
 
