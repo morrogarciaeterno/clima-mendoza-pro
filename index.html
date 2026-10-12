@@ -1159,7 +1159,6 @@
             padding: 15px;
             grid-column: 1 / -1;
         }
-        /* Estilo para etiquetas limpias mostrando solo el ID en el mapa de estaciones */
         .map-station-tooltip {
             background: rgba(14, 21, 38, 0.95) !important;
             border: 1px solid var(--accent) !important;
@@ -1578,9 +1577,9 @@
                     <!-- PANEL DE EDICIÓN RÁPIDA, CAMBIO DE NOMBRE Y BORRADO -->
                     <div style="background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-top: 8px;">
                         <h4 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 6px; font-weight: 800;">✏️ Edición Rápida, Nombre & Borrado</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
-                            <input type="text" id="nuevoIdEstacion" placeholder="ID" readonly style="opacity: 0.7;">
-                            <input type="text" id="nuevoNombreEstacion" placeholder="Nombre de la estación...">
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 6px; margin-bottom: 6px;">
+                            <input type="text" id="nuevoIdEstacion" placeholder="ID" readonly style="opacity: 0.7;" title="ID de la estación (Fijo)">
+                            <input type="text" id="nuevoNombreEstacion" placeholder="Ej: Túnel Internacional (Nombre limpio)...">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px;">
                             <input type="text" id="nuevaRedEstacion" placeholder="Red / Cuenca">
@@ -1590,7 +1589,7 @@
                         <div style="display: flex; gap: 6px;">
                             <button onclick="guardarEdicionEstacionActual()" style="flex: 2; background: #22c55e; color: #000; font-weight: 800; padding: 6px; border-radius: 6px; cursor: pointer;">💾 Guardar Cambios</button>
                             <button onclick="borrarEstacionActual()" style="flex: 1; background: #ef4444; color: #fff; font-weight: 800; font-size: 0.68rem; border-radius: 6px; cursor: pointer;" title="Eliminar punto seleccionado">🗑️ Borrar</button>
-                            <button onclick="restaurarEstacionesOriginales()" style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.65rem; border-radius: 6px; cursor: pointer;">🔄</button>
+                            <button onclick="restaurarEstacionesOriginales()" style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.65rem; border-radius: 6px; cursor: pointer;" title="Restaurar originales">🔄</button>
                         </div>
                     </div>
                 </div>
@@ -2397,7 +2396,11 @@
         const elLon = document.getElementById("nuevaLonEstacion");
 
         if (elId) elId.value = id;
-        if (elNombre) elNombre.value = info.nombre;
+        if (elNombre) {
+            // Limpia prefijos redundantes para que el input sea totalmente editable y limpio
+            let nombreLimpio = info.nombre.replace(new RegExp(`^Estación\\s*${id}\\s*-\\s*`, 'i'), '');
+            elNombre.value = nombreLimpio;
+        }
         if (elRed) elRed.value = info.red;
         if (info.coords && elLat && elLon) {
             elLat.value = info.coords[0].toFixed(4);
@@ -2411,7 +2414,7 @@
         const centroMap = map.getCenter();
 
         estacionesData[nuevoId] = {
-            nombre: "Nuevo Punto de Medición",
+            nombre: "Nuevo Punto",
             red: "Red Personalizada",
             coords: [centroMap.lat, centroMap.lng]
         };
@@ -2429,7 +2432,7 @@
 
     function guardarEdicionEstacionActual() {
         const idActual = document.getElementById("nuevoIdEstacion").value.trim();
-        const nuevoNombre = document.getElementById("nuevoNombreEstacion").value.trim();
+        const textoNombreIngresado = document.getElementById("nuevoNombreEstacion").value.trim();
         const nuevaRed = document.getElementById("nuevaRedEstacion").value.trim();
         const nuevaLat = parseFloat(document.getElementById("nuevaLatEstacion").value);
         const nuevaLon = parseFloat(document.getElementById("nuevaLonEstacion").value);
@@ -2439,14 +2442,21 @@
             return;
         }
 
-        estacionesData[idActual].nombre = nuevoNombre || estacionesData[idActual].nombre;
+        // Armamos el nombre formal de la estación manteniendo el prefijo del ID para el selector y título
+        let nombreFormateado = textoNombreIngresado.startsWith(`Estación ${idActual}`) 
+            ? textoNombreIngresado 
+            : `Estación ${idActual} - ${textoNombreIngresado}`;
+
+        estacionesData[idActual].nombre = nombreFormateado;
         estacionesData[idActual].red = nuevaRed || estacionesData[idActual].red;
+        
         if (!isNaN(nuevaLat) && !isNaN(nuevaLon)) {
             estacionesData[idActual].coords = [nuevaLat, nuevaLon];
         }
 
         localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
         actualizarSelectYMapa();
+        consultar();
         alert("✅ Cambios guardados con éxito.");
     }
 
