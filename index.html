@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    
+
     <!-- Firebase App y Firestore (Compat SDK) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -67,26 +67,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             min-width: 0;
             flex-grow: 1;
         }
 
         .brand-logo {
-            width: 42px;
-            height: 42px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             border-radius: 50%;
             background: #ffffff;
             padding: 2px;
             flex-shrink: 0;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
         .brand-text-container {
@@ -96,7 +96,7 @@
         }
 
         .brand h1 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             white-space: nowrap;
@@ -174,7 +174,7 @@
             gap: 8px;
             box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.2);
             position: sticky;
-            top: 59px;
+            top: 51px;
             z-index: 99;
         }
 
@@ -1176,11 +1176,10 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <!-- LOGOTIPO OFICIAL DE TERRITORIA (EMBEBIDO BASE64) -->
-            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy.xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
+            <img src="territoria-logo.png" alt="Territoria" class="brand-logo" onerror="this.style.display='none'">
             <div class="brand-text-container">
-                <h1>TERRITORIA</h1>
-                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Plataforma Inteligente de Gestión Territorial</p>
+                <h1>Territoria</h1>
+                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Obteniendo localidad GPS...</p>
             </div>
         </div>
 
@@ -1530,11 +1529,11 @@
             </div>
             <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
         </div>
-        
+
         <div class="hidro-layout-grid">
             <!-- COLUMNA IZQUIERDA -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
-               <div>
+                <div>
                     <div class="search-box">
                         <select id="id" onchange="consultar()">
                             <!-- Se llena dinámicamente -->
@@ -1702,8 +1701,8 @@
 <script>
     document.addEventListener('keydown', function(e) {
         if (
-            e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) || 
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
             (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
         ) {
             e.preventDefault();
@@ -1731,7 +1730,8 @@
                 let lat = parseFloat(paso.latitud);
                 let lon = parseFloat(paso.longitud);
 
-                if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
+                // Filtro optimizado para que queden sobre la región cordillerana y fronteriza
+                if (!isNaN(lat) && !isNaN(lon) && lat < -20 && lat > -56 && lon > -76 && lon < -53) {
                     const esAbierto = paso.estado_prioridad === "ABIERTO";
                     const colorPin = esAbierto ? "#16a34a" : "#dc2626";
                     const iconoEmoji = esAbierto ? "🟢" : "🔴";
@@ -1814,7 +1814,7 @@
 
     function centrarMapaEnSismo(lat, lon, descripcion, magnitud) {
         cerrarModalAlarmasActivas();
-        
+
         let parsedLat = parseFloat(lat);
         let parsedLon = parseFloat(lon);
 
@@ -2077,7 +2077,7 @@
         historial.forEach(item => {
             let disparo = item.horaDisparo || "--:--";
             let reconocido = item.horaReconocido || item.hora || "--:--";
-            
+
             let idEstacionExtraido = item.estacionId;
             let esClickable = idEstacionExtraido && estacionesData[idEstacionExtraido];
             let estiloFila = "border-left: 3px solid #22c55e;";
@@ -2331,7 +2331,7 @@
 
                 const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
                 marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span>`);
-                
+
                 marker.on('click', () => {
                     select.value = id;
                     consultar();
@@ -2407,7 +2407,7 @@
         const info = estacionesData[estacionId] || { nombre: `Estación ID: ${estacionId}`, red: "Red Nacional" };
         document.getElementById("tituloEstacion").textContent = `🌊 Monitoreo: ${info.nombre}`;
         document.getElementById("infoDetalle").innerHTML = `<b>Ubicación:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
-        
+
         document.getElementById("resumenAltura").textContent = "--";
         document.getElementById("tendenciaAltura").textContent = "--";
         document.getElementById("resumenPrecipitacion").textContent = "--";
@@ -2455,7 +2455,7 @@
 
             if(alturaValNum !== null && anteriorAltura !== null) {
                 let diferencia = alturaValNum - anteriorAltura;
-                
+
                 if(diferencia > 0.005) {
                     tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
                     tendenciaColor = "#ef4444";
@@ -2486,12 +2486,12 @@
 
                     if(m.NombreCodigo === "Altura" && !isNaN(num)) {
                         alturaValStr = num.toFixed(2) + " m";
-                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true; 
+                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true;
                     }
                     if(m.NombreCodigo.includes("Precipitación") && !isNaN(num)) precipVal = num.toFixed(1) + " mm";
                     if(m.NombreCodigo.includes("Temperatura") && !isNaN(num)) tempVal = num.toFixed(1) + " °C";
                 }
-                
+
                 const unidad = unidades[m.NombreCodigo] || "";
                 let claseAlertaCard = esAlertaTarjeta ? "alerta-roja" : "";
 
@@ -2557,13 +2557,31 @@
             let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
             let sismosVistosRonda = {};
 
+            let s1H = "13:25", s1M = "Mag 3.2", s1L = "SAN JUAN";
+            let s2H = "11:10", s2M = "Mag 2.8", s2L = "MENDOZA";
+            let s3H = "09:00", s3M = "Mag 4.1", s3L = "SALTA";
+
             items.forEach((item, index) => {
                 const provincia = item.querySelector("prov")?.textContent || "Argentina";
                 const fechaStr = item.querySelector("fecha")?.textContent || "";
                 const horaStr = item.querySelector("hora")?.textContent || "";
                 const magnitud = parseFloat(item.querySelector("mg")?.textContent || "0");
                 const profundidad = item.querySelector("prof")?.textContent || "";
-                
+
+                if (index === 0) {
+                    if (horaStr) s1H = horaStr;
+                    if (magnitud) s1M = "Mag " + magnitud.toFixed(1);
+                    if (provincia) s1L = provincia.toUpperCase();
+                } else if (index === 1) {
+                    if (horaStr) s2H = horaStr;
+                    if (magnitud) s2M = "Mag " + magnitud.toFixed(1);
+                    if (provincia) s2L = provincia.toUpperCase();
+                } else if (index === 2) {
+                    if (horaStr) s3H = horaStr;
+                    if (magnitud) s3M = "Mag " + magnitud.toFixed(1);
+                    if (provincia) s3L = provincia.toUpperCase();
+                }
+
                 let latSismo = parseFloat(item.querySelector("lat")?.textContent);
                 let lonSismo = parseFloat(item.querySelector("long")?.textContent);
 
@@ -2616,6 +2634,11 @@
             document.getElementById("inpres-estado").innerHTML = `Actualizado (${contadorMostrados} sismos): ` + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
             actualizarCintaTickerScada();
 
+            if (window.AndroidApp && typeof window.AndroidApp.guardarDatosWidget === "function") {
+                const tempActualTxt = document.getElementById("temp").innerText || "18°C";
+                window.AndroidApp.guardarDatosWidget(tempActualTxt, s1H, s1M, s1L, s2H, s2M, s2L, s3H, s3M, s3L);
+            }
+
         } catch(error) {
             console.error(error);
             document.getElementById("inpres-estado").innerHTML = "Error";
@@ -2635,7 +2658,7 @@
                     let p = s.properties;
                     let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
-                    
+
                     let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
@@ -2674,7 +2697,7 @@
                 btnCenso.style.color = "#000";
             }
             if (banner) banner.style.display = "flex";
-            
+
             if (mapInstance && capaCapaArboles && !mapInstance.hasLayer(capaCapaArboles)) {
                 capaCapaArboles.addTo(mapInstance);
             }
@@ -2685,7 +2708,7 @@
                 btnCenso.style.color = "#22c55e";
             }
             if (banner) banner.style.display = "none";
-            
+
             if (mapInstance && capaCapaArboles && mapInstance.hasLayer(capaCapaArboles)) {
                 mapInstance.removeLayer(capaCapaArboles);
             }
@@ -2806,7 +2829,7 @@
                     const scaleSize = maxWidth / img.width;
                     canvas.width = maxWidth;
                     canvas.height = img.height * scaleSize;
-                    
+
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     const comprimidaBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     enviarAFirebase(comprimidaBase64);
@@ -2943,7 +2966,7 @@
 
         panel.innerHTML = `
             <div class="report-section-title">📊 ${d.nombreLugar}, ${d.provinciaZona}</div>
-            
+
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} ha</span><br>
                 <b>Condiciones:</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
@@ -2982,7 +3005,6 @@
 
         if (!mapInstance) return;
 
-        // Quitar estado activo a todos los botones
         btnBase.classList.remove("active");
         btnTopo.classList.remove("active");
         if (btnCalles) btnCalles.classList.remove("active");
@@ -2991,15 +3013,10 @@
         if (btnSatinfra) btnSatinfra.classList.remove("active");
         if (btnPasos) btnPasos.classList.remove("active");
 
-        // LIMPIEZA TOTAL DE TODAS LAS CAPAS ESPECIALES ANTERIORES PARA EVITAR MEZCLAS
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
         if (capaPasosFronterizosDinamicos && mapInstance.hasLayer(capaPasosFronterizosDinamicos)) mapInstance.removeLayer(capaPasosFronterizosDinamicos);
-
-        // Limpiar sismos destacados previos si los hubiera
-        if (marcadorSismoActual) { mapInstance.removeLayer(marcadorSismoActual); marcadorSismoActual = null; }
-        if (circuloSismoActual) { mapInstance.removeLayer(circuloSismoActual); circuloSismoActual = null; }
 
         if (!capaActual) capaActual = capasBase.base;
         if (!mapInstance.hasLayer(capaActual)) capaActual.addTo(mapInstance);
@@ -3359,7 +3376,7 @@
                 document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
                 document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
                 document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
-                
+
                 actualizarCicloSolar(data.daily.sunrise[0], data.daily.sunset[0]);
             }
 
