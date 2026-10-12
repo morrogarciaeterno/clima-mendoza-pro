@@ -1730,8 +1730,7 @@
                 let lat = parseFloat(paso.latitud);
                 let lon = parseFloat(paso.longitud);
 
-                // Filtro optimizado para que queden sobre la región cordillerana y fronteriza
-                if (!isNaN(lat) && !isNaN(lon) && lat < -20 && lat > -56 && lon > -76 && lon < -53) {
+                if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
                     const esAbierto = paso.estado_prioridad === "ABIERTO";
                     const colorPin = esAbierto ? "#16a34a" : "#dc2626";
                     const iconoEmoji = esAbierto ? "🟢" : "🔴";
