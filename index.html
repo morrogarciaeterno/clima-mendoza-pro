@@ -1051,8 +1051,9 @@
         @media(min-width: 900px) {
             .hidro-layout-grid { grid-template-columns: 1.2fr 1fr; gap: 16px; }
         }
+        /* MAPA HÍDRICO AMPLIADO */
         #map {
-            height: 350px;
+            height: 500px;
             border-radius: 10px;
             border: 1px solid var(--border);
             z-index: 10;
@@ -1060,7 +1061,7 @@
             width: 100%;
         }
         @media(min-width: 768px) {
-            #map { height: 500px; }
+            #map { height: 650px; }
         }
         .cards {
             display: grid;
@@ -1168,14 +1169,16 @@
             padding: 15px;
             grid-column: 1 / -1;
         }
+        /* TOOLTIPS REDUCIDOS PARA EVITAR AMONTONAMIENTO */
         .map-station-tooltip {
-            background: rgba(14, 21, 38, 0.95) !important;
+            background: rgba(14, 21, 38, 0.9) !important;
             border: 1px solid var(--accent) !important;
             color: #38bdf8 !important;
-            font-size: 0.65rem !important;
-            font-weight: 900 !important;
-            padding: 2px 6px !important;
-            border-radius: 4px !important;
+            font-size: 0.55rem !important;
+            font-weight: 700 !important;
+            padding: 1px 4px !important;
+            border-radius: 3px !important;
+            box-shadow: none !important;
         }
     </style>
 </head>
@@ -1551,9 +1554,9 @@
                             <!-- Se llena dinámicamente -->
                         </select>
                         <button onclick="consultar()">Actualizar</button>
-                        <button onclick="prepararModoNuevo()" style="background: #22c55e; color: #000;" title="Agregar nueva estación">➕ Agregar</button>
-                        <button onclick="cargarEstacionParaEditar()" style="background: #eab308; color: #000;" title="Editar estación seleccionada">✏️ Editar</button>
-                        <button onclick="borrarEstacionActual()" style="background: #ef4444; color: #fff;" title="Borrar estación seleccionada">🗑️ Borrar</button>
+                        <button onclick="pedirClaveYEjecutar('agregar')" style="background: #22c55e; color: #000;" title="Agregar nueva estación">➕ Agregar</button>
+                        <button onclick="pedirClaveYEjecutar('editar')" style="background: #eab308; color: #000;" title="Editar estación seleccionada">✏️ Editar</button>
+                        <button onclick="pedirClaveYEjecutar('borrar')" style="background: #ef4444; color: #fff;" title="Borrar estación seleccionada">🗑️ Borrar</button>
                     </div>
 
                     <div id="infoDetalle" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">
@@ -2315,7 +2318,7 @@
 
     function inicializarMapaHidroOriginal() {
         if (!map) {
-            map = L.map('map', { zoomControl: true }).setView([-33.0, -69.0], 8);
+            map = L.map('map', { zoomControl: true }).setView([-33.5, -68.8], 8);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '&copy; OpenStreetMap'
@@ -2386,29 +2389,22 @@
 
                 const customIcon = L.divIcon({
                     className: 'custom-marker',
-                    html: `<div style="background: ${colorPunto}; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px ${colorPunto}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight:bold; color:#000;">💧</div>`,
-                    iconSize: [26, 26],
-                    iconAnchor: [13, 13]
+                    html: `<div style="background: ${colorPunto}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px ${colorPunto}; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight:bold; color:#000;">💧</div>`,
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
                 });
 
-                const marker = L.marker(info.coords, { icon: customIcon, draggable: true }).addTo(markersLayer);
+                /* PUNTOS FIJOS (draggable: false) */
+                const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
                 
                 marker.bindTooltip(`ID: ${id}`, {
                     permanent: true,
                     direction: 'top',
-                    offset: [0, -12],
+                    offset: [0, -8],
                     className: 'map-station-tooltip'
                 });
 
                 marker.bindPopup(`<b>${info.nombre}</b><br>ID: ${id}<br>Red: ${info.red}`);
-
-                marker.on('dragend', function(event) {
-                    const nuevaPos = event.target.getLatLng();
-                    estacionesData[id].coords = [nuevaPos.lat, nuevaPos.lng];
-                    localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
-                    select.value = id;
-                    seleccionarYCentrarEstacion();
-                });
 
                 marker.on('click', () => {
                     select.value = id;
@@ -2439,6 +2435,20 @@
             const latLng = marker.getLatLng();
             map.setView(latLng, 13, { animate: true });
             marker.openPopup();
+        }
+    }
+
+    /* SISTEMA DE CONTRASEÑA ADMIN */
+    function pedirClaveYEjecutar(accion) {
+        const claveIngresada = prompt("Ingrese la contraseña de Administrador:");
+        if (claveIngresada === null) return; // Si cancela
+
+        if (claveIngresada === "admin") {
+            if (accion === 'agregar') prepararModoNuevo();
+            if (accion === 'editar') cargarEstacionParaEditar();
+            if (accion === 'borrar') borrarEstacionActual();
+        } else {
+            alert("❌ Contraseña incorrecta. Acceso denegado.");
         }
     }
 
