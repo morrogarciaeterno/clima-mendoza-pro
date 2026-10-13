@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-
+    
     <!-- Firebase App y Firestore (Compat SDK) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -51,7 +51,7 @@
         header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
-            padding: 8px 16px;
+            padding: 8px 12px;
             padding-top: max(8px, env(safe-area-inset-top));
             position: sticky;
             top: 0;
@@ -62,7 +62,7 @@
 
         .header-content {
             width: 100%;
-            max-width: 98%;
+            max-width: 1400px;
             margin: auto;
             display: flex;
             justify-content: space-between;
@@ -162,11 +162,11 @@
             line-height: 1.1;
         }
 
-        /* CINTA DE ALARMAS SCADA */
+        /* CINTA DE ALARMAS SCADA (BANNER SUPERIOR) */
         .scada-banner-container {
             background: linear-gradient(90deg, #1e1115 0%, #0e1526 50%, #1e1115 100%);
             border-bottom: 2px solid #ef4444;
-            padding: 6px 16px;
+            padding: 6px 12px;
             width: 100%;
             display: flex;
             align-items: center;
@@ -266,22 +266,22 @@
 
         .container {
             width: 100%;
-            max-width: 98%;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 12px 12px 40px 12px;
+            padding: 8px 8px 40px 8px;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
         @media (min-width: 768px) {
             .grid {
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                gap: 14px;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 12px;
             }
         }
 
@@ -289,7 +289,7 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             width: 100%;
             min-width: 0;
             overflow: hidden;
@@ -299,7 +299,7 @@
         @media (min-width: 768px) {
             .card {
                 border-radius: 16px;
-                padding: 16px;
+                padding: 14px;
             }
         }
 
@@ -352,7 +352,7 @@
         .forecast-cards {
             display: flex;
             justify-content: flex-start;
-            gap: 8px;
+            gap: 6px;
             margin-top: 8px;
             width: 100%;
             overflow-x: auto;
@@ -365,7 +365,7 @@
         }
 
         .forecast-card {
-            flex: 0 0 70px;
+            flex: 0 0 64px;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -374,7 +374,7 @@
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
         }
         @media (min-width: 768px) {
-            .forecast-card { flex: 0 0 80px; padding: 10px 4px; }
+            .forecast-card { flex: 0 0 72px; padding: 10px 4px; }
         }
 
         .forecast-card .icon {
@@ -396,7 +396,7 @@
         .sismos-cinta-horizontal {
             display: flex;
             justify-content: flex-start;
-            gap: 8px;
+            gap: 6px;
             margin-top: 8px;
             width: 100%;
             overflow-x: auto;
@@ -409,7 +409,7 @@
         }
 
         .sismo-mini-card {
-            flex: 0 0 84px;
+            flex: 0 0 78px;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -420,7 +420,7 @@
             cursor: pointer;
         }
         @media (min-width: 768px) {
-            .sismo-mini-card { flex: 0 0 96px; padding: 10px 4px; }
+            .sismo-mini-card { flex: 0 0 88px; padding: 10px 4px; }
         }
 
         .sismo-mini-mag {
@@ -447,14 +447,14 @@
         .dashboard-row {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
         }
 
-        @media (min-width: 900px) {
+        @media (min-width: 768px) {
             .dashboard-row {
                 grid-template-columns: 1fr 1fr;
-                gap: 14px;
+                gap: 12px;
             }
         }
 
@@ -620,14 +620,14 @@
         .dual-section {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
         }
 
         @media (min-width: 900px) {
             .dual-section {
                 grid-template-columns: 1.2fr 1fr;
-                gap: 14px;
+                gap: 12px;
             }
         }
 
@@ -695,23 +695,23 @@
             display: flex;
             flex-direction: column;
             margin-top: 6px;
-            min-height: 350px;
+            min-height: 280px;
         }
         @media(min-width: 768px) {
-            .map-wrapper-container { min-height: 480px; }
+            .map-wrapper-container { min-height: 350px; }
         }
 
         #mapaArgentina {
             width: 100%;
             height: 100%;
-            min-height: 350px;
+            min-height: 280px;
             border-radius: 10px;
             z-index: 1;
             border: 2px solid var(--border);
             background-color: #070a14 !important;
         }
         @media(min-width: 768px) {
-            #mapaArgentina { min-height: 480px; }
+            #mapaArgentina { min-height: 350px; }
         }
 
         .modo-oscuro-mapa .leaflet-tile-pane {
@@ -794,15 +794,15 @@
 
         .map-controls {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
             margin-top: 6px;
             width: 100%;
         }
 
-        @media (min-width: 600px) {
+        @media (min-width: 500px) {
             .map-controls {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -848,7 +848,7 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(8px);
-            padding: 10px;
+            padding: 4px;
         }
 
         .modal-content-box {
@@ -856,7 +856,7 @@
             border: 1px solid var(--accent);
             border-radius: 14px;
             width: 100%;
-            max-width: 98vw;
+            max-width: 1300px;
             height: 94vh;
             display: flex;
             flex-direction: column;
@@ -865,7 +865,7 @@
         }
 
         .modal-header {
-            padding: 10px 16px;
+            padding: 8px 12px;
             background: var(--card-inner);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -904,10 +904,10 @@
 
         .modal-body {
             flex-grow: 1;
-            padding: 12px;
+            padding: 8px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 8px;
             overflow-y: auto;
             width: 100%;
         }
@@ -915,8 +915,8 @@
         @media (min-width: 900px) {
             .modal-body {
                 grid-template-columns: 1fr 1.15fr;
-                padding: 16px;
-                gap: 16px;
+                padding: 12px;
+                gap: 12px;
             }
         }
 
@@ -924,7 +924,7 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            min-height: 300px;
+            min-height: 250px;
             width: 100%;
         }
 
@@ -969,14 +969,14 @@
             border-radius: 10px;
             border: 2px solid var(--border);
             background-color: #070a14 !important;
-            min-height: 280px;
+            min-height: 240px;
         }
 
         .modal-report-panel {
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -1041,7 +1041,7 @@
             color: #000;
         }
 
-        /* Estilos de Hidrometría */
+        /* Estilos específicos para el módulo de Hidrometría original */
         .hidro-layout-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -1052,7 +1052,7 @@
             .hidro-layout-grid { grid-template-columns: 1.2fr 1fr; gap: 16px; }
         }
         #map {
-            height: 500px;
+            height: 320px;
             border-radius: 10px;
             border: 1px solid var(--border);
             z-index: 10;
@@ -1060,11 +1060,11 @@
             width: 100%;
         }
         @media(min-width: 768px) {
-            #map { height: 650px; }
+            #map { height: 500px; }
         }
         .cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 8px;
             margin-top: 10px;
         }
@@ -1168,16 +1168,6 @@
             padding: 15px;
             grid-column: 1 / -1;
         }
-        .map-station-tooltip {
-            background: rgba(14, 21, 38, 0.9) !important;
-            border: 1px solid var(--accent) !important;
-            color: #38bdf8 !important;
-            font-size: 0.55rem !important;
-            font-weight: 700 !important;
-            padding: 1px 4px !important;
-            border-radius: 3px !important;
-            box-shadow: none !important;
-        }
     </style>
 </head>
 
@@ -1186,8 +1176,8 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <!-- LOGOTIPO OPTIMIZADO PARA EVITAR CRASH DE MEMORIA EN ANDROID -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Gota_de_agua.png" alt="Territoria" class="brand-logo" crossorigin="anonymous">
+            <!-- LOGOTIPO OFICIAL DE TERRITORIA (EMBEBIDO BASE64) -->
+            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy.xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
             <div class="brand-text-container">
                 <h1>TERRITORIA</h1>
                 <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Plataforma Inteligente de Gestión Territorial</p>
@@ -1206,7 +1196,7 @@
     </div>
 </header>
 
-<!-- CINTA DE ALARMAS SCADA -->
+<!-- CINTA DE ALARMAS SCADA (BANNER SUPERIOR) -->
 <div class="scada-banner-container">
     <div class="scada-banner-left">
         <span class="scada-badge-blink">🚨 SCADA</span>
@@ -1350,7 +1340,7 @@
 
     <br>
 
-    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES) -->
+    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - TODOS) -->
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <h3>🌋 Sismos Oficiales de Argentina - INPRES (Todos los Registros)</h3>
@@ -1499,7 +1489,7 @@
 
         </div>
 
-        <!-- MAPA PRINCIPAL -->
+        <!-- MAPA PRINCIPAL (GEOGRÁFICO SATELITAL) -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺 Visor Geográfico Satelital</h3>
             <div class="map-controls">
@@ -1522,7 +1512,7 @@
                 </div>
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, RainViewer, Firebase</div>
+                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -1531,34 +1521,32 @@
 
     <br>
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH -->
+    <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA -->
     <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
                 <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🌊 Territoria - Monitoreo Hídrico SNIH</h3>
-                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Seleccioná una estación del selector o hacé clic en el mapa.</small>
+                <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Seleccioná una estación del selector o consultá su estado.</small>
             </div>
-            <div style="display: flex; gap: 6px;">
-                <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
-            </div>
+            <button onclick="escanearTodasLasEstaciones()" style="background: #0284c7; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; cursor: pointer;">🔍 Escanear Red</button>
         </div>
-
+        
         <div class="hidro-layout-grid">
+            <!-- COLUMNA IZQUIERDA -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
+               <div>
                     <div class="search-box">
-                        <select id="id" onchange="seleccionarYCentrarEstacion()">
+                        <select id="id" onchange="consultar()">
+                            <!-- Se llena dinámicamente -->
                         </select>
                         <button onclick="consultar()">Actualizar</button>
-                        <button onclick="pedirClaveYEjecutar('agregar')" style="background: #22c55e; color: #000;" title="Agregar nueva estación">➕ Agregar</button>
-                        <button onclick="pedirClaveYEjecutar('editar')" style="background: #eab308; color: #000;" title="Editar estación seleccionada">✏️ Editar</button>
-                        <button onclick="pedirClaveYEjecutar('borrar')" style="background: #ef4444; color: #fff;" title="Borrar estación seleccionada">🗑️ Borrar</button>
                     </div>
 
                     <div id="infoDetalle" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">
                         Información de la red y ubicación...
                     </div>
 
+                    <!-- PANEL RESUMEN ESPECÍFICO -->
                     <div id="panelResumenCaudal" class="resumen-caudal">
                         <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.58rem; background: #64748b; padding: 2px 5px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
                         <div class="indicadores-grid">
@@ -1578,17 +1566,6 @@
                         </div>
                     </div>
 
-                    <div class="form-manual">
-                        <h4 id="formTitulo">➕ Cargar / Editar Estación Interactiva</h4>
-                        <input id="nuevoId" placeholder="ID (ej: 1413)">
-                        <input id="nuevoNombre" placeholder="Nombre (ej: Estación 1413 - Guido)">
-                        <input id="nuevaRed" placeholder="Ubicación / Red (ej: Río Mendoza, Mendoza)">
-                        <div style="display: flex; gap: 8px; margin-top: 6px;">
-                            <button type="button" onclick="prepararModoUbicacion()" style="flex: 2; background: #22c55e; color: #000;">1. Guardar y Ubicar en Mapa</button>
-                            <button type="button" onclick="cancelarEdicion()" id="btnCancelarEdicion" style="flex: 1; background: #ef4444; color: #fff; display:none;">Cancelar</button>
-                        </div>
-                    </div>
-
                     <div id="resultado" class="cards">
                         <div class="loading">Seleccioná una estación del mapa o del selector.</div>
                     </div>
@@ -1602,6 +1579,7 @@
                 </div>
             </div>
 
+            <!-- COLUMNA DERECHA -->
             <div class="panel">
                 <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h3>
                 <div id="map"></div>
@@ -1611,7 +1589,7 @@
 
     <br>
 
-    <!-- ALARMERO E HISTORIAL -->
+    <!-- ALARMERO E HISTORIAL DE INCIDENTES -->
     <div class="card" style="border-left: 6px solid var(--accent); background: linear-gradient(135deg, #0e1526 0%, #0d1e33 100%);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
@@ -1627,7 +1605,7 @@
 
 </div>
 
-<!-- MODAL ALARMAS SCADA -->
+<!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA -->
 <div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
     <div class="modal-content-box" style="max-width: 700px; height: auto; max-height: 85vh;">
         <div class="modal-header">
@@ -1635,11 +1613,12 @@
             <button class="btn-cerrar-modal" onclick="cerrarModalAlarmasActivas()">✕</button>
         </div>
         <div class="modal-body" style="grid-template-columns: 1fr; gap: 6px; overflow-y: auto;" id="contenedorListaAlarmasPopup">
+            <!-- Se llena dinámicamente -->
         </div>
     </div>
 </div>
 
-<!-- MODAL LOTES -->
+<!-- VENTANA MODAL PARA LOTES Y REPORTE REAL -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
@@ -1668,7 +1647,7 @@
     </div>
 </div>
 
-<!-- MODAL CENSO FORESTAL -->
+<!-- VENTANA MODAL PARA CENSO FORESTAL URBANO (ÁRBOL) -->
 <div class="modal-overlay" id="modalCensoForestal">
     <div class="modal-content-box" style="max-width: 500px; height: auto; max-height: 90vh;">
         <div class="modal-header">
@@ -1723,8 +1702,8 @@
 <script>
     document.addEventListener('keydown', function(e) {
         if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+            e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) || 
             (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
         ) {
             e.preventDefault();
@@ -1807,7 +1786,7 @@
         const selectElem = document.getElementById("id");
         if (selectElem) {
             selectElem.value = idEst;
-            seleccionarYCentrarEstacion();
+            consultar();
         }
         const seccion = document.getElementById("seccionHidrometriaModulo");
         if (seccion) {
@@ -1835,7 +1814,7 @@
 
     function centrarMapaEnSismo(lat, lon, descripcion, magnitud) {
         cerrarModalAlarmasActivas();
-
+        
         let parsedLat = parseFloat(lat);
         let parsedLon = parseFloat(lon);
 
@@ -2098,7 +2077,7 @@
         historial.forEach(item => {
             let disparo = item.horaDisparo || "--:--";
             let reconocido = item.horaReconocido || item.hora || "--:--";
-
+            
             let idEstacionExtraido = item.estacionId;
             let esClickable = idEstacionExtraido && estacionesData[idEstacionExtraido];
             let estiloFila = "border-left: 3px solid #22c55e;";
@@ -2201,9 +2180,6 @@
     let historialLecturas = JSON.parse(localStorage.getItem("territoria_historial")) || {};
     let map = null;
     let markersLayer = null;
-    let marcadoresMapa = {};
-    let modoCreacionHidro = false;
-    let idEditandoHidro = null;
 
     const unidades = {
         "Altura": "m", "Precipitación": "mm", "Precipitación acumulada diaria": "mm",
@@ -2223,7 +2199,7 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
-    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, RainViewer, Firebase") {
+    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase") {
         const textEl = document.getElementById("mapStatusText");
         const sourceEl = document.getElementById("mapSourceText");
         const dotEl = document.querySelector(".pulse-dot");
@@ -2234,23 +2210,12 @@
 
     async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
-            try {
-                const response = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-                const data = await response.json();
-                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-                    const latestTime = data.radar.past[data.radar.past.length - 1].time;
-                    capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        tileSize: 256,
-                        opacity: 0.8,
-                        zIndex: 500,
-                        attribution: '&copy; RainViewer'
-                    });
-                }
-            } catch (e) {
-                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_tstamp/{z}/{x}/{y}/2/1_1.png', {
-                    tileSize: 256, opacity: 0.8, zIndex: 500, attribution: '&copy; RainViewer'
-                });
-            }
+            capaLluviaRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
+                tileSize: 256,
+                opacity: 0.75,
+                zIndex: 500,
+                attribution: '&copy; IEM Nexrad Radar'
+            });
         }
 
         if (!capaSateliteGOES) {
@@ -2297,7 +2262,7 @@
                     }
                 });
 
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, RainViewer, Firebase");
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -2321,46 +2286,13 @@
 
     function inicializarMapaHidroOriginal() {
         if (!map) {
-            map = L.map('map', { zoomControl: true }).setView([-33.5, -68.8], 8);
+            map = L.map('map', { zoomControl: true }).setView([-34.0, -69.0], 6);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
             markersLayer = L.layerGroup().addTo(map);
-
-            map.on('click', function(e) {
-                if (modoCreacionHidro) {
-                    const idInput = document.getElementById("nuevoId").value.trim();
-                    const nomInput = document.getElementById("nuevoNombre").value.trim();
-                    const redInput = document.getElementById("nuevaRed").value.trim();
-
-                    if (!idInput) {
-                        alert("Por favor ingresa primero el ID de la estación.");
-                        return;
-                    }
-
-                    if (idEditandoHidro && idEditandoHidro !== idInput) {
-                        delete estacionesData[idEditandoHidro];
-                    }
-
-                    estacionesData[idInput] = {
-                        nombre: nomInput || `Estación ${idInput}`,
-                        red: redInput || "Red Hidrológica",
-                        coords: [e.latlng.lat, e.latlng.lng]
-                    };
-
-                    localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
-                    modoCreacionHidro = false;
-                    document.getElementById("instruccionMapa").textContent = "Punto guardado correctamente.";
-                    cancelarEdicion();
-                    actualizarSelectYMapa();
-
-                    const select = document.getElementById("id");
-                    select.value = idInput;
-                    seleccionarYCentrarEstacion();
-                }
-            });
         }
         actualizarSelectYMapa();
         consultar();
@@ -2377,7 +2309,6 @@
         const valorActual = select.value;
         select.innerHTML = "";
         if (markersLayer) markersLayer.clearLayers();
-        marcadoresMapa = {};
 
         for (const [id, info] of Object.entries(estacionesData)) {
             const option = document.createElement("option");
@@ -2388,133 +2319,27 @@
             if (info.coords && map) {
                 const ultimaAltura = historialLecturas[id] !== undefined ? historialLecturas[id] : 0;
                 const enAlerta = ultimaAltura > 1.5;
+
                 const colorPunto = enAlerta ? "#ef4444" : "#38bdf8";
+                const boxShadowColor = enAlerta ? "0 0 16px #ef4444" : "0 0 12px #38bdf8";
 
                 const customIcon = L.divIcon({
                     className: 'custom-marker',
-                    html: `<div style="background: ${colorPunto}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px ${colorPunto}; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight:bold; color:#000;">💧</div>`,
-                    iconSize: [18, 18],
-                    iconAnchor: [9, 9]
+                    html: `<div style="background: ${colorPunto}; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #000; box-shadow: ${boxShadowColor};"></div>`,
+                    iconSize: [16, 16]
                 });
 
                 const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
-
-                marker.bindTooltip(`ID: ${id}`, {
-                    permanent: true,
-                    direction: 'top',
-                    offset: [0, -8],
-                    className: 'map-station-tooltip'
-                });
-
-                marker.bindPopup(`<b>${info.nombre}</b><br>ID: ${id}<br>Red: ${info.red}`);
-
+                marker.bindPopup(`<b style="color:#000;">${info.nombre}</b><br><span style="color:#333;">ID: ${id}</span>`);
+                
                 marker.on('click', () => {
                     select.value = id;
-                    seleccionarYCentrarEstacion();
+                    consultar();
                 });
-
-                marcadoresMapa[id] = marker;
             }
         }
-
         if (estacionesData[valorActual]) {
             select.value = valorActual;
-        } else {
-            const primerId = Object.keys(estacionesData)[0];
-            if (primerId) select.value = primerId;
-        }
-    }
-
-    function seleccionarYCentrarEstacion() {
-        const selectElem = document.getElementById("id");
-        if (!selectElem) return;
-        const idEst = selectElem.value;
-
-        consultar();
-
-        if (marcadoresMapa[idEst] && map) {
-            const marker = marcadoresMapa[idEst];
-            const latLng = marker.getLatLng();
-            map.setView(latLng, 13, { animate: true });
-            marker.openPopup();
-        }
-    }
-
-    function pedirClaveYEjecutar(accion) {
-        const claveIngresada = prompt("Ingrese la contraseña de Administrador:");
-        if (claveIngresada === null) return;
-
-        if (claveIngresada === "admin") {
-            if (accion === 'agregar') prepararModoNuevo();
-            if (accion === 'editar') cargarEstacionParaEditar();
-            if (accion === 'borrar') borrarEstacionActual();
-        } else {
-            alert("❌ Contraseña incorrecta. Acceso denegado.");
-        }
-    }
-
-    function prepararModoNuevo() {
-        idEditandoHidro = null;
-        document.getElementById("nuevoId").value = "";
-        document.getElementById("nuevoNombre").value = "";
-        document.getElementById("nuevaRed").value = "";
-        document.getElementById("formTitulo").textContent = "➕ Cargar Nueva Estación";
-        document.getElementById("btnCancelarEdicion").style.display = "block";
-        document.getElementById("instruccionMapa").textContent = "Completá los datos y hacé clic en '1. Guardar y Ubicar en Mapa'.";
-    }
-
-    function prepararModoUbicacion() {
-        const idInput = document.getElementById("nuevoId").value.trim();
-        if (!idInput) {
-            alert("Por favor ingresa un ID válido antes de ubicar en el mapa.");
-            return;
-        }
-        modoCreacionHidro = true;
-        document.getElementById("instruccionMapa").textContent = "📍 Hacé clic en el mapa exactamente donde querés ubicar la estación.";
-    }
-
-    function cargarEstacionParaEditar() {
-        const select = document.getElementById("id");
-        const idActual = select.value;
-        if (!estacionesData[idActual]) return;
-
-        idEditandoHidro = idActual;
-        const info = estacionesData[idActual];
-
-        document.getElementById("nuevoId").value = idActual;
-        document.getElementById("nuevoNombre").value = info.nombre;
-        document.getElementById("nuevaRed").value = info.red;
-        document.getElementById("formTitulo").textContent = "✏️ Modificar Estación";
-        document.getElementById("btnCancelarEdicion").style.display = "block";
-    }
-
-    function cancelarEdicion() {
-        idEditandoHidro = null;
-        modoCreacionHidro = false;
-        document.getElementById("nuevoId").value = "";
-        document.getElementById("nuevoNombre").value = "";
-        document.getElementById("nuevaRed").value = "";
-        document.getElementById("formTitulo").textContent = "➕ Cargar / Editar Estación Interactiva";
-        document.getElementById("btnCancelarEdicion").style.display = "none";
-        document.getElementById("instruccionMapa").textContent = "Seleccioná una estación del selector o hacé clic en el mapa.";
-    }
-
-    function borrarEstacionActual() {
-        const select = document.getElementById("id");
-        const idActual = select.value;
-        if (!idActual) return;
-
-        if (confirm(`¿Estás seguro de eliminar la estación ${idActual} (${estacionesData[idActual]?.nombre || ''})?`)) {
-            delete estacionesData[idActual];
-            if (historialLecturas[idActual] !== undefined) {
-                delete historialLecturas[idActual];
-                localStorage.setItem("territoria_historial", JSON.stringify(historialLecturas));
-            }
-            localStorage.setItem("territoria_estaciones", JSON.stringify(estacionesData));
-            cancelarEdicion();
-            actualizarSelectYMapa();
-            consultar();
-            alert("Estación eliminada con éxito.");
         }
     }
 
@@ -2564,6 +2389,7 @@
         estacionesEnAlertaActuales = estacionesVistasEstaRonda;
 
         localStorage.setItem("territoria_historial", JSON.stringify(historialLecturas));
+        actualizarSelectYMapa();
         actualizarCintaTickerScada();
     }
 
@@ -2581,7 +2407,7 @@
         const info = estacionesData[estacionId] || { nombre: `Estación ID: ${estacionId}`, red: "Red Nacional" };
         document.getElementById("tituloEstacion").textContent = `🌊 Monitoreo: ${info.nombre}`;
         document.getElementById("infoDetalle").innerHTML = `<b>Ubicación:</b> ${info.red} | <b>ID:</b> ${estacionId}`;
-
+        
         document.getElementById("resumenAltura").textContent = "--";
         document.getElementById("tendenciaAltura").textContent = "--";
         document.getElementById("resumenPrecipitacion").textContent = "--";
@@ -2607,7 +2433,7 @@
             const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
 
             if(mediciones.length === 0) {
-                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">Punto personalizado operativo. Sin telemetría SNIH en vivo.</div>';
+                resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">No hay mediciones activas.</div>';
                 return;
             }
 
@@ -2629,7 +2455,7 @@
 
             if(alturaValNum !== null && anteriorAltura !== null) {
                 let diferencia = alturaValNum - anteriorAltura;
-
+                
                 if(diferencia > 0.005) {
                     tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
                     tendenciaColor = "#ef4444";
@@ -2660,12 +2486,12 @@
 
                     if(m.NombreCodigo === "Altura" && !isNaN(num)) {
                         alturaValStr = num.toFixed(2) + " m";
-                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true;
+                        if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true; 
                     }
                     if(m.NombreCodigo.includes("Precipitación") && !isNaN(num)) precipVal = num.toFixed(1) + " mm";
                     if(m.NombreCodigo.includes("Temperatura") && !isNaN(num)) tempVal = num.toFixed(1) + " °C";
                 }
-
+                
                 const unidad = unidades[m.NombreCodigo] || "";
                 let claseAlertaCard = esAlertaTarjeta ? "alerta-roja" : "";
 
@@ -2737,7 +2563,7 @@
                 const horaStr = item.querySelector("hora")?.textContent || "";
                 const magnitud = parseFloat(item.querySelector("mg")?.textContent || "0");
                 const profundidad = item.querySelector("prof")?.textContent || "";
-
+                
                 let latSismo = parseFloat(item.querySelector("lat")?.textContent);
                 let lonSismo = parseFloat(item.querySelector("long")?.textContent);
 
@@ -2809,7 +2635,7 @@
                     let p = s.properties;
                     let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
-
+                    
                     let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
@@ -2848,7 +2674,7 @@
                 btnCenso.style.color = "#000";
             }
             if (banner) banner.style.display = "flex";
-
+            
             if (mapInstance && capaCapaArboles && !mapInstance.hasLayer(capaCapaArboles)) {
                 capaCapaArboles.addTo(mapInstance);
             }
@@ -2859,7 +2685,7 @@
                 btnCenso.style.color = "#22c55e";
             }
             if (banner) banner.style.display = "none";
-
+            
             if (mapInstance && capaCapaArboles && mapInstance.hasLayer(capaCapaArboles)) {
                 mapInstance.removeLayer(capaCapaArboles);
             }
@@ -2980,7 +2806,7 @@
                     const scaleSize = maxWidth / img.width;
                     canvas.width = maxWidth;
                     canvas.height = img.height * scaleSize;
-
+                    
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     const comprimidaBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     enviarAFirebase(comprimidaBase64);
@@ -3117,7 +2943,7 @@
 
         panel.innerHTML = `
             <div class="report-section-title">📊 ${d.nombreLugar}, ${d.provinciaZona}</div>
-
+            
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} ha</span><br>
                 <b>Condiciones:</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
@@ -3156,6 +2982,7 @@
 
         if (!mapInstance) return;
 
+        // Quitar estado activo a todos los botones
         btnBase.classList.remove("active");
         btnTopo.classList.remove("active");
         if (btnCalles) btnCalles.classList.remove("active");
@@ -3164,11 +2991,13 @@
         if (btnSatinfra) btnSatinfra.classList.remove("active");
         if (btnPasos) btnPasos.classList.remove("active");
 
+        // LIMPIEZA TOTAL DE TODAS LAS CAPAS ESPECIALES ANTERIORES PARA EVITAR MEZCLAS
         if (capaFuegosFIRMS && mapInstance.hasLayer(capaFuegosFIRMS)) mapInstance.removeLayer(capaFuegosFIRMS);
         if (capaLluviaRadar && mapInstance.hasLayer(capaLluviaRadar)) mapInstance.removeLayer(capaLluviaRadar);
         if (capaSateliteGOES && mapInstance.hasLayer(capaSateliteGOES)) mapInstance.removeLayer(capaSateliteGOES);
         if (capaPasosFronterizosDinamicos && mapInstance.hasLayer(capaPasosFronterizosDinamicos)) mapInstance.removeLayer(capaPasosFronterizosDinamicos);
 
+        // Limpiar sismos destacados previos si los hubiera
         if (marcadorSismoActual) { mapInstance.removeLayer(marcadorSismoActual); marcadorSismoActual = null; }
         if (circuloSismoActual) { mapInstance.removeLayer(circuloSismoActual); circuloSismoActual = null; }
 
@@ -3198,17 +3027,11 @@
             mapTitle.innerText = "🔥 Fuego (NASA FIRMS)";
             contenedorMapaDiv.classList.add("modo-oscuro-mapa");
         } else if (tipo === 'lluvia') {
-            if (!mapInstance.hasLayer(capasBase.base)) {
-                capasBase.base.addTo(mapInstance);
-            }
-            contenedorMapaDiv.classList.add("modo-oscuro-mapa");
-
             await inicializarCapasEspeciales();
-            if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) {
-                capaLluviaRadar.addTo(mapInstance);
-            }
+            if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
             btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧 Radar de Lluvia (RainViewer)";
+            mapTitle.innerText = "🌧 Radar de Lluvia";
+            contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
         } else if (tipo === 'satelite') {
             await inicializarCapasEspeciales();
             if (capaSateliteGOES && !mapInstance.hasLayer(capaSateliteGOES)) capaSateliteGOES.addTo(mapInstance);
@@ -3536,7 +3359,7 @@
                 document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
                 document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
                 document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
-
+                
                 actualizarCicloSolar(data.daily.sunrise[0], data.daily.sunset[0]);
             }
 
