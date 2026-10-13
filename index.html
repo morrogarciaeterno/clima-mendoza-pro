@@ -2240,7 +2240,7 @@
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
-    async function inicializarCapasEspeciales() {
+async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
             capaLluviaRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
                 tileSize: 256,
@@ -2251,19 +2251,23 @@
         }
 
         if (!capaSateliteGOES) {
-            const fechaAyer = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            capaSateliteGOES = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${fechaAyer}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
+            // Usamos una fecha segura de respaldo de 2 días atrás para garantizar que los mosaicos VIIRS estén procesados por NASA GIBS
+            const d = new Date(Date.now() - 172800000);
+            const anio = d.getUTCFullYear();
+            const mes = String(d.getUTCMonth() + 1).padStart(2, '0');
+            const dia = String(d.getUTCDate()).padStart(2, '0');
+            const fechaSegura = `${anio}-${mes}-${dia}`;
+
+            capaSateliteGOES = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${fechaSegura}‌/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
                 tileSize: 256,
-                minZoom: 4,
-                maxZoom: 18,
-                maxNativeZoom: 9,
-                opacity: 0.85,
+                minZoom: 2,
+                maxZoom: 14,
+                opacity: 0.9,
                 zIndex: 500,
                 attribution: '&copy; NASA GIBS / VIIRS SNPP'
             });
         }
     }
-
     function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
