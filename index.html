@@ -162,7 +162,7 @@
             line-height: 1.1;
         }
 
-        /* CINTA DE ALARMAS SCADA (BANNER SUPERIOR) */
+        /* CINTA DE ALARMAS SCADA */
         .scada-banner-container {
             background: linear-gradient(90deg, #1e1115 0%, #0e1526 50%, #1e1115 100%);
             border-bottom: 2px solid #ef4444;
@@ -1041,7 +1041,7 @@
             color: #000;
         }
 
-        /* Estilos específicos para el módulo de Hidrometría original */
+        /* Estilos de Hidrometría */
         .hidro-layout-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -1051,7 +1051,6 @@
         @media(min-width: 900px) {
             .hidro-layout-grid { grid-template-columns: 1.2fr 1fr; gap: 16px; }
         }
-        /* MAPA HÍDRICO AMPLIADO */
         #map {
             height: 500px;
             border-radius: 10px;
@@ -1169,7 +1168,6 @@
             padding: 15px;
             grid-column: 1 / -1;
         }
-        /* TOOLTIPS REDUCIDOS PARA EVITAR AMONTONAMIENTO */
         .map-station-tooltip {
             background: rgba(14, 21, 38, 0.9) !important;
             border: 1px solid var(--accent) !important;
@@ -1188,8 +1186,8 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <!-- LOGOTIPO OFICIAL DE TERRITORIA -->
-            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy.xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
+            <!-- LOGOTIPO OPTIMIZADO PARA EVITAR CRASH DE MEMORIA EN ANDROID -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Gota_de_agua.png" alt="Territoria" class="brand-logo" crossorigin="anonymous">
             <div class="brand-text-container">
                 <h1>TERRITORIA</h1>
                 <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Plataforma Inteligente de Gestión Territorial</p>
@@ -1208,7 +1206,7 @@
     </div>
 </header>
 
-<!-- CINTA DE ALARMAS SCADA (BANNER SUPERIOR) -->
+<!-- CINTA DE ALARMAS SCADA -->
 <div class="scada-banner-container">
     <div class="scada-banner-left">
         <span class="scada-badge-blink">🚨 SCADA</span>
@@ -1352,7 +1350,7 @@
 
     <br>
 
-    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - TODOS) -->
+    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES) -->
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <h3>🌋 Sismos Oficiales de Argentina - INPRES (Todos los Registros)</h3>
@@ -1501,7 +1499,7 @@
 
         </div>
 
-        <!-- MAPA PRINCIPAL (GEOGRÁFICO SATELITAL) -->
+        <!-- MAPA PRINCIPAL -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺 Visor Geográfico Satelital</h3>
             <div class="map-controls">
@@ -1524,7 +1522,7 @@
                 </div>
                 <div class="map-status-pill" id="mapStatusIndicator">
                     <div><span class="pulse-dot"></span> <span id="mapStatusText">Visor GPS activo</span></div>
-                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase</div>
+                    <div style="font-size: 0.52rem; color: var(--accent); opacity: 0.9;" id="mapSourceText">Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, RainViewer, Firebase</div>
                 </div>
                 <div id="mapaArgentina" class="modo-oscuro-mapa"></div>
             </div>
@@ -1533,7 +1531,7 @@
 
     <br>
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA -->
+    <!-- SECCIÓN DE HIDROMETRÍA SNIH -->
     <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
@@ -1546,12 +1544,10 @@
         </div>
 
         <div class="hidro-layout-grid">
-            <!-- COLUMNA IZQUIERDA -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                     <div class="search-box">
                         <select id="id" onchange="seleccionarYCentrarEstacion()">
-                            <!-- Se llena dinámicamente -->
                         </select>
                         <button onclick="consultar()">Actualizar</button>
                         <button onclick="pedirClaveYEjecutar('agregar')" style="background: #22c55e; color: #000;" title="Agregar nueva estación">➕ Agregar</button>
@@ -1563,7 +1559,6 @@
                         Información de la red y ubicación...
                     </div>
 
-                    <!-- PANEL RESUMEN ESPECÍFICO -->
                     <div id="panelResumenCaudal" class="resumen-caudal">
                         <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.58rem; background: #64748b; padding: 2px 5px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
                         <div class="indicadores-grid">
@@ -1583,7 +1578,6 @@
                         </div>
                     </div>
 
-                    <!-- FORMULARIO DE CARGA / EDICIÓN -->
                     <div class="form-manual">
                         <h4 id="formTitulo">➕ Cargar / Editar Estación Interactiva</h4>
                         <input id="nuevoId" placeholder="ID (ej: 1413)">
@@ -1608,7 +1602,6 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA -->
             <div class="panel">
                 <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h3>
                 <div id="map"></div>
@@ -1618,7 +1611,7 @@
 
     <br>
 
-    <!-- ALARMERO E HISTORIAL DE INCIDENTES -->
+    <!-- ALARMERO E HISTORIAL -->
     <div class="card" style="border-left: 6px solid var(--accent); background: linear-gradient(135deg, #0e1526 0%, #0d1e33 100%);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
@@ -1634,7 +1627,7 @@
 
 </div>
 
-<!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA -->
+<!-- MODAL ALARMAS SCADA -->
 <div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
     <div class="modal-content-box" style="max-width: 700px; height: auto; max-height: 85vh;">
         <div class="modal-header">
@@ -1642,12 +1635,11 @@
             <button class="btn-cerrar-modal" onclick="cerrarModalAlarmasActivas()">✕</button>
         </div>
         <div class="modal-body" style="grid-template-columns: 1fr; gap: 6px; overflow-y: auto;" id="contenedorListaAlarmasPopup">
-            <!-- Se llena dinámicamente -->
         </div>
     </div>
 </div>
 
-<!-- VENTANA MODAL PARA LOTES Y REPORTE REAL -->
+<!-- MODAL LOTES -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
@@ -1676,7 +1668,7 @@
     </div>
 </div>
 
-<!-- VENTANA MODAL PARA CENSO FORESTAL URBANO (ÁRBOL) -->
+<!-- MODAL CENSO FORESTAL -->
 <div class="modal-overlay" id="modalCensoForestal">
     <div class="modal-content-box" style="max-width: 500px; height: auto; max-height: 90vh;">
         <div class="modal-header">
@@ -2231,7 +2223,7 @@
         calles: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, minZoom: 4, attribution: 'Tiles &copy; Esri' })
     };
 
-    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase") {
+    function actualizarIndicadorMapa(texto, colorDot = "#22c55e", fuenteTxt = "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, RainViewer, Firebase") {
         const textEl = document.getElementById("mapStatusText");
         const sourceEl = document.getElementById("mapSourceText");
         const dotEl = document.querySelector(".pulse-dot");
@@ -2240,29 +2232,42 @@
         if (dotEl) dotEl.style.backgroundColor = colorDot;
     }
 
-async function inicializarCapasEspeciales() {
+    async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
-            capaLluviaRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
-                tileSize: 256,
-                opacity: 0.75,
-                zIndex: 500,
-                attribution: '&copy; IEM Nexrad Radar'
-            });
+            try {
+                const response = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+                const data = await response.json();
+                if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+                    const latestTime = data.radar.past[data.radar.past.length - 1].time;
+                    capaLluviaRadar = L.tileLayer(`https://tile.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
+                        tileSize: 256,
+                        opacity: 0.8,
+                        zIndex: 500,
+                        attribution: '&copy; RainViewer'
+                    });
+                }
+            } catch (e) {
+                capaLluviaRadar = L.tileLayer('https://tile.rainviewer.com/v2/radar/nowcast_tstamp/{z}/{x}/{y}/2/1_1.png', {
+                    tileSize: 256, opacity: 0.8, zIndex: 500, attribution: '&copy; RainViewer'
+                });
+            }
         }
 
         if (!capaSateliteGOES) {
-            // Usamos el servicio WMS oficial de NASA GIBS para VIIRS True Color (funciona directo en Leaflet sin lidiar con mosaicos rotos)
-            capaSateliteGOES = L.tileLayer.wms('https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi', {
-                layers: 'VIIRS_SNPP_CorrectedReflectance_TrueColor',
-                format: 'image/jpeg',
-                transparent: true,
+            const fechaAyer = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            capaSateliteGOES = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${fechaAyer}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
+                tileSize: 256,
+                minZoom: 4,
                 maxZoom: 18,
-                opacity: 0.95,
+                maxNativeZoom: 9,
+                opacity: 0.85,
                 zIndex: 500,
                 attribution: '&copy; NASA GIBS / VIIRS SNPP'
             });
         }
-    }    function inicializarMapaArgentina(lat, lon) {
+    }
+
+    function inicializarMapaArgentina(lat, lon) {
         try {
             if (!mapInstance) {
                 actualizarIndicadorMapa("Cargando mapa...", "#facc15", "Inicializando motores de mapas...");
@@ -2292,7 +2297,7 @@ async function inicializarCapasEspeciales() {
                     }
                 });
 
-                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase");
+                actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, RainViewer, Firebase");
             }
 
             if (markerInstance) mapInstance.removeLayer(markerInstance);
@@ -2392,9 +2397,8 @@ async function inicializarCapasEspeciales() {
                     iconAnchor: [9, 9]
                 });
 
-                /* PUNTOS FIJOS (draggable: false) */
                 const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
-                
+
                 marker.bindTooltip(`ID: ${id}`, {
                     permanent: true,
                     direction: 'top',
@@ -2436,10 +2440,9 @@ async function inicializarCapasEspeciales() {
         }
     }
 
-    /* SISTEMA DE CONTRASEÑA ADMIN */
     function pedirClaveYEjecutar(accion) {
         const claveIngresada = prompt("Ingrese la contraseña de Administrador:");
-        if (claveIngresada === null) return; // Si cancela
+        if (claveIngresada === null) return;
 
         if (claveIngresada === "admin") {
             if (accion === 'agregar') prepararModoNuevo();
@@ -3195,11 +3198,17 @@ async function inicializarCapasEspeciales() {
             mapTitle.innerText = "🔥 Fuego (NASA FIRMS)";
             contenedorMapaDiv.classList.add("modo-oscuro-mapa");
         } else if (tipo === 'lluvia') {
+            if (!mapInstance.hasLayer(capasBase.base)) {
+                capasBase.base.addTo(mapInstance);
+            }
+            contenedorMapaDiv.classList.add("modo-oscuro-mapa");
+
             await inicializarCapasEspeciales();
-            if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) capaLluviaRadar.addTo(mapInstance);
+            if (capaLluviaRadar && !mapInstance.hasLayer(capaLluviaRadar)) {
+                capaLluviaRadar.addTo(mapInstance);
+            }
             btnLluvia.classList.add("active");
-            mapTitle.innerText = "🌧 Radar de Lluvia";
-            contenedorMapaDiv.classList.remove("modo-oscuro-mapa");
+            mapTitle.innerText = "🌧 Radar de Lluvia (RainViewer)";
         } else if (tipo === 'satelite') {
             await inicializarCapasEspeciales();
             if (capaSateliteGOES && !mapInstance.hasLayer(capaSateliteGOES)) capaSateliteGOES.addTo(mapInstance);
