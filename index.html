@@ -162,7 +162,7 @@
             line-height: 1.1;
         }
 
-        /* BANNER DE ALERTA CLIMÁTICA CRÍTICA (NUEVO) */
+        /* BANNER DE ALERTA CLIMÁTICA CRÍTICA */
         .alerta-clima-critica {
             width: 98%;
             max-width: 98%;
@@ -1256,7 +1256,7 @@
     </div>
 </header>
 
-<!-- BANNER DE ALERTA CLIMÁTICA CRÍTICA (NUEVO) -->
+<!-- BANNER DE ALERTA CLIMÁTICA CRÍTICA -->
 <div id="bannerAlertaClimaServer" class="alerta-clima-critica oculto">
     <div class="alerta-icono-animado">🚨</div>
     <div class="alerta-texto-container">
@@ -1399,7 +1399,7 @@
 
     <br>
 
-    <!-- BLOQUE 1: SISMOS INTERNACIONALES (USGS) -->
+    <!-- SISMOS INTERNACIONALES (USGS) -->
     <div class="card">
         <h3>🌋 Sismos Internacionales Recientes (Fuente: USGS Global Feed)</h3>
         <div id="sismosListaContainer" class="sismos-cinta-horizontal">
@@ -1409,7 +1409,7 @@
 
     <br>
 
-    <!-- BLOQUE 2: SISMOS OFICIALES DE ARGENTINA (INPRES - TODOS) -->
+    <!-- SISMOS OFICIALES DE ARGENTINA (INPRES) -->
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <h3>🌋 Sismos Oficiales de Argentina - INPRES (Todos los Registros)</h3>
@@ -1558,7 +1558,7 @@
 
         </div>
 
-        <!-- MAPA PRINCIPAL (GEOGRÁFICO SATELITAL) -->
+        <!-- MAPA PRINCIPAL -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺 Visor Geográfico Satelital</h3>
             <div class="map-controls">
@@ -1590,7 +1590,7 @@
 
     <br>
 
-    <!-- SECCIÓN DE HIDROMETRÍA SNIH REORGANIZADA -->
+    <!-- HIDROMETRÍA SNIH -->
     <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
@@ -1603,24 +1603,21 @@
         </div>
 
         <div class="hidro-layout-grid">
-            <!-- COLUMNA IZQUIERDA -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                     <div class="search-box">
                         <select id="id" onchange="seleccionarYCentrarEstacion()">
-                            <!-- Se llena dinámicamente -->
                         </select>
                         <button onclick="consultar()">Actualizar</button>
-                        <button onclick="pedirClaveYEjecutar('agregar')" style="background: #22c55e; color: #000;" title="Agregar nueva estación">➕ Agregar</button>
-                        <button onclick="pedirClaveYEjecutar('editar')" style="background: #eab308; color: #000;" title="Editar estación seleccionada">✏️ Editar</button>
-                        <button onclick="pedirClaveYEjecutar('borrar')" style="background: #ef4444; color: #fff;" title="Borrar estación seleccionada">🗑️ Borrar</button>
+                        <button onclick="pedirClaveYEjecutar('agregar')" style="background: #22c55e; color: #000;">➕ Agregar</button>
+                        <button onclick="pedirClaveYEjecutar('editar')" style="background: #eab308; color: #000;">✏️ Editar</button>
+                        <button onclick="pedirClaveYEjecutar('borrar')" style="background: #ef4444; color: #fff;">🗑️ Borrar</button>
                     </div>
 
                     <div id="infoDetalle" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">
                         Información de la red y ubicación...
                     </div>
 
-                    <!-- PANEL RESUMEN ESPECÍFICO -->
                     <div id="panelResumenCaudal" class="resumen-caudal">
                         <h4><span>💧 Resumen Crítico & Tendencia</span> <span id="estadoCaudalBadge" style="font-size: 0.58rem; background: #64748b; padding: 2px 5px; border-radius: 4px; color: #fff;">Sin datos</span></h4>
                         <div class="indicadores-grid">
@@ -1640,7 +1637,6 @@
                         </div>
                     </div>
 
-                    <!-- FORMULARIO DE CARGA / EDICIÓN -->
                     <div class="form-manual">
                         <h4 id="formTitulo">➕ Cargar / Editar Estación Interactiva</h4>
                         <input id="nuevoId" placeholder="ID (ej: 1413)">
@@ -1665,7 +1661,6 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA -->
             <div class="panel">
                 <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h3>
                 <div id="map"></div>
@@ -1675,7 +1670,7 @@
 
     <br>
 
-    <!-- ALARMERO E HISTORIAL DE INCIDENTES -->
+    <!-- ALARMERO E HISTORIAL -->
     <div class="card" style="border-left: 6px solid var(--accent); background: linear-gradient(135deg, #0e1526 0%, #0d1e33 100%);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
@@ -1691,7 +1686,7 @@
 
 </div>
 
-<!-- VENTANA MODAL PARA POPUP CENTRO DE ALARMAS SCADA -->
+<!-- VENTANA MODAL CENTRO DE ALARMAS -->
 <div class="modal-overlay" id="modalAlarmasActivas" style="display: none;">
     <div class="modal-content-box" style="max-width: 700px; height: auto; max-height: 85vh;">
         <div class="modal-header">
@@ -1699,12 +1694,11 @@
             <button class="btn-cerrar-modal" onclick="cerrarModalAlarmasActivas()">✕</button>
         </div>
         <div class="modal-body" style="grid-template-columns: 1fr; gap: 6px; overflow-y: auto;" id="contenedorListaAlarmasPopup">
-            <!-- Se llena dinámicamente -->
         </div>
     </div>
 </div>
 
-<!-- VENTANA MODAL PARA LOTES Y REPORTE REAL -->
+<!-- VENTANA MODAL LOTES -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
@@ -1733,7 +1727,7 @@
     </div>
 </div>
 
-<!-- VENTANA MODAL PARA CENSO FORESTAL URBANO (ÁRBOL) -->
+<!-- VENTANA MODAL CENSO FORESTAL -->
 <div class="modal-overlay" id="modalCensoForestal">
     <div class="modal-content-box" style="max-width: 500px; height: auto; max-height: 90vh;">
         <div class="modal-header">
@@ -1972,7 +1966,7 @@
             let sInfo = sismosInpresEnAlertaActuales[idSismo];
             let rec = sInfo.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer;" onclick="centrarMapaEnSismo(${sInfo.lat}, ${sInfo.lon}, '${sInfo.titulo}', ${sInfo.magnitud})" title="Clic para ubicar en el mapa">
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer;" onclick="centrarMapaEnSismo(${sInfo.lat}, ${sInfo.lon}, '${sInfo.titulo}', ${sInfo.magnitud})">
                     <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
                         <span style="font-size: 1.2rem;">🌋</span>
                         <div style="min-width: 0;">
@@ -2037,7 +2031,7 @@
             let infoEst = estacionesEnAlertaActuales[idEst];
             let rec = infoEst.reconocido;
             contenedor.innerHTML += `
-                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer;" onclick="irAEstacionHidroDetalle('${idEst}')" title="Clic para abrir detalle de estación">
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer;" onclick="irAEstacionHidroDetalle('${idEst}')">
                     <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
                         <span style="font-size: 1.2rem;">🌊</span>
                         <div style="min-width: 0;">
@@ -2067,7 +2061,7 @@
             let sInfo = sismosInpresEnAlertaActuales[idSismo];
             let rec = sInfo.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
-            alertasHtml += `<span class="scada-alert-item" onclick="centrarMapaEnSismo(${sInfo.lat}, ${sInfo.lon}, '${sInfo.titulo}', ${sInfo.magnitud})" title="Clic para ubicar">${iconoEstado} <b>[SISMO INPRES]</b> ${sInfo.titulo}</span>`;
+            alertasHtml += `<span class="scada-alert-item" onclick="centrarMapaEnSismo(${sInfo.lat}, ${sInfo.lon}, '${sInfo.titulo}', ${sInfo.magnitud})">${iconoEstado} <b>[SISMO INPRES]</b> ${sInfo.titulo}</span>`;
         });
 
         if (hayFuego) {
@@ -2090,7 +2084,7 @@
             let infoEst = estacionesEnAlertaActuales[idEst];
             let rec = infoEst.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
-            alertasHtml += `<span class="scada-alert-item" onclick="irAEstacionHidroDetalle('${idEst}')" title="Clic para abrir detalle">${iconoEstado} <b>[HIDRO]</b> ${infoEst.nombre} (${infoEst.altura.toFixed(2)}m)</span>`;
+            alertasHtml += `<span class="scada-alert-item" onclick="irAEstacionHidroDetalle('${idEst}')">${iconoEstado} <b>[HIDRO]</b> ${infoEst.nombre} (${infoEst.altura.toFixed(2)}m)</span>`;
         });
 
         if (alertasHtml === "") {
@@ -2163,15 +2157,13 @@
         historial.forEach(item => {
             let disparo = item.horaDisparo || "--:--";
             let reconocido = item.horaReconocido || item.hora || "--:--";
-
             let idEstacionExtraido = item.estacionId;
             let esClickable = idEstacionExtraido && estacionesData[idEstacionExtraido];
-            let estiloFila = "border-left: 3px solid #22c55e;";
-            let onclickAttr = esClickable ? `onclick="irAEstacionHidroDetalle('${idEstacionExtraido}')" title="Clic para ver detalle de caudal"` : "";
+            let onclickAttr = esClickable ? `onclick="irAEstacionHidroDetalle('${idEstacionExtraido}')"` : "";
             let textoExtra = esClickable ? ` <span style="color:var(--accent); font-size:0.6rem; text-decoration:underline;">(Ver Caudal 🔍)</span>` : "";
 
             contenedor.innerHTML += `
-                <div style="background: var(--card-bg); border: 1px solid var(--border); ${estiloFila} padding: 5px 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; font-size: 0.7rem;" ${onclickAttr}>
+                <div style="background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid #22c55e; padding: 5px 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; font-size: 0.7rem;" ${onclickAttr}>
                     <div style="display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden;">
                         <span style="color: #22c55e; font-weight: bold; font-size: 0.75rem;">✔</span>
                         <span style="color: #22c55e; font-weight: 700; font-size: 0.58rem; text-transform: uppercase; white-space: nowrap;">REC</span>
@@ -2300,23 +2292,13 @@
     async function inicializarCapasEspeciales() {
         if (!capaLluviaRadar) {
             capaLluviaRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
-                tileSize: 256,
-                opacity: 0.75,
-                zIndex: 500,
-                attribution: '&copy; IEM Nexrad Radar'
+                tileSize: 256, opacity: 0.75, zIndex: 500, attribution: '&copy; IEM Nexrad Radar'
             });
         }
-
         if (!capaSateliteGOES) {
             const fechaAyer = new Date(Date.now() - 86400000).toISOString().split('T')[0];
             capaSateliteGOES = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${fechaAyer}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
-                tileSize: 256,
-                minZoom: 4,
-                maxZoom: 18,
-                maxNativeZoom: 9,
-                opacity: 0.85,
-                zIndex: 500,
-                attribution: '&copy; NASA GIBS / VIIRS SNPP'
+                tileSize: 256, minZoom: 4, maxZoom: 18, maxNativeZoom: 9, opacity: 0.85, zIndex: 500, attribution: '&copy; NASA GIBS'
             });
         }
     }
@@ -2331,15 +2313,10 @@
                 capaActual.addTo(mapInstance);
 
                 capaFuegosFIRMS = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${MAP_KEY_FIRMS}/`, {
-                    layers: 'fires_viirs_24',
-                    format: 'image/png',
-                    transparent: true,
-                    version: '1.3.0',
-                    attribution: '&copy; NASA LANCE FIRMS'
+                    layers: 'fires_viirs_24', format: 'image/png', transparent: true, version: '1.3.0', attribution: '&copy; NASA LANCE FIRMS'
                 });
 
                 capaCapaArboles = L.layerGroup();
-
                 inicializarCapasEspeciales();
                 escucharArbolesEnTiempoReal();
 
@@ -2350,7 +2327,6 @@
                         abrirModalCensoForestal(latSeleccionadaCenso, lonSeleccionadaCenso);
                     }
                 });
-
                 actualizarIndicadorMapa("Visor operativo", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Open-Meteo, NASA FIRMS, Firebase");
             }
 
@@ -2359,8 +2335,7 @@
             const iconoLimpio = L.divIcon({
                 className: '',
                 html: '<div style="background-color: #38bdf8; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #0e1526; box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"></div>',
-                iconSize: [18, 18],
-                iconAnchor: [9, 9]
+                iconSize: [18, 18], iconAnchor: [9, 9]
             });
 
             markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
@@ -2376,11 +2351,7 @@
     function inicializarMapaHidroOriginal() {
         if (!map) {
             map = L.map('map', { zoomControl: true }).setView([-33.5, -68.8], 8);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
-
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap' }).addTo(map);
             markersLayer = L.layerGroup().addTo(map);
 
             map.on('click', function(e) {
@@ -2389,14 +2360,8 @@
                     const nomInput = document.getElementById("nuevoNombre").value.trim();
                     const redInput = document.getElementById("nuevaRed").value.trim();
 
-                    if (!idInput) {
-                        alert("Por favor ingresa primero el ID de la estación.");
-                        return;
-                    }
-
-                    if (idEditandoHidro && idEditandoHidro !== idInput) {
-                        delete estacionesData[idEditandoHidro];
-                    }
+                    if (!idInput) { alert("Por favor ingresa primero el ID de la estación."); return; }
+                    if (idEditandoHidro && idEditandoHidro !== idInput) { delete estacionesData[idEditandoHidro]; }
 
                     estacionesData[idInput] = {
                         nombre: nomInput || `Estación ${idInput}`,
@@ -2420,9 +2385,7 @@
         consultar();
         escanearTodasLasEstaciones();
 
-        setTimeout(() => {
-            if (map) map.invalidateSize();
-        }, 300);
+        setTimeout(() => { if (map) map.invalidateSize(); }, 300);
     }
 
     function actualizarSelectYMapa() {
@@ -2447,25 +2410,13 @@
                 const customIcon = L.divIcon({
                     className: 'custom-marker',
                     html: `<div style="background: ${colorPunto}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px ${colorPunto}; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight:bold; color:#000;">💧</div>`,
-                    iconSize: [18, 18],
-                    iconAnchor: [9, 9]
+                    iconSize: [18, 18], iconAnchor: [9, 9]
                 });
 
                 const marker = L.marker(info.coords, { icon: customIcon, draggable: false }).addTo(markersLayer);
-                
-                marker.bindTooltip(`ID: ${id}`, {
-                    permanent: true,
-                    direction: 'top',
-                    offset: [0, -8],
-                    className: 'map-station-tooltip'
-                });
-
+                marker.bindTooltip(`ID: ${id}`, { permanent: true, direction: 'top', offset: [0, -8], className: 'map-station-tooltip' });
                 marker.bindPopup(`<b>${info.nombre}</b><br>ID: ${id}<br>Red: ${info.red}`);
-
-                marker.on('click', () => {
-                    select.value = id;
-                    seleccionarYCentrarEstacion();
-                });
+                marker.on('click', () => { select.value = id; seleccionarYCentrarEstacion(); });
 
                 marcadoresMapa[id] = marker;
             }
@@ -2483,13 +2434,11 @@
         const selectElem = document.getElementById("id");
         if (!selectElem) return;
         const idEst = selectElem.value;
-
         consultar();
 
         if (marcadoresMapa[idEst] && map) {
             const marker = marcadoresMapa[idEst];
-            const latLng = marker.getLatLng();
-            map.setView(latLng, 13, { animate: true });
+            map.setView(marker.getLatLng(), 13, { animate: true });
             marker.openPopup();
         }
     }
@@ -2497,7 +2446,6 @@
     function pedirClaveYEjecutar(accion) {
         const claveIngresada = prompt("Ingrese la contraseña de Administrador:");
         if (claveIngresada === null) return;
-
         if (claveIngresada === "admin") {
             if (accion === 'agregar') prepararModoNuevo();
             if (accion === 'editar') cargarEstacionParaEditar();
@@ -2519,10 +2467,7 @@
 
     function prepararModoUbicacion() {
         const idInput = document.getElementById("nuevoId").value.trim();
-        if (!idInput) {
-            alert("Por favor ingresa un ID válido antes de ubicar en el mapa.");
-            return;
-        }
+        if (!idInput) { alert("Por favor ingresa un ID válido antes de ubicar en el mapa."); return; }
         modoCreacionHidro = true;
         document.getElementById("instruccionMapa").textContent = "📍 Hacé clic en el mapa exactamente donde querés ubicar la estación.";
     }
@@ -2534,7 +2479,6 @@
 
         idEditandoHidro = idActual;
         const info = estacionesData[idActual];
-
         document.getElementById("nuevoId").value = idActual;
         document.getElementById("nuevoNombre").value = info.nombre;
         document.getElementById("nuevaRed").value = info.red;
@@ -2558,7 +2502,7 @@
         const idActual = select.value;
         if (!idActual) return;
 
-        if (confirm(`¿Estás seguro de eliminar la estación ${idActual} (${estacionesData[idActual]?.nombre || ''})?`)) {
+        if (confirm(`¿Estás seguro de eliminar la estación ${idActual}?`)) {
             delete estacionesData[idActual];
             if (historialLecturas[idActual] !== undefined) {
                 delete historialLecturas[idActual];
@@ -2575,7 +2519,6 @@
     async function escanearTodasLasEstaciones() {
         let idsEstaciones = Object.keys(estacionesData);
         let muestraIds = idsEstaciones.slice(0, 12);
-
         let estacionesVistasEstaRonda = {};
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
@@ -2614,9 +2557,7 @@
                 }
             } catch(e) {}
         }
-
         estacionesEnAlertaActuales = estacionesVistasEstaRonda;
-
         localStorage.setItem("territoria_historial", JSON.stringify(historialLecturas));
         actualizarCintaTickerScada();
     }
@@ -2659,7 +2600,6 @@
             resultado.innerHTML = "";
 
             const mediciones = data.d && data.d.Mediciones ? data.d.Mediciones : [];
-
             if(mediciones.length === 0) {
                 resultado.innerHTML = '<div class="card" style="grid-column: 1 / -1; color: var(--text-muted); text-align: center;">Punto personalizado operativo. Sin telemetría SNIH en vivo.</div>';
                 return;
@@ -2683,7 +2623,6 @@
 
             if(alturaValNum !== null && anteriorAltura !== null) {
                 let diferencia = alturaValNum - anteriorAltura;
-
                 if(diferencia > 0.005) {
                     tendenciaTexto = `📈 Subió (+${diferencia.toFixed(3)} m)`;
                     tendenciaColor = "#ef4444";
@@ -2691,9 +2630,6 @@
                 } else if(diferencia < -0.005) {
                     tendenciaTexto = `📉 Bajó (${diferencia.toFixed(3)} m)`;
                     tendenciaColor = "#38bdf8";
-                } else {
-                    tendenciaTexto = `➖ Estable`;
-                    tendenciaColor = "#22c55e";
                 }
             }
 
@@ -2711,7 +2647,6 @@
                 } else {
                     let num = Number(valor);
                     valor = isNaN(num) ? valor : num.toFixed(2);
-
                     if(m.NombreCodigo === "Altura" && !isNaN(num)) {
                         alturaValStr = num.toFixed(2) + " m";
                         if(num > 1.5 || huboCrecidaSensible) esAlertaTarjeta = true;
@@ -2721,10 +2656,8 @@
                 }
 
                 const unidad = unidades[m.NombreCodigo] || "";
-                let claseAlertaCard = esAlertaTarjeta ? "alerta-roja" : "";
-
                 resultado.innerHTML += `
-                    <div class="card ${claseAlertaCard}">
+                    <div class="card ${esAlertaTarjeta ? "alerta-roja" : ""}">
                         <div class="nombre" style="font-size:0.68rem;">${m.NombreCodigo}</div>
                         <div class="valor" style="font-size:1.2rem; font-weight:800;">${valor}</div>
                         <div class="unidad" style="font-size:0.6rem; color:var(--text-muted);">${unidad}</div>
@@ -2751,15 +2684,9 @@
                 badge.textContent = "Normal";
                 badge.style.background = "#22c55e";
             }
-
             escanearTodasLasEstaciones();
-
         } catch(error){
-            resultado.innerHTML = `
-                <div class="card" style="grid-column: 1 / -1; border-color: #ef4444;">
-                    <div style="color: #ef4444; font-weight: bold; text-align: center; font-size:0.75rem;">Error de conexión con la red SNIH.</div>
-                </div>
-            `;
+            resultado.innerHTML = `<div class="card" style="grid-column: 1 / -1; border-color: #ef4444;"><div style="color: #ef4444; font-weight: bold; text-align: center; font-size:0.75rem;">Error de conexión con la red SNIH.</div></div>`;
         }
     }
 
@@ -2768,9 +2695,7 @@
     async function cargarSismosInpres() {
         try {
             const response = await fetch(INPRES_API_URL);
-            if (!response.ok) {
-                throw new Error("HTTP " + response.status);
-            }
+            if (!response.ok) throw new Error("HTTP " + response.status);
             const xmlText = await response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(xmlText, "text/xml");
@@ -2798,11 +2723,7 @@
                 if (isNaN(latSismo) || isNaN(lonSismo) || (latSismo === 0 && lonSismo === 0)) {
                     let provUp = provincia.toUpperCase();
                     for (let [pKey, coords] of Object.entries(centrosProvincias)) {
-                        if (provUp.includes(pKey)) {
-                            latSismo = coords[0];
-                            lonSismo = coords[1];
-                            break;
-                        }
+                        if (provUp.includes(pKey)) { latSismo = coords[0]; lonSismo = coords[1]; break; }
                     }
                     if (isNaN(latSismo)) { latSismo = -31.53; lonSismo = -68.53; }
                 }
@@ -2816,16 +2737,14 @@
                     let yaExistia = sismosInpresEnAlertaActuales[sismoIdKey];
                     sismosVistosRonda[sismoIdKey] = {
                         titulo: `Sismo [${provincia}] Mag ${magnitud.toFixed(1)}`,
-                        magnitud: magnitud,
-                        lat: latSismo,
-                        lon: lonSismo,
+                        magnitud: magnitud, lat: latSismo, lon: lonSismo,
                         reconocido: yaExistia ? yaExistia.reconocido : false,
                         horaDisparo: yaExistia ? yaExistia.horaDisparo : horaActualStr
                     };
                 }
 
                 htmlCinta += `
-                    <div class="sismo-mini-card" title="${provincia} - Prof: ${profundidad}km (Lat: ${latSismo}, Lon: ${lonSismo})" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia.replace(/'/g, "")} (Mag ${magnitud.toFixed(1)})', ${magnitud})">
+                    <div class="sismo-mini-card" title="${provincia}" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia.replace(/'/g, "")} (Mag ${magnitud.toFixed(1)})', ${magnitud})">
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr.slice(0,5)}</div>
                         <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
                         <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud.toFixed(1)}</div>
@@ -2835,17 +2754,12 @@
             });
 
             sismosInpresEnAlertaActuales = sismosVistosRonda;
-
-            if (contadorMostrados === 0) {
-                htmlCinta += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; width: 100%;">Sin registros sísmicos disponibles.</div>`;
-            }
+            if (contadorMostrados === 0) htmlCinta += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; width: 100%;">Sin registros sísmicos disponibles.</div>`;
 
             contenedor.innerHTML = htmlCinta;
             document.getElementById("inpres-estado").innerHTML = `Actualizado (${contadorMostrados} sismos): ` + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
             actualizarCintaTickerScada();
-
         } catch(error) {
-            console.error(error);
             document.getElementById("inpres-estado").innerHTML = "Error";
             document.getElementById("inpres-contenedor").innerHTML = "<div style='font-size:0.68rem; color:#ef4444; text-align:center;'>No fue posible conectar con el servicio INPRES.</div>";
         }
@@ -2863,14 +2777,13 @@
                     let p = s.properties;
                     let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
-
                     let fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' });
                     let horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: false });
                     let mag = p.mag ? p.mag.toFixed(1) : "--";
                     let lugarCorto = (p.place || "Desconocido").split(',').pop().trim().replace(/'/g, "");
 
                     contenedor.innerHTML += `
-                        <div class="sismo-mini-card" title="${p.place} (Clic para ubicar)" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
+                        <div class="sismo-mini-card" title="${p.place}" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
                             <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr}</div>
                             <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
                             <div class="sismo-mini-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
@@ -2880,9 +2793,7 @@
                 });
             }
         } catch (e) {
-            if (contenedor) {
-                contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; width: 100%;">Error USGS</div>`;
-            }
+            if (contenedor) contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; width: 100%;">Error USGS</div>`;
         }
     }
 
@@ -2891,32 +2802,16 @@
         const btnCenso = document.getElementById("btnModoCenso");
         const banner = document.getElementById("bannerModoCenso");
 
-        if (!capaCapaArboles && mapInstance) {
-            capaCapaArboles = L.layerGroup();
-        }
+        if (!capaCapaArboles && mapInstance) capaCapaArboles = L.layerGroup();
 
         if (modoCensoActivo) {
-            if (btnCenso) {
-                btnCenso.classList.add("active");
-                btnCenso.style.background = "#22c55e";
-                btnCenso.style.color = "#000";
-            }
+            if (btnCenso) { btnCenso.classList.add("active"); btnCenso.style.background = "#22c55e"; btnCenso.style.color = "#000"; }
             if (banner) banner.style.display = "flex";
-
-            if (mapInstance && capaCapaArboles && !mapInstance.hasLayer(capaCapaArboles)) {
-                capaCapaArboles.addTo(mapInstance);
-            }
+            if (mapInstance && capaCapaArboles && !mapInstance.hasLayer(capaCapaArboles)) capaCapaArboles.addTo(mapInstance);
         } else {
-            if (btnCenso) {
-                btnCenso.classList.remove("active");
-                btnCenso.style.background = "rgba(34, 197, 94, 0.2)";
-                btnCenso.style.color = "#22c55e";
-            }
+            if (btnCenso) { btnCenso.classList.remove("active"); btnCenso.style.background = "rgba(34, 197, 94, 0.2)"; btnCenso.style.color = "#22c55e"; }
             if (banner) banner.style.display = "none";
-
-            if (mapInstance && capaCapaArboles && mapInstance.hasLayer(capaCapaArboles)) {
-                mapInstance.removeLayer(capaCapaArboles);
-            }
+            if (mapInstance && capaCapaArboles && mapInstance.hasLayer(capaCapaArboles)) mapInstance.removeLayer(capaCapaArboles);
         }
     }
 
@@ -2955,7 +2850,6 @@
                         }
                         loteHectareasGlobal = parseFloat((areaM2 / 10000).toFixed(2));
                         const centro = layer.getBounds().getCenter();
-
                         analizarLoteModalPro(centro.lat, centro.lng, loteHectareasGlobal);
                     });
                 }
@@ -2991,36 +2885,26 @@
         const observaciones = document.getElementById("txtObservacionesArbol").value;
         const fileInput = document.getElementById("inputFotoArbol");
 
-        if (!db) {
-            alert("Error crítico: Base de datos no inicializada.");
-            return;
-        }
+        if (!db) { alert("Error crítico: Base de datos no inicializada."); return; }
 
         const latFinal = latSeleccionadaCenso !== null ? latSeleccionadaCenso : currentLat;
         const lonFinal = lonSeleccionadaCenso !== null ? lonSeleccionadaCenso : currentLon;
 
         const enviarAFirebase = (imagenBase64) => {
             const nuevoArbol = {
-                especie,
-                estado,
-                observaciones: observaciones || "Sin observaciones",
-                lat: latFinal,
-                lon: lonFinal,
-                fecha: new Date().toLocaleDateString("es-AR"),
-                foto: imagenBase64 || ""
+                especie, estado, observaciones: observaciones || "Sin observaciones",
+                lat: latFinal, lon: lonFinal, fecha: new Date().toLocaleDateString("es-AR"), foto: imagenBase64 || ""
             };
 
             db.collection("arboles_censados").add(nuevoArbol)
-                .then((docRef) => {
+                .then(() => {
                     alert(`¡Árbol registrado con éxito!`);
                     cerrarModalCensoForestal();
                     alternarModoCensoMapa();
                     document.getElementById("txtObservacionesArbol").value = "";
                     if (fileInput) fileInput.value = "";
                 })
-                .catch((error) => {
-                    alert("Error al guardar: " + error.message);
-                });
+                .catch((error) => { alert("Error al guardar: " + error.message); });
         };
 
         if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -3034,12 +2918,10 @@
                     const scaleSize = maxWidth / img.width;
                     canvas.width = maxWidth;
                     canvas.height = img.height * scaleSize;
-
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const comprimidaBase64 = canvas.toDataURL('image/jpeg', 0.4);
-                    enviarAFirebase(comprimidaBase64);
+                    enviarAFirebase(canvas.toDataURL('image/jpeg', 0.4));
                 };
-                img.onerror = function() { enviarAFirebase(""); };
+                img.onerror = () => enviarAFirebase("");
                 img.src = e.target.result;
             };
             reader.readAsDataURL(fileInput.files[0]);
@@ -3050,9 +2932,7 @@
 
     function escucharArbolesEnTiempoReal() {
         if (!db) return;
-        if (!capaCapaArboles) {
-            capaCapaArboles = L.layerGroup();
-        }
+        if (!capaCapaArboles) capaCapaArboles = L.layerGroup();
 
         db.collection("arboles_censados").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
@@ -3065,8 +2945,7 @@
                     let iconoArbol = L.divIcon({
                         className: '',
                         html: `<div style="background-color: ${colorPin}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0e1526; box-shadow: 0 0 10px ${colorPin}; display: flex; align-items: center; justify-content: center; font-size: 9px;">🌳</div>`,
-                        iconSize: [18, 18],
-                        iconAnchor: [9, 9]
+                        iconSize: [18, 18], iconAnchor: [9, 9]
                     });
 
                     if (capaCapaArboles && arbol.lat && arbol.lon) {
@@ -3074,10 +2953,7 @@
                         if (arbol.foto && arbol.foto.length > 20) {
                             htmlPopup += `<br><img src="${arbol.foto}" style="width: 100%; max-width: 140px; border-radius: 6px; margin-top: 4px; display: block;">`;
                         }
-
-                        L.marker([arbol.lat, arbol.lon], { icon: iconoArbol })
-                            .bindPopup(htmlPopup)
-                            .addTo(capaCapaArboles);
+                        L.marker([arbol.lat, arbol.lon], { icon: iconoArbol }).bindPopup(htmlPopup).addTo(capaCapaArboles);
                     }
                 }
             });
@@ -3087,10 +2963,8 @@
     async function buscarLugarModal() {
         const input = document.getElementById("modalSearchInput");
         if (!input || !input.value.trim()) return;
-
-        const query = input.value.trim();
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.value.trim())}`);
             const data = await res.json();
             if (data && data.length > 0) {
                 const lat = parseFloat(data[0].lat);
@@ -3099,18 +2973,13 @@
                     modalMapInstance.setView([lat, lon], 14);
                     L.marker([lat, lon]).addTo(modalMapInstance).bindPopup(`<b>${data[0].display_name}</b>`).openPopup();
                 }
-            } else {
-                alert("No se encontró la ubicación.");
-            }
-        } catch (err) {
-            alert("Error al buscar ubicación.");
-        }
+            } else { alert("No se encontró la ubicación."); }
+        } catch (err) { alert("Error al buscar ubicación."); }
     }
 
     async function analizarLoteModalPro(lat, lon, hectareas) {
         const panel = document.getElementById("reporteLotePanel");
         if (!panel) return;
-
         panel.innerHTML = `<div class="report-section-title">📊 Procesando (${hectareas} ha)...</div><div style="text-align:center; padding: 20px; color:var(--accent); font-size:0.75rem;">Consultando Open-Meteo...</div>`;
 
         let nombreLugar = `Lote Agrícola GPS`;
@@ -3119,9 +2988,8 @@
             const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=12`);
             const geoData = await geoRes.json();
             if (geoData && geoData.address) {
-                const localidad = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.suburb || geoData.address.municipality || "";
+                nombreLugar = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.suburb || geoData.address.municipality || "Lote";
                 provinciaZona = geoData.address.state || "Mendoza";
-                if (localidad) nombreLugar = localidad;
             }
         } catch(e) {}
 
@@ -3135,10 +3003,8 @@
             let lluvia = data.daily ? (data.daily.precipitation_sum[0] || 0) : 0;
             let et0 = data.daily ? (data.daily.et0_fao_evapotranspiration[0] || 4.5) : 4.5;
 
-            let cultivoDefault = "Vid";
-            datosLoteActual = { nombreLugar, provinciaZona, hectareas, temp, hum, viento, lluvia, et0, cultivoDefault };
-            renderizarPanelReporteYCostos(cultivoDefault);
-
+            datosLoteActual = { nombreLugar, provinciaZona, hectareas, temp, hum, viento, lluvia, et0 };
+            renderizarPanelReporteYCostos("Vid");
         } catch(e) {
             panel.innerHTML = `<div class="report-section-title">📊 Reporte de Lote</div><div class="recommendation-card" style="color:#ef4444;">Error de red en Open-Meteo.</div>`;
         }
@@ -3154,41 +3020,22 @@
             <span class="cultivo-btn-select ${c === cultivoSeleccionado ? 'active':''}" onclick="renderizarPanelReporteYCostos('${c}')">${c}</span>
         `).join("");
 
-        let recomendacionFertilizante = "";
-        let alertaDeriva = "";
-
-        if (d.viento > 20) {
-            alertaDeriva = `<br><span style="color:#ef4444; font-weight:bold;">⚠ ALERTA DE DERIVA:</span> Viento fuerte. No aplicar foliares.`;
-        }
-
-        if (d.temp < 12) {
-            recomendacionFertilizante = `Suelo frío (${d.temp}°C): Priorizar aplicación fosforada para enraizar ${cultivoSeleccionado}.${alertaDeriva}`;
-        } else if (d.temp > 28) {
-            recomendacionFertilizante = `Temp elevada (${d.temp}°C): Riesgo de volatilización. Aplicar por fertirriego nocturno.${alertaDeriva}`;
-        } else {
-            recomendacionFertilizante = `Condiciones estables (${d.temp}°C, ${d.viento} km/h): Apto para fertilización en ${cultivoSeleccionado}.${alertaDeriva}`;
-        }
+        let recomendacionFertilizante = d.temp < 12 ? `Suelo frío (${d.temp}°C): Priorizar aplicación fosforada.` : (d.temp > 28 ? `Temp elevada (${d.temp}°C): Aplicar por fertirriego nocturno.` : `Condiciones estables (${d.temp}°C, ${d.viento} km/h): Apto para fertilización.`);
 
         panel.innerHTML = `
             <div class="report-section-title">📊 ${d.nombreLugar}, ${d.provinciaZona}</div>
-
             <div class="recommendation-card">
                 <b>Superficie:</b> <span style="color:var(--accent); font-weight:bold;">${d.hectareas} ha</span><br>
                 <b>Condiciones:</b> ${d.temp}°C | ${d.hum}% Hum | ${d.viento} km/h
             </div>
-
             <div class="report-section-title">🌱 Cultivo</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
                 <div style="margin-bottom: 4px; font-size:0.65rem; color:var(--text-muted);">Seleccionar Cultivo:</div>
                 <div style="margin-bottom: 6px;">${listaCultivosHtml}</div>
                 <b>Evaluación para ${cultivoSeleccionado}:</b> Óptima.
             </div>
-
             <div class="report-section-title">🧪 Recomendación Experta</div>
-            <div class="recommendation-card" style="border-left: 4px solid #22c55e;">
-                ${recomendacionFertilizante}
-            </div>
-
+            <div class="recommendation-card" style="border-left: 4px solid #22c55e;">${recomendacionFertilizante}</div>
             <div class="report-section-title">💧 Balance Hídrico</div>
             <div class="recommendation-card" style="border-left: 4px solid var(--accent);">
                 <b>Precipitación:</b> ${d.lluvia} mm | <b>ET0:</b> ${d.et0} mm/d<br>
@@ -3234,7 +3081,6 @@
             capaActual = capasBase[tipo];
             capaActual.addTo(mapInstance);
             contenedorMapaDiv.classList.add("modo-oscuro-mapa");
-
             if (tipo === 'base') { btnBase.classList.add("active"); mapTitle.innerText = "🗺 Visor Geográfico Satelital"; }
             else if (tipo === 'topo') { btnTopo.classList.add("active"); mapTitle.innerText = "⛰ Visor Topográfico"; }
             else if (tipo === 'calles') { if (btnCalles) btnCalles.classList.add("active"); mapTitle.innerText = "🛣 Red Vial"; }
@@ -3280,12 +3126,10 @@
                     }
                     actualizarIndicadorMapa("GPS actualizado", "#22c55e", "Fuentes: Territoria, INPRES, USGS, Firebase");
                 },
-                (error) => { usarUbicacionPorDefecto(); },
+                (error) => { alert("No se pudo obtener el GPS actual. Usando ubicación por defecto."); },
                 { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
-        } else {
-            alert("Geolocalización no soportada.");
-        }
+        } else { alert("Geolocalización no soportada."); }
     }
 
     function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
@@ -3316,9 +3160,7 @@
                     let fLat = parseFloat(cols[idxLat]);
                     let fLon = parseFloat(cols[idxLon]);
                     if (!isNaN(fLat) && !isNaN(fLon)) {
-                        let distRefineria = calcularDistanciaKm(fLat, fLon, -33.04, -68.87);
-                        if (distRefineria < 3.0) continue;
-
+                        if (calcularDistanciaKm(fLat, fLon, -33.04, -68.87) < 3.0) continue;
                         let distancia = calcularDistanciaKm(lat, lon, fLat, fLon);
                         if (distancia < fuegoCercanoKm) fuegoCercanoKm = distancia;
                     }
@@ -3343,31 +3185,18 @@
     }
 
     function verificarContingenciaClimatica(minTemp, vientoActual, rafagaActual, dirViento, humedadActual) {
-        const esZonda = (dirViento >= 220 && dirViento <= 290) && (rafagasActual >= 45) && (humedadActual <= 20);
-        const umbralVientoComun = 40;
+        const esZonda = (dirViento >= 220 && dirViento <= 290) && (rafagaActual >= 45) && (humedadActual <= 20);
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
-        if (minTemp <= 2.0) {
+        if (minTemp <= 2.0 || esZonda || vientoActual >= 40 || rafagaActual >= 40) {
             if (!estadoAlarmasSistema.zonda.activo) {
                 estadoAlarmasSistema.zonda.activo = true;
                 estadoAlarmasSistema.zonda.reconocido = false;
                 estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
             }
-            estadoAlarmasSistema.zonda.titulo = `Alerta Helada Extrema (${minTemp}°C)`;
-        } else if (esZonda) {
-            if (!estadoAlarmasSistema.zonda.activo) {
-                estadoAlarmasSistema.zonda.activo = true;
-                estadoAlarmasSistema.zonda.reconocido = false;
-                estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
-            }
-            estadoAlarmasSistema.zonda.titulo = `Alerta Viento Zonda (${Math.round(rafagasActual)} km/h)`;
-        } else if (vientoActual >= umbralVientoComun || rafagaActual >= umbralVientoComun) {
-            if (!estadoAlarmasSistema.zonda.activo) {
-                estadoAlarmasSistema.zonda.activo = true;
-                estadoAlarmasSistema.zonda.reconocido = false;
-                estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
-            }
-            estadoAlarmasSistema.zonda.titulo = `Ráfagas Severas (${Math.round(Math.max(vientoActual, rafagaActual))} km/h)`;
+            if (minTemp <= 2.0) estadoAlarmasSistema.zonda.titulo = `Alerta Helada Extrema (${minTemp}°C)`;
+            else if (esZonda) estadoAlarmasSistema.zonda.titulo = `Alerta Viento Zonda (${Math.round(rafagaActual)} km/h)`;
+            else estadoAlarmasSistema.zonda.titulo = `Ráfagas Severas (${Math.round(Math.max(vientoActual, rafagaActual))} km/h)`;
         } else {
             estadoAlarmasSistema.zonda.activo = false;
             estadoAlarmasSistema.zonda.reconocido = false;
@@ -3376,7 +3205,7 @@
         actualizarCintaTickerScada();
     }
 
-    function verificarRiesgoHeladaAvanzado(tMin, humedadRelativa, vientoVel) {
+    function verificarRiesgoHeladaAvanzado(tMin) {
         const lblRiesgo = document.getElementById("riesgoHelada");
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
 
@@ -3402,7 +3231,6 @@
         actualizarCintaTickerScada();
     }
 
-    /* NUEVA FUNCIÓN DE EVALUACIÓN CLIMÁTICA LOCAL ESTRICTA (SIN MENTIRAS) */
     function evaluarAlertaClimaticaLocal(temp, hum, viento, rafaga, dirViento, weatherCode) {
         let banner = document.getElementById("bannerAlertaClimaServer");
         let titulo = document.getElementById("tituloAlertaClima");
@@ -3417,7 +3245,6 @@
             hayAlerta = true;
             tipoAlerta = "¡ALERTA ROJA: POSIBLE GRANIZO Y TORMENTA SEVERA!";
             mensajeDetalle = `Humedad crítica (${hum}%) y ráfagas de ${Math.round(rafaga)} km/h detectadas. Resguarde vehículos y cultivos de inmediato.`;
-            
             estadoAlarmasSistema.zonda.activo = true;
             estadoAlarmasSistema.zonda.reconocido = false;
             estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
@@ -3425,8 +3252,7 @@
         } else if (rafaga >= 45 || viento >= 40) {
             hayAlerta = true;
             tipoAlerta = "¡ADVERTENCIA: RÁFAGAS DE VIENTO INTENSAS!";
-            mensajeDetalle = `Viento sostenido de ${Math.round(viento)} km/h con ráfagas de ${Math.round(rafaga)} km/h. Precaución en traslados y estructuras externas.`;
-
+            mensajeDetalle = `Viento sostenido de ${Math.round(viento)} km/h con ráfagas de ${Math.round(rafaga)} km/h. Precaución.`;
             estadoAlarmasSistema.zonda.activo = true;
             estadoAlarmasSistema.zonda.reconocido = false;
             estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
@@ -3443,7 +3269,6 @@
         } else {
             if (banner) banner.classList.add("oculto");
         }
-
         actualizarCintaTickerScada();
     }
 
@@ -3478,3 +3303,259 @@
             let y = ahora.getFullYear(), m = ahora.getMonth() + 1, d = ahora.getDate();
             if (m < 3) { y--; m += 12; }
             m++;
+            let jd = (365.25 * y) + (30.6 * m) + d - 694039.09;
+            jd /= 29.5305882;
+            let fase = Math.round((jd - Math.floor(jd)) * 8);
+            if (fase >= 8) fase = 0;
+            let iluminacion = Math.round((1 - Math.cos((jd - Math.floor(jd)) * 2 * Math.PI)) / 2 * 100);
+            let nombres = ["Luna Nueva", "Creciente", "Cuarto Crec.", "Gibosa Crec.", "Luna Llena", "Gibosa Meng.", "Cuarto Meng.", "Menguante"];
+            let iconos = ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘"];
+
+            document.getElementById("moonIcon").innerText = iconos[fase];
+            document.getElementById("moonPhaseName").innerText = nombres[fase];
+            document.getElementById("moonIllumination").innerText = iluminacion + "%";
+        } catch(e) {}
+    }
+
+    function actualizarCicloSolar(amanecerIso, atardecerIso) {
+        try {
+            const ahora = new Date();
+            const amanecer = new Date(amanecerIso);
+            const atardecer = new Date(atardecerIso);
+
+            document.getElementById("amanecerTime").innerText = amanecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit', hour12: false});
+            document.getElementById("atardecerTime").innerText = atardecer.toLocaleTimeString("es-AR", {hour:'2-digit', minute:'2-digit', hour12: false});
+
+            let totalDiaMs = atardecer - amanecer;
+            let transcurridoMs = ahora - amanecer;
+            let porcentaje = transcurridoMs / totalDiaMs;
+            if (porcentaje < 0) porcentaje = 0;
+            if (porcentaje > 1) porcentaje = 1;
+
+            let gradosRotacion = -90 + (porcentaje * 180);
+            const sunPivot = document.getElementById("sunPivot");
+            if (sunPivot) sunPivot.style.transform = `rotate(${gradosRotacion}deg)`;
+        } catch(e) {}
+    }
+
+    async function cargarCalidadAire() {
+        try {
+            const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${currentLat}&longitude=${currentLon}&current=us_aqi&timezone=auto`);
+            const data = await res.json();
+            if (!data || !data.current) return;
+            const aqi = data.current.us_aqi;
+            let estado = "Buena", color = "#22c55e";
+            if (aqi > 50) { estado = "Moderada"; color = "#facc15"; }
+            if (aqi > 100) { estado = "Dañina"; color = "#ef4444"; }
+            document.getElementById("aire").innerText = aqi;
+            document.getElementById("aire").style.color = color;
+            document.getElementById("aireEstado").innerText = estado;
+        } catch (e) {}
+    }
+
+    async function cargarPolen() {
+        try {
+            const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${currentLat}&longitude=${currentLon}&hourly=grass_pollen,ragweed_pollen,alder_pollen&timezone=auto`);
+            const data = await res.json();
+            if (!data || !data.hourly) return;
+
+            function evalNivel(v) {
+                if (v <= 0) return { t: "Ninguno", c: "dot-ninguno" };
+                if (v <= 15) return { t: "Bajo", c: "dot-bajo" };
+                if (v <= 50) return { t: "Medio", c: "dot-medio" };
+                return { t: "Alto", c: "dot-alto" };
+            }
+
+            let htmlA = "", htmlC = "", htmlM = "";
+            [12, 36, 60].forEach((idx, i) => {
+                let d = i === 0 ? "Hoy" : (i === 1 ? "Mañ" : "Pas");
+                let nA = evalNivel((data.hourly.alder_pollen[idx] || 0));
+                let nC = evalNivel(data.hourly.grass_pollen[idx] || 0);
+                let nM = evalNivel(data.hourly.ragweed_pollen[idx] || 0);
+
+                htmlA += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:3px;">${nA.t}</span><span class="dot-nivel ${nA.c}"></span></div></div>`;
+                htmlC += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:3px;">${nC.t}</span><span class="dot-nivel ${nC.c}"></span></div></div>`;
+                htmlM += `<div class="polen-item"><span>${d}</span> <div><span style="font-weight:700; margin-right:3px;">${nM.t}</span><span class="dot-nivel ${nM.c}"></span></div></div>`;
+            });
+
+            document.getElementById("polenArboles").innerHTML = htmlA;
+            document.getElementById("polenCesped").innerHTML = htmlC;
+            document.getElementById("polenMaleza").innerHTML = htmlM;
+        } catch (e) {}
+    }
+
+    async function cargarClima() {
+        try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,weather_code,uv_index,shortwave_radiation,is_day&hourly=temperature_2m,relative_humidity_2m,surface_pressure,weather_code,soil_temperature_0cm,soil_moisture_0_to_1cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
+            const data = await res.json();
+            if (!data || !data.current) return;
+
+            const temp = data.current.temperature_2m ?? 0;
+            const st = Math.round(data.current.apparent_temperature ?? temp);
+            const hum = data.current.relative_humidity_2m ?? 0;
+            const viento = data.current.wind_speed_10m ?? 0;
+            const rafagaActual = data.current.wind_gusts_10m ?? viento;
+            const dirV = data.current.wind_direction_10m ?? 0;
+            const presion = data.current.surface_pressure ?? 1013;
+            const uv = data.current.uv_index ?? 0;
+            const code = data.current.weather_code ?? 0;
+            const isDay = data.current.is_day ?? 1;
+            const rad = data.current.shortwave_radiation ?? 0;
+
+            document.getElementById("temp").innerText = Math.round(temp) + "°C";
+            document.getElementById("stTemp").innerText = "ST: " + st + "°C";
+            document.getElementById("headerTemp").textContent = Math.round(temp) + "°C";
+            document.getElementById("humedad").innerText = hum + "%";
+            document.getElementById("viento").innerText = Math.round(viento) + " km/h";
+            document.getElementById("vientoDir").innerText = `Dir: ${obtenerDireccionViento(dirV)}`;
+            document.getElementById("presion").innerText = Math.round(presion);
+            document.getElementById("uvIndex").innerText = uv.toFixed(1);
+
+            const elIconoPrincipal = document.getElementById("weatherIcon");
+            if (elIconoPrincipal) elIconoPrincipal.innerText = iconoClima(code, isDay);
+
+            document.getElementById("radiacionSolar").innerText = Math.round(rad) + " W/m²";
+            let tw = temp * 0.5 + hum * 0.1;
+            document.getElementById("bulboHumedad").innerText = tw.toFixed(1) + " °C";
+
+            const estres = document.getElementById("estresTermico");
+            if (temp >= 32) { estres.innerText = "Peligroso"; estres.style.color = "#ef4444"; }
+            else if (temp >= 28) { estres.innerText = "Moderado"; estres.style.color = "#facc15"; }
+            else { estres.innerText = "Confortable"; estres.style.color = "#22c55e"; }
+
+            evaluarAlertaClimaticaLocal(temp, hum, viento, rafagaActual, dirV, code);
+
+            if (data.daily) {
+                let minTempPronostico = data.daily.temperature_2m_min[0] ?? 5;
+                let maxRafagaPronostico = data.daily.wind_gusts_10m_max[0] ?? 10;
+                let precipitacionHoy = data.daily.precipitation_sum[0] ?? 0;
+                let et0Hoy = data.daily.et0_fao_evapotranspiration[0] ?? 4.5;
+                let tMaxHoy = data.daily.temperature_2m_max[0] ?? 25;
+                let tMinHoy = data.daily.temperature_2m_min[0] ?? 15;
+
+                verificarContingenciaClimatica(minTempPronostico, viento, rafagaActual, dirV, hum);
+                verificarRiesgoHeladaAvanzado(minTempPronostico);
+
+                document.getElementById("lluviaAcum").innerText = Math.max(0, et0Hoy - precipitacionHoy).toFixed(1) + " mm";
+                document.getElementById("gddAcum").innerText = Math.round(Math.max(0, ((tMaxHoy + tMinHoy) / 2) - 10)) + " GDD";
+                document.getElementById("balanceHidrico").innerText = (precipitacionHoy - et0Hoy).toFixed(1) + " mm";
+                document.getElementById("probLluvia").innerText = (data.daily.precipitation_probability_max[0] ?? 0) + "%";
+                document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
+                document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
+                document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
+
+                actualizarCicloSolar(data.daily.sunrise[0], data.daily.sunset[0]);
+            }
+
+            if (data.hourly && data.hourly.temperature_2m) {
+                let horasFrioCount = 0;
+                data.hourly.temperature_2m.slice(0, 24).forEach(t => { if (t >= 0 && t <= 7) horasFrioCount++; });
+                document.getElementById("horasFrio").innerText = horasFrioCount + " hs";
+
+                let tActual = data.current.temperature_2m;
+                let rhActual = data.current.relative_humidity_2m;
+                let es = 0.61078 * Math.exp((17.27 * tActual) / (tActual + 237.3));
+                document.getElementById("vpdAire").innerText = (es - (es * (rhActual / 100))).toFixed(2) + " kPa";
+            }
+
+            if (data.hourly && data.hourly.soil_moisture_0_to_1cm) {
+                document.getElementById("humSuelo").innerText = (data.hourly.soil_moisture_0_to_1cm[0] * 100).toFixed(0) + " %";
+            }
+            if (data.hourly && data.hourly.soil_temperature_0cm) {
+                document.getElementById("tempSuelo").innerText = data.hourly.soil_temperature_0cm[0].toFixed(1) + " °C";
+            }
+
+            const hourly = document.getElementById("hourlyForecast");
+            if (hourly && data.hourly) {
+                hourly.innerHTML = "";
+                let h = new Date().getHours();
+                for(let i = h; i < h + 12; i++) {
+                    if (data.hourly.temperature_2m[i] !== undefined) {
+                        hourly.innerHTML += `<div class="forecast-card"><div style="font-size:0.65rem; font-weight:700;">${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i], 1)}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
+                    }
+                }
+            }
+
+            const forecast = document.getElementById("forecast");
+            if (forecast && data.daily) {
+                forecast.innerHTML = "";
+                data.daily.time.forEach((t, i) => {
+                    let d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", {weekday: "short"});
+                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize; font-weight:700; font-size:0.65rem;">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i], 1)}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
+                });
+            }
+        } catch(e) {}
+    }
+
+    function dispararCargaDeDatos() {
+        cargarClima();
+        cargarCalidadAire();
+        cargarPolen();
+        cargarSismosInternacionalesUsgs();
+        cargarSismosInpres();
+        verificarProximidadIncendios(currentLat, currentLon);
+        escanearTodasLasEstaciones();
+    }
+
+    async function procesarUbicacionExitosa(lat, lon) {
+        currentLat = lat;
+        currentLon = lon;
+        let nombreTextoFinal = "Godoy Cruz, Mendoza";
+        try {
+            const res = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=12`)).json();
+            if (res && res.address) {
+                let localidad = res.address.city || res.address.town || res.address.village || res.address.suburb || res.address.municipality || "";
+                let provincia = res.address.state || "Mendoza";
+                nombreTextoFinal = localidad ? `${localidad}, ${provincia}` : provincia;
+            }
+        } catch(e) {}
+
+        document.getElementById("ubicacionTexto").innerText = nombreTextoFinal;
+        inicializarMapaArgentina(currentLat, currentLon);
+        dispararCargaDeDatos();
+    }
+
+    // INICIO SEGURO: Carga inmediata por defecto para evitar congelamientos por GPS
+    function iniciarApp() {
+        actualizarFechaYHoraDigital();
+        calcularFaseLunar();
+        renderizarAlarmero();
+        actualizarCintaTickerScada();
+
+        // 1. Cargar por defecto instantáneamente
+        currentLat = -32.92;
+        currentLon = -68.84;
+        document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+        inicializarMapaArgentina(currentLat, currentLon);
+        inicializarMapaHidroOriginal();
+        dispararCargaDeDatos();
+
+        // 2. Intentar buscar ubicación GPS precisa en segundo plano (no bloquea el renderizado)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    await procesarUbicacionExitosa(pos.coords.latitude, pos.coords.longitude);
+                },
+                (error) => { console.log("Usando ubicación por defecto preconfigurada."); },
+                { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+            );
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnGuardar = document.getElementById("btnGuardarCensor") || document.getElementById("btnGuardarCenso");
+        if (btnGuardar) {
+            btnGuardar.addEventListener("click", function(e) {
+                e.preventDefault();
+                guardarRegistroArbol();
+            });
+        }
+        iniciarApp();
+    });
+
+    setInterval(actualizarFechaYHoraDigital, 1000);
+    setInterval(dispararCargaDeDatos, 300000);
+</script>
+
+</body>
+</html>
