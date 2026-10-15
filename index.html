@@ -3515,14 +3515,12 @@
         dispararCargaDeDatos();
     }
 
-    // INICIO SEGURO: Carga inmediata por defecto para evitar congelamientos por GPS
     function iniciarApp() {
         actualizarFechaYHoraDigital();
         calcularFaseLunar();
         renderizarAlarmero();
         actualizarCintaTickerScada();
 
-        // 1. Cargar por defecto instantáneamente
         currentLat = -32.92;
         currentLon = -68.84;
         document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
@@ -3530,7 +3528,6 @@
         inicializarMapaHidroOriginal();
         dispararCargaDeDatos();
 
-        // 2. Intentar buscar ubicación GPS precisa en segundo plano (no bloquea el renderizado)
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
