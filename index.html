@@ -1845,7 +1845,8 @@
     let estadoAlarmasSistema = {
         fuego: { activo: false, reconocido: false, titulo: "Foco Forestal Activo (NASA FIRMS)", horaDisparo: "" },
         zonda: { activo: false, reconocido: false, titulo: "Alerta Climática Extrema", horaDisparo: "" },
-        helada: { activo: false, reconocido: false, titulo: "Alerta de Helada Agrícola", horaDisparo: "" }
+        helada: { activo: false, reconocido: false, titulo: "Alerta de Helada Agrícola", horaDisparo: "" },
+        tormentaBarometrica: { activo: false, reconocido: false, titulo: "Alerta Tormenta por Presión Barométrica", horaDisparo: "" }
     };
 
     function abrirModalAlarmasActivas() {
@@ -1954,8 +1955,9 @@
         let hayFuego = estadoAlarmasSistema.fuego.activo;
         let hayZonda = estadoAlarmasSistema.zonda.activo;
         let hayHelada = estadoAlarmasSistema.helada.activo;
+        let hayTormentaBarom = estadoAlarmasSistema.tormentaBarometrica.activo;
 
-        if (llavesEstaciones.length === 0 && llavesSismos.length === 0 && !hayFuego && !hayZonda && !hayHelada) {
+        if (llavesEstaciones.length === 0 && llavesSismos.length === 0 && !hayFuego && !hayZonda && !hayHelada && !hayTormentaBarom) {
             contenedor.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 0.75rem;">✔ Sistema Normal. No hay alarmas activas en el alarmero.</div>`;
             return;
         }
@@ -2011,6 +2013,22 @@
             `;
         }
 
+        if (hayTormentaBarom) {
+            let rec = estadoAlarmasSistema.tormentaBarometrica.reconocido;
+            contenedor.innerHTML += `
+                <div style="background: var(--card-inner); border: 1px solid ${rec ? '#22c55e' : '#ef4444'}; border-left: 6px solid ${rec ? '#22c55e' : '#ef4444'}; padding: 8px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                        <span style="font-size: 1.2rem;">🌩️</span>
+                        <div style="min-width: 0;">
+                            <div style="font-size: 0.6rem; color: ${rec ? '#22c55e' : '#ef4444'}; font-weight: 800;">${rec ? '✔ RECONOCIDO' : 'ACTIVO / PENDIENTE'} (Disparo: ${estadoAlarmasSistema.tormentaBarometrica.horaDisparo})</div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-main);">${estadoAlarmasSistema.tormentaBarometrica.titulo}</div>
+                        </div>
+                    </div>
+                    ${!rec ? `<button class="btn-reconocer" onclick="reconocerAlarmaScada('tormentaBarometrica')">✅ Reconocer</button>` : `<span style="font-size: 0.7rem; color: #22c55e; font-weight: bold;">✔ Reconocido</span>`}
+                </div>
+            `;
+        }
+
         if (hayHelada) {
             let rec = estadoAlarmasSistema.helada.reconocido;
             contenedor.innerHTML += `
@@ -2054,6 +2072,7 @@
         let hayFuego = estadoAlarmasSistema.fuego.activo;
         let hayZonda = estadoAlarmasSistema.zonda.activo;
         let hayHelada = estadoAlarmasSistema.helada.activo;
+        let hayTormentaBarom = estadoAlarmasSistema.tormentaBarometrica.activo;
 
         let alertasHtml = "";
 
@@ -2073,6 +2092,11 @@
             let rec = estadoAlarmasSistema.zonda.reconocido;
             let iconoEstado = rec ? "✔ [REC]" : "🚨";
             alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[CLIMA]</b> ${estadoAlarmasSistema.zonda.titulo}</span>`;
+        }
+        if (hayTormentaBarom) {
+            let rec = estadoAlarmasSistema.tormentaBarometrica.reconocido;
+            let iconoEstado = rec ? "✔ [REC]" : "🚨";
+            alertasHtml += `<span class="scada-alert-item" onclick="abrirModalAlarmasActivas()">${iconoEstado} <b>[TORMENTA BAROMÉTRICA]</b> ${estadoAlarmasSistema.tormentaBarometrica.titulo}</span>`;
         }
         if (hayHelada) {
             let rec = estadoAlarmasSistema.helada.reconocido;
@@ -2114,6 +2138,10 @@
             estadoAlarmasSistema.zonda.reconocido = true;
             tituloIncidente = estadoAlarmasSistema.zonda.titulo;
             horaDisparoStr = estadoAlarmasSistema.zonda.horaDisparo || horaActualStr;
+        } else if (tipo === 'tormentaBarometrica') {
+            estadoAlarmasSistema.tormentaBarometrica.reconocido = true;
+            tituloIncidente = estadoAlarmasSistema.tormentaBarometrica.titulo;
+            horaDisparoStr = estadoAlarmasSistema.tormentaBarometrica.horaDisparo || horaActualStr;
         } else if (tipo === 'helada') {
             estadoAlarmasSistema.helada.reconocido = true;
             tituloIncidente = estadoAlarmasSistema.helada.titulo;
@@ -2221,6 +2249,8 @@
     let modoCensoActivo = false;
     let latSeleccionadaCenso = null;
     let lonSeleccionadaCenso = null;
+
+    let historialPresionBarometrica = [];
 
     const WORKER = "https://snih-proxy.elexpreso17.workers.dev";
     const estacionesDefault = {
@@ -3231,35 +3261,60 @@
         actualizarCintaTickerScada();
     }
 
-    function evaluarAlertaClimaticaLocal(temp, hum, viento, rafaga, dirViento, weatherCode) {
+    // LÓGICA PROPIA DE PRESIÓN BAROMÉTRICA Y TORMENTAS CON CÓDIGO PROPIO
+    function evaluarAlertaClimaticaLocal(temp, hum, viento, rafaga, dirViento, weatherCode, presionActual) {
         let banner = document.getElementById("bannerAlertaClimaServer");
         let titulo = document.getElementById("tituloAlertaClima");
         let detalle = document.getElementById("detalleAlertaClima");
+        let lblPresionTendencia = document.getElementById("presionTendencia");
         let horaActualStr = new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
+
+        historialPresionBarometrica.push({ presion: presionActual, tiempo: Date.now() });
+        if (historialPresionBarometrica.length > 12) historialPresionBarometrica.shift();
+
+        let tendenciaPresionStr = "Estable (Hectopascales)";
+        let caidaPresionRapida = false;
+
+        if (historialPresionBarometrica.length >= 2) {
+            let primera = historialPresionBarometrica[0].presion;
+            let ultima = historialPresionBarometrica[historialPresionBarometrica.length - 1].presion;
+            let diferenciaPresion = ultima - primera;
+
+            if (diferenciaPresion <= -3.0) {
+                tendenciaPresionStr = `⚠️ ¡Caída brusca (${diferenciaPresion.toFixed(1)} hPa)! Frente inestable`;
+                caidaPresionRapida = true;
+            } else if (diferenciaPresion < -1.0) {
+                tendenciaPresionStr = `📉 Descenso barométrico (${diferenciaPresion.toFixed(1)} hPa)`;
+                caidaPresionRapida = true;
+            } else if (diferenciaPresion > 1.0) {
+                tendenciaPresionStr = `📈 Presión en ascenso (+${diferenciaPresion.toFixed(1)} hPa)`;
+            }
+        }
+        if (lblPresionTendencia) lblPresionTendencia.innerText = tendenciaPresionStr;
 
         let hayAlerta = false;
         let tipoAlerta = "";
         let mensajeDetalle = "";
 
-        if (weatherCode >= 95 || (hum >= 65 && (viento >= 25 || rafaga >= 40) && temp >= 20)) {
+        const esTormentaBarometrica = caidaPresionRapida && (hum >= 60 || weatherCode >= 95 || rafaga >= 35);
+
+        if (esTormentaBarometrica || weatherCode >= 95 || (hum >= 65 && (viento >= 25 || rafaga >= 40) && temp >= 20)) {
             hayAlerta = true;
-            tipoAlerta = "¡ALERTA ROJA: POSIBLE GRANIZO Y TORMENTA SEVERA!";
-            mensajeDetalle = `Humedad crítica (${hum}%) y ráfagas de ${Math.round(rafaga)} km/h detectadas. Resguarde vehículos y cultivos de inmediato.`;
-            estadoAlarmasSistema.zonda.activo = true;
-            estadoAlarmasSistema.zonda.reconocido = false;
-            estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
-            estadoAlarmasSistema.zonda.titulo = "Alerta Tormenta / Granizo Inminente";
+            tipoAlerta = "🌩️ ¡ALERTA TORMENTA / BAJÓN BAROMÉTRICO DETECTADO!";
+            mensajeDetalle = `Presión inestable (${presionActual} hPa, caída rápida), humedad ${hum}% y ráfagas de ${Math.round(rafaga)} km/h. Riesgo inminente de chaparrones y granizo.`;
+            
+            estadoAlarmasSistema.tormentaBarometrica.activo = true;
+            estadoAlarmasSistema.tormentaBarometrica.reconocido = false;
+            estadoAlarmasSistema.tormentaBarometrica.horaDisparo = horaActualStr;
+            estadoAlarmasSistema.tormentaBarometrica.titulo = `Tormenta por Presión (${presionActual} hPa - Caída brusca)`;
         } else if (rafaga >= 45 || viento >= 40) {
             hayAlerta = true;
             tipoAlerta = "¡ADVERTENCIA: RÁFAGAS DE VIENTO INTENSAS!";
             mensajeDetalle = `Viento sostenido de ${Math.round(viento)} km/h con ráfagas de ${Math.round(rafaga)} km/h. Precaución.`;
-            estadoAlarmasSistema.zonda.activo = true;
-            estadoAlarmasSistema.zonda.reconocido = false;
-            estadoAlarmasSistema.zonda.horaDisparo = horaActualStr;
-            estadoAlarmasSistema.zonda.titulo = `Vientos Fuertes (${Math.round(rafaga)} km/h)`;
+            estadoAlarmasSistema.tormentaBarometrica.activo = false;
         } else {
-            estadoAlarmasSistema.zonda.activo = false;
-            estadoAlarmasSistema.zonda.reconocido = false;
+            estadoAlarmasSistema.tormentaBarometrica.activo = false;
+            estadoAlarmasSistema.tormentaBarometrica.reconocido = false;
         }
 
         if (hayAlerta) {
@@ -3423,139 +3478,4 @@
             else if (temp >= 28) { estres.innerText = "Moderado"; estres.style.color = "#facc15"; }
             else { estres.innerText = "Confortable"; estres.style.color = "#22c55e"; }
 
-            evaluarAlertaClimaticaLocal(temp, hum, viento, rafagaActual, dirV, code);
-
-            if (data.daily) {
-                let minTempPronostico = data.daily.temperature_2m_min[0] ?? 5;
-                let maxRafagaPronostico = data.daily.wind_gusts_10m_max[0] ?? 10;
-                let precipitacionHoy = data.daily.precipitation_sum[0] ?? 0;
-                let et0Hoy = data.daily.et0_fao_evapotranspiration[0] ?? 4.5;
-                let tMaxHoy = data.daily.temperature_2m_max[0] ?? 25;
-                let tMinHoy = data.daily.temperature_2m_min[0] ?? 15;
-
-                verificarContingenciaClimatica(minTempPronostico, viento, rafagaActual, dirV, hum);
-                verificarRiesgoHeladaAvanzado(minTempPronostico);
-
-                document.getElementById("lluviaAcum").innerText = Math.max(0, et0Hoy - precipitacionHoy).toFixed(1) + " mm";
-                document.getElementById("gddAcum").innerText = Math.round(Math.max(0, ((tMaxHoy + tMinHoy) / 2) - 10)) + " GDD";
-                document.getElementById("balanceHidrico").innerText = (precipitacionHoy - et0Hoy).toFixed(1) + " mm";
-                document.getElementById("probLluvia").innerText = (data.daily.precipitation_probability_max[0] ?? 0) + "%";
-                document.getElementById("horasSol").innerText = ((data.daily.sunshine_duration[0] ?? 0) / 3600).toFixed(1) + " hs";
-                document.getElementById("rafagasMax").innerText = Math.round(maxRafagaPronostico) + " km/h";
-                document.getElementById("etoDiario").innerText = et0Hoy.toFixed(1) + " mm";
-
-                actualizarCicloSolar(data.daily.sunrise[0], data.daily.sunset[0]);
-            }
-
-            if (data.hourly && data.hourly.temperature_2m) {
-                let horasFrioCount = 0;
-                data.hourly.temperature_2m.slice(0, 24).forEach(t => { if (t >= 0 && t <= 7) horasFrioCount++; });
-                document.getElementById("horasFrio").innerText = horasFrioCount + " hs";
-
-                let tActual = data.current.temperature_2m;
-                let rhActual = data.current.relative_humidity_2m;
-                let es = 0.61078 * Math.exp((17.27 * tActual) / (tActual + 237.3));
-                document.getElementById("vpdAire").innerText = (es - (es * (rhActual / 100))).toFixed(2) + " kPa";
-            }
-
-            if (data.hourly && data.hourly.soil_moisture_0_to_1cm) {
-                document.getElementById("humSuelo").innerText = (data.hourly.soil_moisture_0_to_1cm[0] * 100).toFixed(0) + " %";
-            }
-            if (data.hourly && data.hourly.soil_temperature_0cm) {
-                document.getElementById("tempSuelo").innerText = data.hourly.soil_temperature_0cm[0].toFixed(1) + " °C";
-            }
-
-            const hourly = document.getElementById("hourlyForecast");
-            if (hourly && data.hourly) {
-                hourly.innerHTML = "";
-                let h = new Date().getHours();
-                for(let i = h; i < h + 12; i++) {
-                    if (data.hourly.temperature_2m[i] !== undefined) {
-                        hourly.innerHTML += `<div class="forecast-card"><div style="font-size:0.65rem; font-weight:700;">${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i], 1)}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
-                    }
-                }
-            }
-
-            const forecast = document.getElementById("forecast");
-            if (forecast && data.daily) {
-                forecast.innerHTML = "";
-                data.daily.time.forEach((t, i) => {
-                    let d = i === 0 ? "Hoy" : new Date(t + "T00:00:00").toLocaleDateString("es-AR", {weekday: "short"});
-                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize; font-weight:700; font-size:0.65rem;">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i], 1)}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
-                });
-            }
-        } catch(e) {}
-    }
-
-    function dispararCargaDeDatos() {
-        cargarClima();
-        cargarCalidadAire();
-        cargarPolen();
-        cargarSismosInternacionalesUsgs();
-        cargarSismosInpres();
-        verificarProximidadIncendios(currentLat, currentLon);
-        escanearTodasLasEstaciones();
-    }
-
-    async function procesarUbicacionExitosa(lat, lon) {
-        currentLat = lat;
-        currentLon = lon;
-        let nombreTextoFinal = "Godoy Cruz, Mendoza";
-        try {
-            const res = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLon}&zoom=12`)).json();
-            if (res && res.address) {
-                let localidad = res.address.city || res.address.town || res.address.village || res.address.suburb || res.address.municipality || "";
-                let provincia = res.address.state || "Mendoza";
-                nombreTextoFinal = localidad ? `${localidad}, ${provincia}` : provincia;
-            }
-        } catch(e) {}
-
-        document.getElementById("ubicacionTexto").innerText = nombreTextoFinal;
-        inicializarMapaArgentina(currentLat, currentLon);
-        dispararCargaDeDatos();
-    }
-
-    // INICIO SEGURO: Carga inmediata por defecto para evitar congelamientos por GPS
-    function iniciarApp() {
-        actualizarFechaYHoraDigital();
-        calcularFaseLunar();
-        renderizarAlarmero();
-        actualizarCintaTickerScada();
-
-        // 1. Cargar por defecto instantáneamente
-        currentLat = -32.92;
-        currentLon = -68.84;
-        document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
-        inicializarMapaArgentina(currentLat, currentLon);
-        inicializarMapaHidroOriginal();
-        dispararCargaDeDatos();
-
-        // 2. Intentar buscar ubicación GPS precisa en segundo plano (no bloquea el renderizado)
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                async (pos) => {
-                    await procesarUbicacionExitosa(pos.coords.latitude, pos.coords.longitude);
-                },
-                (error) => { console.log("Usando ubicación por defecto preconfigurada."); },
-                { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
-            );
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const btnGuardar = document.getElementById("btnGuardarCensor") || document.getElementById("btnGuardarCenso");
-        if (btnGuardar) {
-            btnGuardar.addEventListener("click", function(e) {
-                e.preventDefault();
-                guardarRegistroArbol();
-            });
-        }
-        iniciarApp();
-    });
-
-    setInterval(actualizarFechaYHoraDigital, 1000);
-    setInterval(dispararCargaDeDatos, 300000);
-</script>
-
-</body>
-</html>
+            evaluarAl
