@@ -1204,10 +1204,17 @@
 
     <br>
 
-    <!-- PRONÓSTICO PRÓXIMAS 12 HORAS -->
-    <div class="card">
-        <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
-        <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
+    <!-- FILA COMPARTIDA: PRONÓSTICO 12 HORAS & PRONÓSTICO 7 DÍAS -->
+    <div class="dashboard-row">
+        <div class="card">
+            <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
+            <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
+        </div>
+
+        <div class="card">
+            <h3>📅 Pronóstico 7 días</h3>
+            <div id="forecast" class="forecast-cards"></div>
+        </div>
     </div>
 
     <br>
@@ -1238,12 +1245,7 @@
 
     <div class="dual-section">
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-                <h3>📅 Pronóstico 7 días</h3>
-                <div id="forecast" class="forecast-cards"></div>
-            </div>
-
-            <div class="card" style="margin-top: 10px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
+            <div class="card" style="margin-top: 0px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
                 <h3 style="color: var(--accent); margin-bottom: 6px;">⚡ Confort Térmico & Radiación</h3>
                 <div class="grid-confort-termico">
 
