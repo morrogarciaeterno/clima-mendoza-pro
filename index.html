@@ -678,7 +678,7 @@
 
         @media (min-width: 600px) {
             .map-controls {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(6, 1fr);
             }
         }
 
@@ -1396,7 +1396,7 @@
                 <button class="map-btn" id="btnTopo" onclick="cambiarCapaMapa('topo')">⛰ Topo</button>
                 <button class="map-btn" id="btnCalles" onclick="cambiarCapaMapa('calles')">🛣 Calles</button>
                 <button class="map-btn" id="btnPasos" onclick="cambiarCapaMapa('pasos')" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #f59e0b;">🚧 Pasos API</button>
-                <button class="map-btn" onclick="centrarUbicacion()">📍 GPS</button>
+                <button class="map-btn" id="btnGpsWatch" onclick="alternarSeguimientoGps()" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e;">📍 Seguir GPS</button>
                 <button class="map-btn" id="btnFuego" onclick="cambiarCapaMapa('fuego')">🔥 Fuego NASA</button>
                 <button class="map-btn" id="btnLluvia" onclick="cambiarCapaMapa('lluvia')">🌧 Lluvia Radar</button>
                 <button class="map-btn" id="btnSatinfra" onclick="cambiarCapaMapa('satelite')">🛰️ Satélite VIIRS</button>
@@ -1731,11 +1731,11 @@
         console.error("Error inicializando Firebase:", e);
     }
 
-    // Coordenadas por defecto iniciales (Godoy Cruz, Mendoza)
     let currentLat = -32.8895;
     let currentLon = -68.8458;
     let mapInstance = null;
     let markerInstance = null;
+    let watchIdGPS = null; // ID para el seguimiento continuo de GPS
     let capaActual = null;
     let capaFuegosFIRMS = null;
     let capaLluviaRadar = null;
@@ -1867,7 +1867,7 @@
             });
 
             markerInstance = L.marker([lat, lon], { icon: iconoLimpio }).addTo(mapInstance)
-                .bindPopup("<b>Ubicación Activa (Godoy Cruz, Mendoza)</b>")
+                .bindPopup("<b>Ubicación Activa GPS</b>")
                 .openPopup();
 
             mapInstance.setView([lat, lon], 15);
@@ -2624,6 +2624,49 @@
         } else { alert("Geolocalización no soportada."); }
     }
 
+    // NUEVO: Función para alternar el seguimiento continuo (watchPosition)
+    function alternarSeguimientoGps() {
+        const btnWatch = document.getElementById("btnGpsWatch");
+        if (watchIdGPS !== null) {
+            // Desactivar seguimiento
+            navigator.geolocation.clearWatch(watchIdGPS);
+            watchIdGPS = null;
+            if (btnWatch) {
+                btnWatch.classList.remove("active");
+                btnWatch.style.background = "rgba(34, 197, 94, 0.2)";
+                btnWatch.style.color = "#22c55e";
+            }
+            actualizarIndicadorMapa("GPS Seguir desactivado", "#94a3b8");
+        } else {
+            // Activar seguimiento continuo
+            if (!navigator.geolocation) {
+                alert("Geolocalización no soportada en este dispositivo.");
+                return;
+            }
+            if (btnWatch) {
+                btnWatch.classList.add("active");
+                btnWatch.style.background = "#22c55e";
+                btnWatch.style.color = "#000";
+            }
+            actualizarIndicadorMapa("GPS en seguimiento continuo...", "#22c55e");
+            
+            watchIdGPS = navigator.geolocation.watchPosition(
+                async (pos) => {
+                    currentLat = pos.coords.latitude;
+                    currentLon = pos.coords.longitude;
+                    await procesarUbicacionExitosa(currentLat, currentLon);
+                    if (mapInstance) {
+                        mapInstance.setView([currentLat, currentLon], mapInstance.getZoom());
+                    }
+                },
+                (err) => {
+                    console.warn("Error en watchPosition: ", err.message);
+                },
+                { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+            );
+        }
+    }
+
     function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -2988,7 +3031,6 @@
                 document.getElementById("bloque-proyeccion").innerHTML = mensajeProyeccion;
             }
 
-            // CÁLCULO DE RIESGOS NATIVOS
             let helada = 0;
             let infoHelada = null;
 
@@ -3136,7 +3178,6 @@
         actualizarFechaYHoraDigital();
         calcularFaseLunar();
 
-        // Carga inmediata asegurada con coordenadas por defecto (Godoy Cruz, Mendoza)
         currentLat = -32.8895;
         currentLon = -68.8458;
         document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
@@ -3145,7 +3186,6 @@
         inicializarMapaHidroOriginal();
         dispararCargaDeDatos();
 
-        // Intento de GPS en segundo plano no bloqueante
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
