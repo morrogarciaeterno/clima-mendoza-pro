@@ -2669,6 +2669,18 @@
                     }
                 }
             }
+
+            // Si hay un incendio a menos de 150 km, dispara alerta en la cinta superior
+            if (fuegoCercanoKm <= 150) {
+                const banner = document.getElementById("bannerAlertaClimaServer");
+                const titulo = document.getElementById("tituloAlertaClima");
+                const detalle = document.getElementById("detalleAlertaClima");
+                if (banner && titulo && detalle) {
+                    banner.classList.remove("oculto");
+                    titulo.innerText = `🔥 ALERTA DE INCENDIO / QUEMA A ${Math.round(fuegoCercanoKm)} KM`;
+                    detalle.innerText = "Foco térmico satelital detectado dentro de su radio de seguridad de 150 km. Revise el mapa de calor.";
+                }
+            }
         } catch (e) {}
     }
 
@@ -2737,7 +2749,7 @@
                 detalle.innerText = "Variables moderadas. Monitorear evolución de presión y vientos.";
             }
         } else {
-            banner.classList.add("oculto");
+            // Si no hay alertas climáticas altas, dejamos que la función de incendios maneje el banner si aplica
         }
     }
 
