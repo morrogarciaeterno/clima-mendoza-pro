@@ -1204,6 +1204,7 @@
 
     <br>
 
+    <!-- PRONÓSTICO PRÓXIMAS 12 HORAS -->
     <div class="card">
         <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
         <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
@@ -2917,7 +2918,7 @@
         }
 
         try {
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,cloud_cover,weather_code,uv_index,precipitation,is_day&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,cloud_cover,weather_code,uv_index,precipitation,is_day&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
             const data = await res.json();
             if (!data || !data.current) return;
 
@@ -3163,10 +3164,6 @@
                 guardarRegistroArbol();
             });
         }
-        ininarApp = iniciarApp();
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
         iniciarApp();
     });
 
