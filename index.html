@@ -493,6 +493,7 @@
             margin-top: 1px;
         }
 
+        /* SECCIÓN DUAL PERFECTAMENTE ALINEADA (1 A 1 EN ANCHO) */
         .dual-section {
             display: grid;
             grid-template-columns: 1fr;
@@ -502,7 +503,7 @@
 
         @media (min-width: 900px) {
             .dual-section {
-                grid-template-columns: 1.2fr 1fr;
+                grid-template-columns: 1fr 1fr;
                 gap: 14px;
             }
         }
@@ -529,30 +530,28 @@
             }
         }
 
+        /* MAPA PRINCIPAL PERFECTAMENTE CUADRADO Y SIMÉTRICO */
         .map-wrapper-container {
             position: relative;
             width: 100%;
-            flex-grow: 1;
+            flex-grow: 0;
             display: flex;
             flex-direction: column;
             margin-top: 6px;
-            min-height: 350px;
-        }
-        @media(min-width: 768px) {
-            .map-wrapper-container { min-height: 480px; }
+            height: 480px;
+            min-height: 480px;
+            max-height: 480px;
         }
 
         #mapaArgentina {
             width: 100%;
-            height: 100%;
-            min-height: 350px;
+            height: 480px !important;
+            min-height: 480px !important;
+            max-height: 480px !important;
             border-radius: 10px;
             z-index: 1;
             border: 2px solid var(--border);
             background-color: #070a14 !important;
-        }
-        @media(min-width: 768px) {
-            #mapaArgentina { min-height: 480px; }
         }
 
         .modo-oscuro-mapa .leaflet-tile-pane {
@@ -861,26 +860,29 @@
             color: #000;
         }
 
+        /* HIDROMETRÍA MAPA ALINEADO Y CUADRADO */
         .hidro-layout-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 12px;
             width: 100%;
+            align-items: stretch;
         }
         @media(min-width: 900px) {
-            .hidro-layout-grid { grid-template-columns: 1.2fr 1fr; gap: 16px; }
+            .hidro-layout-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
         }
+        
         #map {
-            height: 500px;
+            width: 100%;
+            height: 480px !important;
+            min-height: 480px !important;
+            max-height: 480px !important;
             border-radius: 10px;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             z-index: 10;
             cursor: crosshair;
-            width: 100%;
         }
-        @media(min-width: 768px) {
-            #map { height: 650px; }
-        }
+
         .cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1243,6 +1245,7 @@
 
     <br>
 
+    <!-- SECCIÓN DUAL: CONFORT TÉRMICO / AGROMETROLOGÍA & MAPA PRINCIPAL -->
     <div class="dual-section">
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div class="card" style="margin-top: 0px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
@@ -1453,7 +1456,7 @@
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" style="display: flex; flex-direction: column;">
                 <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h3>
                 <div id="map"></div>
             </div>
@@ -1833,6 +1836,7 @@
                 .openPopup();
 
             mapInstance.setView([lat, lon], 15);
+            setTimeout(() => { mapInstance.invalidateSize(); }, 250);
         } catch (e) {
             actualizarIndicadorMapa("Error en mapa", "#ef4444", "Error cargando tiles");
         }
