@@ -27,6 +27,7 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border: #1e293b;
+            --title-sober: #ffffff;
         }
 
         * {
@@ -51,8 +52,8 @@
         header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
-            padding: 8px 16px;
-            padding-top: max(8px, env(safe-area-inset-top));
+            padding: 10px 16px;
+            padding-top: max(10px, env(safe-area-inset-top));
             position: sticky;
             top: 0;
             z-index: 100;
@@ -67,26 +68,36 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             min-width: 0;
             flex-grow: 1;
         }
 
-        .brand-logo {
+        /* Contenedor elegante para el logo circular con brillo sutil */
+        .brand-logo-wrapper {
             width: 42px;
             height: 42px;
-            object-fit: contain;
             border-radius: 50%;
-            background: #ffffff;
-            padding: 2px;
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+            padding: 2px;
+        }
+
+        .brand-logo-inner {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 50%;
         }
 
         .brand-text-container {
@@ -95,10 +106,11 @@
             flex-direction: column;
         }
 
+        /* Título limpio, sin sombras molestas y con excelente definición */
         .brand h1 {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: 0.5px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -106,15 +118,22 @@
             line-height: 1.2;
         }
 
+        /* Subtítulo de ubicación sin subrayado, limpio y interactivo */
         .brand p {
-            font-size: 0.62rem;
+            font-size: 0.65rem;
             color: var(--accent);
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: 1px;
+            margin-top: 2px;
             line-height: 1.2;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .brand p:hover {
+            opacity: 0.8;
         }
 
         .header-right {
@@ -168,7 +187,7 @@
             margin: 8px auto;
             background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
             border: 2px solid #f87171;
-            border-left: 8px solid #facc15;
+            border-left: 8px solid #38bdf8;
             border-radius: 12px;
             padding: 12px 16px;
             display: flex;
@@ -253,10 +272,11 @@
         }
 
         .card h3 {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--title-sober);
+            font-weight: 700;
             letter-spacing: 0.3px;
+            margin-bottom: 6px;
         }
 
         .metric {
@@ -339,7 +359,6 @@
             color: var(--text-muted);
         }
 
-        /* SISMOS EN FILAS VERTICALES */
         .sismos-lista-vertical {
             display: flex;
             flex-direction: column;
@@ -392,7 +411,7 @@
         }
 
         #inpres-estado {
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             color: var(--text-muted);
             margin-top: 2px;
         }
@@ -493,7 +512,6 @@
             margin-top: 1px;
         }
 
-        /* SECCIÓN DUAL PERFECTAMENTE ALINEADA (1 A 1 EN ANCHO) */
         .dual-section {
             display: grid;
             grid-template-columns: 1fr;
@@ -530,7 +548,6 @@
             }
         }
 
-        /* MAPA PRINCIPAL PERFECTAMENTE CUADRADO Y SIMÉTRICO */
         .map-wrapper-container {
             position: relative;
             width: 100%;
@@ -860,7 +877,6 @@
             color: #000;
         }
 
-        /* HIDROMETRÍA MAPA ALINEADO Y CUADRADO */
         .hidro-layout-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -1028,7 +1044,6 @@
             border: 1px solid var(--border);
         }
 
-        /* Canvas de presión compacto */
         canvas#graficoPresionCompacto {
             width: 100% !important;
             max-width: 100% !important;
@@ -1047,10 +1062,12 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy.xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
+            <div class="brand-logo-wrapper">
+                <div class="brand-logo-inner"></div>
+            </div>
             <div class="brand-text-container">
                 <h1>TERRITORIA</h1>
-                <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Plataforma Inteligente de Gestión Territorial</p>
+                <p id="ubicacionTexto" onclick="centrarUbicacion()" title="Clic para activar GPS">📍 Departamento Godoy Cruz, Mendoza</p>
             </div>
         </div>
 
@@ -1066,7 +1083,6 @@
     </div>
 </header>
 
-<!-- BANNER DE ALERTA CLIMÁTICA CRÍTICA -->
 <div id="bannerAlertaClimaServer" class="alerta-clima-critica oculto">
     <div class="alerta-icono-animado">🚨</div>
     <div class="alerta-texto-container">
@@ -1135,7 +1151,6 @@
 
     <br>
 
-    <!-- PREDICCIÓN Y TENDENCIA PRÓXIMAS HORAS -->
     <div class="card">
         <h3>🔮 Predicción y Tendencia Próximas Horas</h3>
         <div id="bloque-proyeccion" class="proyeccion-caja">Calculando tendencias de corto plazo...</div>
@@ -1143,7 +1158,6 @@
 
     <br>
 
-    <!-- TARJETAS DE PROBABILIDAD DE RIESGOS -->
     <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
         <div class="card">
             <h3>❄️ Probabilidad de Helada</h3>
@@ -1173,7 +1187,6 @@
 
     <br>
 
-    <!-- FILA COMPARTIDA: HISTÓRICO DE PRESIÓN & CICLO SOLAR -->
     <div class="dashboard-row">
         <div class="card">
             <h3>📈 Histórico de Presión Atmosférica</h3>
@@ -1206,7 +1219,6 @@
 
     <br>
 
-    <!-- FILA COMPARTIDA: PRONÓSTICO 12 HORAS & PRONÓSTICO 7 DÍAS -->
     <div class="dashboard-row">
         <div class="card">
             <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
@@ -1221,9 +1233,7 @@
 
     <br>
 
-    <!-- SISMOS EN FILAS VERTICALES (USGS E INPRES) -->
     <div class="dashboard-row">
-        <!-- SISMOS INTERNACIONALES (USGS) -->
         <div class="card">
             <h3>🌋 Sismos Internacionales Recientes (USGS)</h3>
             <div id="sismosListaContainer" class="sismos-lista-vertical">
@@ -1231,7 +1241,6 @@
             </div>
         </div>
 
-        <!-- SISMOS OFICIALES DE ARGENTINA (INPRES) -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <h3>🌋 Sismos Oficiales Argentina (INPRES)</h3>
@@ -1245,11 +1254,10 @@
 
     <br>
 
-    <!-- SECCIÓN DUAL: CONFORT TÉRMICO / AGROMETROLOGÍA & MAPA PRINCIPAL -->
     <div class="dual-section">
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div class="card" style="margin-top: 0px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 6px;">⚡ Confort Térmico & Radiación</h3>
+                <h3 style="color: var(--title-sober); margin-bottom: 6px;">⚡ Confort Térmico & Radiación</h3>
                 <div class="grid-confort-termico">
 
                     <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
@@ -1274,7 +1282,7 @@
             </div>
 
             <div class="card" style="margin-top: 10px; margin-bottom: 0px; background: var(--card-inner); border: 1px solid var(--border);">
-                <h3 style="color: var(--accent); margin-bottom: 6px;">🌾 Resumen Agrometeorológico Local</h3>
+                <h3 style="color: var(--title-sober); margin-bottom: 6px;">🌾 Resumen Agrometeorológico Local</h3>
                 <div class="grid-agricola">
 
                     <div style="background: var(--card-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
@@ -1353,7 +1361,6 @@
             </div>
         </div>
 
-        <!-- MAPA PRINCIPAL -->
         <div class="card" style="display: flex; flex-direction: column; height: 100%;">
             <h3 id="mapTitle">🗺 Visor Geográfico Satelital</h3>
             <div class="map-controls">
@@ -1385,11 +1392,10 @@
 
     <br>
 
-    <!-- HIDROMETRÍA SNIH -->
     <div id="seccionHidrometriaModulo" class="card" style="border-left: 6px solid #0284c7; background: linear-gradient(135deg, #0e1526 0%, #0c1a2f 100%); margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; flex-wrap: wrap; gap: 6px;">
             <div>
-                <h3 id="tituloEstacion" style="color: var(--text-main); font-size: 0.85rem; font-weight: 800;">🌊 Territoria - Monitoreo Hídrico SNIH</h3>
+                <h3 id="tituloEstacion" style="color: var(--title-sober); font-size: 0.85rem; font-weight: 800;">🌊 Territoria - Monitoreo Hídrico SNIH</h3>
                 <small id="instruccionMapa" style="color: var(--text-muted); font-size: 0.65rem;">Seleccioná una estación del selector o hacé clic en el mapa.</small>
             </div>
             <div style="display: flex; gap: 6px;">
@@ -1457,7 +1463,7 @@
             </div>
 
             <div class="panel" style="display: flex; flex-direction: column;">
-                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--text-main);">📍 Mapa de Estaciones y Cuencas</h3>
+                <h3 style="font-size: 0.78rem; margin-bottom: 8px; color: var(--title-sober);">📍 Mapa de Estaciones y Cuencas</h3>
                 <div id="map"></div>
             </div>
         </div>
@@ -1465,7 +1471,6 @@
 
 </div>
 
-<!-- VENTANA MODAL LOTES -->
 <div class="modal-overlay" id="modalLotes">
     <div class="modal-content-box">
         <div class="modal-header">
@@ -1494,7 +1499,6 @@
     </div>
 </div>
 
-<!-- VENTANA MODAL CENSO FORESTAL -->
 <div class="modal-overlay" id="modalCensoForestal">
     <div class="modal-content-box" style="max-width: 500px; height: auto; max-height: 90vh;">
         <div class="modal-header">
@@ -2918,9 +2922,9 @@
             const lugar = await geo.json();
             const localidad = lugar.address?.city || lugar.address?.town || lugar.address?.village || lugar.address?.suburb || lugar.address?.county || "Godoy Cruz";
             const provincia = lugar.address?.state || "Mendoza";
-            document.getElementById("ubicacionTexto").innerText = `${localidad}, ${provincia}`;
+            document.getElementById("ubicacionTexto").innerText = `📍 ${localidad}, ${provincia}`;
         } catch(e) {
-            document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+            document.getElementById("ubicacionTexto").innerText = "📍 Departamento Godoy Cruz, Mendoza";
         }
 
         try {
@@ -3145,7 +3149,7 @@
 
         currentLat = -32.8895;
         currentLon = -68.8458;
-        document.getElementById("ubicacionTexto").innerText = "Godoy Cruz, Mendoza";
+        document.getElementById("ubicacionTexto").innerText = "📍 Departamento Godoy Cruz, Mendoza";
         
         inicializarMapaArgentina(currentLat, currentLon);
         inicializarMapaHidroOriginal();
