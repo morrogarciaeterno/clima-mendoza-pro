@@ -162,7 +162,6 @@
             line-height: 1.1;
         }
 
-        /* BANNER DE ALERTA CLIMÁTICA CRÍTICA */
         .alerta-clima-critica {
             width: 98%;
             max-width: 98%;
@@ -292,9 +291,6 @@
             margin-top: 2px;
             text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
         }
-        @media (min-width: 768px) {
-            .card-temp-main .metric { font-size: 2.8rem !important; }
-        }
 
         .temp-box {
             display: flex;
@@ -326,9 +322,6 @@
             text-align: center;
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
         }
-        @media (min-width: 768px) {
-            .forecast-card { flex: 0 0 80px; padding: 10px 4px; }
-        }
 
         .forecast-card .icon {
             font-size: 1.1rem;
@@ -346,49 +339,56 @@
             color: var(--text-muted);
         }
 
-        .sismos-cinta-horizontal {
+        /* SISMOS EN FILAS VERTICALES */
+        .sismos-lista-vertical {
             display: flex;
-            justify-content: flex-start;
-            gap: 8px;
+            flex-direction: column;
+            gap: 6px;
             margin-top: 8px;
             width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
-            scrollbar-width: none;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 2px;
         }
-        .sismos-cinta-horizontal::-webkit-scrollbar {
-            display: none;
+        .sismos-lista-vertical::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sismos-lista-vertical::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
         }
 
-        .sismo-mini-card {
-            flex: 0 0 84px;
+        .sismo-fila-item {
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px 4px;
-            text-align: center;
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
-            overflow: hidden;
+            border-radius: 8px;
+            padding: 6px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        @media (min-width: 768px) {
-            .sismo-mini-card { flex: 0 0 96px; padding: 10px 4px; }
+        .sismo-fila-item:hover {
+            border-color: var(--accent);
+            background: #1e293b;
         }
 
-        .sismo-mini-mag {
-            font-size: 0.85rem;
+        .sismo-fila-mag {
+            font-size: 0.78rem;
             font-weight: 800;
-            margin: 2px 0;
+            padding: 2px 6px;
+            border-radius: 4px;
         }
-
         .sismo-mendoza {
+            background: rgba(239, 68, 68, 0.2);
             color: #ef4444 !important;
-            font-weight: 900;
+            border: 1px solid #ef4444;
         }
-
         .sismo-normal {
+            background: rgba(56, 189, 248, 0.15);
             color: var(--accent);
+            border: 1px solid var(--accent);
         }
 
         #inpres-estado {
@@ -421,19 +421,19 @@
 
         .solar-arc {
             position: relative;
-            width: 110px;
-            height: 55px;
+            width: 100px;
+            height: 50px;
             border: 2px dashed #334155;
             border-bottom: 2px solid #334155;
-            border-radius: 55px 55px 0 0;
-            margin-top: 6px;
+            border-radius: 50px 50px 0 0;
+            margin-top: 4px;
             overflow: visible;
         }
 
         .sun-pivot {
             position: absolute;
-            width: 110px;
-            height: 55px;
+            width: 100px;
+            height: 50px;
             bottom: 0;
             left: 0;
             transform-origin: bottom center;
@@ -443,25 +443,25 @@
 
         .sun-icon {
             position: absolute;
-            left: 48px;
+            left: 42px;
             top: -10px;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .solar-times {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 160px;
-            margin-top: 6px;
-            font-size: 0.68rem;
+            max-width: 150px;
+            margin-top: 4px;
+            font-size: 0.62rem;
             color: var(--text-muted);
         }
 
         .solar-times strong {
             color: var(--text-main);
             display: block;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
         }
 
         .lunar-container {
@@ -473,24 +473,24 @@
         }
 
         .moon-display {
-            font-size: 2rem;
+            font-size: 1.6rem;
             line-height: 1;
             margin: 2px 0;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.25));
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.25));
         }
 
         .moon-phase-title {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 800;
             color: var(--text-main);
             text-align: center;
         }
 
         .moon-illumination {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--accent);
             font-weight: 800;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .dual-section {
@@ -527,41 +527,6 @@
             .grid-agricola {
                 grid-template-columns: repeat(3, 1fr);
             }
-        }
-
-        .glosario-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 6px;
-            margin-top: 6px;
-            width: 100%;
-        }
-
-        @media (min-width: 600px) {
-            .glosario-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .glosario-item {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 6px 8px;
-            width: 100%;
-        }
-
-        .glosario-titulo {
-            font-size: 0.72rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 2px;
-        }
-
-        .glosario-desc {
-            font-size: 0.62rem;
-            color: var(--text-muted);
-            line-height: 1.3;
         }
 
         .map-wrapper-container {
@@ -823,10 +788,6 @@
             min-width: 0;
         }
 
-        .modal-search-input:focus {
-            border-color: var(--accent);
-        }
-
         .modal-search-btn {
             background: var(--accent-glow);
             border: 1px solid var(--accent);
@@ -982,7 +943,6 @@
             font-size: 0.78rem;
             outline: none;
         }
-        select:focus, input:focus { border-color: var(--accent); }
         button{
             padding: 8px 12px;
             border: none;
@@ -1005,7 +965,6 @@
             cursor: pointer;
             width: 100%;
         }
-        .btn-secundario:hover { border-color: var(--accent); color: var(--accent); }
         .json-box{
             display: none;
             margin-top: 10px;
@@ -1064,17 +1023,16 @@
             margin-top: 8px;
             border-radius: 6px;
             line-height: 1.5;
-            border-top: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            border: 1px solid var(--border);
         }
 
+        /* Canvas de presión compacto */
         canvas#graficoPresionCompacto {
             width: 100% !important;
             max-width: 100% !important;
-            height: 130px !important;
+            height: 90px !important;
             display: block;
-            margin: 8px auto 0 auto;
+            margin: 4px auto 0 auto;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -1087,7 +1045,7 @@
 <header>
     <div class="header-content">
         <div class="brand">
-            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy.xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
+            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBgRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFpbnQubmV0IDQuMy.xMgAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoNDA0MDAwNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/9sAQwEHBwcKCAoTCgoTCgoNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0N/8AAEQgAKAAoAwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAEABf8BAgMRBAAhBRIxQVEGEyJhcTKBFCKhJLIjVQQ1hiNisQcSo8Hwzgo0kVKiwYLRU8LE8uJzi9LS0vM0ZHRVW0hUZWY3RXV2g6W2lqWj0/V3mKW1ZcW1l6X1hZfX1ZeV1ka3ZXWVtcdXZ3h4eXp6fn+Dh4uPk5ebn6Onq8vP09fb3+Pn6/9oACAEBAAA/APo3gA1+Gf8A9Hj+rXzV83dJ2v0V5e/8A+B+rXzV83f8AnmP//Z" alt="Territoria" class="brand-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
             <div class="brand-text-container">
                 <h1>TERRITORIA</h1>
                 <p id="ubicacionTexto" style="cursor: pointer; text-decoration: underline;" onclick="centrarUbicacion()" title="Clic para activar GPS">Plataforma Inteligente de Gestión Territorial</p>
@@ -1213,32 +1171,23 @@
 
     <br>
 
-    <!-- MINIGRÁFICO COMPACTO DE HISTÓRICO DE PRESIÓN -->
-    <div class="card">
-        <h3>📈 Histórico de Presión Atmosférica</h3>
-        <canvas id="graficoPresionCompacto" width="500" height="130"></canvas>
-    </div>
-
-    <br>
-
-    <div class="card">
-        <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
-        <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
-    </div>
-
-    <br>
-
+    <!-- FILA COMPARTIDA: HISTÓRICO DE PRESIÓN & CICLO SOLAR -->
     <div class="dashboard-row">
+        <div class="card">
+            <h3>📈 Histórico de Presión Atmosférica</h3>
+            <canvas id="graficoPresionCompacto" width="500" height="90"></canvas>
+        </div>
+
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <h3 style="margin-bottom: 4px;">🌅 Astronomía & Ciclo Solar</h3>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; padding: 4px 0;">
+            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; padding: 2px 0;">
                 <div class="solar-container" style="padding-top:0;">
                     <div class="solar-arc" style="margin: 2px auto;">
                         <div class="sun-pivot" id="sunPivot">
                             <div class="sun-icon" id="sunIcon">☀</div>
                         </div>
                     </div>
-                    <div class="solar-times" style="margin: 4px auto 0 auto;">
+                    <div class="solar-times" style="margin: 2px auto 0 auto;">
                         <div>Amanecer<strong id="amanecerTime">--:--</strong></div>
                         <div style="text-align:right">Atardecer<strong id="atardecerTime">--:--</strong></div>
                     </div>
@@ -1251,26 +1200,36 @@
                 </div>
             </div>
         </div>
-
-        <!-- SISMOS INTERNACIONALES (USGS) -->
-        <div class="card">
-            <h3>🌋 Sismos Internacionales Recientes (Fuente: USGS Global Feed)</h3>
-            <div id="sismosListaContainer" class="sismos-cinta-horizontal">
-                Cargando sismos internacionales...
-            </div>
-        </div>
     </div>
 
     <br>
 
-    <!-- SISMOS OFICIALES DE ARGENTINA (INPRES) -->
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <h3>🌋 Sismos Oficiales de Argentina - INPRES</h3>
-            <span id="inpres-estado" style="font-size: 0.62rem; color: var(--text-muted);">Cargando...</span>
+        <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
+        <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
+    </div>
+
+    <br>
+
+    <!-- SISMOS EN FILAS VERTICALES (USGS E INPRES) -->
+    <div class="dashboard-row">
+        <!-- SISMOS INTERNACIONALES (USGS) -->
+        <div class="card">
+            <h3>🌋 Sismos Internacionales Recientes (USGS)</h3>
+            <div id="sismosListaContainer" class="sismos-lista-vertical">
+                Cargando sismos internacionales...
+            </div>
         </div>
-        <div id="inpres-contenedor" class="sismos-cinta-horizontal">
-            Cargando sismos de Argentina...
+
+        <!-- SISMOS OFICIALES DE ARGENTINA (INPRES) -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <h3>🌋 Sismos Oficiales Argentina (INPRES)</h3>
+                <span id="inpres-estado" style="font-size: 0.62rem; color: var(--text-muted);">Cargando...</span>
+            </div>
+            <div id="inpres-contenedor" class="sismos-lista-vertical">
+                Cargando sismos de Argentina...
+            </div>
         </div>
     </div>
 
@@ -1735,7 +1694,7 @@
     let currentLon = -68.8458;
     let mapInstance = null;
     let markerInstance = null;
-    let watchIdGPS = null; // ID para el seguimiento continuo de GPS
+    let watchIdGPS = null;
     let capaActual = null;
     let capaFuegosFIRMS = null;
     let capaLluviaRadar = null;
@@ -2213,10 +2172,10 @@
             if (!contenedor) return;
             contenedor.innerHTML = "";
 
-            let htmlCinta = '';
+            let htmlLista = '';
             let contadorMostrados = 0;
 
-            items.forEach((item, index) => {
+            items.forEach((item) => {
                 const provincia = item.querySelector("prov")?.textContent || "Argentina";
                 const fechaStr = item.querySelector("fecha")?.textContent || "";
                 const horaStr = item.querySelector("hora")?.textContent || "";
@@ -2237,20 +2196,21 @@
                 const esMendoza = provincia.includes("MENDOZA");
                 const claseMag = esMendoza ? "sismo-mendoza" : "sismo-normal";
 
-                htmlCinta += `
-                    <div class="sismo-mini-card" title="${provincia}" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia.replace(/'/g, "")} (Mag ${magnitud.toFixed(1)})', ${magnitud})">
-                        <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr.slice(0,5)}</div>
-                        <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
-                        <div class="sismo-mini-mag ${claseMag}">Mag ${magnitud.toFixed(1)}</div>
-                        <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;" title="${provincia}">${provincia}</div>
+                htmlLista += `
+                    <div class="sismo-fila-item" onclick="centrarMapaEnSismo(${latSismo}, ${lonSismo}, '${provincia.replace(/'/g, "")} (Mag ${magnitud.toFixed(1)})', ${magnitud})">
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-main);">${provincia}</div>
+                            <div style="font-size: 0.58rem; color: var(--text-muted);">${fechaStr} - ${horaStr}</div>
+                        </div>
+                        <div class="sismo-fila-mag ${claseMag}">Mag ${magnitud.toFixed(1)}</div>
                     </div>
                 `;
             });
 
-            if (contadorMostrados === 0) htmlCinta += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px; width: 100%;">Sin registros sísmicos disponibles.</div>`;
+            if (contadorMostrados === 0) htmlLista += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:center; padding:8px;">Sin registros sísmicos disponibles.</div>`;
 
-            contenedor.innerHTML = htmlCinta;
-            document.getElementById("inpres-estado").innerHTML = `Actualizado (${contadorMostrados} sismos): ` + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false });
+            contenedor.innerHTML = htmlLista;
+            document.getElementById("inpres-estado").innerHTML = `Actualizado (${contadorMostrados}): ` + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute:'2-digit', hour12: false });
         } catch(error) {
             document.getElementById("inpres-estado").innerHTML = "Error";
             document.getElementById("inpres-contenedor").innerHTML = "<div style='font-size:0.68rem; color:#ef4444; text-align:center;'>No fue posible conectar con el servicio INPRES.</div>";
@@ -2265,7 +2225,7 @@
 
             if (dataUSGS && dataUSGS.features && contenedor) {
                 contenedor.innerHTML = "";
-                dataUSGS.features.slice(0, 15).forEach(s => {
+                dataUSGS.features.slice(0, 10).forEach(s => {
                     let p = s.properties;
                     let coords = s.geometry.coordinates;
                     let fechaObj = new Date(p.time);
@@ -2275,17 +2235,18 @@
                     let lugarCorto = (p.place || "Desconocido").split(',').pop().trim().replace(/'/g, "");
 
                     contenedor.innerHTML += `
-                        <div class="sismo-mini-card" title="${p.place}" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
-                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${fechaStr}</div>
-                            <div style="font-size: 0.58rem; color: var(--text-muted); font-weight:600; white-space: nowrap;">${horaStr}</div>
-                            <div class="sismo-mini-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
-                            <div style="font-size: 0.58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:700;">${lugarCorto}</div>
+                        <div class="sismo-fila-item" onclick="centrarMapaEnSismo(${coords[1]}, ${coords[0]}, '${lugarCorto}', ${mag})">
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-main);">${lugarCorto}</div>
+                                <div style="font-size: 0.58rem; color: var(--text-muted);">${fechaStr} - ${horaStr}</div>
+                            </div>
+                            <div class="sismo-fila-mag ${p.mag >= 4.5 ? 'sismo-mendoza' : 'sismo-normal'}">Mag ${mag}</div>
                         </div>
                     `;
                 });
             }
         } catch (e) {
-            if (contenedor) contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px; width: 100%;">Error USGS</div>`;
+            if (contenedor) contenedor.innerHTML = `<div style="font-size:0.68rem; color:#ef4444; text-align:center; padding:8px;">Error USGS</div>`;
         }
     }
 
@@ -2624,11 +2585,9 @@
         } else { alert("Geolocalización no soportada."); }
     }
 
-    // NUEVO: Función para alternar el seguimiento continuo (watchPosition)
     function alternarSeguimientoGps() {
         const btnWatch = document.getElementById("btnGpsWatch");
         if (watchIdGPS !== null) {
-            // Desactivar seguimiento
             navigator.geolocation.clearWatch(watchIdGPS);
             watchIdGPS = null;
             if (btnWatch) {
@@ -2638,7 +2597,6 @@
             }
             actualizarIndicadorMapa("GPS Seguir desactivado", "#94a3b8");
         } else {
-            // Activar seguimiento continuo
             if (!navigator.geolocation) {
                 alert("Geolocalización no soportada en este dispositivo.");
                 return;
@@ -2799,7 +2757,7 @@
         ctx.clearRect(0, 0, w, h);
 
         if(historialPresion.length < 2){
-            ctx.font = "12px Arial";
+            ctx.font = "11px Arial";
             ctx.fillStyle = "#888";
             ctx.textAlign = "center";
             ctx.fillText("Recopilando mediciones de presión...", w / 2, h / 2);
@@ -2819,14 +2777,14 @@
         for(let i = 1; i <= 3; i++){
             let yGuia = (h / 4) * i;
             ctx.beginPath();
-            ctx.moveTo(40, yGuia);
-            ctx.lineTo(w - 20, yGuia);
+            ctx.moveTo(35, yGuia);
+            ctx.lineTo(w - 15, yGuia);
             ctx.stroke();
         }
 
         const puntos = historialPresion.map((dato, i) => {
-            const x = 45 + (i / (historialPresion.length - 1)) * (w - 65);
-            const y = h - 22 - (((dato.presion - minGraf) / rango) * (h - 40));
+            const x = 38 + (i / (historialPresion.length - 1)) * (w - 55);
+            const y = h - 18 - (((dato.presion - minGraf) / rango) * (h - 30));
             return { x, y, presion: dato.presion, hora: dato.hora };
         });
 
@@ -2835,9 +2793,9 @@
         gradiente.addColorStop(1, "rgba(56, 189, 248, 0.0)");
 
         ctx.beginPath();
-        ctx.moveTo(puntos[0].x, h - 18);
+        ctx.moveTo(puntos[0].x, h - 14);
         puntos.forEach(p => ctx.lineTo(p.x, p.y));
-        ctx.lineTo(puntos[puntos.length - 1].x, h - 18);
+        ctx.lineTo(puntos[puntos.length - 1].x, h - 14);
         ctx.fillStyle = gradiente;
         ctx.fill();
 
@@ -2847,24 +2805,24 @@
             else ctx.lineTo(p.x, p.y);
         });
         ctx.strokeStyle = "#38bdf8";
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 2;
         ctx.stroke();
 
         puntos.forEach((p, i) => {
             if(i === 0 || i === puntos.length - 1){
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
                 ctx.fillStyle = "#ffffff";
                 ctx.fill();
                 ctx.strokeStyle = "#38bdf8";
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                ctx.font = "9px Arial";
+                ctx.font = "8.5px Arial";
                 ctx.fillStyle = "#94a3b8";
                 ctx.textAlign = "center";
-                ctx.fillText(p.presion + " hPa", p.x, p.y - 8);
-                ctx.fillText(p.hora, p.x, h - 6);
+                ctx.fillText(p.presion + " hPa", p.x, p.y - 6);
+                ctx.fillText(p.hora, p.x, h - 4);
             }
         });
     }
@@ -3205,6 +3163,10 @@
                 guardarRegistroArbol();
             });
         }
+        ininarApp = iniciarApp();
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
         iniciarApp();
     });
 
