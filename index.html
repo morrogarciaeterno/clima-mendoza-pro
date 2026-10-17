@@ -1711,8 +1711,8 @@
         console.error("Error inicializando Firebase:", e);
     }
 
-    let currentLat = -32.8895;
-    let currentLon = -68.8458;
+    let currentLat = null;
+    let currentLon = null;
     let mapInstance = null;
     let markerInstance = null;
     let watchIdGPS = null;
@@ -2725,41 +2725,70 @@
         return arr[(val % 16)];
     }
 
-    function actualizarBannerAlertaNativa(riesgos, detalleHelada) {
-        const banner = document.getElementById("bannerAlertaClimaServer");
-        const titulo = document.getElementById("tituloAlertaClima");
-        const detalle = document.getElementById("detalleAlertaClima");
+function actualizarBannerAlertaNativa(riesgos, detalleHelada) {
+    const banner = document.getElementById("bannerAlertaClimaServer");
+    const titulo = document.getElementById("tituloAlertaClima");
+    const detalle = document.getElementById("detalleAlertaClima");
 
-        let maxRiesgo = 0;
-        let tipoCritico = "Estable";
+    if (!banner || !titulo || !detalle) return;
 
-        for(let r in riesgos){
-            if(riesgos[r].valor > maxRiesgo){
-                maxRiesgo = riesgos[r].valor;
-                tipoCritico = riesgos[r].nombre;
-            }
-        }
+    let maxRiesgo = 0;
+    let tipoCritico = "Estable";
 
-        if(maxRiesgo >= 70){
-            banner.classList.remove("oculto");
-            if(tipoCritico === "Helada" && detalleHelada){
-                titulo.innerText = `ALERTA HELADA: ${detalleHelada.tipo} (${maxRiesgo}%)`;
-                detalle.innerHTML = detalleHelada.actionBanner;
-            } else {
-                titulo.innerText = `ALERTA ALTA: Riesgo de ${tipoCritico} (${maxRiesgo}%)`;
-                detalle.innerText = "Condiciones atmosféricas críticas detectadas localmente. Extremar precauciones.";
-            }
-        } else if(maxRiesgo >= 30){
-            banner.classList.remove("oculto");
-            if(tipoCritico === "Helada" && detalleHelada){
-                titulo.innerText = `Atención: Posible ${detalleHelada.tipo} (${maxRiesgo}%)`;
-                detalle.innerText = "Monitorear descenso de temperatura en las próximas horas.";
-            } else {
-                titulo.innerText = `Atención: Inestabilidad por ${tipoCritico} (${maxRiesgo}%)`;
-                detalle.innerText = "Variables moderadas. Monitorear evolución de presión y vientos.";
-            }
+    for(let r in riesgos){
+        if(riesgos[r].valor > maxRiesgo){
+            maxRiesgo = riesgos[r].valor;
+            tipoCritico = riesgos[r].nombre;
         }
     }
+
+    // Más de 85: ROJO (Crítico)
+    if(maxRiesgo > 85){
+        banner.style.background = "linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%)";
+        banner.style.borderColor = "#f87171";
+        banner.style.boxShadow = "0 6px 20px rgba(185, 28, 28, 0.6)";
+        banner.classList.remove("oculto");
+        if(tipoCritico === "Helada" && detalleHelada){
+            titulo.innerText = `🚨 ALERTA ROJA HELADA: ${detalleHelada.tipo} (${maxRiesgo}%)`;
+            detalle.innerHTML = detalleHelada.actionBanner;
+        } else {
+            titulo.innerText = `🚨 ALERTA ROJA: Riesgo crítico de ${tipoCritico} (${maxRiesgo}%)`;
+            detalle.innerText = "Condiciones severas extremas detectadas. ¡Actuar de inmediato!";
+        }
+    } 
+    // Mayor a 70 hasta 85: NARANJA (Alerta Fuerte)
+    else if(maxRiesgo > 70){
+        banner.style.background = "linear-gradient(135deg, #c2410c 0%, #7c2d12 100%)";
+        banner.style.borderColor = "#f97316";
+        banner.style.boxShadow = "0 6px 20px rgba(249, 115, 22, 0.6)";
+        banner.classList.remove("oculto");
+        if(tipoCritico === "Helada" && detalleHelada){
+            titulo.innerText = `⚠️ ALERTA NARANJA: Posible ${detalleHelada.tipo} (${maxRiesgo}%)`;
+            detalle.innerText = "Preparar sistemas de mitigación activos.";
+        } else {
+            titulo.innerText = `⚠️ ALERTA NARANJA: Alto riesgo de ${tipoCritico} (${maxRiesgo}%)`;
+            detalle.innerText = "Variables elevadas. Monitoreo continuo requerido.";
+        }
+    } 
+    // De 21 a 70: AMARILLO (Inestabilidad / Atención)
+    else if(maxRiesgo >= 21){
+        banner.style.background = "linear-gradient(135deg, #ca8a04 0%, #854d0e 100%)";
+        banner.style.borderColor = "#facc15";
+        banner.style.boxShadow = "0 6px 20px rgba(250, 204, 21, 0.4)";
+        banner.classList.remove("oculto");
+        if(tipoCritico === "Helada" && detalleHelada){
+            titulo.innerText = `Atención: Posible ${detalleHelada.tipo} (${maxRiesgo}%)`;
+            detalle.innerText = "Monitorear descenso de temperatura en las próximas horas.";
+        } else {
+            titulo.innerText = `Atención: Inestabilidad por ${tipoCritico} (${maxRiesgo}%)`;
+            detalle.innerText = "Variables moderadas. Monitorear evolución de presión y vientos.";
+        }
+    } 
+    // De 0 a 20: NORMAL / SIN RIESGO (Ocultar banner por completo)
+    else {
+        banner.classList.add("oculto");
+    }
+}
 
     function guardarPresion(valor){
         const ultimo = historialPresion[historialPresion.length - 1];
