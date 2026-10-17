@@ -79,7 +79,6 @@
             flex-grow: 1;
         }
 
-        /* Contenedor elegante para el logo circular con brillo sutil */
         .brand-logo-wrapper {
             width: 42px;
             height: 42px;
@@ -106,7 +105,6 @@
             flex-direction: column;
         }
 
-        /* Título limpio, sin sombras molestas y con excelente definición */
         .brand h1 {
             font-size: 1.05rem;
             font-weight: 800;
@@ -118,7 +116,6 @@
             line-height: 1.2;
         }
 
-        /* Subtítulo de ubicación sin subrayado, limpio y interactivo */
         .brand p {
             font-size: 0.65rem;
             color: var(--accent);
@@ -316,104 +313,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .forecast-cards {
-            display: flex;
-            justify-content: flex-start;
-            gap: 8px;
-            margin-top: 8px;
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
-            scrollbar-width: none;
-        }
-        .forecast-cards::-webkit-scrollbar {
-            display: none;
-        }
-
-        .forecast-card {
-            flex: 0 0 70px;
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px 4px;
-            text-align: center;
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
-        }
-
-        .forecast-card .icon {
-            font-size: 1.1rem;
-            margin: 2px 0;
-        }
-
-        .forecast-card .max {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--accent);
-        }
-
-        .forecast-card .min {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-
-        .sismos-lista-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 8px;
-            width: 100%;
-            max-height: 180px;
-            overflow-y: auto;
-            padding-right: 2px;
-        }
-        .sismos-lista-vertical::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sismos-lista-vertical::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        .sismo-fila-item {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 6px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .sismo-fila-item:hover {
-            border-color: var(--accent);
-            background: #1e293b;
-        }
-
-        .sismo-fila-mag {
-            font-size: 0.78rem;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        .sismo-mendoza {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444 !important;
-            border: 1px solid #ef4444;
-        }
-        .sismo-normal {
-            background: rgba(56, 189, 248, 0.15);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-
-        #inpres-estado {
-            font-size: 0.62rem;
-            color: var(--text-muted);
-            margin-top: 2px;
         }
 
         .dashboard-row {
@@ -1044,15 +943,110 @@
             border: 1px solid var(--border);
         }
 
-        canvas#graficoPresionCompacto {
+        canvas.grafico-tendencia {
             width: 100% !important;
             max-width: 100% !important;
-            height: 90px !important;
+            height: 110px !important;
             display: block;
-            margin: 4px auto 0 auto;
+            margin: 6px auto 0 auto;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 8px;
+        }
+
+        .forecast-scroll-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 6px 0;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .forecast-scroll-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .forecast-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        .forecast-mini-card {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 6px;
+            min-width: 65px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .forecast-mini-card .f-time {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .forecast-mini-card .f-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+        }
+        .forecast-mini-card .f-temp {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .forecast-mini-card .f-temp-min {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .sismos-lista-vertical {
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
+            padding-right: 4px;
+        }
+        .sismos-lista-vertical::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sismos-lista-vertical::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        .sismo-fila-item {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sismo-fila-item:hover {
+            border-color: var(--accent);
+            background: #1e293b;
+        }
+        .sismo-fila-mag {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .sismo-mendoza {
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: #f87171 !important;
+            border-color: #ef4444 !important;
         }
     </style>
 </head>
@@ -1190,7 +1184,7 @@
     <div class="dashboard-row">
         <div class="card">
             <h3>📈 Histórico de Presión Atmosférica</h3>
-            <canvas id="graficoPresionCompacto" width="500" height="90"></canvas>
+            <canvas id="graficoPresionCompacto" width="500" height="110" class="grafico-tendencia"></canvas>
         </div>
 
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -1221,13 +1215,19 @@
 
     <div class="dashboard-row">
         <div class="card">
-            <h3>Pronóstico Próximas 12 Horas (Open-Meteo)</h3>
-            <div id="hourlyForecast" class="forecast-cards">Cargando horas...</div>
+            <h3>⏳ Tendencia Próximas 12 Horas (Gráfico Térmico & Nubosidad)</h3>
+            <canvas id="graficoHorasTendencia" width="500" height="110" class="grafico-tendencia"></canvas>
+            <div id="contenedorPronosticoHoras" class="forecast-scroll-container">
+                <div style="font-size:0.7rem; color:var(--text-muted); text-align:center; width:100%; padding:15px;">Cargando pronóstico por hora...</div>
+            </div>
         </div>
 
         <div class="card">
-            <h3>📅 Pronóstico 7 días</h3>
-            <div id="forecast" class="forecast-cards"></div>
+            <h3>📅 Tendencia Próximas 7 Días (Gráfico Térmico & Nubosidad)</h3>
+            <canvas id="graficoDiasTendencia" width="500" height="110" class="grafico-tendencia"></canvas>
+            <div id="contenedorPronosticoDias" class="forecast-scroll-container">
+                <div style="font-size:0.7rem; color:var(--text-muted); text-align:center; width:100%; padding:15px;">Cargando pronóstico extendido...</div>
+            </div>
         </div>
     </div>
 
@@ -1563,6 +1563,8 @@
     });
 
     let historialPresion = JSON.parse(localStorage.getItem("historialPresion")) || [];
+    let datosHourlyGlobal = null;
+    let datosDailyGlobal = null;
     let capaPasosFronterizosDinamicos = null;
     const PASOS_API_URL = ["https://", "pasos-proxy", ".elexpreso17.workers.dev"].join("");
 
@@ -2670,7 +2672,6 @@
                 }
             }
 
-            // Si hay un incendio a menos de 150 km, dispara alerta en la cinta superior
             if (fuegoCercanoKm <= 150) {
                 const banner = document.getElementById("bannerAlertaClimaServer");
                 const titulo = document.getElementById("tituloAlertaClima");
@@ -2748,8 +2749,6 @@
                 titulo.innerText = `Atención: Inestabilidad por ${tipoCritico} (${maxRiesgo}%)`;
                 detalle.innerText = "Variables moderadas. Monitorear evolución de presión y vientos.";
             }
-        } else {
-            // Si no hay alertas climáticas altas, dejamos que la función de incendios maneje el banner si aplica
         }
     }
 
@@ -2850,6 +2849,117 @@
         });
     }
 
+    function dibujarGraficoTendenciaCanvas(canvasId, temperaturas) {
+        const canvas = document.getElementById(canvasId);
+        if(!canvas || !temperaturas || temperaturas.length === 0) return;
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const min = Math.min(...temperaturas);
+        const max = Math.max(...temperaturas);
+        const margen = (max === min) ? 2 : (max - min) * 0.3;
+        const minGraf = min - margen;
+        const maxGraf = max + margen;
+        const rango = maxGraf - minGraf;
+
+        const puntos = temperaturas.map((temp, i) => {
+            const x = 25 + (i / (temperaturas.length - 1)) * (w - 50);
+            const y = h - 20 - (((temp - minGraf) / rango) * (h - 35));
+            return { x, y, temp };
+        });
+
+        const gradiente = ctx.createLinearGradient(0, 0, 0, h);
+        gradiente.addColorStop(0, "rgba(56, 189, 248, 0.35)");
+        gradiente.addColorStop(1, "rgba(56, 189, 248, 0.0)");
+
+        ctx.beginPath();
+        ctx.moveTo(puntos[0].x, h - 14);
+        puntos.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(puntos[puntos.length - 1].x, h - 14);
+        ctx.fillStyle = gradiente;
+        ctx.fill();
+
+        ctx.beginPath();
+        puntos.forEach((p, i) => {
+            if(i === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+        });
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        puntos.forEach((p, i) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.font = "9px Arial";
+            ctx.fillStyle = "#38bdf8";
+            ctx.textAlign = "center";
+            ctx.fillText(Math.round(p.temp) + "°", p.x, p.y - 7);
+        });
+    }
+
+    function renderizarPronosticoHoras() {
+        const container = document.getElementById("contenedorPronosticoHoras");
+        if(!container || !datosHourlyGlobal) return;
+
+        const ahoraIndex = new Date().getHours();
+        let temps = datosHourlyGlobal.temperature_2m.slice(ahoraIndex, ahoraIndex + 12);
+        let codes = datosHourlyGlobal.weather_code.slice(ahoraIndex, ahoraIndex + 12);
+
+        dibujarGraficoTendenciaCanvas("graficoHorasTendencia", temps);
+
+        let html = "";
+        for(let i = 0; i < temps.length; i++) {
+            let horaStr = (((ahoraIndex + i) % 24)).toString().padStart(2, '0') + ":00";
+            let icono = iconoClima(codes[i], (ahoraIndex + i) % 24 >= 6 && (ahoraIndex + i) % 24 <= 20 ? 1 : 0);
+            html += `
+                <div class="forecast-mini-card">
+                    <div class="f-time">${horaStr}</div>
+                    <div class="f-icon">${icono}</div>
+                    <div class="f-temp">${Math.round(temps[i])}°</div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    function renderizarPronosticoDias() {
+        const container = document.getElementById("contenedorPronosticoDias");
+        if(!container || !datosDailyGlobal) return;
+
+        let tempsMax = datosDailyGlobal.temperature_2m_max;
+        let tempsMin = datosDailyGlobal.temperature_2m_min;
+        let codes = datosDailyGlobal.weather_code;
+        let fechas = datosDailyGlobal.time;
+
+        let tempsMaxSlice = tempsMax.slice(0, 7);
+        dibujarGraficoTendenciaCanvas("graficoDiasTendencia", tempsMaxSlice);
+
+        let html = "";
+        for(let i = 0; i < Math.min(7, fechas.length); i++) {
+            let diaLabel = i === 0 ? "Hoy" : new Date(fechas[i] + "T00:00:00").toLocaleDateString("es-AR", {weekday: "short"});
+            let icono = iconoClima(codes[i], 1);
+            html += `
+                <div class="forecast-mini-card">
+                    <div class="f-time" style="text-transform:capitalize;">${diaLabel}</div>
+                    <div class="f-icon">${icono}</div>
+                    <div class="f-temp">${Math.round(tempsMax[i])}°</div>
+                    <div class="f-temp-min">${Math.round(tempsMin[i])}°</div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
     function actualizarFechaYHoraDigital() {
         try {
             const ahora = new Date();
@@ -2940,9 +3050,12 @@
         }
 
         try {
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,cloud_cover,weather_code,uv_index,precipitation,is_day&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,cloud_cover,weather_code,uv_index,precipitation,is_day&hourly=temperature_2m,precipitation_probability,precipitation,wind_speed_10m,weather_code,soil_moisture_0_to_1cm,soil_temperature_0cm&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,sunshine_duration,wind_gusts_10m_max,et0_fao_evapotranspiration&timezone=auto`);
             const data = await res.json();
             if (!data || !data.current) return;
+
+            datosHourlyGlobal = data.hourly;
+            datosDailyGlobal = data.daily;
 
             const t = data.current.temperature_2m ?? 0;
             const st = Math.round(data.current.apparent_temperature ?? t);
@@ -2986,6 +3099,8 @@
             if (elIconoPrincipal) elIconoPrincipal.innerText = iconoClima(code, isDay);
 
             guardarPresion(presion);
+            renderizarPronosticoHoras();
+            renderizarPronosticoDias();
 
             if(data.hourly && data.hourly.time){
                 const ahoraIndex = new Date().getHours();
@@ -3033,18 +3148,26 @@
             }
 
             let tormenta = 0;
-            if(h > 60) tormenta += 20;
-            if(h > 80) tormenta += 20;
-            if(nubes > 50) tormenta += 20;
-            if(nubes > 80) tormenta += 20;
-            if(v > 20) tormenta += 20;
+            if (precipitacionActual > 0) {
+                tormenta = 100;
+            } else {
+                if(h > 60) tormenta += 20;
+                if(h > 80) tormenta += 20;
+                if(nubes > 50) tormenta += 20;
+                if(nubes > 80) tormenta += 20;
+                if(v > 20) tormenta += 20;
+                tormenta = Math.min(100, tormenta);
+            }
 
             let granizo = 0;
-            if(h > 70) granizo += 20;
-            if(h > 85) granizo += 20;
-            if(nubes > 60) granizo += 20;
-            if(nubes > 80) granizo += 20;
-            if(t > 20) granizo += 20;
+            if (t > 18) {
+                if(h > 70) granizo += 30;
+                if(nubes > 80) granizo += 35;
+                if(v > 25) granizo += 35;
+                granizo = Math.min(100, granizo);
+            } else {
+                granizo = 0;
+            }
 
             let incendio = 0;
             if(h < 40) incendio += 40;
@@ -3062,8 +3185,6 @@
             if(v > 20) zonda += 20;
 
             helada = Math.min(100, helada);
-            tormenta = Math.min(100, tormenta);
-            granizo = Math.min(100, granizo);
             incendio = Math.min(100, incendio);
             zonda = Math.min(100, zonda);
 
@@ -3115,26 +3236,6 @@
             }
             if (data.hourly && data.hourly.soil_temperature_0cm) {
                 document.getElementById("tempSuelo").innerText = data.hourly.soil_temperature_0cm[0].toFixed(1) + " °C";
-            }
-
-            const hourly = document.getElementById("hourlyForecast");
-            if (hourly && data.hourly) {
-                hourly.innerHTML = "";
-                let hIndex = new Date().getHours();
-                for(let i = hIndex; i < hIndex + 12; i++) {
-                    if (data.hourly.temperature_2m[i] !== undefined) {
-                        hourly.innerHTML += `<div class="forecast-card"><div style="font-size:0.65rem; font-weight:700;">${i%24}:00</div><div class="icon">${iconoClima(data.hourly.weather_code[i], 1)}</div><div class="max">${Math.round(data.hourly.temperature_2m[i])}°</div></div>`;
-                    }
-                }
-            }
-
-            const forecast = document.getElementById("forecast");
-            if (forecast && data.daily) {
-                forecast.innerHTML = "";
-                data.daily.time.forEach((tStr, i) => {
-                    let d = i === 0 ? "Hoy" : new Date(tStr + "T00:00:00").toLocaleDateString("es-AR", {weekday: "short"});
-                    forecast.innerHTML += `<div class="forecast-card"><div style="text-transform:capitalize; font-weight:700; font-size:0.65rem;">${d}</div><div class="icon">${iconoClima(data.daily.weather_code[i], 1)}</div><div class="max">${Math.round(data.daily.temperature_2m_max[i])}°</div><div class="min">${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
-                });
             }
         } catch(e) {}
     }
