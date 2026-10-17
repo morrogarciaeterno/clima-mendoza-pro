@@ -320,6 +320,7 @@
             grid-template-columns: 1fr;
             gap: 12px;
             width: 100%;
+            align-items: stretch;
         }
 
         @media (min-width: 900px) {
@@ -327,6 +328,13 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 14px;
             }
+        }
+
+        .dashboard-row .card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
         }
 
         .solar-container {
@@ -946,9 +954,9 @@
         canvas.grafico-tendencia {
             width: 100% !important;
             max-width: 100% !important;
-            height: 110px !important;
+            height: 75px !important;
             display: block;
-            margin: 6px auto 0 auto;
+            margin: 4px auto 0 auto;
             background: var(--card-inner);
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -956,11 +964,12 @@
 
         .forecast-scroll-container {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             overflow-x: auto;
-            padding: 6px 0;
+            padding: 4px 0;
             width: 100%;
-            margin-top: 8px;
+            margin-top: auto;
+            justify-content: space-between;
         }
         .forecast-scroll-container::-webkit-scrollbar {
             height: 4px;
@@ -972,33 +981,33 @@
         .forecast-mini-card {
             background: var(--card-inner);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 6px;
-            min-width: 65px;
+            border-radius: 6px;
+            padding: 5px 4px;
+            flex: 1;
+            min-width: 0;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             flex-shrink: 0;
         }
         .forecast-mini-card .f-time {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-muted);
             font-weight: 700;
         }
         .forecast-mini-card .f-icon {
-            font-size: 1.2rem;
+            font-size: 1rem;
             line-height: 1;
-            filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
         }
         .forecast-mini-card .f-temp {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 800;
             color: var(--accent);
         }
         .forecast-mini-card .f-temp-min {
-            font-size: 0.65rem;
+            font-size: 0.58rem;
             color: var(--text-muted);
             font-weight: 600;
         }
@@ -1216,17 +1225,17 @@
     <div class="dashboard-row">
         <div class="card">
             <h3>⏳ Tendencia Próximas 12 Horas (Gráfico Térmico & Nubosidad)</h3>
-            <canvas id="graficoHorasTendencia" width="500" height="110" class="grafico-tendencia"></canvas>
+            <canvas id="graficoHorasTendencia" width="500" height="75" class="grafico-tendencia"></canvas>
             <div id="contenedorPronosticoHoras" class="forecast-scroll-container">
-                <div style="font-size:0.7rem; color:var(--text-muted); text-align:center; width:100%; padding:15px;">Cargando pronóstico por hora...</div>
+                <div style="font-size:0.7rem; color:var(--text-muted); text-align:center; width:100%; padding:10px;">Cargando pronóstico por hora...</div>
             </div>
         </div>
 
         <div class="card">
             <h3>📅 Tendencia Próximas 7 Días (Gráfico Térmico & Nubosidad)</h3>
-            <canvas id="graficoDiasTendencia" width="500" height="110" class="grafico-tendencia"></canvas>
+            <canvas id="graficoDiasTendencia" width="500" height="75" class="grafico-tendencia"></canvas>
             <div id="contenedorPronosticoDias" class="forecast-scroll-container">
-                <div style="font-size:0.7rem; color:var(--text-muted); text-align:center; width:100%; padding:15px;">Cargando pronóstico extendido...</div>
+                <div style="font-size:0.7rem; color:var(--text-muted); text-align:center; width:100%; padding:10px;">Cargando pronóstico extendido...</div>
             </div>
         </div>
     </div>
@@ -2867,7 +2876,7 @@
 
         const puntos = temperaturas.map((temp, i) => {
             const x = 25 + (i / (temperaturas.length - 1)) * (w - 50);
-            const y = h - 20 - (((temp - minGraf) / rango) * (h - 35));
+            const y = h - 16 - (((temp - minGraf) / rango) * (h - 26));
             return { x, y, temp };
         });
 
@@ -2876,9 +2885,9 @@
         gradiente.addColorStop(1, "rgba(56, 189, 248, 0.0)");
 
         ctx.beginPath();
-        ctx.moveTo(puntos[0].x, h - 14);
+        ctx.moveTo(puntos[0].x, h - 10);
         puntos.forEach(p => ctx.lineTo(p.x, p.y));
-        ctx.lineTo(puntos[puntos.length - 1].x, h - 14);
+        ctx.lineTo(puntos[puntos.length - 1].x, h - 10);
         ctx.fillStyle = gradiente;
         ctx.fill();
 
@@ -2893,17 +2902,17 @@
 
         puntos.forEach((p, i) => {
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
             ctx.fillStyle = "#ffffff";
             ctx.fill();
             ctx.strokeStyle = "#38bdf8";
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            ctx.font = "9px Arial";
+            ctx.font = "8.5px Arial";
             ctx.fillStyle = "#38bdf8";
             ctx.textAlign = "center";
-            ctx.fillText(Math.round(p.temp) + "°", p.x, p.y - 7);
+            ctx.fillText(Math.round(p.temp) + "°", p.x, p.y - 5);
         });
     }
 
@@ -3280,7 +3289,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const btnGuardar = document.getElementById("btnGuardarCensor") || document.getElementById("btnGuardarCenso");
+        const btnGuardar = document.getElementById("btnGuardarCensado") || document.getElementById("btnGuardarCenso");
         if (btnGuardar) {
             btnGuardar.addEventListener("click", function(e) {
                 e.preventDefault();
