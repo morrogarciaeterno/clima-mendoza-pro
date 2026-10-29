@@ -51,7 +51,6 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .big { font-size: 24px; font-weight: 800; }
         
-        /* Tarjetas de alerta operativa */
         .card.fire-critical { background: linear-gradient(145deg, #541015, #270a0d) !important; border-color: #ef4444 !important; }
         .card.fire-near { background: linear-gradient(145deg, #542107, #281408) !important; border-color: #f97316 !important; }
         .card.fire-watch { background: linear-gradient(145deg, #3a3005, #211d08) !important; border-color: #facc15 !important; }
@@ -74,10 +73,9 @@
 <main class="app">
     <header class="card">
         <h1>BOMBEROS ARGENTINA · Monitoreo Satelital Térmico Nacional</h1>
-        <div class="muted">Detección de focos de calor y anomalías (GOES-19 y VIIRS) filtradas exclusivamente para el territorio argentino.</div>
+        <div class="muted">Detección de focos de calor y anomalías (GOES-19 y VIIRS) con detalle de ubicación y temperatura.</div>
     </header>
 
-    <!-- Paneles Operativos -->
     <section class="grid-2">
         <div class="card fire-watch" id="fireCard">
             <div class="flex"><b>🔥 Focos VIIRS (Argentina)</b><span class="badge" id="fireState">CARGANDO</span></div>
@@ -92,7 +90,6 @@
         </div>
     </section>
 
-    <!-- Controles y Mapa -->
     <section class="card">
         <div class="controls">
             <button onclick="centrarArgentina()">🇦🇷 Centrar en Argentina</button>
@@ -104,7 +101,6 @@
     </section>
 </main>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     let map, goesLayer = null, fireLayer = null;
@@ -113,25 +109,14 @@
     const FIRMS_MAP_KEY = "77a9490b2a337c7055de7a2e5948c836";
     const GOES_WORKER_URL = "https://territoria-goes.elexpreso17.workers.dev/";
 
-    // Límites geográficos aproximados de la República Argentina para filtrado estricto
-    const ARG_BOUNDS = {
-        latMin: -55.6,
-        latMax: -21.7,
-        lonMin: -73.6,
-        lonMax: -53.6
-    };
-
-    const isInsideArgentina = (lat, lon) => {
-        return lat >= ARG_BOUNDS.latMin && lat <= ARG_BOUNDS.latMax &&
-               lon >= ARG_BOUNDS.lonMin && lon <= ARG_BOUNDS.lonMax;
-    };
+    const ARG_BOUNDS = { latMin: -55.6, latMax: -21.7, lonMin: -73.6, lonMax: -53.6 };
+    const isInsideArgentina = (lat, lon) => lat >= ARG_BOUNDS.latMin && lat <= ARG_BOUNDS.latMax && lon >= ARG_BOUNDS.lonMin && lon <= ARG_BOUNDS.lonMax;
 
     const $ = id => document.getElementById(id);
     const set = (id, v) => { const e = $(id); if (e) e.textContent = v; };
 
     function initMap() {
         if (map) return;
-        // Centrado inicial en Argentina (Córdoba / centro geográfico)
         map = L.map('map').setView([-38.4161, -63.6167], 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
@@ -145,11 +130,9 @@
         if (map) map.setView([-38.4161, -63.6167], 5);
     }
 
-    // --- Carga y Filtrado Exclusivo para Argentina: VIIRS ---
     async function loadViirsArgentina() {
         try {
             set('fireState', 'CONSULTANDO');
-            // Caja amplia que cubre todo el Cono Sur para recortar solo Argentina
             const box = `${ARG_BOUNDS.lonMin},${ARG_BOUNDS.latMin},${ARG_BOUNDS.lonMax},${ARG_BOUNDS.latMax}`;
             const r = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/VIIRS_SNPP_NRT/${box}/1`, { cache: 'no-store' });
             if (!r.ok) throw Error('HTTP ' + r.status);
@@ -164,9 +147,7 @@
             viirsDetections = lines.slice(1).map(x => {
                 const c = x.split(',');
                 const a = Number(c[il]), b = Number(c[io]);
-                if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
-                // Filtrado estricto por polígono de Argentina
-                if (!isInsideArgentina(a, b)) return null;
+                if (!Number.isFinite(a) || !Number.isFinite(b) || !isInsideArgentina(a, b)) return null;
                 return { lat: a, lon: b, date: c[id] || '', time: c[it] || '', conf: c[ic] || 'n/d' };
             }).filter(Boolean);
 
@@ -179,20 +160,17 @@
         }
     }
 
-    // --- Carga y Filtrado Exclusivo para Argentina: GOES-19 ---
     async function loadGoesArgentina() {
         try {
             set('goesState', 'CONSULTANDO');
-            // Coordenada central de referencia para el worker en Argentina
             const u = new URL(GOES_WORKER_URL);
             u.searchParams.set('lat', '-32.89');
             u.searchParams.set('lon', '-68.84');
-            u.searchParams.set('radius', '3000'); // Radio amplio nacional
+            u.searchParams.set('radius', '3000');
             const r = await fetch(u, { cache: 'no-store' });
             const j = await r.json();
             if (!r.ok || j.ok === false) throw Error(j.error || 'Respuesta GOES inválida');
 
-            // Filtrar estrictamente las que caen dentro de Argentina
             goesDetections = (j.detections || []).map(d => ({
                 ...d,
                 lat: Number(d.lat),
@@ -218,13 +196,34 @@
         goesDetections.forEach(n => {
             const isHigh = String(n.classification || '').toLowerCase().includes('high');
             const color = isHigh ? '#ef4444' : '#f97316';
-            L.circleMarker([n.lat, n.lon], {
+            
+            // Cálculo de temperatura en Celsius si viene en Kelvin (K -> °C)
+            let tempStr = 'No informada';
+            if (n.temperatureK != null && Number.isFinite(Number(n.temperatureK))) {
+                const tempC = Number(n.temperatureK) - 273.15;
+                tempStr = tempC.toFixed(1) + ' °C (' + Number(n.temperatureK).toFixed(1) + ' K)';
+            }
+
+            const marker = L.circleMarker([n.lat, n.lon], {
                 radius: isHigh ? 7 : 5,
                 color: '#fff',
                 fillColor: color,
                 fillOpacity: 0.9,
                 weight: 1.5
-            }).bindPopup(`<b>🔥 GOES-19 (Argentina)</b><br>Clasificación: ${n.classification}<br>FRP: ${n.frpMw || 's/d'} MW<br>Coords: ${n.lat.toFixed(4)}, ${n.lon.toFixed(4)}`).addTo(goesLayer);
+            });
+
+            // Popup dinámico con Lugar (calculado o coordenadas) y Temperatura
+            marker.bindPopup(`
+                <div style="color:#111827; min-width: 180px;">
+                    <b>🔥 GOES-19 · Argentina</b><br>
+                    <b>Clasificación:</b> ${n.classification || 'Anomalía'}<br>
+                    <b>Temperatura:</b> <span style="color:#dc2626; font-weight:bold;">${tempStr}</span><br>
+                    <b>Potencia (FRP):</b> ${n.frpMw ? Number(n.frpMw).toFixed(1) + ' MW' : 's/d'}<br>
+                    <span style="font-size:10px; color:#4b5563;">Lat/Lon: ${n.lat.toFixed(4)}, ${n.lon.toFixed(4)}</span>
+                </div>
+            `);
+
+            marker.addTo(goesLayer);
         });
     }
 
