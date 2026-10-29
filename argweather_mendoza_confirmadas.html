@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Territoria · Monitoreo de Incendios y Calor - Bomberos Argentina</title>
+    <title>Territoria · Dashboard Operativo de Bomberos</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
@@ -22,89 +22,166 @@
         }
         body {
             margin: 0;
-            padding: 14px;
+            padding: 12px;
             background: var(--bg);
             color: var(--t);
             font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 14px;
+            font-size: 13px;
         }
-        .app { max-width: 1400px; margin: auto; }
+        .app { max-width: 1450px; margin: auto; }
         .card {
-            margin-bottom: 12px;
-            padding: 16px;
+            margin-bottom: 10px;
+            padding: 14px;
             border: 1px solid var(--b);
-            border-radius: 14px;
+            border-radius: 12px;
             background: var(--p);
         }
         h1, h3 { margin-top: 0; color: #40c6ef; }
         .flex { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .badge {
-            padding: 5px 9px;
-            border: 1px solid #15803d;
+            padding: 4px 8px;
             border-radius: 20px;
             background: #064e3b;
             color: #86efac;
             font-size: 10px;
             font-weight: 800;
         }
+        .badge.crit { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .muted { color: var(--m); font-size: 11px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .big { font-size: 24px; font-weight: 800; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-dashboard { display: grid; grid-template-columns: 360px 1fr; gap: 10px; }
+        .big { font-size: 22px; font-weight: 800; }
         
-        .card.fire-critical { background: linear-gradient(145deg, #541015, #270a0d) !important; border-color: #ef4444 !important; }
-        .card.fire-near { background: linear-gradient(145deg, #542107, #281408) !important; border-color: #f97316 !important; }
-        .card.fire-watch { background: linear-gradient(145deg, #3a3005, #211d08) !important; border-color: #facc15 !important; }
+        /* Banner de Alerta Crítica Superior */
+        #alertBanner {
+            background: linear-gradient(135deg, #7f1d1d, #450a0a);
+            border: 1px solid #ef4444;
+            display: none;
+            margin-bottom: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
 
         .controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
         button, select {
-            padding: 9px 12px;
+            padding: 8px 12px;
             border: 1px solid #3b82f6;
             border-radius: 8px;
             background: #172554;
             color: #fff;
             cursor: pointer;
             font-weight: 600;
+            font-size: 12px;
         }
         button.active { border-color: #22c55e !important; background: #14532d !important; }
-        #map { width: 100%; height: 600px; border: 1px solid var(--b); border-radius: 12px; background: #0f172a; }
+        
+        /* Listado lateral de focos activos */
+        #firesList { max-height: 520px; overflow-y: auto; padding-right: 4px; }
+        .fire-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid var(--b);
+            border-radius: 8px;
+            background: var(--i);
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .fire-item:hover { border-color: #38bdf8; background: #1e293b; }
+        .fire-item.critical { border-color: #ef4444; background: #2a1215; }
+
+        #map { width: 100%; height: 570px; border: 1px solid var(--b); border-radius: 10px; background: #0f172a; }
+        .btn-radio { background: #b91c1c; border-color: #f87171; font-size: 11px; padding: 4px 8px; }
     </style>
 </head>
 <body>
 <main class="app">
-    <header class="card">
-        <h1>BOMBEROS ARGENTINA · Monitoreo Satelital Térmico Nacional</h1>
-        <div class="muted">Detección de focos de calor y anomalías (GOES-19 y VIIRS) con detalle de ubicación y temperatura.</div>
+    <header class="card" style="padding: 10px 14px;">
+        <div class="flex">
+            <div>
+                <h2 style="margin:0; color:#38bdf8;">🚨 TERRITORIA · Centro de Operaciones de Emergencia (COE Bomberos)</h2>
+                <div class="muted">Monitoreo en tiempo real de anomalías térmicas e incendios forestales en Argentina</div>
+            </div>
+            <div>
+                <span class="badge" id="sysStatus">SISTEMA ACTIVO</span>
+            </div>
+        </div>
     </header>
 
-    <section class="grid-2">
-        <div class="card fire-watch" id="fireCard">
-            <div class="flex"><b>🔥 Focos VIIRS (Argentina)</b><span class="badge" id="fireState">CARGANDO</span></div>
-            <div class="big" id="fireCountTotal">-- detecciones</div>
-            <div class="muted" id="fireDetail">Analizando cartografía nacional de incendios…</div>
+    <!-- Banner de Alerta Crítica en Tiempo Real -->
+    <div id="alertBanner">
+        <div>
+            <strong style="color:#fca5a5; font-size:14px;">⚠️ ALERTA DE INCENDIO CRÍTICO DETECTADO</strong>
+            <div id="alertBannerText" class="muted" style="color:#fecaca;">Analizando vectores de riesgo...</div>
         </div>
+        <button class="btn-radio" onclick="focoCriticoZoom()">UBICAR EN MAPA</button>
+    </div>
 
-        <div class="card fire-watch" id="goesCard">
-            <div class="flex"><b>🛰️ GOES-19 Térmico (Argentina)</b><span class="badge" id="goesState">CARGANDO</span></div>
-            <div class="big" id="goesCountTotal">-- anomalías</div>
-            <div class="muted" id="goesDetail">Procesando satélite geoestacionario en sector sur…</div>
+    <!-- Indicadores Generales -->
+    <section class="grid-3">
+        <div class="card" style="margin-bottom:0;">
+            <div class="flex"><b>🔥 Focos VIIRS (Nacional)</b><span class="badge" id="badgeViirs">--</span></div>
+            <div class="big" id="valViirs">0 detectados</div>
+            <div class="muted">Satélite SNPP / NOAA-20</div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="flex"><b>🛰️ GOES-19 Térmico</b><span class="badge" id="badgeGoes">--</span></div>
+            <div class="big" id="valGoes">0 anomalías</div>
+            <div class="muted">Geoestacionario (Alta frecuencia)</div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="flex"><b>⚡ Nivel de Riesgo País</b><span class="badge crit" id="badgeRiesgo">ELEVADO</span></div>
+            <div class="big" id="valRiesgo">Temporada Activa</div>
+            <div class="muted">Filtro exclusivo: Argentina</div>
         </div>
     </section>
 
-    <section class="card">
-        <div class="controls">
-            <button onclick="centrarArgentina()">🇦🇷 Centrar en Argentina</button>
-            <button id="viirsBtn" onclick="toggleViirsLayer()">🔥 Activar Capa WMS VIIRS</button>
-            <button id="goesBtn" onclick="toggleGoesLayer()" class="active">🛰️ Marcadores GOES ON</button>
-            <span class="muted" style="margin-left:auto;" id="statusInfo">Actualizado en tiempo real</span>
+    <!-- Panel Principal Dividido: Lista Lateral + Mapa -->
+    <section class="grid-dashboard" style="margin-top: 10px;">
+        <!-- Columna Izquierda: Listado Operativo y Filtros -->
+        <div class="card" style="margin-bottom:0;">
+            <div class="flex" style="margin-bottom: 8px;">
+                <b>📋 Central de Alertas</b>
+                <select id="provinciaFilter" onchange="filtrarPorProvincia()">
+                    <option value="TODAS">Todas las Provincias</option>
+                    <option value="Mendoza">Mendoza / San Juan</option>
+                    <option value="Cordoba">Córdoba / San Luis</option>
+                    <option value="Buenos Aires">Buenos Aires / CABA</option>
+                    <option value="Litoral">Formosa / Chaco / Misiones</option>
+                    <option value="Patagonia">Neuquén / Río Negro / Chubut</option>
+                </select>
+            </div>
+            <div class="controls">
+                <button onclick="recargarDatos()">🔄 Actualizar</button>
+                <button id="toggleListBtn" class="active" onclick="toggleVistaLista()">Ver Todos</button>
+            </div>
+            <div id="firesList">
+                <div class="muted" style="text-align:center; padding:20px;">Cargando registros satelitales...</div>
+            </div>
         </div>
-        <div id="map"></div>
+
+        <!-- Columna Derecha: Mapa Cartográfico -->
+        <div class="card" style="margin-bottom:0;">
+            <div class="controls">
+                <button onclick="centrarArgentina()">🇦🇷 Vista Nacional</button>
+                <button id="viirsBtn" onclick="toggleViirsLayer()">🔥 Capa WMS VIIRS ON</button>
+                <button id="goesBtn" onclick="toggleGoesLayer()" class="active">🛰️ GOES Marcadores ON</button>
+                <span class="muted" style="margin-left:auto;" id="ultimaActualizacion">Actualizando...</span>
+            </div>
+            <div id="map"></div>
+        </div>
     </section>
 </main>
 
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     let map, goesLayer = null, fireLayer = null;
-    let goesDetections = [], viirsDetections = [];
+    let allDetections = [];
+    let focoCriticoActual = null;
 
     const FIRMS_MAP_KEY = "77a9490b2a337c7055de7a2e5948c836";
     const GOES_WORKER_URL = "https://territoria-goes.elexpreso17.workers.dev/";
@@ -112,8 +189,17 @@
     const ARG_BOUNDS = { latMin: -55.6, latMax: -21.7, lonMin: -73.6, lonMax: -53.6 };
     const isInsideArgentina = (lat, lon) => lat >= ARG_BOUNDS.latMin && lat <= ARG_BOUNDS.latMax && lon >= ARG_BOUNDS.lonMin && lon <= ARG_BOUNDS.lonMax;
 
+    function clasificarProvincia(lat, lon) {
+        if (lat >= -29 && lat <= -22 && lon >= -66 && lon <= -57) return "Litoral / Norte";
+        if (lat >= -34 && lat <= -29 && lon >= -70 && lon <= -64) return "Mendoza";
+        if (lat >= -37 && lat <= -30 && lon >= -66 && lon <= -60) return "Cordoba";
+        if (lat >= -33 && lat <= -27 && lon >= -60 && lon <= -53) return "Litoral";
+        if (lat >= -41 && lat <= -33 && lon >= -63 && lon <= -56) return "Buenos Aires";
+        if (lat <= -41) return "Patagonia";
+        return "Argentina Central";
+    }
+
     const $ = id => document.getElementById(id);
-    const set = (id, v) => { const e = $(id); if (e) e.textContent = v; };
 
     function initMap() {
         if (map) return;
@@ -123,68 +209,134 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        loadArgentinaThermalData();
+        recargarDatos();
     }
 
     function centrarArgentina() {
         if (map) map.setView([-38.4161, -63.6167], 5);
     }
 
+    async function recargarDatos() {
+        $('firesList').innerHTML = '<div class="muted" style="text-align:center; padding:20px;">Consultando servidores satelitales NASA y GOES...</div>';
+        await Promise.all([loadViirsArgentina(), loadGoesArgentina()]);
+        procesarDashboardGeneral();
+    }
+
     async function loadViirsArgentina() {
         try {
-            set('fireState', 'CONSULTANDO');
             const box = `${ARG_BOUNDS.lonMin},${ARG_BOUNDS.latMin},${ARG_BOUNDS.lonMax},${ARG_BOUNDS.latMax}`;
             const r = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/VIIRS_SNPP_NRT/${box}/1`, { cache: 'no-store' });
-            if (!r.ok) throw Error('HTTP ' + r.status);
+            if (!r.ok) return;
             const text = await r.text();
             const lines = text.trim().split(/\r?\n/);
             const headers = lines[0]?.split(',') || [];
             const il = headers.indexOf('latitude'), io = headers.indexOf('longitude');
             const id = headers.indexOf('acq_date'), it = headers.indexOf('acq_time'), ic = headers.indexOf('confidence');
 
-            if (il < 0 || io < 0) throw Error('Formato CSV inválido');
-
-            viirsDetections = lines.slice(1).map(x => {
+            const viirs = lines.slice(1).map(x => {
                 const c = x.split(',');
                 const a = Number(c[il]), b = Number(c[io]);
                 if (!Number.isFinite(a) || !Number.isFinite(b) || !isInsideArgentina(a, b)) return null;
-                return { lat: a, lon: b, date: c[id] || '', time: c[it] || '', conf: c[ic] || 'n/d' };
+                return {
+                    id: 'v_' + Math.random().toString(36).substr(2, 5),
+                    source: 'VIIRS',
+                    lat: a, lon: b,
+                    provincia: clasificarProvincia(a, b),
+                    fecha: c[id] + ' ' + c[it] + ' UTC',
+                    detalle: 'Confianza: ' + (c[ic] || 'n/d'),
+                    criticidad: 'MEDIA',
+                    tempC: 'No reg.'
+                };
             }).filter(Boolean);
 
-            set('fireCountTotal', viirsDetections.length + ' focos activos');
-            set('fireState', viirsDetections.length > 0 ? 'ALERTAS EN PAÍS' : 'SIN INCENDIOS');
-            $('fireCard').className = 'card ' + (viirsDetections.length > 10 ? 'fire-critical' : viirsDetections.length > 0 ? 'fire-near' : 'fire-watch');
+            allDetections = [...allDetections.filter(d => d.source !== 'VIIRS'), ...viirs];
+            $('valViirs').textContent = viirs.length + ' detectados';
+            $('badgeViirs').textContent = viirs.length > 0 ? 'ACTIVO' : 'ESTABLE';
         } catch (e) {
-            set('fireState', 'ERROR');
-            set('fireDetail', 'Error VIIRS: ' + e.message);
+            console.error(e);
         }
     }
 
     async function loadGoesArgentina() {
         try {
-            set('goesState', 'CONSULTANDO');
             const u = new URL(GOES_WORKER_URL);
             u.searchParams.set('lat', '-32.89');
             u.searchParams.set('lon', '-68.84');
             u.searchParams.set('radius', '3000');
             const r = await fetch(u, { cache: 'no-store' });
             const j = await r.json();
-            if (!r.ok || j.ok === false) throw Error(j.error || 'Respuesta GOES inválida');
+            if (!r.ok || j.ok === false) return;
 
-            goesDetections = (j.detections || []).map(d => ({
-                ...d,
-                lat: Number(d.lat),
-                lon: Number(d.lon)
-            })).filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lon) && isInsideArgentina(d.lat, d.lon));
+            const goes = (j.detections || []).map(d => {
+                const lat = Number(d.lat), lon = Number(d.lon);
+                if (!isInsideArgentina(lat, lon)) return null;
+                const tempC = d.temperatureK ? (Number(d.temperatureK) - 273.15).toFixed(1) + ' °C' : 's/d';
+                const isHigh = String(d.classification || '').toLowerCase().includes('high');
+                return {
+                    id: 'g_' + Math.random().toString(36).substr(2, 5),
+                    source: 'GOES-19',
+                    lat: lat, lon: lon,
+                    provincia: clasificarProvincia(lat, lon),
+                    fecha: 'Tiempo real GEO',
+                    detalle: `${d.classification || 'Anomalía'} · FRP: ${d.frpMw ? Number(d.frpMw).toFixed(1) + ' MW' : 's/d'}`,
+                    criticidad: isHigh ? 'CRITICA' : 'MODERADA',
+                    tempC: tempC
+                };
+            }).filter(Boolean);
 
-            set('goesCountTotal', goesDetections.length + ' anomalías');
-            set('goesState', goesDetections.length > 0 ? 'MONITOREO ACTIVO' : 'ESTABLE');
-            $('goesCard').className = 'card ' + (goesDetections.length > 5 ? 'fire-critical' : goesDetections.length > 0 ? 'fire-near' : 'fire-watch');
-            
+            allDetections = [...allDetections.filter(d => d.source !== 'GOES-19'), ...goes];
+            $('valGoes').textContent = goes.length + ' anomalías';
+            $('badgeGoes').textContent = goes.length > 0 ? 'ACTIVO' : 'ESTABLE';
             renderGoesMarkers();
         } catch (e) {
-            set('goesState', 'ERROR');
-            set('goesDetail', 'Error GOES: ' + e.message);
+            console.error(e);
+        }
+    }
+
+    function procesarDashboardGeneral() {
+        renderizarLista(allDetections);
+        $('ultimaActualizacion').textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
+
+        // Detectar si hay algún foco crítico para activar el Banner de Emergencia superior
+        const critico = allDetections.find(d => d.criticidad === 'CRITICA');
+        if (critico) {
+            focoCriticoActual = critico;
+            $('alertBanner').style.display = 'flex';
+            $('alertBannerText').textContent = `Ubicación: ${critico.provincia} | Temp: ${critico.tempC} | Detalle: ${critico.detalle}`;
+        } else {
+            $('alertBanner').style.display = 'none';
+        }
+    }
+
+    function renderizarLista(items) {
+        const contenedor = $('firesList');
+        if (!items.length) {
+            contenedor.innerHTML = '<div class="muted" style="text-align:center; padding:20px;">Sin alertas registradas en este filtro.</div>';
+            return;
+        }
+
+        contenedor.innerHTML = items.map(d => `
+            <div class="fire-item ${d.criticidad === 'CRITICA' ? 'critical' : ''}" onclick="enfocarFoco(${d.lat}, ${d.lon}, '${d.source}')">
+                <div class="flex">
+                    <b>${d.source} · ${d.provincia}</b>
+                    <span class="badge" style="background:${d.criticidad === 'CRITICA' ? '#7f1d1d' : '#1e3a8a'}">${d.criticidad}</span>
+                </div>
+                <div class="muted" style="margin-top:4px;">${d.detalle}</div>
+                <div class="flex" style="margin-top:6px;">
+                    <span style="font-size:11px; color:#38bdf8;">Temp: <b>${d.tempC}</b></span>
+                    <button class="btn-radio" onclick="event.stopPropagation(); copiarParte(${d.lat}, ${d.lon}, '${d.provincia}', '${d.tempC}')">📋 Copiar Parte</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filtrarPorProvincia() {
+        const prov = $('provinciaFilter').value;
+        if (prov === 'TODAS') {
+            renderizarLista(allDetections);
+        } else {
+            const filtrados = allDetections.filter(d => d.provincia === prov);
+            renderizarLista(filtrados);
         }
     }
 
@@ -193,37 +345,48 @@
         if (!goesLayer) goesLayer = L.layerGroup().addTo(map);
         goesLayer.clearLayers();
 
-        goesDetections.forEach(n => {
-            const isHigh = String(n.classification || '').toLowerCase().includes('high');
-            const color = isHigh ? '#ef4444' : '#f97316';
+        allDetections.filter(d => d.source === 'GOES-19' || d.source === 'VIIRS').forEach(n => {
+            const isCrit = n.criticidad === 'CRITICA';
+            const color = isCrit ? '#ef4444' : '#f97316';
             
-            // Cálculo de temperatura en Celsius si viene en Kelvin (K -> °C)
-            let tempStr = 'No informada';
-            if (n.temperatureK != null && Number.isFinite(Number(n.temperatureK))) {
-                const tempC = Number(n.temperatureK) - 273.15;
-                tempStr = tempC.toFixed(1) + ' °C (' + Number(n.temperatureK).toFixed(1) + ' K)';
-            }
-
             const marker = L.circleMarker([n.lat, n.lon], {
-                radius: isHigh ? 7 : 5,
+                radius: isCrit ? 8 : 5,
                 color: '#fff',
                 fillColor: color,
                 fillOpacity: 0.9,
                 weight: 1.5
             });
 
-            // Popup dinámico con Lugar (calculado o coordenadas) y Temperatura
             marker.bindPopup(`
                 <div style="color:#111827; min-width: 180px;">
-                    <b>🔥 GOES-19 · Argentina</b><br>
-                    <b>Clasificación:</b> ${n.classification || 'Anomalía'}<br>
-                    <b>Temperatura:</b> <span style="color:#dc2626; font-weight:bold;">${tempStr}</span><br>
-                    <b>Potencia (FRP):</b> ${n.frpMw ? Number(n.frpMw).toFixed(1) + ' MW' : 's/d'}<br>
-                    <span style="font-size:10px; color:#4b5563;">Lat/Lon: ${n.lat.toFixed(4)}, ${n.lon.toFixed(4)}</span>
+                    <b>🇦🇷 ${n.provincia} (${n.source})</b><br>
+                    <b>Estado:</b> ${n.detalle}<br>
+                    <b>Temperatura:</b> <span style="color:#dc2626; font-weight:bold;">${n.tempC}</span><br>
+                    <span style="font-size:10px; color:#4b5563;">Lat/Lon: ${n.lat.toFixed(4)}, ${n.lon.toFixed(4)}</span><br>
+                    <button style="margin-top:6px; background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="copiarParte(${n.lat}, ${n.lon}, '${n.provincia}', '${n.tempC}')">Copiar Coordenadas</button>
                 </div>
             `);
-
             marker.addTo(goesLayer);
+        });
+    }
+
+    function enfocarFoco(lat, lon, fuente) {
+        if (map) {
+            map.setView([lat, lon], 10);
+            L.popup().setLatLng([lat, lon]).setContent(`<b>Foco Seleccionado (${fuente})</b><br>Lat/Lon: ${lat.toFixed(4)}, ${lon.toFixed(4)}`).openOn(map);
+        }
+    }
+
+    function focoCriticoZoom() {
+        if (focoCriticoActual && map) {
+            enfocarFoco(focoCriticoActual.lat, focoCriticoActual.lon, focoCriticoActual.source);
+        }
+    }
+
+    function copiarParte(lat, lon, prov, temp) {
+        const texto = `🚨 [PARTE BOMBEROS TERRITORIA] Alerta Térmica en ${prov}. Coordenadas: ${lat.toFixed(4)}, ${lon.toFixed(4)}. Temperatura estimada: ${temp}. Google Maps: https://maps.google.com/?q=${lat},${lon}`;
+        navigator.clipboard.writeText(texto).then(() => {
+            alert('¡Parte copiado al portapapeles listo para enviar por WhatsApp o Radio!');
         });
     }
 
@@ -232,11 +395,11 @@
         if (goesLayer && map.hasLayer(goesLayer)) {
             map.removeLayer(goesLayer);
             $('goesBtn').classList.remove('active');
-            set('goesBtn', '🛰️ Marcadores GOES OFF');
+            $('goesBtn').textContent = '🛰️ GOES OFF';
         } else {
             if (goesLayer) goesLayer.addTo(map);
             $('goesBtn').classList.add('active');
-            set('goesBtn', '🛰️ Marcadores GOES ON');
+            $('goesBtn').textContent = '🛰️ GOES Marcadores ON';
         }
     }
 
@@ -245,7 +408,7 @@
         if (fireLayer && map.hasLayer(fireLayer)) {
             map.removeLayer(fireLayer);
             $('viirsBtn').classList.remove('active');
-            set('viirsBtn', '🔥 Activar Capa WMS VIIRS');
+            $('viirsBtn').textContent = '🔥 Capa WMS VIIRS OFF';
         } else {
             if (!fireLayer) {
                 fireLayer = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${FIRMS_MAP_KEY}/`, {
@@ -258,13 +421,8 @@
             }
             fireLayer.addTo(map);
             $('viirsBtn').classList.add('active');
-            set('viirsBtn', '🔥 Desactivar Capa WMS VIIRS');
+            $('viirsBtn').textContent = '🔥 Capa WMS VIIRS ON';
         }
-    }
-
-    function loadArgentinaThermalData() {
-        loadViirsArgentina();
-        loadGoesArgentina();
     }
 
     window.onload = () => {
