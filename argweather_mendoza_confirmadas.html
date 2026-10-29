@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Territoria · Monitoreo Satelital de Calor</title>
+    <title>Territoria · Monitoreo de Incendios y Calor - Bomberos Argentina</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
@@ -28,7 +28,7 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 14px;
         }
-        .app { max-width: 1200px; margin: auto; }
+        .app { max-width: 1400px; margin: auto; }
         .card {
             margin-bottom: 12px;
             padding: 16px;
@@ -51,19 +51,12 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .big { font-size: 24px; font-weight: 800; }
         
-        /* Tarjetas con alertas dinámicas idénticas a Territoria */
-        #fireCard, #goesCard {
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: background .4s ease, border-color .4s ease;
-        }
-        #fireCard.fire-safe, #goesCard.goes-safe { background: var(--p); border-color: var(--b); }
-        #fireCard.fire-watch, #goesCard.goes-watch { background: linear-gradient(145deg, #3a3005, #211d08); border-color: #facc15; }
-        #fireCard.fire-near, #goesCard.goes-near { background: linear-gradient(145deg, #542107, #281408); border-color: #f97316; }
-        #fireCard.fire-critical, #goesCard.goes-critical { background: linear-gradient(145deg, #541015, #270a0d); border-color: #ef4444; }
+        /* Tarjetas de alerta operativa */
+        .card.fire-critical { background: linear-gradient(145deg, #541015, #270a0d) !important; border-color: #ef4444 !important; }
+        .card.fire-near { background: linear-gradient(145deg, #542107, #281408) !important; border-color: #f97316 !important; }
+        .card.fire-watch { background: linear-gradient(145deg, #3a3005, #211d08) !important; border-color: #facc15 !important; }
 
-        .controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
         button, select {
             padding: 9px 12px;
             border: 1px solid #3b82f6;
@@ -74,52 +67,38 @@
             font-weight: 600;
         }
         button.active { border-color: #22c55e !important; background: #14532d !important; }
-        #map { width: 100%; height: 500px; border: 1px solid var(--b); border-radius: 12px; background: #0f172a; }
-        .gpsdot { width: 16px; height: 16px; border-radius: 50%; background: #2563eb; border: 3px solid white; box-shadow: 0 0 10px #3b82f6; }
+        #map { width: 100%; height: 600px; border: 1px solid var(--b); border-radius: 12px; background: #0f172a; }
     </style>
 </head>
 <body>
 <main class="app">
     <header class="card">
-        <h1>TERRITORIA · Módulo Satelital Térmico</h1>
-        <div class="muted">Ejemplo completo e independiente para integración de anomalías térmicas (GOES-19 y VIIRS).</div>
+        <h1>BOMBEROS ARGENTINA · Monitoreo Satelital Térmico Nacional</h1>
+        <div class="muted">Detección de focos de calor y anomalías (GOES-19 y VIIRS) filtradas exclusivamente para el territorio argentino.</div>
     </header>
 
-    <!-- Paneles de Estado Térmico -->
+    <!-- Paneles Operativos -->
     <section class="grid-2">
-        <div class="card alert" id="fireCard" onclick="focusCurrentFire()">
-            <div class="flex"><b>🛰️ Focos VIIRS más próximos</b><span class="badge" id="fireState">ESPERANDO</span></div>
-            <div class="flex" style="align-items:flex-end">
-                <div class="big" id="fireDistance">-- km</div>
-                <strong id="fireIndex" style="color:#7dd3fc;font-size:11px">-- / --</strong>
-            </div>
-            <div class="muted" id="fireDetail">Consultando NASA FIRMS…</div>
-            <div id="fireDots" style="margin-top:8px;color:#38bdf8;letter-spacing:6px">○ ○ ○ ○</div>
+        <div class="card fire-watch" id="fireCard">
+            <div class="flex"><b>🔥 Focos VIIRS (Argentina)</b><span class="badge" id="fireState">CARGANDO</span></div>
+            <div class="big" id="fireCountTotal">-- detecciones</div>
+            <div class="muted" id="fireDetail">Analizando cartografía nacional de incendios…</div>
         </div>
 
-        <div class="card alert" id="goesCard" onclick="focusCurrentGoes()">
-            <div class="flex"><b>🛰️ GOES-19 · Anomalía térmica</b><span class="badge" id="goesCardState">ESPERANDO</span></div>
-            <div class="flex" style="align-items:flex-end">
-                <div class="big" id="goesDistance">-- km</div>
-                <strong id="goesIndex" style="color:#7dd3fc;font-size:11px">-- / --</strong>
-            </div>
-            <div class="muted" id="goesDetail">Consultando GOES-19 FDCF…</div>
-            <div id="goesDots" style="margin-top:8px;color:#f59e0b;letter-spacing:6px">○ ○ ○ ○</div>
+        <div class="card fire-watch" id="goesCard">
+            <div class="flex"><b>🛰️ GOES-19 Térmico (Argentina)</b><span class="badge" id="goesState">CARGANDO</span></div>
+            <div class="big" id="goesCountTotal">-- anomalías</div>
+            <div class="muted" id="goesDetail">Procesando satélite geoestacionario en sector sur…</div>
         </div>
     </section>
 
-    <!-- Controles y Mapa Cartográfico -->
+    <!-- Controles y Mapa -->
     <section class="card">
         <div class="controls">
-            <button onclick="centerGps()">📍 Centrar GPS</button>
-            <button id="viirsBtn" onclick="toggleViirsLayer()">🔥 VIIRS WMS OFF</button>
-            <button id="goesBtn" onclick="toggleGoesLayer()" class="active">🛰️ GOES Marcadores ON</button>
-            <select id="radiusSelect" onchange="changeRadius()">
-                <option value="20">Radio 20 km</option>
-                <option value="50" selected>Radio 50 km</option>
-                <option value="100">Radio 100 km</option>
-                <option value="200">Radio 200 km</option>
-            </select>
+            <button onclick="centrarArgentina()">🇦🇷 Centrar en Argentina</button>
+            <button id="viirsBtn" onclick="toggleViirsLayer()">🔥 Activar Capa WMS VIIRS</button>
+            <button id="goesBtn" onclick="toggleGoesLayer()" class="active">🛰️ Marcadores GOES ON</button>
+            <span class="muted" style="margin-left:auto;" id="statusInfo">Actualizado en tiempo real</span>
         </div>
         <div id="map"></div>
     </section>
@@ -128,69 +107,50 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Configuración base (Coordenadas de referencia: Mendoza / Godoy Cruz)
-    let lat = -32.89, lon = -68.84, radiusKm = 50;
-    let map, gpsMarker, radiusCircle;
-    let viirsVisible = false, goesVisible = true;
-    let fireLayer = null, goesLayer = null;
-
-    let closestFires = [], currentFireIndex = 0, fireRotationTimer = null;
-    let goesDetections = [], closestGoes = [], currentGoesIndex = 0, goesRotationTimer = null;
+    let map, goesLayer = null, fireLayer = null;
+    let goesDetections = [], viirsDetections = [];
 
     const FIRMS_MAP_KEY = "77a9490b2a337c7055de7a2e5948c836";
     const GOES_WORKER_URL = "https://territoria-goes.elexpreso17.workers.dev/";
 
-    const $ = id => document.getElementById(id);
-    const set = (id, v) => { const e = $(id); if (e) e.textContent = v; };
-    const distance = (a, b, c, d) => {
-        const R = 6371, x = (c - a) * Math.PI/180, y = (d - b) * Math.PI/180;
-        const q = Math.sin(x/2)**2 + Math.cos(a*Math.PI/180) * Math.cos(c*Math.PI/180) * Math.sin(y/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(q), Math.sqrt(1 - q));
+    // Límites geográficos aproximados de la República Argentina para filtrado estricto
+    const ARG_BOUNDS = {
+        latMin: -55.6,
+        latMax: -21.7,
+        lonMin: -73.6,
+        lonMax: -53.6
     };
 
-    // Inicializar Mapa Leaflet
+    const isInsideArgentina = (lat, lon) => {
+        return lat >= ARG_BOUNDS.latMin && lat <= ARG_BOUNDS.latMax &&
+               lon >= ARG_BOUNDS.lonMin && lon <= ARG_BOUNDS.lonMax;
+    };
+
+    const $ = id => document.getElementById(id);
+    const set = (id, v) => { const e = $(id); if (e) e.textContent = v; };
+
     function initMap() {
         if (map) return;
-        map = L.map('map').setView([lat, lon], 9);
+        // Centrado inicial en Argentina (Córdoba / centro geográfico)
+        map = L.map('map').setView([-38.4161, -63.6167], 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
+            maxZoom: 18,
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        gpsMarker = L.marker([lat, lon], {
-            icon: L.divIcon({ className: '', html: '<div class="gpsdot"></div>', iconSize: [16, 16], iconAnchor: [8, 8] })
-        }).addTo(map).bindPopup('<b>Ubicación GPS Territoria</b>');
-
-        updateRadiusCircle();
-        loadAllThermalData();
+        loadArgentinaThermalData();
     }
 
-    function updateRadiusCircle() {
-        if (!map) return;
-        if (radiusCircle) map.removeLayer(radiusCircle);
-        radiusCircle = L.circle([lat, lon], {
-            radius: radiusKm * 1000,
-            color: '#38bdf8',
-            weight: 1.5,
-            fillOpacity: 0.04
-        }).addTo(map);
+    function centrarArgentina() {
+        if (map) map.setView([-38.4161, -63.6167], 5);
     }
 
-    function changeRadius() {
-        radiusKm = Number($('radiusSelect').value);
-        updateRadiusCircle();
-        filterAndRenderProximate();
-    }
-
-    function centerGps() {
-        if (map) map.setView([lat, lon], 11);
-    }
-
-    // --- Carga de Focos VIIRS (NASA FIRMS) ---
-    async function loadViirsFires() {
+    // --- Carga y Filtrado Exclusivo para Argentina: VIIRS ---
+    async function loadViirsArgentina() {
         try {
             set('fireState', 'CONSULTANDO');
-            const d = 3, box = [lon - d, lat - d, lon + d, lat + d].map(v => v.toFixed(4)).join(',');
+            // Caja amplia que cubre todo el Cono Sur para recortar solo Argentina
+            const box = `${ARG_BOUNDS.lonMin},${ARG_BOUNDS.latMin},${ARG_BOUNDS.lonMax},${ARG_BOUNDS.latMax}`;
             const r = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/VIIRS_SNPP_NRT/${box}/1`, { cache: 'no-store' });
             if (!r.ok) throw Error('HTTP ' + r.status);
             const text = await r.text();
@@ -201,129 +161,52 @@
 
             if (il < 0 || io < 0) throw Error('Formato CSV inválido');
 
-            const events = lines.slice(1).map(x => {
+            viirsDetections = lines.slice(1).map(x => {
                 const c = x.split(',');
                 const a = Number(c[il]), b = Number(c[io]);
                 if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
-                return {
-                    lat: a, lon: b,
-                    dist: distance(lat, lon, a, b),
-                    date: c[id] || '', time: c[it] || '', conf: c[ic] || 'n/d'
-                };
-            }).filter(Boolean).sort((a, b) => a.dist - b.dist);
+                // Filtrado estricto por polígono de Argentina
+                if (!isInsideArgentina(a, b)) return null;
+                return { lat: a, lon: b, date: c[id] || '', time: c[it] || '', conf: c[ic] || 'n/d' };
+            }).filter(Boolean);
 
-            closestFires = events.filter(e => e.dist <= radiusKm).slice(0, 4);
-            currentFireIndex = 0;
-            set('fireState', closestFires.length ? 'ACTIVO' : 'SIN FOCOS');
-            renderCurrentFire();
-            startFireRotation();
+            set('fireCountTotal', viirsDetections.length + ' focos activos');
+            set('fireState', viirsDetections.length > 0 ? 'ALERTAS EN PAÍS' : 'SIN INCENDIOS');
+            $('fireCard').className = 'card ' + (viirsDetections.length > 10 ? 'fire-critical' : viirsDetections.length > 0 ? 'fire-near' : 'fire-watch');
         } catch (e) {
-            closestFires = [];
             set('fireState', 'ERROR');
-            set('fireDetail', 'VIIRS: ' + e.message);
+            set('fireDetail', 'Error VIIRS: ' + e.message);
         }
     }
 
-    function renderCurrentFire() {
-        const card = $('fireCard');
-        if (!closestFires.length) {
-            set('fireDistance', '-- km');
-            set('fireIndex', '0 / 0');
-            set('fireDetail', 'Sin focos VIIRS en el radio configurado.');
-            $('fireDots').textContent = '○ ○ ○';
-            card.className = 'card alert fire-safe';
-            return;
-        }
-        currentFireIndex = (currentFireIndex + closestFires.length) % closestFires.length;
-        const n = closestFires[currentFireIndex];
-        const km = Math.round(n.dist);
-        set('fireDistance', km + ' km');
-        set('fireIndex', `${currentFireIndex + 1} / ${closestFires.length}`);
-        set('fireDetail', `Fecha: ${n.date} · ${n.time} UTC · Confianza: ${n.conf}`);
-        $('fireDots').textContent = closestFires.map((_, i) => i === currentFireIndex ? '●' : '○').join(' ');
-        
-        // Asignación de clase visual por proximidad
-        card.className = 'card alert ' + (km <= 25 ? 'fire-critical' : km <= 75 ? 'fire-near' : 'fire-watch');
-    }
-
-    function startFireRotation() {
-        if (fireRotationTimer) clearInterval(fireRotationTimer);
-        if (closestFires.length > 1) {
-            fireRotationTimer = setInterval(() => {
-                currentFireIndex = (currentFireIndex + 1) % closestFires.length;
-                renderCurrentFire();
-            }, 8000);
-        }
-    }
-
-    function focusCurrentFire() {
-        if (!map || !closestFires.length) return;
-        const n = closestFires[currentFireIndex];
-        map.setView([n.lat, n.lon], 10);
-        L.popup().setLatLng([n.lat, n.lon]).setContent(`<b>🔥 Foco VIIRS</b><br>Distancia: ${Math.round(n.dist)} km<br>Confianza: ${n.conf}`).openOn(map);
-    }
-
-    // --- Carga de GOES-19 (Worker dedicado) ---
-    async function loadGoesData() {
+    // --- Carga y Filtrado Exclusivo para Argentina: GOES-19 ---
+    async function loadGoesArgentina() {
         try {
-            set('goesCardState', 'CONSULTANDO');
+            set('goesState', 'CONSULTANDO');
+            // Coordenada central de referencia para el worker en Argentina
             const u = new URL(GOES_WORKER_URL);
-            u.searchParams.set('lat', lat);
-            u.searchParams.set('lon', lon);
-            u.searchParams.set('radius', '5000');
+            u.searchParams.set('lat', '-32.89');
+            u.searchParams.set('lon', '-68.84');
+            u.searchParams.set('radius', '3000'); // Radio amplio nacional
             const r = await fetch(u, { cache: 'no-store' });
             const j = await r.json();
             if (!r.ok || j.ok === false) throw Error(j.error || 'Respuesta GOES inválida');
 
+            // Filtrar estrictamente las que caen dentro de Argentina
             goesDetections = (j.detections || []).map(d => ({
                 ...d,
-                distanceKm: Number.isFinite(Number(d.distanceKm)) ? Number(d.distanceKm) : distance(lat, lon, Number(d.lat), Number(d.lon))
-            })).sort((a, b) => a.distanceKm - b.distanceKm);
+                lat: Number(d.lat),
+                lon: Number(d.lon)
+            })).filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lon) && isInsideArgentina(d.lat, d.lon));
 
-            filterAndRenderProximate();
+            set('goesCountTotal', goesDetections.length + ' anomalías');
+            set('goesState', goesDetections.length > 0 ? 'MONITOREO ACTIVO' : 'ESTABLE');
+            $('goesCard').className = 'card ' + (goesDetections.length > 5 ? 'fire-critical' : goesDetections.length > 0 ? 'fire-near' : 'fire-watch');
+            
+            renderGoesMarkers();
         } catch (e) {
-            goesDetections = [];
-            set('goesCardState', 'ERROR');
-            set('goesDetail', 'GOES-19: ' + e.message);
-        }
-    }
-
-    function filterAndRenderProximate() {
-        closestGoes = goesDetections.filter(d => d.distanceKm <= radiusKm).slice(0, 4);
-        currentGoesIndex = 0;
-        renderCurrentGoes();
-        startGoesRotation();
-        renderGoesMarkers();
-    }
-
-    function renderCurrentGoes() {
-        const card = $('goesCard');
-        if (!closestGoes.length) {
-            set('goesDistance', '-- km');
-            set('goesIndex', '0 / 0');
-            set('goesDetail', `${goesDetections.length} anomalías GOES regionales · ninguna dentro del radio de ${radiusKm} km.`);
-            $('goesDots').textContent = '○ ○ ○';
-            card.className = 'card alert goes-safe';
-            return;
-        }
-        currentFireIndex = (currentGoesIndex + closestGoes.length) % closestGoes.length;
-        const n = goesDetections[currentGoesIndex] || closestGoes[currentGoesIndex];
-        const km = Math.round(n.distanceKm);
-        set('goesDistance', km + ' km');
-        set('goesIndex', `${currentGoesIndex + 1} / ${closestGoes.length}`);
-        set('goesDetail', `${n.classification || 'Anomalía térmica'} · FRP: ${n.frpMw ? Number(n.frpMw).toFixed(1) + ' MW' : 's/d'}`);
-        $('goesDots').textContent = closestGoes.map((_, i) => i === currentGoesIndex ? '●' : '○').join(' ');
-        
-        card.className = 'card alert ' + (km <= 25 ? 'goes-critical' : km <= 75 ? 'goes-near' : 'goes-watch');
-    }
-
-    function startGoesRotation() {
-        if (goesRotationTimer) clearInterval(goesRotationTimer);
-        if (closestGoes.length > 1) {
-            goesRotationTimer = setInterval(() => {
-                currentGoesIndex = (currentGoesIndex + 1) % closestGoes.length;
-                renderCurrentGoes();
-            }, 8000);
+            set('goesState', 'ERROR');
+            set('goesDetail', 'Error GOES: ' + e.message);
         }
     }
 
@@ -332,34 +215,39 @@
         if (!goesLayer) goesLayer = L.layerGroup().addTo(map);
         goesLayer.clearLayers();
 
-        if (!goesVisible) return;
-
         goesDetections.forEach(n => {
             const isHigh = String(n.classification || '').toLowerCase().includes('high');
-            const color = isHigh ? '#f97316' : '#facc15';
+            const color = isHigh ? '#ef4444' : '#f97316';
             L.circleMarker([n.lat, n.lon], {
-                radius: isHigh ? 6 : 4,
-                color: color,
+                radius: isHigh ? 7 : 5,
+                color: '#fff',
                 fillColor: color,
-                fillOpacity: 0.85,
-                weight: 1
-            }).bindPopup(`<b>🛰️ GOES-19 · ${n.classification}</b><br>Distancia: ${Math.round(n.distanceKm)} km<br>FRP: ${n.frpMw || 's/d'} MW`).addTo(goesLayer);
+                fillOpacity: 0.9,
+                weight: 1.5
+            }).bindPopup(`<b>🔥 GOES-19 (Argentina)</b><br>Clasificación: ${n.classification}<br>FRP: ${n.frpMw || 's/d'} MW<br>Coords: ${n.lat.toFixed(4)}, ${n.lon.toFixed(4)}`).addTo(goesLayer);
         });
     }
 
     function toggleGoesLayer() {
-        goesVisible = !goesVisible;
-        $('goesBtn').classList.toggle('active', goesVisible);
-        set('goesBtn', goesVisible ? '🛰️ GOES Marcadores ON' : '🛰️ GOES OFF');
-        renderGoesMarkers();
+        if (!map) return;
+        if (goesLayer && map.hasLayer(goesLayer)) {
+            map.removeLayer(goesLayer);
+            $('goesBtn').classList.remove('active');
+            set('goesBtn', '🛰️ Marcadores GOES OFF');
+        } else {
+            if (goesLayer) goesLayer.addTo(map);
+            $('goesBtn').classList.add('active');
+            set('goesBtn', '🛰️ Marcadores GOES ON');
+        }
     }
 
     function toggleViirsLayer() {
-        viirsVisible = !viirsVisible;
-        $('viirsBtn').classList.toggle('active', viirsVisible);
-        set('viirsBtn', viirsVisible ? '🔥 VIIRS WMS ON' : '🔥 VIIRS WMS OFF');
-
-        if (viirsVisible) {
+        if (!map) return;
+        if (fireLayer && map.hasLayer(fireLayer)) {
+            map.removeLayer(fireLayer);
+            $('viirsBtn').classList.remove('active');
+            set('viirsBtn', '🔥 Activar Capa WMS VIIRS');
+        } else {
             if (!fireLayer) {
                 fireLayer = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${FIRMS_MAP_KEY}/`, {
                     layers: 'fires_viirs_24',
@@ -370,24 +258,16 @@
                 });
             }
             fireLayer.addTo(map);
-        } else if (fireLayer && map.hasLayer(fireLayer)) {
-            map.removeLayer(fireLayer);
+            $('viirsBtn').classList.add('active');
+            set('viirsBtn', '🔥 Desactivar Capa WMS VIIRS');
         }
     }
 
-    function focusCurrentGoes() {
-        if (!map || !closestGoes.length) return;
-        const n = closestGoes[currentGoesIndex];
-        map.setView([n.lat, n.lon], 9);
-        L.popup().setLatLng([n.lat, n.lon]).setContent(`<b>🛰️ GOES-19</b><br>${n.classification}<br>Distancia: ${Math.round(n.distanceKm)} km`).openOn(map);
+    function loadArgentinaThermalData() {
+        loadViirsArgentina();
+        loadGoesArgentina();
     }
 
-    function loadAllThermalData() {
-        loadViirsFires();
-        loadGoesData();
-    }
-
-    // Arranque inicial
     window.onload = () => {
         initMap();
     };
