@@ -1,433 +1,59 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Territoria · Dashboard Operativo de Bomberos</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        :root {
-            --bg: #07111f;
-            --p: #101d31;
-            --i: #17263d;
-            --b: #293b55;
-            --t: #e7edf6;
-            --m: #9baac0;
-            --a: #38bdf8;
-            --g: #22c55e;
-            --y: #facc15;
-            --o: #f97316;
-            --r: #ef4444;
-        }
-        body {
-            margin: 0;
-            padding: 12px;
-            background: var(--bg);
-            color: var(--t);
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 13px;
-        }
-        .app { max-width: 1450px; margin: auto; }
-        .card {
-            margin-bottom: 10px;
-            padding: 14px;
-            border: 1px solid var(--b);
-            border-radius: 12px;
-            background: var(--p);
-        }
-        h1, h3 { margin-top: 0; color: #40c6ef; }
-        .flex { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .badge {
-            padding: 4px 8px;
-            border-radius: 20px;
-            background: #064e3b;
-            color: #86efac;
-            font-size: 10px;
-            font-weight: 800;
-        }
-        .badge.crit { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        .muted { color: var(--m); font-size: 11px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .grid-dashboard { display: grid; grid-template-columns: 360px 1fr; gap: 10px; }
-        .big { font-size: 22px; font-weight: 800; }
-        
-        /* Banner de Alerta Crítica Superior */
-        #alertBanner {
-            background: linear-gradient(135deg, #7f1d1d, #450a0a);
-            border: 1px solid #ef4444;
-            display: none;
-            margin-bottom: 10px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-        button, select {
-            padding: 8px 12px;
-            border: 1px solid #3b82f6;
-            border-radius: 8px;
-            background: #172554;
-            color: #fff;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-        }
-        button.active { border-color: #22c55e !important; background: #14532d !important; }
-        
-        /* Listado lateral de focos activos */
-        #firesList { max-height: 520px; overflow-y: auto; padding-right: 4px; }
-        .fire-item {
-            padding: 10px;
-            margin-bottom: 8px;
-            border: 1px solid var(--b);
-            border-radius: 8px;
-            background: var(--i);
-            cursor: pointer;
-            transition: all .2s;
-        }
-        .fire-item:hover { border-color: #38bdf8; background: #1e293b; }
-        .fire-item.critical { border-color: #ef4444; background: #2a1215; }
-
-        #map { width: 100%; height: 570px; border: 1px solid var(--b); border-radius: 10px; background: #0f172a; }
-        .btn-radio { background: #b91c1c; border-color: #f87171; font-size: 11px; padding: 4px 8px; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Territoria · Monitoreo satelital Argentina</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#07111f;--p:#101d31;--i:#17263d;--b:#293b55;--t:#e7edf6;--m:#9baac0;--a:#38bdf8;--g:#22c55e;--y:#facc15;--o:#f97316;--r:#ef4444}*{box-sizing:border-box}body{margin:0;padding:12px;background:var(--bg);color:var(--t);font-family:Segoe UI,Arial,sans-serif;font-size:13px}.app{max-width:1450px;margin:auto}.card{margin-bottom:10px;padding:14px;border:1px solid var(--b);border-radius:12px;background:var(--p)}h1,h2,h3{margin-top:0;color:#40c6ef}.flex{display:flex;align-items:center;justify-content:space-between;gap:10px}.badge{padding:4px 8px;border-radius:20px;background:#064e3b;color:#86efac;font-size:10px;font-weight:800}.badge.crit{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444;animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.5}}.muted{color:var(--m);font-size:11px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid-dashboard{display:grid;grid-template-columns:360px 1fr;gap:10px}.big{font-size:22px;font-weight:800}.controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}button,select,input{padding:8px 12px;border:1px solid #3b82f6;border-radius:8px;background:#172554;color:#fff;font-weight:600;font-size:12px}button{cursor:pointer}button.active{border-color:#22c55e!important;background:#14532d!important}#alertBanner{background:linear-gradient(135deg,#7f1d1d,#450a0a);border:1px solid #ef4444;display:none;margin-bottom:10px;padding:12px 16px;border-radius:12px;align-items:center;justify-content:space-between}#firesList{max-height:520px;overflow:auto;padding-right:4px}.fire-item{padding:10px;margin-bottom:8px;border:1px solid var(--b);border-radius:8px;background:var(--i);cursor:pointer}.fire-item:hover{border-color:#38bdf8;background:#1e293b}.fire-item.critical{border-color:#ef4444;background:#2a1215}#map{width:100%;height:570px;border:1px solid var(--b);border-radius:10px;background:#0f172a}.btn-radio{background:#b91c1c;border-color:#f87171;font-size:11px;padding:4px 8px}.source-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.goes-dot{background:#f97316}.viirs-dot{background:#ef4444}@media(max-width:900px){.grid-dashboard,.grid-3{grid-template-columns:1fr}#map{height:440px}}
+</style>
 </head>
 <body>
 <main class="app">
-    <header class="card" style="padding: 10px 14px;">
-        <div class="flex">
-            <div>
-                <h2 style="margin:0; color:#38bdf8;">🚨 TERRITORIA · Centro de Operaciones de Emergencia (COE Bomberos)</h2>
-                <div class="muted">Monitoreo en tiempo real de anomalías térmicas e incendios forestales en Argentina</div>
-            </div>
-            <div>
-                <span class="badge" id="sysStatus">SISTEMA ACTIVO</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- Banner de Alerta Crítica en Tiempo Real -->
-    <div id="alertBanner">
-        <div>
-            <strong style="color:#fca5a5; font-size:14px;">⚠️ ALERTA DE INCENDIO CRÍTICO DETECTADO</strong>
-            <div id="alertBannerText" class="muted" style="color:#fecaca;">Analizando vectores de riesgo...</div>
-        </div>
-        <button class="btn-radio" onclick="focoCriticoZoom()">UBICAR EN MAPA</button>
-    </div>
-
-    <!-- Indicadores Generales -->
-    <section class="grid-3">
-        <div class="card" style="margin-bottom:0;">
-            <div class="flex"><b>🔥 Focos VIIRS (Nacional)</b><span class="badge" id="badgeViirs">--</span></div>
-            <div class="big" id="valViirs">0 detectados</div>
-            <div class="muted">Satélite SNPP / NOAA-20</div>
-        </div>
-        <div class="card" style="margin-bottom:0;">
-            <div class="flex"><b>🛰️ GOES-19 Térmico</b><span class="badge" id="badgeGoes">--</span></div>
-            <div class="big" id="valGoes">0 anomalías</div>
-            <div class="muted">Geoestacionario (Alta frecuencia)</div>
-        </div>
-        <div class="card" style="margin-bottom:0;">
-            <div class="flex"><b>⚡ Nivel de Riesgo País</b><span class="badge crit" id="badgeRiesgo">ELEVADO</span></div>
-            <div class="big" id="valRiesgo">Temporada Activa</div>
-            <div class="muted">Filtro exclusivo: Argentina</div>
-        </div>
-    </section>
-
-    <!-- Panel Principal Dividido: Lista Lateral + Mapa -->
-    <section class="grid-dashboard" style="margin-top: 10px;">
-        <!-- Columna Izquierda: Listado Operativo y Filtros -->
-        <div class="card" style="margin-bottom:0;">
-            <div class="flex" style="margin-bottom: 8px;">
-                <b>📋 Central de Alertas</b>
-                <select id="provinciaFilter" onchange="filtrarPorProvincia()">
-                    <option value="TODAS">Todas las Provincias</option>
-                    <option value="Mendoza">Mendoza / San Juan</option>
-                    <option value="Cordoba">Córdoba / San Luis</option>
-                    <option value="Buenos Aires">Buenos Aires / CABA</option>
-                    <option value="Litoral">Formosa / Chaco / Misiones</option>
-                    <option value="Patagonia">Neuquén / Río Negro / Chubut</option>
-                </select>
-            </div>
-            <div class="controls">
-                <button onclick="recargarDatos()">🔄 Actualizar</button>
-                <button id="toggleListBtn" class="active" onclick="toggleVistaLista()">Ver Todos</button>
-            </div>
-            <div id="firesList">
-                <div class="muted" style="text-align:center; padding:20px;">Cargando registros satelitales...</div>
-            </div>
-        </div>
-
-        <!-- Columna Derecha: Mapa Cartográfico -->
-        <div class="card" style="margin-bottom:0;">
-            <div class="controls">
-                <button onclick="centrarArgentina()">🇦🇷 Vista Nacional</button>
-                <button id="viirsBtn" onclick="toggleViirsLayer()">🔥 Capa WMS VIIRS ON</button>
-                <button id="goesBtn" onclick="toggleGoesLayer()" class="active">🛰️ GOES Marcadores ON</button>
-                <span class="muted" style="margin-left:auto;" id="ultimaActualizacion">Actualizando...</span>
-            </div>
-            <div id="map"></div>
-        </div>
-    </section>
+<header class="card" style="padding:10px 14px"><div class="flex"><div><h2 style="margin:0">🚨 TERRITORIA · Monitoreo satelital Argentina</h2><div class="muted">VIIRS + GOES-19 sobre territorio argentino, con vigilancia por distancia al GPS</div></div><span class="badge" id="sysStatus">SISTEMA ACTIVO</span></div></header>
+<div id="alertBanner"><div><strong style="color:#fca5a5;font-size:14px">⚠️ ANOMALÍA TÉRMICA CERCANA</strong><div id="alertBannerText" class="muted" style="color:#fecaca">Analizando…</div></div><button class="btn-radio" onclick="focoCriticoZoom()">UBICAR</button></div>
+<section class="grid-3">
+<div class="card"><div class="flex"><b>🔥 VIIRS Argentina</b><span class="badge" id="badgeViirs">--</span></div><div class="big" id="valViirs">0 detectados</div><div class="muted">NASA FIRMS · últimas 24 h</div></div>
+<div class="card"><div class="flex"><b>🛰️ GOES-19 Argentina</b><span class="badge" id="badgeGoes">--</span></div><div class="big" id="valGoes">0 anomalías</div><div class="muted">FDCF · observación más reciente</div></div>
+<div class="card"><div class="flex"><b>📍 Vigilancia cercana</b><span class="badge" id="badgeCerca">--</span></div><div class="big" id="valCerca">0 dentro del radio</div><div class="muted" id="gpsInfo">Esperando GPS…</div></div>
+</section>
+<section class="grid-dashboard">
+<div class="card"><div class="flex" style="margin-bottom:8px"><b>📋 Central de anomalías</b><select id="sourceFilter" onchange="renderDashboard()"><option value="TODAS">Todas</option><option value="GOES-19">GOES-19</option><option value="VIIRS">VIIRS</option></select></div><div class="controls"><button onclick="recargarDatos()">🔄 Actualizar</button><select id="radius" onchange="renderDashboard()"><option value="20">20 km</option><option value="50" selected>50 km</option><option value="100">100 km</option><option value="200">200 km</option></select><input id="search" placeholder="Buscar zona, fuente o clase" oninput="renderDashboard()"></div><div id="firesList"><div class="muted" style="text-align:center;padding:20px">Cargando…</div></div></div>
+<div class="card"><div class="controls"><button onclick="centrarArgentina()">🇦🇷 Vista nacional</button><button id="gpsBtn" onclick="centrarGPS()">📍 Mi GPS</button><button id="viirsBtn" class="active" onclick="toggleViirsLayer()">🔥 VIIRS ON</button><button id="goesBtn" class="active" onclick="toggleGoesLayer()">🛰️ GOES ON</button><span class="muted" style="margin-left:auto" id="ultimaActualizacion">Actualizando…</span></div><div id="map"></div></div>
+</section>
 </main>
-
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    let map, goesLayer = null, fireLayer = null;
-    let allDetections = [];
-    let focoCriticoActual = null;
-
-    const FIRMS_MAP_KEY = "77a9490b2a337c7055de7a2e5948c836";
-    const GOES_WORKER_URL = "https://territoria-goes.elexpreso17.workers.dev/";
-
-    const ARG_BOUNDS = { latMin: -55.6, latMax: -21.7, lonMin: -73.6, lonMax: -53.6 };
-    const isInsideArgentina = (lat, lon) => lat >= ARG_BOUNDS.latMin && lat <= ARG_BOUNDS.latMax && lon >= ARG_BOUNDS.lonMin && lon <= ARG_BOUNDS.lonMax;
-
-    function clasificarProvincia(lat, lon) {
-        if (lat >= -29 && lat <= -22 && lon >= -66 && lon <= -57) return "Litoral / Norte";
-        if (lat >= -34 && lat <= -29 && lon >= -70 && lon <= -64) return "Mendoza";
-        if (lat >= -37 && lat <= -30 && lon >= -66 && lon <= -60) return "Cordoba";
-        if (lat >= -33 && lat <= -27 && lon >= -60 && lon <= -53) return "Litoral";
-        if (lat >= -41 && lat <= -33 && lon >= -63 && lon <= -56) return "Buenos Aires";
-        if (lat <= -41) return "Patagonia";
-        return "Argentina Central";
-    }
-
-    const $ = id => document.getElementById(id);
-
-    function initMap() {
-        if (map) return;
-        map = L.map('map').setView([-38.4161, -63.6167], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        recargarDatos();
-    }
-
-    function centrarArgentina() {
-        if (map) map.setView([-38.4161, -63.6167], 5);
-    }
-
-    async function recargarDatos() {
-        $('firesList').innerHTML = '<div class="muted" style="text-align:center; padding:20px;">Consultando servidores satelitales NASA y GOES...</div>';
-        await Promise.all([loadViirsArgentina(), loadGoesArgentina()]);
-        procesarDashboardGeneral();
-    }
-
-    async function loadViirsArgentina() {
-        try {
-            const box = `${ARG_BOUNDS.lonMin},${ARG_BOUNDS.latMin},${ARG_BOUNDS.lonMax},${ARG_BOUNDS.latMax}`;
-            const r = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/VIIRS_SNPP_NRT/${box}/1`, { cache: 'no-store' });
-            if (!r.ok) return;
-            const text = await r.text();
-            const lines = text.trim().split(/\r?\n/);
-            const headers = lines[0]?.split(',') || [];
-            const il = headers.indexOf('latitude'), io = headers.indexOf('longitude');
-            const id = headers.indexOf('acq_date'), it = headers.indexOf('acq_time'), ic = headers.indexOf('confidence');
-
-            const viirs = lines.slice(1).map(x => {
-                const c = x.split(',');
-                const a = Number(c[il]), b = Number(c[io]);
-                if (!Number.isFinite(a) || !Number.isFinite(b) || !isInsideArgentina(a, b)) return null;
-                return {
-                    id: 'v_' + Math.random().toString(36).substr(2, 5),
-                    source: 'VIIRS',
-                    lat: a, lon: b,
-                    provincia: clasificarProvincia(a, b),
-                    fecha: c[id] + ' ' + c[it] + ' UTC',
-                    detalle: 'Confianza: ' + (c[ic] || 'n/d'),
-                    criticidad: 'MEDIA',
-                    tempC: 'No reg.'
-                };
-            }).filter(Boolean);
-
-            allDetections = [...allDetections.filter(d => d.source !== 'VIIRS'), ...viirs];
-            $('valViirs').textContent = viirs.length + ' detectados';
-            $('badgeViirs').textContent = viirs.length > 0 ? 'ACTIVO' : 'ESTABLE';
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    async function loadGoesArgentina() {
-        try {
-            const u = new URL(GOES_WORKER_URL);
-            u.searchParams.set('lat', '-32.89');
-            u.searchParams.set('lon', '-68.84');
-            u.searchParams.set('radius', '3000');
-            const r = await fetch(u, { cache: 'no-store' });
-            const j = await r.json();
-            if (!r.ok || j.ok === false) return;
-
-            const goes = (j.detections || []).map(d => {
-                const lat = Number(d.lat), lon = Number(d.lon);
-                if (!isInsideArgentina(lat, lon)) return null;
-                const tempC = d.temperatureK ? (Number(d.temperatureK) - 273.15).toFixed(1) + ' °C' : 's/d';
-                const isHigh = String(d.classification || '').toLowerCase().includes('high');
-                return {
-                    id: 'g_' + Math.random().toString(36).substr(2, 5),
-                    source: 'GOES-19',
-                    lat: lat, lon: lon,
-                    provincia: clasificarProvincia(lat, lon),
-                    fecha: 'Tiempo real GEO',
-                    detalle: `${d.classification || 'Anomalía'} · FRP: ${d.frpMw ? Number(d.frpMw).toFixed(1) + ' MW' : 's/d'}`,
-                    criticidad: isHigh ? 'CRITICA' : 'MODERADA',
-                    tempC: tempC
-                };
-            }).filter(Boolean);
-
-            allDetections = [...allDetections.filter(d => d.source !== 'GOES-19'), ...goes];
-            $('valGoes').textContent = goes.length + ' anomalías';
-            $('badgeGoes').textContent = goes.length > 0 ? 'ACTIVO' : 'ESTABLE';
-            renderGoesMarkers();
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    function procesarDashboardGeneral() {
-        renderizarLista(allDetections);
-        $('ultimaActualizacion').textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
-
-        // Detectar si hay algún foco crítico para activar el Banner de Emergencia superior
-        const critico = allDetections.find(d => d.criticidad === 'CRITICA');
-        if (critico) {
-            focoCriticoActual = critico;
-            $('alertBanner').style.display = 'flex';
-            $('alertBannerText').textContent = `Ubicación: ${critico.provincia} | Temp: ${critico.tempC} | Detalle: ${critico.detalle}`;
-        } else {
-            $('alertBanner').style.display = 'none';
-        }
-    }
-
-    function renderizarLista(items) {
-        const contenedor = $('firesList');
-        if (!items.length) {
-            contenedor.innerHTML = '<div class="muted" style="text-align:center; padding:20px;">Sin alertas registradas en este filtro.</div>';
-            return;
-        }
-
-        contenedor.innerHTML = items.map(d => `
-            <div class="fire-item ${d.criticidad === 'CRITICA' ? 'critical' : ''}" onclick="enfocarFoco(${d.lat}, ${d.lon}, '${d.source}')">
-                <div class="flex">
-                    <b>${d.source} · ${d.provincia}</b>
-                    <span class="badge" style="background:${d.criticidad === 'CRITICA' ? '#7f1d1d' : '#1e3a8a'}">${d.criticidad}</span>
-                </div>
-                <div class="muted" style="margin-top:4px;">${d.detalle}</div>
-                <div class="flex" style="margin-top:6px;">
-                    <span style="font-size:11px; color:#38bdf8;">Temp: <b>${d.tempC}</b></span>
-                    <button class="btn-radio" onclick="event.stopPropagation(); copiarParte(${d.lat}, ${d.lon}, '${d.provincia}', '${d.tempC}')">📋 Copiar Parte</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function filtrarPorProvincia() {
-        const prov = $('provinciaFilter').value;
-        if (prov === 'TODAS') {
-            renderizarLista(allDetections);
-        } else {
-            const filtrados = allDetections.filter(d => d.provincia === prov);
-            renderizarLista(filtrados);
-        }
-    }
-
-    function renderGoesMarkers() {
-        if (!map) return;
-        if (!goesLayer) goesLayer = L.layerGroup().addTo(map);
-        goesLayer.clearLayers();
-
-        allDetections.filter(d => d.source === 'GOES-19' || d.source === 'VIIRS').forEach(n => {
-            const isCrit = n.criticidad === 'CRITICA';
-            const color = isCrit ? '#ef4444' : '#f97316';
-            
-            const marker = L.circleMarker([n.lat, n.lon], {
-                radius: isCrit ? 8 : 5,
-                color: '#fff',
-                fillColor: color,
-                fillOpacity: 0.9,
-                weight: 1.5
-            });
-
-            marker.bindPopup(`
-                <div style="color:#111827; min-width: 180px;">
-                    <b>🇦🇷 ${n.provincia} (${n.source})</b><br>
-                    <b>Estado:</b> ${n.detalle}<br>
-                    <b>Temperatura:</b> <span style="color:#dc2626; font-weight:bold;">${n.tempC}</span><br>
-                    <span style="font-size:10px; color:#4b5563;">Lat/Lon: ${n.lat.toFixed(4)}, ${n.lon.toFixed(4)}</span><br>
-                    <button style="margin-top:6px; background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="copiarParte(${n.lat}, ${n.lon}, '${n.provincia}', '${n.tempC}')">Copiar Coordenadas</button>
-                </div>
-            `);
-            marker.addTo(goesLayer);
-        });
-    }
-
-    function enfocarFoco(lat, lon, fuente) {
-        if (map) {
-            map.setView([lat, lon], 10);
-            L.popup().setLatLng([lat, lon]).setContent(`<b>Foco Seleccionado (${fuente})</b><br>Lat/Lon: ${lat.toFixed(4)}, ${lon.toFixed(4)}`).openOn(map);
-        }
-    }
-
-    function focoCriticoZoom() {
-        if (focoCriticoActual && map) {
-            enfocarFoco(focoCriticoActual.lat, focoCriticoActual.lon, focoCriticoActual.source);
-        }
-    }
-
-    function copiarParte(lat, lon, prov, temp) {
-        const texto = `🚨 [PARTE BOMBEROS TERRITORIA] Alerta Térmica en ${prov}. Coordenadas: ${lat.toFixed(4)}, ${lon.toFixed(4)}. Temperatura estimada: ${temp}. Google Maps: https://maps.google.com/?q=${lat},${lon}`;
-        navigator.clipboard.writeText(texto).then(() => {
-            alert('¡Parte copiado al portapapeles listo para enviar por WhatsApp o Radio!');
-        });
-    }
-
-    function toggleGoesLayer() {
-        if (!map) return;
-        if (goesLayer && map.hasLayer(goesLayer)) {
-            map.removeLayer(goesLayer);
-            $('goesBtn').classList.remove('active');
-            $('goesBtn').textContent = '🛰️ GOES OFF';
-        } else {
-            if (goesLayer) goesLayer.addTo(map);
-            $('goesBtn').classList.add('active');
-            $('goesBtn').textContent = '🛰️ GOES Marcadores ON';
-        }
-    }
-
-    function toggleViirsLayer() {
-        if (!map) return;
-        if (fireLayer && map.hasLayer(fireLayer)) {
-            map.removeLayer(fireLayer);
-            $('viirsBtn').classList.remove('active');
-            $('viirsBtn').textContent = '🔥 Capa WMS VIIRS OFF';
-        } else {
-            if (!fireLayer) {
-                fireLayer = L.tileLayer.wms(`https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${FIRMS_MAP_KEY}/`, {
-                    layers: 'fires_viirs_24',
-                    format: 'image/png',
-                    transparent: true,
-                    version: '1.1.1',
-                    opacity: 0.8
-                });
-            }
-            fireLayer.addTo(map);
-            $('viirsBtn').classList.add('active');
-            $('viirsBtn').textContent = '🔥 Capa WMS VIIRS ON';
-        }
-    }
-
-    window.onload = () => {
-        initMap();
-    };
+let map,goesLayer,viirsLayer,gpsMarker,radiusCircle,highlightLayer;
+let allDetections=[],focoCriticoActual=null,userLat=-34.6037,userLon=-58.3816;
+let argentinaGeometry=null;
+const FIRMS_MAP_KEY='77a9490b2a337c7055de7a2e5948c836';
+const GOES_WORKER_URL='https://territoria-goes.elexpreso17.workers.dev/';
+const COUNTRIES_URL='https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
+const ARG_BOUNDS={latMin:-55.2,latMax:-21.7,lonMin:-73.7,lonMax:-53.5};
+const $=id=>document.getElementById(id);
+function pointInRing(lon,lat,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if(((a[1]>lat)!=(b[1]>lat))&&(lon<(b[0]-a[0])*(lat-a[1])/((b[1]-a[1])||1e-12)+a[0]))inside=!inside}return inside}
+function pointInGeometry(lon,lat,g){if(!g)return false;if(g.type==='Polygon')return pointInRing(lon,lat,g.coordinates[0]);if(g.type==='MultiPolygon')return g.coordinates.some(p=>pointInRing(lon,lat,p[0]));return false}
+function isInsideArgentina(lat,lon){return argentinaGeometry?pointInGeometry(lon,lat,argentinaGeometry):(lat>=ARG_BOUNDS.latMin&&lat<=ARG_BOUNDS.latMax&&lon>=ARG_BOUNDS.lonMin&&lon<=ARG_BOUNDS.lonMax)}
+async function loadArgentinaBoundary(){try{const r=await fetch(COUNTRIES_URL,{cache:'force-cache'}),j=await r.json();const f=j.features.find(x=>['Argentina','ARG'].includes(x.properties.ADMIN)||x.properties.ISO_A3==='ARG');if(f)argentinaGeometry=f.geometry}catch(e){console.warn('Límite argentino no disponible; usando recuadro de respaldo')}}
+function distanceKm(a,b,c,d){const R=6371,p1=a*Math.PI/180,p2=c*Math.PI/180,dp=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,q=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))}
+function zonaArgentina(lat,lon){if(lat<-41)return'Patagonia';if(lon<-67&&lat>-37)return'Cuyo';if(lat>-30)return'Norte argentino';if(lon>-62&&lat<-33)return'Buenos Aires / Litoral';return'Centro argentino'}
+function initMap(){map=L.map('map').setView([-38.4161,-63.6167],5);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);goesLayer=L.layerGroup().addTo(map);viirsLayer=L.layerGroup().addTo(map);highlightLayer=L.layerGroup().addTo(map);getGPS();recargarDatos()}
+function getGPS(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(p=>{userLat=p.coords.latitude;userLon=p.coords.longitude;$('gpsInfo').textContent=`GPS ${userLat.toFixed(4)}, ${userLon.toFixed(4)} · ±${Math.round(p.coords.accuracy)} m`;drawGPS();renderDashboard()},()=>{$('gpsInfo').textContent='GPS no disponible · referencia CABA'}, {enableHighAccuracy:true,timeout:12000,maximumAge:60000})}
+function drawGPS(){if(gpsMarker)map.removeLayer(gpsMarker);gpsMarker=L.circleMarker([userLat,userLon],{radius:8,color:'#fff',weight:3,fillColor:'#38bdf8',fillOpacity:1}).addTo(map).bindPopup('📍 Ubicación GPS');drawRadius()}
+function drawRadius(){if(radiusCircle)map.removeLayer(radiusCircle);const r=Number($('radius').value||50);radiusCircle=L.circle([userLat,userLon],{radius:r*1000,color:'#38bdf8',weight:2,fillOpacity:.04}).addTo(map)}
+function centrarArgentina(){map.setView([-38.4161,-63.6167],5)}function centrarGPS(){map.setView([userLat,userLon],9);drawRadius()}
+async function recargarDatos(){$('firesList').innerHTML='<div class="muted" style="text-align:center;padding:20px">Consultando NASA FIRMS y GOES-19…</div>';allDetections=[];await Promise.all([loadViirsArgentina(),loadGoesArgentina()]);renderMarkers();renderDashboard();$('ultimaActualizacion').textContent='Actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}
+async function loadViirsArgentina(){try{const box=`${ARG_BOUNDS.lonMin},${ARG_BOUNDS.latMin},${ARG_BOUNDS.lonMax},${ARG_BOUNDS.latMax}`,url=`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/VIIRS_SNPP_NRT/${box}/1`,r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('FIRMS HTTP '+r.status);const text=await r.text(),lines=text.trim().split(/\r?\n/),h=lines[0]?.split(',')||[],il=h.indexOf('latitude'),io=h.indexOf('longitude'),id=h.indexOf('acq_date'),it=h.indexOf('acq_time'),ic=h.indexOf('confidence');const rows=lines.slice(1).map(x=>{const c=x.split(','),lat=Number(c[il]),lon=Number(c[io]);if(!Number.isFinite(lat)||!Number.isFinite(lon)||!isInsideArgentina(lat,lon))return null;return{id:'v_'+lat+'_'+lon,source:'VIIRS',lat,lon,zona:zonaArgentina(lat,lon),fecha:(c[id]||'')+' '+(c[it]||'')+' UTC',detalle:'Confianza '+(c[ic]||'n/d'),classification:'viirs',frpMw:null,temperatureK:null}}).filter(Boolean);allDetections.push(...rows);$('valViirs').textContent=rows.length+' detectados';$('badgeViirs').textContent=rows.length?'ACTIVO':'ESTABLE'}catch(e){$('badgeViirs').textContent='ERROR';console.error(e)}}
+async function loadGoesArgentina(){try{const u=new URL(GOES_WORKER_URL);u.searchParams.set('lat',userLat);u.searchParams.set('lon',userLon);u.searchParams.set('radius','5000');const r=await fetch(u,{cache:'no-store'}),j=await r.json();if(!r.ok||j.ok===false)throw Error(j.error||'GOES HTTP '+r.status);const rows=(j.detections||[]).map(d=>{const lat=Number(d.lat),lon=Number(d.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon)||!isInsideArgentina(lat,lon))return null;return{id:d.id,source:'GOES-19',lat,lon,zona:zonaArgentina(lat,lon),fecha:'Observación GOES reciente',detalle:`${d.classification||'anomalía'} · FRP ${d.frpMw==null?'s/d':Number(d.frpMw).toFixed(1)+' MW'}`,classification:d.classification||'anomalía',frpMw:d.frpMw,temperatureK:d.temperatureK}}).filter(Boolean);allDetections.push(...rows);$('valGoes').textContent=rows.length+' anomalías';$('badgeGoes').textContent=rows.length?'ACTIVO':'ESTABLE'}catch(e){$('badgeGoes').textContent='ERROR';console.error(e)}}
+function classify(d){const c=String(d.classification||'').toLowerCase();if(d.source==='VIIRS')return{color:'#ef4444',label:'VIIRS'};if(c.includes('processed')||c.includes('saturated'))return{color:'#ef4444',label:'ALTA'};if(c.includes('high'))return{color:'#f97316',label:'ALTA'};if(c.includes('medium'))return{color:'#facc15',label:'MEDIA'};return{color:'#94a3b8',label:'BAJA'}}
+function renderMarkers(){goesLayer.clearLayers();viirsLayer.clearLayers();allDetections.forEach(d=>{d.distanceKm=distanceKm(userLat,userLon,d.lat,d.lon);const c=classify(d),m=L.circleMarker([d.lat,d.lon],{radius:d.source==='VIIRS'?6:5,color:'#fff',weight:1.5,fillColor:c.color,fillOpacity:.9}).bindPopup(`<div style="color:#111827"><b>🇦🇷 ${d.zona} · ${d.source}</b><br>${d.detalle}<br>${Math.round(d.distanceKm)} km del GPS<br>${d.lat.toFixed(5)}, ${d.lon.toFixed(5)}</div>`);m.addTo(d.source==='VIIRS'?viirsLayer:goesLayer)})}
+function renderDashboard(){drawRadius();const radius=Number($('radius').value||50),source=$('sourceFilter').value,q=$('search').value.trim().toLowerCase();allDetections.forEach(d=>d.distanceKm=distanceKm(userLat,userLon,d.lat,d.lon));let rows=allDetections.filter(d=>(source==='TODAS'||d.source===source)&&(!q||[d.source,d.zona,d.classification,d.detalle].join(' ').toLowerCase().includes(q))).sort((a,b)=>a.distanceKm-b.distanceKm);const near=allDetections.filter(d=>d.distanceKm<=radius).sort((a,b)=>a.distanceKm-b.distanceKm);$('valCerca').textContent=near.length+' dentro de '+radius+' km';$('badgeCerca').textContent=near.length?'ATENCIÓN':'SIN CERCANAS';$('badgeCerca').className='badge'+(near.length?' crit':'');focoCriticoActual=near[0]||null;if(focoCriticoActual){$('alertBanner').style.display='flex';$('alertBannerText').textContent=`${focoCriticoActual.source} · ${Math.round(focoCriticoActual.distanceKm)} km · ${focoCriticoActual.zona} · ${focoCriticoActual.detalle}`}else $('alertBanner').style.display='none';$('firesList').innerHTML=rows.length?rows.map(d=>{const c=classify(d),temp=d.temperatureK==null?'s/d':(Number(d.temperatureK)-273.15).toFixed(1)+' °C';return `<div class="fire-item ${d.distanceKm<=25?'critical':''}" onclick="enfocarFoco('${d.id}')"><div class="flex"><b><span class="source-dot ${d.source==='VIIRS'?'viirs-dot':'goes-dot'}"></span>${d.source} · ${d.zona}</b><span class="badge" style="background:${c.color}33;color:${c.color}">${c.label}</span></div><div class="muted" style="margin-top:4px">${d.detalle}</div><div class="flex" style="margin-top:6px"><span>${Math.round(d.distanceKm)} km del GPS · Temp. ${temp}</span><button class="btn-radio" onclick="event.stopPropagation();enfocarFoco('${d.id}')">Ver mapa</button></div></div>`}).join(''):'<div class="muted" style="text-align:center;padding:20px">Sin anomalías para este filtro.</div>'}
+function enfocarFoco(id){const d=allDetections.find(x=>x.id===id);if(!d)return;highlightLayer.clearLayers();const c=classify(d);L.circle([d.lat,d.lon],{radius:12000,color:c.color,weight:3,fillColor:c.color,fillOpacity:.12,dashArray:'8,6'}).addTo(highlightLayer);L.circleMarker([d.lat,d.lon],{radius:13,color:'#fff',weight:4,fillColor:c.color,fillOpacity:1}).addTo(highlightLayer).bindPopup(`<div style="color:#111827"><b>${d.source} · ${d.zona}</b><br>${d.detalle}<br>${Math.round(d.distanceKm)} km del GPS<br>${d.lat.toFixed(5)}, ${d.lon.toFixed(5)}</div>`).openPopup();map.setView([d.lat,d.lon],10)}
+function focoCriticoZoom(){if(focoCriticoActual)enfocarFoco(focoCriticoActual.id)}function toggleGoesLayer(){if(map.hasLayer(goesLayer)){map.removeLayer(goesLayer);$('goesBtn').classList.remove('active');$('goesBtn').textContent='🛰️ GOES OFF'}else{goesLayer.addTo(map);$('goesBtn').classList.add('active');$('goesBtn').textContent='🛰️ GOES ON'}}function toggleViirsLayer(){if(map.hasLayer(viirsLayer)){map.removeLayer(viirsLayer);$('viirsBtn').classList.remove('active');$('viirsBtn').textContent='🔥 VIIRS OFF'}else{viirsLayer.addTo(map);$('viirsBtn').classList.add('active');$('viirsBtn').textContent='🔥 VIIRS ON'}}
+window.addEventListener('load',async()=>{await loadArgentinaBoundary();initMap()});
 </script>
 </body>
 </html>
