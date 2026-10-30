@@ -347,6 +347,8 @@ body{font-family:"Segoe UI Variable","Segoe UI",Arial,sans-serif!important;font-
 
 /* Rayos GLM discretos: menos invasivos */
 .glm-bolt{width:9px!important;height:9px!important;border-radius:50%!important;background:#c084fc!important;border:1px solid #7e22ce!important;color:transparent!important;font-size:0!important;box-shadow:0 0 3px #a855f788!important;animation:none!important;opacity:.72!important}
+/* Alerta temprana: estado en una sola linea */
+#earlyWarningState{display:block!important;white-space:nowrap!important;font-size:10px!important;line-height:1.25!important;letter-spacing:-.1px!important;max-width:none!important}#earlyWarning .early-warning-head>div{width:100%!important;min-width:0!important}@media(max-width:1100px){#earlyWarningState{font-size:9px!important}}
 </style></head><body><main class="app">
 <header class="card head"><div class="flex"><div style="display:flex;align-items:center;gap:14px;min-width:0"><img alt="Logo Territoria" onerror="this.style.display='none'" src="logo-territoria.png" style="width:76px;height:76px;object-fit:contain;padding:3px;border-radius:14px;background:#fff"/><div><h1 style="color:#40c6ef;margin-bottom:4px">TERRITORIA</h1><div class="muted" style="font-size:12px">Plataforma inteligente de monitoreo territorial</div><div class="muted" id="updated" style="margin-top:8px">Esperando GPS…</div></div></div><span class="online" id="systemStatus">● INICIANDO</span></div></header>
 <div class="card red" id="error" style="display:none"></div>
