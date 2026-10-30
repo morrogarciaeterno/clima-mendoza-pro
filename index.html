@@ -677,15 +677,15 @@ async function loadGoes19(){
  if(!goes19Detections.length)set('goes19State','CONSULTANDO');
  try{
   const radius=num($('radius')?.value,50),u=new URL('/fires',GOES19_WORKER_URL);
-  u.searchParams.set('lat',String(lat));u.searchParams.set('lon',String(lon));u.searchParams.set('radius','5000');u.searchParams.set('scenes','6');
+  u.searchParams.set('lat',String(lat));u.searchParams.set('lon',String(lon));u.searchParams.set('radius','300');u.searchParams.set('scenes','1');
   const r=await fetch(u.toString(),{cache:'no-store',headers:{Accept:'application/json'}}),text=await r.text();let j;try{j=JSON.parse(text)}catch{throw Error('HTTP '+r.status+' respuesta no JSON')}if(!r.ok||j.ok===false)throw Error(j.error||('HTTP '+r.status));
   goes19Detections=(j.detections||[]).map(d=>({...d,lat:Number(d.lat),lon:Number(d.lon),distanceKm:Number.isFinite(Number(d.distanceKm))?Number(d.distanceKm):distance(lat,lon,Number(d.lat),Number(d.lon))})).filter(d=>Number.isFinite(d.lat)&&Number.isFinite(d.lon)).sort((a,b)=>a.distanceKm-b.distanceKm);
   closestGoes19=goes19Detections.filter(d=>d.distanceKm<=radius).slice(0,3);currentGoes19Index=0;goes19LastSuccessAt=Date.now();if(goes19RetryTimer){clearTimeout(goes19RetryTimer);goes19RetryTimer=null}renderCurrentGoes19();startGoes19Rotation();if($('satelliteModal')?.style.display==='flex')renderSatelliteWorkspace();
  }catch(e){
   console.warn('GOES-19 FDCF actualización transitoria:',e.message||e);
   if(goes19Detections.length){const age=Math.max(0,Math.round((Date.now()-goes19LastSuccessAt)/60000));set('goes19State','ÚLTIMA LECTURA');set('goes19Detail',goes19Detections.length+' registros conservados · hace '+age+' min')}
-  else{set('goes19State','REINTENTO');set('goes19Distance','-- km');set('goes19Index','0 de 0');set('goes19Detail','GOES-19 temporalmente no disponible · reintento automático')}
-  if(!goes19RetryTimer)goes19RetryTimer=setTimeout(()=>{goes19RetryTimer=null;loadGoes19()},30000)
+  else{set('goes19State','SIN ACTUALIZAR');set('goes19Distance','-- km');set('goes19Index','0 de 0');set('goes19Detail','GOES-19 térmico sin respuesta · nueva consulta en 2 min')}
+  if(!goes19RetryTimer)goes19RetryTimer=setTimeout(()=>{goes19RetryTimer=null;loadGoes19()},120000)
  }finally{goes19Loading=false}
 }
 // ===== FIN GOES-19 REAL =====
