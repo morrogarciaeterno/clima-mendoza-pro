@@ -1,215 +1,282 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07111f">
-<title>Modelo Territoria IA</title>
-<style>
-*{box-sizing:border-box}:root{--bg:#07111f;--panel:#0d1829;--line:#2b3d56;--text:#eaf2fb;--muted:#91a5bd;--orange:#f59e0b;--red:#ef4444;--green:#16a34a;--blue:#3b82f6}html{color-scheme:dark}body{margin:0;min-height:100vh;padding:12px;background:var(--bg);color:var(--text);font:14px Segoe UI,Arial,sans-serif}.app{max-width:1550px;margin:auto}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}.header,.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.header{background:linear-gradient(135deg,#10253e,#123757)}h1,h2{margin:0}.header h1{color:#63cbea;font-size:22px}.sub{color:var(--muted);font-size:11px}.status{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid #276d45;border-radius:999px;background:#0b3825;color:#8ce5ac;font-size:10px;font-weight:800}.dot{width:7px;height:7px;border-radius:50%;background:currentColor}.btn{padding:8px 11px;border:1px solid #3b587b;border-radius:7px;background:#14243b;color:#edf5ff;cursor:pointer;font-weight:650}.btn.green{border-color:#2c8252;background:#123d29}.group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.three{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px}.station-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px}.station-title{font-size:15px;font-weight:750}.station-code{color:var(--muted);font-size:10px;margin-top:3px}.station-temp{font-size:34px;font-weight:780;letter-spacing:-1px}.distance{color:#b9c8d9;font-size:11px}.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px}.tile{min-height:68px;padding:9px;border:1px solid #283c56;border-radius:8px;background:#0a1525}.tile label{display:block;color:#8fa6be;font-size:9px;text-transform:uppercase;letter-spacing:.5px}.tile strong{display:block;margin-top:7px;color:#f5f8fc;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.foot{display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid #26384f;color:var(--muted);font-size:9px}.off{color:#ffcf6b!important}.modal{display:none;position:fixed;inset:0;z-index:1000;padding:16px;background:#020711e8;align-items:center;justify-content:center}.modal.show{display:flex}.modal-box{width:min(1450px,98vw);height:min(900px,95vh);display:flex;flex-direction:column;overflow:hidden;border:1px solid #4a5f7b;border-radius:13px;background:#081322}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}.modal-body{padding:12px;overflow:auto}.filters{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin-bottom:9px}.select,.range-btn,.model-btn{padding:7px 10px;border:1px solid #344d6b;border-radius:6px;background:#101c2e;color:#d8e4f2}.range-btn,.model-btn{cursor:pointer}.range-btn.active,.range-btn.now-active,.range-btn.now-active-live{border-color:#38bdf8;background:#123348;color:#bdefff}.model-btn.active[data-series="station"]{border-color:#f8fafc;color:#fff;background:#263244}.model-btn.active[data-series="weatherapi"]{border-color:var(--orange);color:#fbbf24}.model-btn.active[data-series="openmeteo"]{border-color:var(--red);color:#fca5a5}.model-btn.active[data-series="ecmwf"]{border-color:var(--blue);color:#93c5fd;background:#0b1f3a}.model-btn.active[data-series="average"]{border-color:#a855f7;color:#d8b4fe;background:#25113b}.model-btn.active[data-series="territoria"]{border-color:var(--green);color:#4ade80;background:#0b2f1b}.chart-card{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0b1728}.chart-title{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}.chart-wrap{height:390px;overflow:hidden}.chart-wrap svg{width:100%;height:100%;display:block}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:10px}.legend i{display:inline-block;width:18px;height:3px;margin-right:5px;vertical-align:middle}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.metric{padding:10px;border:1px solid #293d56;border-radius:8px;background:#0c192a}.metric label{display:block;color:var(--muted);font-size:9px}.metric strong{display:block;margin-top:5px;font-size:17px}.empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted)}@media(max-width:1100px){.three{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:1fr 1fr}}@media(max-width:680px){body{padding:7px}.three{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:1fr}.modal{padding:4px}.modal-box{width:100vw;height:100vh;border-radius:0}.chart-wrap{height:320px}}
-
-.grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-rows:68px;gap:8px!important;margin-top:12px!important}
-.cell{min-width:0;height:68px;display:flex;flex-direction:column;justify-content:center;padding:8px!important}
-.cell label{height:15px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:8px!important;line-height:15px!important;margin:0!important}
-.cell strong{height:25px;display:flex;align-items:center;font-size:13px!important;line-height:1.1!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.station-temp{min-height:49px;display:flex;align-items:flex-end}.distance{min-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.station-head{min-height:54px;align-items:flex-start}.station-code{min-height:28px;line-height:13px}
-@media(max-width:1250px){main{grid-template-columns:repeat(3,minmax(0,1fr))!important}}@media(max-width:800px){main{grid-template-columns:1fr!important}.grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
-
-main .station-code, main .distance{display:none!important}
-main .station-head{min-height:38px!important}
-main .station-temp{min-height:50px!important;margin-top:8px}
-
-main{grid-template-columns:repeat(5,minmax(260px,1fr))!important;overflow-x:auto;padding-bottom:8px}
-.grid{grid-template-columns:repeat(3,minmax(78px,1fr))!important;grid-auto-rows:minmax(72px,auto)!important}
-.cell{height:auto!important;min-height:72px!important;overflow:visible!important}
-.cell label{height:auto!important;min-height:15px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:8px!important}
-.cell strong{height:auto!important;min-height:27px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:12px!important;word-break:normal}
-@media(max-width:1250px){main{grid-template-columns:repeat(2,minmax(300px,1fr))!important;overflow-x:visible}}
-@media(max-width:800px){main{grid-template-columns:1fr!important}.grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.cell strong{font-size:13px!important}}
-
-.precision-panel{margin-top:10px;padding:12px;border:1px solid #344d6b;border-radius:10px;background:#091728}.precision-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:9px}.precision-head strong{font-size:14px;color:#dff4ff}.precision-state{font-size:9px;color:#fbbf24;border:1px solid #72551a;border-radius:999px;padding:4px 8px}.precision-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.precision-row{padding:9px;border:1px solid #293d56;border-radius:8px;background:#0c192a;min-width:0}.precision-rank{font-size:16px;font-weight:900}.precision-name{margin-top:3px;font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.precision-mae{margin-top:6px;font-size:15px;font-weight:900}.precision-meta{margin-top:4px;color:#91a5bd;font-size:8px;line-height:1.4}.precision-empty{color:#91a5bd;font-size:10px;padding:8px 0}@media(max-width:900px){.precision-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.precision-grid{grid-template-columns:1fr}}
-
-html,body{max-width:100%;overflow-x:hidden!important}.app{width:100%;max-width:1600px;overflow:visible!important}main.app{display:block!important;overflow-x:hidden!important;padding-bottom:0!important}.three{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:8px!important;width:100%;overflow:visible!important}.three .panel{min-width:0!important;padding:12px!important}.tiles{grid-template-columns:repeat(3,minmax(0,1fr))!important}.tile{min-width:0!important;padding:7px!important}.tile strong{font-size:12px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:normal}.station-title{font-size:14px!important}.station-temp{font-size:31px!important}
-.smn-alert-panel{position:relative;overflow:hidden;margin-top:10px;padding:0!important;border:1px solid #2d557b!important;border-radius:14px!important;background:linear-gradient(135deg,#0b1b2e 0%,#0d2740 55%,#0a1a2c 100%)!important;box-shadow:0 8px 30px #0004}.smn-alert-panel:before{content:'';position:absolute;inset:0 auto 0 0;width:5px;background:#22c55e;box-shadow:0 0 16px #22c55e}.smn-alert-head{padding:11px 14px 9px 18px!important;border-bottom:1px solid #203b57;background:#10284299}.smn-alert-title{display:flex;align-items:center;gap:8px;font-size:16px!important;letter-spacing:.2px}.smn-testing{background:#392b09!important;border-color:#a87509!important;color:#ffd45a!important}.smn-alert-body{display:grid!important;grid-template-columns:minmax(250px,.85fr) minmax(0,2.2fr)!important;gap:0!important;margin:0!important}.smn-alert-status{border:0!important;border-right:1px solid #203b57!important;border-radius:0!important;background:#0a192a!important;padding:14px 18px!important;font-size:13px!important}.smn-alert-dot{width:12px!important;height:12px!important;flex:0 0 auto}.smn-alert-detail{border:0!important;border-radius:0!important;background:#0b1727!important;padding:12px 16px!important;font-size:10px!important}.smn-alert-meta{color:#7fa0bd!important}
-@media(max-width:1350px){.three{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
-@media(max-width:820px){.three{grid-template-columns:repeat(2,minmax(0,1fr))!important}.smn-alert-body{grid-template-columns:1fr!important}.smn-alert-status{border-right:0!important;border-bottom:1px solid #203b57!important}}
-@media(max-width:560px){body{padding:6px!important}.three{grid-template-columns:1fr!important}.tiles{grid-template-columns:repeat(3,minmax(0,1fr))!important}.smn-alert-title{font-size:14px!important}}
-</style>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+    <meta name="theme-color" content="#07111f"/>
+    <title>Territoria - Monitoreo Satelital Directo (VIIRS + GOES)</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        * { box-sizing: border-box; }
+        :root { --bg: #07111f; --p: #101d31; --b: #293b55; --t: #e7edf6; --m: #9baac0; --a: #38bdf8; --r: #ef4444; --g: #f97316; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--t); font-family: system-ui, -apple-system, sans-serif; }
+        .app { display: flex; flex-direction: column; height: 100vh; padding: 10px; gap: 10px; max-width: 1600px; margin: auto; }
+        header { background: linear-gradient(135deg, #102b49, #153f68); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--b); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        h1 { margin: 0; font-size: 20px; color: #38bdf8; }
+        .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        button, select, input { padding: 8px 12px; background: #172554; border: 1px solid #3b82f6; border-radius: 8px; color: #fff; cursor: pointer; font-size: 13px; }
+        button:hover { background: #1d4ed8; }
+        .main-layout { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 10px; flex: 1; min-height: 0; }
+        .sidebar { background: var(--p); border: 1px solid var(--b); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+        .list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px; }
+        .foco-item { padding: 10px; background: #0c1728; border: 1px solid var(--b); border-left: 4px solid var(--r); border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .foco-item.goes { border-left-color: var(--g); }
+        .foco-item:hover { background: #14243a; }
+        #map { width: 100%; height: 100%; min-height: 400px; border-radius: 12px; border: 1px solid var(--b); background: #0f172a; }
+        .muted { color: var(--m); font-size: 11px; }
+        .badge { background: #064e3b; color: #86efac; border: 1px solid #15803d; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+        @media(max-width: 900px) { .main-layout { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } }
+    </style>
 </head>
 <body>
-<main class="app">
-<section class="panel header"><div><h1>MODELO TERRITORIA IA</h1><div class="sub">Open-Meteo Best Match + WeatherAPI + ECMWF + aprendizaje local</div></div><span class="status" id="globalStatus"><span class="dot"></span> INICIANDO</span></section>
-<section class="panel toolbar"><div><strong>Panel meteorológico</strong><div class="sub" id="lastGlobal">Última actualización: --</div><div class="sub" id="gpsText">Ubicación: esperando GPS</div></div><div class="group"><button class="btn green" onclick="refreshAll()">↻ Actualizar</button><button class="btn" onclick="openHistory()">📊 Históricos</button></div></section>
-<section class="smn-alert-panel" id="smnAlertsPanel"><div class="smn-alert-head"><div class="smn-alert-title">⚠️ ALERTAS OFICIALES · SMN</div><span class="smn-testing">🧪 TESTING</span></div><div class="smn-alert-body"><div class="smn-alert-status"><span class="smn-alert-dot" id="smnAlertDot"></span><span id="smnAlertStatus">CONSULTANDO AVISOS OFICIALES…</span></div><div class="smn-alert-detail" id="smnAlertDetail">Fuente oficial: Servicio Meteorológico Nacional · Avisos Meteorológicos a Corto Plazo (ACP).<div class="smn-alert-meta" id="smnAlertMeta">Última consulta: --</div></div></div></section>
-<section class="three"><article class="panel" id="stationCard"></article><article class="panel" id="openMeteoCard"></article><article class="panel" id="weatherApiCard"></article><article class="panel" id="ecmwfCard"></article><article class="panel" id="averageCard"></article><article class="panel" id="aiCard"></article></section>
-</main>
-<div class="modal" id="historyModal"><div class="modal-box"><div class="modal-head"><div><h2>Historial del Modelo Territoria IA</h2><div class="sub" id="rangeText">Últimos 7 días</div></div><button class="btn" onclick="closeHistory()">✕ Cerrar</button></div><div class="modal-body"><div class="filters"><select class="select" id="variableSelect" onchange="drawHistory()"><option value="temperature">Temperatura</option><option value="feels">Sensación térmica</option><option value="humidity">Humedad</option><option value="wind">Viento</option><option value="pressure">Presión</option><option value="visibility">Visibilidad</option><option value="cloud">Nubosidad</option><option value="precipitation">Precipitación</option></select><div class="group"><button class="range-btn" onclick="shiftRange(-1)">◀</button><button class="range-btn active" data-range="7" onclick="setRange(7,this)">7D</button><button class="range-btn" data-range="14" onclick="setRange(14,this)">14D</button><button class="range-btn" data-range="31" onclick="setRange(31,this)">31D</button><button class="range-btn" data-range="1M" onclick="setRange('1M',this)">1M</button><button class="range-btn" data-range="3M" onclick="setRange('3M',this)">3M</button><button class="range-btn" data-range="6M" onclick="setRange('6M',this)">6M</button><button class="range-btn" data-range="1Y" onclick="setRange('1Y',this)">1A</button><button class="range-btn" data-range="ALL" onclick="setRange('ALL',this)">TODO</button><button class="range-btn" onclick="shiftRange(1)">▶</button><button class="range-btn" id="nowBtn" onclick="goNow(event)">● AHORA</button></div><div class="group"><button class="model-btn active" data-series="station" onclick="toggleSeries(this)">● OBSERVACIÓN REAL</button><button class="model-btn active" data-series="weatherapi" onclick="toggleSeries(this)">● WEATHERAPI</button><button class="model-btn active" data-series="openmeteo" onclick="toggleSeries(this)">● OPEN-METEO</button><button class="model-btn active" data-series="ecmwf" onclick="toggleSeries(this)">● ECMWF</button><button class="model-btn active" data-series="average" onclick="toggleSeries(this)">● TERRITORIA MATEMÁTICA</button><button class="model-btn active" data-series="territoria" onclick="toggleSeries(this)">● MODELO TERRITORIA IA</button></div></div><section class="chart-card"><div class="chart-title"><strong id="chartTitle">Temperatura</strong><div class="legend"><span><i style="background:#f8fafc"></i>Observación real</span><span><i style="background:#f59e0b"></i>WeatherAPI</span><span><i style="background:#ef4444"></i>Open-Meteo</span><span><i style="background:#3b82f6"></i>ECMWF</span><span><i style="background:#a855f7"></i>Territoria Matemática</span><span><i style="background:#16a34a"></i>Modelo Territoria IA</span></div></div><div class="chart-wrap" id="mainChart"></div></section><section class="metrics" id="historyMetrics"></section><section class="precision-panel" id="precisionPanel"></section></div></div></div>
-<script>
-const FIREBASE_CONFIG={
-  apiKey:"AIzaSyDWWxho-0WaxgsYcE6i4oa9I9F2xJ5eZ_s",
-  authDomain:"modelo-territoria-ia.firebaseapp.com",
-  projectId:"modelo-territoria-ia",
-  storageBucket:"modelo-territoria-ia.firebasestorage.app",
-  messagingSenderId:"127019007898",
-  appId:"1:127019007898:web:1addbf9f583c73cee38423"
-};
-const FIRESTORE_COLLECTION='territoria_meteo_historial';
-let firestoreDb=null,firestoreReady=false,cloudSyncing=false,cloudHistoryUnsubscribe=null;
-async function initFirestore(){
- try{
-  if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
-  firestoreDb=firebase.firestore();
-  firestoreReady=true;
-  await loadCloudHistory();
-  startCloudHistoryLive();
-  return true;
- }catch(e){console.error('Firestore init:',e);firestoreReady=false;return false}
-}
-function mergeHistoryRows(rows){
- const map=new Map(history.map(x=>[x.id,x]));
- rows.forEach(x=>{if(x&&x.id)map.set(x.id,{...(map.get(x.id)||{}),...x})});
- history=[...map.values()].sort((a,b)=>new Date(a.observedAt)-new Date(b.observedAt)).slice(-20000);
- saveHistory();
-}
-async function loadCloudHistory(){
- if(!firestoreReady||cloudSyncing)return;
- cloudSyncing=true;
- try{
-  const snap=await firestoreDb.collection(FIRESTORE_COLLECTION).orderBy('observedAt','desc').limit(2000).get();
-  mergeHistoryRows(snap.docs.map(d=>({id:d.id,...d.data()})));
-  if(document.getElementById('historyModal')?.classList.contains('show'))drawHistory();
-  const el=document.getElementById('lastGlobal');if(el)el.textContent='Historial sincronizado: '+history.length+' registros';
- }catch(e){console.error('Firestore lectura:',e)}finally{cloudSyncing=false}
-}
-function startCloudHistoryLive(){if(!firestoreReady||cloudHistoryUnsubscribe)return;cloudHistoryUnsubscribe=firestoreDb.collection(FIRESTORE_COLLECTION).orderBy('observedAt','desc').limit(2000).onSnapshot(snap=>{mergeHistoryRows(snap.docs.map(d=>({id:d.id,...d.data()})));if($('historyModal')?.classList.contains('show')){if($('nowBtn')?.classList.contains('now-active-live'))range.end=new Date(Date.now()+60000);drawHistory()}},e=>console.error('Firestore tiempo real:',e))}
-async function saveCloudRecord(rec){
- if(!firestoreReady||!rec?.id)return;
- try{await firestoreDb.collection(FIRESTORE_COLLECTION).doc(rec.id).set(rec,{merge:true})}
- catch(e){console.error('Firestore escritura:',e)}
-}
-async function uploadLocalHistoryOnce(){
- if(!firestoreReady||!history.length)return;
- const batchSize=400;
- for(let i=0;i<history.length;i+=batchSize){
-  const batch=firestoreDb.batch();
-  history.slice(i,i+batchSize).forEach(rec=>batch.set(firestoreDb.collection(FIRESTORE_COLLECTION).doc(rec.id),rec,{merge:true}));
-  await batch.commit();
- }
- await loadCloudHistory();
-}
-const WEATHER_PROXY='https://weatherapi-proxy.elexpreso17.workers.dev/';
-const SMN_PROXY='https://territoria-smn-alertas.elexpreso17.workers.dev/'; /* Reemplazá con tu propia Cloudflare Worker configurada */
-const SMN_STATION='MENDOZA OBSERVATORIO';
-const STORE='territoria_meteo_weatherapi_v1';
-let gps={lat:-32.9294,lon:-68.8607,accuracy:null},history=loadHistory(),range={kind:7,end:new Date()},visible={station:true,weatherapi:true,openmeteo:true,ecmwf:true,average:true,territoria:true},refreshing=false;
-const $=id=>document.getElementById(id),num=v=>(v===null||v===undefined||String(v).trim()===''||String(v).toLowerCase().includes('no se calcula'))?null:(Number.isFinite(Number(v))?Number(v):null),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmt=(v,d=1)=>Number.isFinite(Number(v))?Number(v).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d}):'--';
-const VARS={temperature:{label:'Temperatura',unit:'°C'},feels:{label:'Sensación térmica',unit:'°C'},humidity:{label:'Humedad',unit:'%'},wind:{label:'Viento',unit:'km/h'},pressure:{label:'Presión',unit:'hPa'},visibility:{label:'Visibilidad',unit:'km'},cloud:{label:'Nubosidad',unit:'%'},precipitation:{label:'Precipitación',unit:'mm'}};
-function loadHistory(){try{return JSON.parse(localStorage.getItem(STORE)||'[]')}catch{return[]}}function saveHistory(){localStorage.setItem(STORE,JSON.stringify(history.slice(-20000)))}
-async function fetchWeatherApi(){const r=await fetch(`${WEATHER_PROXY}?lat=${gps.lat}&lon=${gps.lon}`,{cache:'no-store'});const j=await r.json();if(!r.ok||j.error)throw Error(j.error?.message||j.error||'WeatherAPI no disponible');return j}
-async function fetchOpenMeteo(){const current='temperature_2m,apparent_temperature,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,cloud_cover,visibility,precipitation';const p=new URLSearchParams({latitude:gps.lat,longitude:gps.lon,current,timezone:'America/Argentina/Mendoza',wind_speed_unit:'kmh'});const r=await fetch('https://api.open-meteo.com/v1/forecast?'+p,{cache:'no-store'});if(!r.ok)throw Error('Open-Meteo HTTP '+r.status);return (await r.json()).current}
-async function fetchECMWF(){const current='temperature_2m,apparent_temperature,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,cloud_cover,visibility,precipitation';const p=new URLSearchParams({latitude:gps.lat,longitude:gps.lon,current,timezone:'America/Argentina/Mendoza',wind_speed_unit:'kmh',models:'ecmwf_ifs025'});const r=await fetch('https://api.open-meteo.com/v1/forecast?'+p,{cache:'no-store'});if(!r.ok)throw Error('ECMWF HTTP '+r.status);return (await r.json()).current}
-async function fetchStation(){
- if(SMN_PROXY.startsWith('PEGA_AQUI'))throw Error('Falta configurar SMN_PROXY');
- const u=new URL(SMN_PROXY);u.searchParams.set('station',SMN_STATION);
- const r=await fetch(u,{cache:'no-store'}),j=await r.json();if(!r.ok||j.ok===false)throw Error(j.error||'Estación SMN no disponible');return j.data||j
-}
-function pick(obj,names){for(const n of names){const v=obj?.[n];if(v!==undefined&&v!==null&&v!=='')return v}return null}
-function parseStation(j){const d=j.data||j.current||j.observation||j;return{
- temperature:num(pick(d,['temperature','temperatura','temp','temp_c'])),feels:num(pick(d,['feels','sensacion','sensacion_termica','feelslike_c'])),humidity:num(pick(d,['humidity','humedad','rh'])),wind:num(pick(d,['wind','viento','wind_speed','wind_kph'])),pressure:num(pick(d,['pressure','presion','pressure_hpa','pressure_mb'])),visibility:num(pick(d,['visibility','visibilidad','visibility_km'])),cloud:num(pick(d,['cloud','nubosidad','cloud_cover'])),precipitation:num(pick(d,['precipitation','precipitacion','rain','precip_mm'])),windDirection:pick(d,['windDirection','direccion_viento','wind_dir'])||'--',condition:pick(d,['condition','estado','weather'])||'Observación de estación',updated:pick(d,['updated','fecha','date','time','timestamp'])||new Date().toISOString(),stationName:pick(d,['station','estacion','name','station_name'])||'Mendoza Aero',wmo:pick(d,['wmo_id','wmo'])||''}}
-function parseWA(j){const c=j.current||{};return{temperature:num(c.temp_c),feels:num(c.feelslike_c),humidity:num(c.humidity),wind:num(c.wind_kph),pressure:num(c.pressure_mb),visibility:num(c.vis_km),cloud:num(c.cloud),precipitation:num(c.precip_mm),windDirection:c.wind_dir||'--',condition:c.condition?.text||'--',updated:c.last_updated||null}}
-function parseOM(c){return{temperature:num(c.temperature_2m),feels:num(c.apparent_temperature),humidity:num(c.relative_humidity_2m),wind:num(c.wind_speed_10m),pressure:num(c.surface_pressure),visibility:Number.isFinite(Number(c.visibility))?Number(c.visibility)/1000:null,cloud:num(c.cloud_cover),precipitation:num(c.precipitation),windDirection:Number.isFinite(Number(c.wind_direction_10m))?Math.round(c.wind_direction_10m)+'°':'--',condition:'Modelo meteorológico',updated:c.time||null}}
-function aiValue(key,base){
- if(!Number.isFinite(base))return null;
- const rows=history.filter(x=>Number.isFinite(x.openmeteo?.[key])&&(Number.isFinite(x.weatherapi?.[key])||Number.isFinite(x.ecmwf?.[key]))).slice(-240);
- const diffs=rows.map(x=>{const refs=[x.weatherapi?.[key],x.ecmwf?.[key]].filter(Number.isFinite);return refs.length?refs.reduce((a,b)=>a+b,0)/refs.length-x.openmeteo[key]:null}).filter(Number.isFinite);
- if(!diffs.length)return base;
- const recent=diffs.slice(-Math.min(24,diffs.length));
- const bias=recent.reduce((a,b)=>a+b,0)/recent.length;
- const confidence=Math.min(1,diffs.length/12);
- return base+bias*confidence
-}
-function makeAI(om){const out={};for(const k of Object.keys(VARS))out[k]=aiValue(k,om[k]);return out}
-function upsert(rec){const i=history.findIndex(x=>x.id===rec.id);if(i>=0)history[i]={...history[i],...rec};else history.push(rec);history.sort((a,b)=>new Date(a.observedAt)-new Date(b.observedAt));saveHistory();saveCloudRecord(rec)}
-function card(title,subtitle,data,color,status){return `<div class="station-head"><div><div class="station-title">${esc(title)}</div><div class="station-code">${esc(subtitle)}</div></div><span class="status" style="border-color:${color};color:${color};background:#091521"><span class="dot"></span> ${esc(status)}</span></div><div class="station-temp" style="color:${color}">${fmt(data.temperature,1)} °C</div><div class="distance">${esc(data.condition||'--')}</div><div class="tiles"><div class="tile"><label>Humedad</label><strong>${fmt(data.humidity,0)} %</strong></div><div class="tile"><label>Sensación</label><strong>${fmt(data.feels,1)} °C</strong></div><div class="tile"><label>Viento</label><strong>${fmt(data.wind,1)} km/h</strong></div><div class="tile"><label>Dirección</label><strong>${esc(data.windDirection||'--')}</strong></div><div class="tile"><label>Presión</label><strong>${fmt(data.pressure,1)} hPa</strong></div><div class="tile"><label>Visibilidad</label><strong>${fmt(data.visibility,1)} km</strong></div><div class="tile"><label>Nubosidad</label><strong>${fmt(data.cloud,0)} %</strong></div><div class="tile"><label>Precipitación</label><strong>${fmt(data.precipitation,2)} mm</strong></div><div class="tile"><label>Actualización</label><strong style="font-size:10px">${esc(data.updated||'--')}</strong></div></div>`}
-function directionDegrees(v){
- if(Number.isFinite(Number(v)))return Number(v);
- const txt=String(v||'').trim().toUpperCase().replace('°','');
- if(Number.isFinite(Number(txt)))return Number(txt);
- const dirs={N:0,NNE:22.5,NE:45,ENE:67.5,E:90,ESE:112.5,SE:135,SSE:157.5,S:180,SSW:202.5,SW:225,WSW:247.5,W:270,WNW:292.5,NW:315,NNW:337.5};
- return Number.isFinite(dirs[txt])?dirs[txt]:null
-}
-function circularMean(values){
- const a=values.map(directionDegrees).filter(Number.isFinite);if(a.length!==3)return null;
- const x=a.reduce((s,d)=>s+Math.cos(d*Math.PI/180),0)/a.length,y=a.reduce((s,d)=>s+Math.sin(d*Math.PI/180),0)/a.length;
- return (Math.atan2(y,x)*180/Math.PI+360)%360
-}
-function mean3(a,b,c){const v=[a,b,c].filter(Number.isFinite);return v.length===3?v.reduce((x,y)=>x+y,0)/3:null}
-function makeAverage(wa,om,ecmwf){
- if(!wa||!om||!ecmwf)return null;
- const out={condition:'Promedio matemático multivariable',updated:new Date().toLocaleString('es-AR'),sources:3};
- for(const k of Object.keys(VARS))out[k]=mean3(wa?.[k],om?.[k],ecmwf?.[k]);
- const dir=circularMean([wa.windDirection,om.windDirection,ecmwf.windDirection]);
- out.windDirection=Number.isFinite(dir)?Math.round(dir)+'°':'--';
- return out
-}
-function renderAverage(avg){
- if(!avg){$('averageCard').innerHTML='<div class="sub">Esperando las 3 fuentes…</div>';return}
- $('averageCard').innerHTML=card('🟣 Territoria Matemática','Promedio de WeatherAPI + Open-Meteo + ECMWF',avg,'#a855f7','REGISTRANDO')+`<div class="foot"><span>Promedio cada 15 min multivariable</span><strong>${avg.sources}/3 fuentes</strong></div>`
-}
-function renderAI(ai){const valid=Number.isFinite(ai?.temperature),n=history.filter(x=>Number.isFinite(x.openmeteo?.temperature)&&(Number.isFinite(x.weatherapi?.temperature)||Number.isFinite(x.ecmwf?.temperature))).length,status=valid?(n>=12?'CALIBRADO':'APRENDIENDO'):'ESPERANDO';const d={...ai,condition:valid?`Estimacion inicial · aprendizaje ${Math.min(n,12)}/12`:'Esperando primera muestra comparable',windDirection:'--',updated:new Date().toLocaleString('es-AR')};$('aiCard').innerHTML=card('🧠 Modelo Territoria IA',`Muestras comparables: ${n}`,d,'#16a34a',status)+`<div class="foot"><span>Correccion progresiva desde ahora</span><strong class="off">${valid?'ON':'OFF'}</strong></div>`}
+    <div class="app">
+        <header>
+            <div>
+                <h1>TERRITORIA · VIIRS + GOES (Argentina)</h1>
+                <div class="muted">Monitoreo térmico multissatelital directo (Sin proxys)</div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span id="gpsBadge" class="badge">GPS: Iniciando...</span>
+                <button onclick="forzarGpsReal()">📍 Reintentar GPS</button>
+            </div>
+        </header>
 
-async function refreshSmnAlerts(){
- const status=$('smnAlertStatus'),detail=$('smnAlertDetail'),dot=$('smnAlertDot'),meta=$('smnAlertMeta');
- try{
-  const r=await fetch(SMN_PROXY,{cache:'no-store'}),j=await r.json();
-  if(!r.ok||j.ok===false)throw Error(j.error||'Avisos SMN no disponibles');
-  const items=Array.isArray(j.items)?j.items:[];
-  if(!items.length){dot.style.background='#22c55e';dot.style.boxShadow='0 0 8px #22c55e88';status.textContent='SIN AVISOS A CORTO PLAZO';detail.innerHTML='No hay avisos ACP informados por la fuente consultada.<div class="smn-alert-meta" id="smnAlertMeta">Última consulta: '+new Date().toLocaleString('es-AR')+'</div>';return}
-  dot.style.background=j.limited?'#f59e0b':'#ef4444';dot.style.boxShadow=j.limited?'0 0 8px #f59e0b88':'0 0 8px #ef444499';
-  status.textContent=j.limited?'MODO CONTINGENCIA · SMN':'AVISO A CORTO PLAZO · '+items.length;
-  detail.innerHTML=items.slice(0,3).map(x=>'<strong>'+esc(x.title||'Aviso SMN')+'</strong><br>'+esc(x.description||'')+(x.link?'<br><span style="color:#7dd3fc">'+esc(x.link)+'</span>':'')).join('<hr style="border:0;border-top:1px solid #26384f;margin:8px 0">')+'<div class="smn-alert-meta" id="smnAlertMeta">Última consulta: '+new Date().toLocaleString('es-AR')+'</div>';
- }catch(e){dot.style.background='#64748b';dot.style.boxShadow='none';status.textContent='ALERTAS SMN TEMPORALMENTE NO DISPONIBLES';detail.innerHTML=esc(e.message)+'<div class="smn-alert-meta" id="smnAlertMeta">Último intento: '+new Date().toLocaleString('es-AR')+'</div>'}
-}
+        <div class="controls">
+            <button onclick="ejecutarConsulta()">🔄 Actualizar Ambos Satélites</button>
+            <label>Radio: 
+                <select id="radioSelect" onchange="ejecutarConsulta()">
+                    <option value="500">500 km</option>
+                    <option value="1000">1000 km</option>
+                    <option value="2000" selected>2000 km (Nacional)</option>
+                    <option value="5000">Cono Sur</option>
+                </select>
+            </label>
+            <button onclick="centrarMapaGps()">🎯 Centrar Posición</button>
+        </div>
 
-async function refreshAll(){if(refreshing)return;refreshing=true;$('globalStatus').innerHTML='<span class="dot"></span> ACTUALIZANDO';try{
- const results=await Promise.allSettled([fetchStation(),fetchWeatherApi(),fetchOpenMeteo(),fetchECMWF()]);
- const [stRes,waRes,omRes,eRes]=results;
- let station=null,wa=null,om=null,ecmwf=null,waRaw=null;
- if(stRes.status==='fulfilled'){station=parseStation(stRes.value);$('stationCard').innerHTML=card('⚪ Observación real',`${station.stationName} · SMN ${station.updated||''}`,station,'#f8fafc','ESTACIÓN')}else $('stationCard').innerHTML='<div class="sub">Observación real pendiente: '+esc(stRes.reason?.message||'error')+'</div>';
- if(waRes.status==='fulfilled'){waRaw=waRes.value;wa=parseWA(waRaw);$('weatherApiCard').innerHTML=card('🟠 WeatherAPI',(waRaw.location?.name||'GPS')+' · '+(waRaw.location?.region||''),wa,'#f59e0b','ACTUAL')}else $('weatherApiCard').innerHTML='<div class="sub">WeatherAPI no disponible: '+esc(waRes.reason?.message||'error')+'</div>';
- if(omRes.status==='fulfilled'){om=parseOM(omRes.value);$('openMeteoCard').innerHTML=card('🔴 Open-Meteo','Modelo en coordenadas GPS',om,'#ef4444','ACTUAL')}else $('openMeteoCard').innerHTML='<div class="sub">Open-Meteo no disponible: '+esc(omRes.reason?.message||'error')+'</div>';
- if(eRes.status==='fulfilled'){ecmwf=parseOM(eRes.value);ecmwf.condition='ECMWF IFS';$('ecmwfCard').innerHTML=card('🔵 ECMWF','IFS · modelo individual vía Open-Meteo',ecmwf,'#3b82f6','ACTUAL')}else $('ecmwfCard').innerHTML='<div class="sub">ECMWF no disponible: '+esc(eRes.reason?.message||'error')+'</div>';
- const average=makeAverage(wa,om,ecmwf);renderAverage(average);const ai=om?makeAI(om):null;renderAI(ai);
- const now=new Date(),localParts=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Argentina/Mendoza',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now),lp=Object.fromEntries(localParts.map(x=>[x.type,x.value])),slot=Math.floor(Number(lp.minute)/15)*15,slotKey=`${lp.year}${lp.month}${lp.day}${lp.hour}${String(slot).padStart(2,'0')}`;
- const observedAt=now.toISOString(),rec={id:'q15_'+slotKey,observedAt,queriedAt:observedAt,lat:gps.lat,lon:gps.lon};
- const lastSmnUpdate=[...history].reverse().find(x=>x.station?.updated)?.station?.updated;
- if(station&&station.updated&&station.updated!==lastSmnUpdate)rec.station=station;
- if(wa)rec.weatherapi=wa;if(om)rec.openmeteo=om;if(ecmwf)rec.ecmwf=ecmwf;if(average)rec.average=average;if(ai)rec.territoria=ai;
- if(station||wa||om||ecmwf)upsert(rec);
- $('lastGlobal').textContent='Última actualización: '+now.toLocaleString('es-AR')+' · historial cada 15 min';
- const ok=results.filter(x=>x.status==='fulfilled').length;$('globalStatus').innerHTML='<span class="dot"></span> '+(ok?'EN LÍNEA':'ERROR');
- }catch(e){$('globalStatus').innerHTML='<span class="dot"></span> ERROR';$('lastGlobal').textContent='Error: '+e.message}finally{refreshing=false;refreshSmnAlerts()}}
-function openHistory(){$('historyModal').classList.add('show');$('nowBtn')?.classList.add('now-active-live');range.end=new Date(Date.now()+60000);drawHistory();loadCloudHistory();startCloudHistoryLive()}function closeHistory(){$('historyModal').classList.remove('show');$('nowBtn')?.classList.remove('now-active-live')}function setRange(v,b){range.kind=v;range.end=new Date();document.querySelectorAll('.range-btn[data-range]').forEach(x=>x.classList.toggle('active',x===b));drawHistory()}function rangeMs(){if(range.kind==='ALL')return Infinity;if(range.kind==='1M')return 31*864e5;if(range.kind==='3M')return 92*864e5;if(range.kind==='6M')return 183*864e5;if(range.kind==='1Y')return 365*864e5;return Number(range.kind)*864e5}function shiftRange(d){const ms=rangeMs();if(Number.isFinite(ms)){range.end=new Date(range.end.getTime()+d*ms);drawHistory()}}function goNow(e){e?.preventDefault();range.end=new Date(Date.now()+60000);const b=$('nowBtn');b?.classList.add('now-active','now-active-live');drawHistory();setTimeout(()=>b?.classList.remove('now-active'),900)}function toggleSeries(b){const k=b.dataset.series;visible[k]=!visible[k];b.classList.toggle('active',visible[k]);drawHistory()}
-function rowsNow(){const end=range.end.getTime(),ms=rangeMs(),start=Number.isFinite(ms)?end-ms:-Infinity;return history.filter(x=>{const t=new Date(x.observedAt).getTime();return t>=start&&t<=end})}function val(o,k){const v=o?.[k];return v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null}
-function chartSvg(rows,key){if(!rows.length)return '<div class="empty">Todavía no hay registros para este periodo.</div>';const series={station:rows.map(x=>val(x.station,key)),weatherapi:rows.map(x=>val(x.weatherapi,key)),openmeteo:rows.map(x=>val(x.openmeteo,key)),ecmwf:rows.map(x=>val(x.ecmwf,key)),average:rows.map(x=>val(x.average,key)),territoria:rows.map(x=>val(x.territoria,key))},enabled=Object.entries(series).filter(([k])=>visible[k]),values=enabled.flatMap(([,a])=>a.filter(Number.isFinite));if(!values.length)return '<div class="empty">Sin valores para esta selección.</div>';let mn=Math.min(...values),mx=Math.max(...values);if(mx===mn){mx++;mn--}const W=1200,H=330,L=58,R=20,T=20,B=58,X=i=>rows.length===1?(L+W-R)/2:L+i*(W-L-R)/(rows.length-1),Y=v=>T+(mx-v)/(mx-mn)*(H-T-B),colors={station:'#f8fafc',weatherapi:'#f59e0b',openmeteo:'#ef4444',ecmwf:'#3b82f6',average:'#a855f7',territoria:'#16a34a'};let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`;for(let i=0;i<=4;i++){const y=T+i*(H-T-B)/4,v=mx-i*(mx-mn)/4;s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#24364d"/><text x="${L-8}" y="${y+4}" fill="#91a5bd" font-size="11" text-anchor="end">${v.toFixed(1)}</text>`}for(const [k,a] of enabled){const pts=a.map((v,i)=>Number.isFinite(v)?`${X(i)},${Y(v)}`:null).filter(Boolean);if(pts.length>1)s+=`<polyline points="${pts.join(' ')}" fill="none" stroke="${colors[k]}" stroke-width="3"/>`;a.forEach((v,i)=>{if(Number.isFinite(v))s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${rows.length===1?7:4}" fill="${colors[k]}" stroke="#081322" stroke-width="2"><title>${k}: ${v}</title></circle>`})}const every=Math.max(1,Math.ceil(rows.length/8));rows.forEach((r,i)=>{if(i%every===0||i===rows.length-1){const d=new Date(r.observedAt),lab=d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).replace(',',' ·');s+=`<text x="${X(i)}" y="${H-18}" fill="#91a5bd" font-size="10" text-anchor="middle">${lab}</text>`}});return s+'</svg>'}
-function nearestModelValue(rows,index,src,key,stationTime){
- const same=val(rows[index]?.[src],key);if(Number.isFinite(same))return same;
- let best=null,bestDt=Infinity;
- for(let i=0;i<rows.length;i++){const v=val(rows[i]?.[src],key);if(!Number.isFinite(v))continue;const dt=Math.abs(new Date(rows[i].observedAt).getTime()-stationTime);if(dt<bestDt&&dt<=45*60*1000){best=v;bestDt=dt}}
- return best
-}
-function precisionRanking(rows,key){
- const sources=[['weatherapi','WeatherAPI','#f59e0b'],['openmeteo','Open-Meteo','#ef4444'],['ecmwf','ECMWF','#3b82f6'],['average','Territoria Matemática','#a855f7'],['territoria','Territoria IA','#16a34a']];
- const stats=Object.fromEntries(sources.map(([id,name,color])=>[id,{id,name,color,errors:[],signed:[]}]))
- rows.forEach((r,i)=>{const observed=val(r.station,key);if(!Number.isFinite(observed))return;const t=new Date(r.observedAt).getTime();sources.forEach(([id])=>{const m=nearestModelValue(rows,i,id,key,t);if(Number.isFinite(m)){stats[id].errors.push(Math.abs(m-observed));stats[id].signed.push(m-observed)}})});
- return Object.values(stats).filter(x=>x.errors.length).map(x=>({...x,n:x.errors.length,mae:x.errors.reduce((a,b)=>a+b,0)/x.errors.length,bias:x.signed.reduce((a,b)=>a+b,0)/x.signed.length})).sort((a,b)=>a.mae-b.mae)
-}
-function renderPrecision(rows,key){const el=$('precisionPanel'),unit=VARS[key].unit,ranking=precisionRanking(rows,key),maxN=ranking.length?Math.max(...ranking.map(x=>x.n)):0,state=maxN>=12?'CONSOLIDADO':maxN>=3?'PRELIMINAR':'INICIAL';if(!ranking.length){el.innerHTML='<div class="precision-head"><strong>🎯 Precisión respecto al SMN · '+esc(VARS[key].label)+'</strong><span class="precision-state">SIN COMPARACIONES</span></div><div class="precision-empty">Todavía no hay pares válidos entre observaciones SMN y esta variable.</div>';return}const medals=['🥇','🥈','🥉','4º','5º'];el.innerHTML=`<div class="precision-head"><strong>🎯 Precisión respecto al SMN · ${esc(VARS[key].label)}</strong><span class="precision-state">${state} · ${maxN} comparaciones máx.</span></div><div class="precision-grid">${ranking.map((x,i)=>`<div class="precision-row"><div class="precision-rank">${medals[i]||i+1}</div><div class="precision-name" style="color:${x.color}">${esc(x.name)}</div><div class="precision-mae">MAE ${fmt(x.mae,key==='precipitation'?2:1)} ${unit}</div><div class="precision-meta">${x.n} comparaciones<br>Sesgo ${x.bias>0?'+':''}${fmt(x.bias,key==='precipitation'?2:1)} ${unit}</div></div>`).join('')}</div>`}
-function latest(rows,key,src){for(let i=rows.length-1;i>=0;i--){const v=val(rows[i][src],key);if(Number.isFinite(v))return v}return null}function drawHistory(){const rows=rowsNow(),key=$('variableSelect').value,v=VARS[key];$('chartTitle').textContent=v.label+' · comparación superpuesta';$('mainChart').innerHTML=chartSvg(rows,key);const ms=rangeMs(),start=Number.isFinite(ms)?new Date(range.end-ms):rows[0]?new Date(rows[0].observedAt):null;$('rangeText').textContent=start?start.toLocaleString('es-AR')+' → '+range.end.toLocaleString('es-AR'):'Sin registros';$('historyMetrics').innerHTML=`<div class="metric"><label>Observación real</label><strong>${fmt(latest(rows,key,'station'),key==='precipitation'?2:1)} ${v.unit}</strong></div><div class="metric"><label>Registros visibles</label><strong>${rows.length}</strong></div><div class="metric"><label>Último WeatherAPI</label><strong>${fmt(latest(rows,key,'weatherapi'),key==='precipitation'?2:1)} ${v.unit}</strong></div><div class="metric"><label>Último Open-Meteo</label><strong>${fmt(latest(rows,key,'openmeteo'),key==='precipitation'?2:1)} ${v.unit}</strong></div><div class="metric"><label>Último ECMWF</label><strong>${fmt(latest(rows,key,'ecmwf'),key==='precipitation'?2:1)} ${v.unit}</strong></div><div class="metric"><label>Territoria Matemática</label><strong>${fmt(latest(rows,key,'average'),key==='precipitation'?2:1)} ${v.unit}</strong></div>`;renderPrecision(rows,key)}
-initFirestore().then(ok=>{if(ok)uploadLocalHistoryOnce()});$('openMeteoCard').innerHTML='<div class="sub">Esperando Open-Meteo…</div>';$('weatherApiCard').innerHTML='<div class="sub">Esperando WeatherAPI…</div>';$('ecmwfCard').innerHTML='<div class="sub">Esperando ECMWF…</div>';$('averageCard').innerHTML='<div class="sub">Esperando las 3 fuentes…</div>';renderAI(null);if(navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>{gps={lat:p.coords.latitude,lon:p.coords.longitude,accuracy:p.coords.accuracy};$('gpsText').textContent=`Ubicación: ${gps.lat.toFixed(4)}, ${gps.lon.toFixed(4)} · ±${Math.round(gps.accuracy)} m`;refreshAll()},()=>{ $('gpsText').textContent=`Ubicación de referencia: ${gps.lat}, ${gps.lon}`;refreshAll()},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});else refreshAll();setInterval(refreshAll,15*60*1000);setInterval(refreshSmnAlerts,60*60*1000);
-</script>
+        <div class="main-layout">
+            <aside class="sidebar">
+                <div style="font-weight: 700; font-size: 14px;">Anomalías Térmicas (VIIRS & GOES)</div>
+                <div class="muted" id="contadorFocos">Sin datos cargados</div>
+                <div class="list" id="listaFocos">
+                    <div class="muted" style="padding: 10px;">Consultando servidores de la NASA y NOAA...</div>
+                </div>
+            </aside>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const FIRMS_MAP_KEY = "77a9490b2a337c7055de7a2e5948c836";
+        
+        let lat = -32.89, lon = -68.84;
+        let map, markersLayer, gpsMarker, radiusCircle;
+        let focosData = [];
+
+        function initApp() {
+            map = L.map('map').setView([lat, lon], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+
+            forzarGpsReal();
+        }
+
+        function forzarGpsReal() {
+            const badge = document.getElementById('gpsBadge');
+            badge.textContent = "GPS: Buscando...";
+            badge.style.background = "#78350f";
+            badge.style.borderColor = "#d97706";
+            badge.style.color = "#fde047";
+
+            if (!navigator.geolocation) {
+                activarFallbackGps("No soportado");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    lat = pos.coords.latitude;
+                    lon = pos.coords.longitude;
+                    badge.textContent = `GPS OK: ${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+                    badge.style.background = "#064e3b";
+                    badge.style.borderColor = "#15803d";
+                    badge.style.color = "#86efac";
+                    
+                    actualizarCapaGps();
+                    ejecutarConsulta();
+                },
+                err => {
+                    activarFallbackGps("Usando Mendoza");
+                },
+                { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+            );
+        }
+
+        function activarFallbackGps(motivo) {
+            const badge = document.getElementById('gpsBadge');
+            badge.textContent = `GPS: ${motivo}`;
+            badge.style.background = "#7f1d1d";
+            badge.style.borderColor = "#dc2626";
+            badge.style.color = "#fecaca";
+            
+            actualizarCapaGps();
+            ejecutarConsulta();
+        }
+
+        function actualizarCapaGps() {
+            if (gpsMarker) map.removeLayer(gpsMarker);
+            if (radiusCircle) map.removeLayer(radiusCircle);
+
+            gpsMarker = L.marker([lat, lon]).addTo(map).bindPopup(`<b>Mi Posición Activa</b><br>Lat: ${lat}, Lon: ${lon}`);
+            const radioKm = parseInt(document.getElementById('radioSelect').value);
+            radiusCircle = L.circle([lat, lon], { radius: radioKm * 1000, color: '#38bdf8', fillOpacity: 0.04 }).addTo(map);
+            map.setView([lat, lon], 5);
+        }
+
+        function centrarMapaGps() {
+            if (map) {
+                map.setView([lat, lon], 6);
+                if (radiusCircle) map.fitBounds(radiusCircle.getBounds());
+            }
+        }
+
+        function calcularDistancia(x1, y1, x2, y2) {
+            const R = 6371;
+            const dLat = (x2 - x1) * Math.PI / 180;
+            const dLon = (y2 - y1) * Math.PI / 180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(x1 * Math.PI / 180) * Math.cos(x2 * Math.PI / 180) * Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        async function ejecutarConsulta() {
+            const radioKm = parseInt(document.getElementById('radioSelect').value);
+            actualizarCapaGps();
+            
+            document.getElementById('contadorFocos').textContent = 'Consultando VIIRS y GOES...';
+            document.getElementById('listaFocos').innerHTML = '<div class="muted" style="padding:10px;">Descargando fuentes satelitales en paralelo...</div>';
+            markersLayer.clearLayers();
+
+            const delta = radioKm / 111.0;
+            const box = [
+                (lon - delta).toFixed(4),
+                (lat - delta).toFixed(4),
+                (lon + delta).toFixed(4),
+                (lat + delta).toFixed(4)
+            ].join(',');
+
+            // Consultar VIIRS y GOES (via NASA FIRMS endpoints en paralelo)
+            const urlViirs = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/VIIRS_SNPP_NRT/${box}/1`;
+            const urlGoes = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/GOES_NRT/${box}/1`;
+
+            try {
+                const [resViirs, resGoes] = await Promise.allSettled([
+                    fetch(urlViirs).then(r => r.ok ? r.text() : ''),
+                    fetch(urlGoes).then(r => r.ok ? r.text() : '')
+                ]);
+
+                let parsedFocos = [];
+
+                // Parsear VIIRS
+                if (resViirs.status === 'fulfilled' && resViirs.value) {
+                    const lines = resViirs.value.trim().split(/\r?\n/);
+                    if (lines.length > 1) {
+                        const h = lines[0].split(',');
+                        const iLat = h.indexOf('latitude'), iLon = h.indexOf('longitude'), iBright = h.indexOf('brightness'), iConf = h.indexOf('confidence'), iDate = h.indexOf('acq_date'), iTime = h.indexOf('acq_time');
+                        
+                        lines.slice(1).forEach(row => {
+                            const c = row.split(',');
+                            const fLat = parseFloat(c[iLat]), fLon = parseFloat(c[iLon]);
+                            const dist = calcularDistancia(lat, lon, fLat, fLon);
+                            if (!isNaN(fLat) && !isNaN(fLon) && dist <= radioKm) {
+                                parsedFocos.push({
+                                    satelite: 'VIIRS (Alta Res)',
+                                    lat: fLat, lon: fLon, distancia: dist,
+                                    brilloC: c[iBright] ? (parseFloat(c[iBright]) - 273.15).toFixed(1) : 'N/D',
+                                    confianza: c[iConf] || 'n/d',
+                                    fecha: c[iDate] || '', hora: c[iTime] || ''
+                                });
+                            }
+                        });
+                    }
+                }
+
+                // Parsear GOES
+                if (resGoes.status === 'fulfilled' && resGoes.value) {
+                    const lines = resGoes.value.trim().split(/\r?\n/);
+                    if (lines.length > 1) {
+                        const h = lines[0].split(',');
+                        const iLat = h.indexOf('latitude'), iLon = h.indexOf('longitude'), iBright = h.indexOf('brightness'), iConf = h.indexOf('confidence'), iDate = h.indexOf('acq_date'), iTime = h.indexOf('acq_time');
+                        
+                        lines.slice(1).forEach(row => {
+                            const c = row.split(',');
+                            const fLat = parseFloat(c[iLat]), fLon = parseFloat(c[iLon]);
+                            const dist = calcularDistancia(lat, lon, fLat, fLon);
+                            if (!isNaN(fLat) && !isNaN(fLon) && dist <= radioKm) {
+                                parsedFocos.push({
+                                    satelite: 'GOES (Geoestacionario)',
+                                    lat: fLat, lon: fLon, distancia: dist,
+                                    brilloC: c[iBright] ? (parseFloat(c[iBright]) - 273.15).toFixed(1) : 'N/D',
+                                    confianza: c[iConf] || 'n/d',
+                                    fecha: c[iDate] || '', hora: c[iTime] || ''
+                                });
+                            }
+                        });
+                    }
+                }
+
+                focosData = parsedFocos.sort((a, b) => a.distancia - b.distancia);
+                document.getElementById('contadorFocos').textContent = `${focosData.length} registros totales`;
+
+                if (focosData.length === 0) {
+                    document.getElementById('listaFocos').innerHTML = '<div class="muted" style="padding:10px;">Sin anomalías en VIIRS ni GOES para este radio.</div>';
+                    return;
+                }
+
+                let listHtml = '';
+                focosData.forEach((foco, index) => {
+                    const isGoes = foco.satelite.includes('GOES');
+                    listHtml += `
+                        <div class="foco-item ${isGoes ? 'goes' : ''}" onclick="enfocarFoco(${index})">
+                            <div style="font-weight:700;">📡 ${foco.satelite} · ${Math.round(foco.distancia)} km</div>
+                            <div class="muted">📍 Lat: ${foco.lat.toFixed(4)}, Lon: ${foco.lon.toFixed(4)}</div>
+                            <div style="color: ${isGoes ? '#fdba74' : '#fca5a5'}; font-weight: bold; font-size: 12px; margin-top: 2px;">🌡️ Brillo: ${foco.brilloC} °C</div>
+                            <div class="muted">📅 ${foco.fecha} ${foco.hora} UTC · Conf: ${foco.confianza}</div>
+                        </div>
+                    `;
+
+                    L.circleMarker([foco.lat, foco.lon], {
+                        radius: 6,
+                        color: '#fff',
+                        weight: 1,
+                        fillColor: isGoes ? '#f97316' : '#ef4444',
+                        fillOpacity: 0.85
+                    }).bindPopup(`<b>${foco.satelite}</b><br><b>Ubicación:</b> ${foco.lat.toFixed(4)}, ${foco.lon.toFixed(4)}<br><b>Distancia:</b> ${Math.round(foco.distancia)} km<br><b>Brillo:</b> ${foco.brilloC} °C<br><b>Fecha:</b> ${foco.fecha} ${foco.hora} UTC`)
+                      .addTo(markersLayer);
+                });
+
+                document.getElementById('listaFocos').innerHTML = listHtml;
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('contadorFocos').textContent = 'Error de red';
+                document.getElementById('listaFocos').innerHTML = `<div class="muted" style="padding:10px; color:#ef4444;">Error al consultar los satélites. (${error.message})</div>`;
+            }
+        }
+
+        function enfocarFoco(index) {
+            const f = focosData[index];
+            if (f && map) {
+                map.setView([f.lat, f.lon], 10);
+            }
+        }
+
+        window.onload = initApp;
+    </script>
 </body>
 </html>
