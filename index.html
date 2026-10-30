@@ -572,6 +572,19 @@ function satelliteViewGps(){if(!satelliteMap)return;satelliteMap.setView([lat,lo
 function toggleSatelliteViirs(){satelliteViirsVisible=!satelliteViirsVisible;if(satelliteMap&&satelliteViirsLayer){if(satelliteViirsVisible&&!satelliteMap.hasLayer(satelliteViirsLayer))satelliteViirsLayer.addTo(satelliteMap);if(!satelliteViirsVisible&&satelliteMap.hasLayer(satelliteViirsLayer))satelliteMap.removeLayer(satelliteViirsLayer)}$('satViirsBtn')?.classList.toggle('active',satelliteViirsVisible);set('satViirsBtn',satelliteViirsVisible?'🔥 VIIRS ON':'🔥 VIIRS OFF')}
 function toggleSatelliteGoes(){satelliteGoesVisible=!satelliteGoesVisible;if(satelliteMap&&satelliteGoesLayer){if(satelliteGoesVisible&&!satelliteMap.hasLayer(satelliteGoesLayer))satelliteGoesLayer.addTo(satelliteMap);if(!satelliteGoesVisible&&satelliteMap.hasLayer(satelliteGoesLayer))satelliteMap.removeLayer(satelliteGoesLayer)}$('satGoesBtn')?.classList.toggle('active',satelliteGoesVisible);set('satGoesBtn',satelliteGoesVisible?'🛰️ MODIS ON':'🛰️ MODIS OFF')}
 function toggleSatelliteGoes19(){satelliteGoes19Visible=!satelliteGoes19Visible;if(satelliteMap&&satelliteGoes19Layer){if(satelliteGoes19Visible&&!satelliteMap.hasLayer(satelliteGoes19Layer))satelliteGoes19Layer.addTo(satelliteMap);if(!satelliteGoes19Visible&&satelliteMap.hasLayer(satelliteGoes19Layer))satelliteMap.removeLayer(satelliteGoes19Layer)}$('satGoes19Btn')?.classList.toggle('active',satelliteGoes19Visible);set('satGoes19Btn',satelliteGoes19Visible?'🛰️ GOES-19 ON':'🛰️ GOES-19 OFF')}
+const LIGHTNING_PLACE_CACHE=new Map();
+function lightningPlaceKey(a,b){return Number(a).toFixed(3)+','+Number(b).toFixed(3)}
+function lightningPlaceLabel(address){
+ const locality=address?.city||address?.town||address?.village||address?.municipality||address?.suburb||address?.county||'';
+ const province=address?.state||address?.province||'';
+ const parts=[locality,province].filter((v,i,a)=>v&&a.indexOf(v)===i);
+ return parts.join(', ')||'Ubicación no identificada'
+}
+async function resolveLightningPlace(d){
+ const key=lightningPlaceKey(d.lat,d.lon);if(LIGHTNING_PLACE_CACHE.has(key))return LIGHTNING_PLACE_CACHE.get(key);
+ try{const q=new URLSearchParams({lat:String(d.lat),lon:String(d.lon),format:'jsonv2',addressdetails:'1',zoom:'10','accept-language':'es'}),r=await fetch('https://nominatim.openstreetmap.org/reverse?'+q.toString(),{headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json(),name=lightningPlaceLabel(j?.address);LIGHTNING_PLACE_CACHE.set(key,name);return name}catch(e){LIGHTNING_PLACE_CACHE.set(key,'Ubicación no disponible');return'Ubicación no disponible'}
+}
+async function fillLightningPlace(id,d){const el=document.getElementById(id);if(!el)return;const name=await resolveLightningPlace(d);if(el)el.textContent='📍 '+name}
 function renderSatelliteWorkspace(){
  if(!satelliteMap)return;
  const r=num($('satWorkspaceRadius')?.value,2000),source=$('satSourceFilter')?.value||'ALL',q=String($('satWorkspaceSearch')?.value||'').trim().toLowerCase();
@@ -587,19 +600,20 @@ function renderSatelliteWorkspace(){
  modis.forEach(x=>L.circleMarker([x.lat,x.lon],{radius:5,color:'#fff',weight:1,fillColor:'#f97316',fillOpacity:.82}).bindPopup(`<div style="color:#111827"><b>🛰️ MODIS</b><br>${esc(x.detail)}<br>📍 ${x.lat.toFixed(5)}, ${x.lon.toFixed(5)}</div>`).addTo(satelliteGoesLayer));
  goes19.forEach(x=>{const c=goesColor(x.classification);L.circleMarker([x.lat,x.lon],{radius:5.5,color:'#fff',weight:1,fillColor:c,fillOpacity:.9}).bindPopup(`<div style="color:#111827"><b>🛰️ GOES-19 · ABI-L2-FDCF</b><br>${esc(x.detail)}<br>📍 ${x.lat.toFixed(5)}, ${x.lon.toFixed(5)}</div>`).addTo(satelliteGoes19Layer)});
  rain.forEach(x=>{const mm=Number(x.raw.rateMmH),radius=Math.min(13,3+Math.sqrt(mm)*1.3);L.circleMarker([x.lat,x.lon],{radius,color:rainColor(mm),weight:0,fillColor:rainColor(mm),fillOpacity:.38}).bindPopup(`<div style="color:#111827"><b>🌧️ GOES-19 RRQPE</b><br><b>Intensidad estimada:</b> ${mm.toFixed(1)} mm/h<br>${esc(x.detail)}<br>📍 ${x.lat.toFixed(5)}, ${x.lon.toFixed(5)}</div>`).addTo(satelliteRainLayer)});
- lightning.forEach(x=>{const ageMin=Math.max(0,(Date.now()-(x.raw.timeMs||Date.now()))/60000),opacity=ageMin<5?.85:ageMin<10?.55:.28,size=ageMin<5?9:ageMin<10?7:5;const icon=L.divIcon({className:'',html:`<div class="glm-bolt" style="width:${size}px!important;height:${size}px!important;opacity:${opacity}!important"></div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]});L.marker([x.lat,x.lon],{icon}).bindPopup(`<div style="color:#111827"><b>⚡ GOES-19 GLM</b><br>${esc(x.detail)}<br><b>Antigüedad:</b> ${ageMin.toFixed(1)} min<br>📍 ${x.lat.toFixed(5)}, ${x.lon.toFixed(5)}</div>`).addTo(satelliteLightningLayer)});
+ lightning.forEach(x=>{const ageMin=Math.max(0,(Date.now()-(x.raw.timeMs||Date.now()))/60000),opacity=ageMin<5?.85:ageMin<10?.55:.28,size=ageMin<5?9:ageMin<10?7:5;const icon=L.divIcon({className:'',html:`<div class="glm-bolt" style="width:${size}px!important;height:${size}px!important;opacity:${opacity}!important"></div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]});const pid='glmPlace'+String(x.id).replace(/[^a-zA-Z0-9]/g,'').slice(-28);const mk=L.marker([x.lat,x.lon],{icon}).bindPopup(`<div style="color:#111827"><b>⚡ GOES-19 GLM</b><br>${esc(x.detail)}<br><b>Antigüedad:</b> ${ageMin.toFixed(1)} min<br><span id="${pid}">📍 Buscando ubicación…</span></div>`);mk.on('popupopen',()=>fillLightningPlace(pid,x.raw));mk.addTo(satelliteLightningLayer)});
  if(!satelliteViirsVisible&&satelliteMap.hasLayer(satelliteViirsLayer))satelliteMap.removeLayer(satelliteViirsLayer);else if(satelliteViirsVisible&&!satelliteMap.hasLayer(satelliteViirsLayer))satelliteViirsLayer.addTo(satelliteMap);
  if(!satelliteGoesVisible&&satelliteMap.hasLayer(satelliteGoesLayer))satelliteMap.removeLayer(satelliteGoesLayer);else if(satelliteGoesVisible&&!satelliteMap.hasLayer(satelliteGoesLayer))satelliteGoesLayer.addTo(satelliteMap);
  if(!satelliteGoes19Visible&&satelliteMap.hasLayer(satelliteGoes19Layer))satelliteMap.removeLayer(satelliteGoes19Layer);else if(satelliteGoes19Visible&&!satelliteMap.hasLayer(satelliteGoes19Layer))satelliteGoes19Layer.addTo(satelliteMap);
  if(!satelliteLightningVisible&&satelliteMap.hasLayer(satelliteLightningLayer))satelliteMap.removeLayer(satelliteLightningLayer);else if(satelliteLightningVisible&&!satelliteMap.hasLayer(satelliteLightningLayer))satelliteLightningLayer.addTo(satelliteMap);
  if(!satelliteRainVisible&&satelliteMap.hasLayer(satelliteRainLayer))satelliteMap.removeLayer(satelliteRainLayer);else if(satelliteRainVisible&&!satelliteMap.hasLayer(satelliteRainLayer))satelliteRainLayer.addTo(satelliteMap);
  let items=[...(source==='ALL'||source==='VIIRS'?viirs:[]),...(source==='ALL'||source==='GOES'?modis:[]),...(source==='ALL'||source==='GOES19'?goes19:[]),...(source==='ALL'?lightning:[]),...(source==='ALL'?rain:[])].filter(x=>!q||`${x.source} ${x.title} ${x.detail} ${x.lat} ${x.lon}`.toLowerCase().includes(q)).sort((a,b)=>a.km-b.km);
- $('satelliteWorkspaceList').innerHTML=items.map(x=>`<article class="satellite-item ${x.source==='VIIRS'?'viirs':''}" onclick="focusSatelliteDetection('${x.source}',${x.lat},${x.lon})"><div class="flex"><span class="sat-title">${x.source==='VIIRS'?'🔥':'🛰️'} ${esc(x.title)}</span><span class="badge">${x.source==='GOES19'?'GOES-19':x.source==='GLM'?'RAYO':x.source==='RAIN'?'LLUVIA':x.source}</span></div><div class="sat-meta">${esc(x.detail)}</div><div class="sat-foot"><span>📍 ${x.lat.toFixed(5)}, ${x.lon.toFixed(5)}</span><button onclick="event.stopPropagation();focusSatelliteDetection('${x.source}',${x.lat},${x.lon})">Ver mapa</button></div></article>`).join('')||'<div class="muted">Sin detecciones para el filtro seleccionado.</div>';
+ $('satelliteWorkspaceList').innerHTML=items.map(x=>`<article class="satellite-item ${x.source==='VIIRS'?'viirs':''}" onclick="focusSatelliteDetection('${x.source}',${x.lat},${x.lon})"><div class="flex"><span class="sat-title">${x.source==='VIIRS'?'🔥':'🛰️'} ${esc(x.title)}</span><span class="badge">${x.source==='GOES19'?'GOES-19':x.source==='GLM'?'RAYO':x.source==='RAIN'?'LLUVIA':x.source}</span></div><div class="sat-meta">${esc(x.detail)}</div><div class="sat-foot"><span>${x.source==='GLM'?`<span id="glmList${String(x.id).replace(/[^a-zA-Z0-9]/g,'').slice(-28)}">📍 Ubicación…</span>`:`📍 ${x.lat.toFixed(5)}, ${x.lon.toFixed(5)}`}</span><button onclick="event.stopPropagation();focusSatelliteDetection('${x.source}',${x.lat},${x.lon})">Ver mapa</button></div></article>`).join('')||'<div class="muted">Sin detecciones para el filtro seleccionado.</div>';
+ lightning.forEach(x=>fillLightningPlace('glmList'+String(x.id).replace(/[^a-zA-Z0-9]/g,'').slice(-28),x.raw));
  const near=[...viirs,...modis,...goes19,...lightning,...rain].filter(x=>x.km<=r).sort((a,b)=>a.km-b.km);satelliteCritical=near[0]||null;
  set('satViirsTotalLeft',viirs.length+' detectados');set('satGoesTotalLeft',modis.length+' anomalías');set('satGoes19TotalLeft',goes19.length+' anomalías');set('satNearTotalLeft',near.length+' / '+r+' km');set('satGpsDetailLeft',`GPS ${lat.toFixed(4)}, ${lon.toFixed(4)} · ±${Math.round(acc||0)} m`);
  set('satViirsTotal',viirs.length+' detectados');set('satGoesTotal',modis.length+' anomalías');set('satNearTotal',near.length+' dentro de '+r+' km');
  set('satWorkspaceTime','Actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}));
- const lightningState=lightning.length?`${lightning.length} rayos / 15 min`:'sin rayos recientes';
+ const lightningState=lightning.length?`${lightning.length} rayos / 20 km · 5 min`:'sin rayos recientes';
  const rainState=rain.length?`${rain.length} celdas de lluvia`:'sin lluvia RRQPE';
  const timeEl=$('satWorkspaceTime');if(timeEl)timeEl.title=`GLM: ${lightningState} · RRQPE: ${rainState}`;
 }
@@ -635,7 +649,7 @@ async function loadGoes19Lightning(){
   u.searchParams.set('lat',String(lat));
   u.searchParams.set('lon',String(lon));
   u.searchParams.set('minutes','5');
-  u.searchParams.set('radius','2000');
+  u.searchParams.set('radius','20');
   u.searchParams.set('argentina','true');
   u.searchParams.set('max_flashes','300');
   const r=await fetch(u.toString(),{cache:'no-store',headers:{Accept:'application/json'}});
@@ -647,8 +661,8 @@ async function loadGoes19Lightning(){
   lightningDetections=raw.map((d,i)=>{
     const time=d.time||d.datetime||d.timestamp||'',timeMs=Date.parse(time);
     return{id:d.id||`GLM-${i}`,lat:Number(d.lat??d.latitude),lon:Number(d.lon??d.longitude),energyJ:Number(d.energyJ??d.energy??0),time,timeMs:Number.isFinite(timeMs)?timeMs:nowMs,distanceKm:Number.isFinite(Number(d.distanceKm))?Number(d.distanceKm):distance(lat,lon,Number(d.lat??d.latitude),Number(d.lon??d.longitude))}
-  }).filter(d=>Number.isFinite(d.lat)&&Number.isFinite(d.lon)&&(!Number.isFinite(d.timeMs)||Math.abs(nowMs-d.timeMs)<=windowMs));
-  set('satLightningTotalLeft',lightningDetections.length+' rayos / 5 min');
+  }).filter(d=>Number.isFinite(d.lat)&&Number.isFinite(d.lon)&&d.distanceKm<=20&&(!Number.isFinite(d.timeMs)||Math.abs(nowMs-d.timeMs)<=windowMs));
+  set('satLightningTotalLeft',lightningDetections.length+' rayos / 20 km · 5 min');
   if($('satelliteModal')?.style.display==='flex')renderSatelliteWorkspace();
  }catch(e){
   lightningDetections=[];
