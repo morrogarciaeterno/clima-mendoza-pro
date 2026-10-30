@@ -599,7 +599,7 @@ function renderSatelliteWorkspace(){
  set('satViirsTotalLeft',viirs.length+' detectados');set('satGoesTotalLeft',modis.length+' anomalías');set('satGoes19TotalLeft',goes19.length+' anomalías');set('satNearTotalLeft',near.length+' / '+r+' km');set('satGpsDetailLeft',`GPS ${lat.toFixed(4)}, ${lon.toFixed(4)} · ±${Math.round(acc||0)} m`);
  set('satViirsTotal',viirs.length+' detectados');set('satGoesTotal',modis.length+' anomalías');set('satNearTotal',near.length+' dentro de '+r+' km');
  set('satWorkspaceTime','Actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}));
- const lightningState=lightning.length?`${lightning.length} rayos / 15 min`:'sin rayos recientes';
+ const lightningState=lightning.length?`${lightning.length} rayos / 20 km · 5 min`:'sin rayos recientes';
  const rainState=rain.length?`${rain.length} celdas de lluvia`:'sin lluvia RRQPE';
  const timeEl=$('satWorkspaceTime');if(timeEl)timeEl.title=`GLM: ${lightningState} · RRQPE: ${rainState}`;
 }
@@ -635,7 +635,7 @@ async function loadGoes19Lightning(){
   u.searchParams.set('lat',String(lat));
   u.searchParams.set('lon',String(lon));
   u.searchParams.set('minutes','5');
-  u.searchParams.set('radius','2000');
+  u.searchParams.set('radius','20');
   u.searchParams.set('argentina','true');
   u.searchParams.set('max_flashes','300');
   const r=await fetch(u.toString(),{cache:'no-store',headers:{Accept:'application/json'}});
@@ -647,8 +647,8 @@ async function loadGoes19Lightning(){
   lightningDetections=raw.map((d,i)=>{
     const time=d.time||d.datetime||d.timestamp||'',timeMs=Date.parse(time);
     return{id:d.id||`GLM-${i}`,lat:Number(d.lat??d.latitude),lon:Number(d.lon??d.longitude),energyJ:Number(d.energyJ??d.energy??0),time,timeMs:Number.isFinite(timeMs)?timeMs:nowMs,distanceKm:Number.isFinite(Number(d.distanceKm))?Number(d.distanceKm):distance(lat,lon,Number(d.lat??d.latitude),Number(d.lon??d.longitude))}
-  }).filter(d=>Number.isFinite(d.lat)&&Number.isFinite(d.lon)&&(!Number.isFinite(d.timeMs)||Math.abs(nowMs-d.timeMs)<=windowMs));
-  set('satLightningTotalLeft',lightningDetections.length+' rayos / 5 min');
+  }).filter(d=>Number.isFinite(d.lat)&&Number.isFinite(d.lon)&&d.distanceKm<=20&&(!Number.isFinite(d.timeMs)||Math.abs(nowMs-d.timeMs)<=windowMs));
+  set('satLightningTotalLeft',lightningDetections.length+' rayos / 20 km · 5 min');
   if($('satelliteModal')?.style.display==='flex')renderSatelliteWorkspace();
  }catch(e){
   lightningDetections=[];
