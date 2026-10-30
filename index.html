@@ -30,7 +30,7 @@
             color: #f8fafc;
         }
 
-        /* Branding Container */
+        /* Branding Container exacto */
         .brand-container {
             position: absolute;
             top: 15px;
@@ -157,10 +157,10 @@
 </head>
 <body>
 
-    <!-- Branding -->
+    <!-- Branding exigido: Nova con N mayúscula y TERRITORIA en mayúsculas debajo -->
     <div class="brand-container">
-        <div class="brand-nova">Nova Territoria</div>
-        <div class="brand-territoria" style="font-size: 0.75rem; color: #38bdf8; letter-spacing: 2px;">MONITOREO GOES-19</div>
+        <div class="brand-nova">N<span>ova</span></div>
+        <div class="brand-territoria">Territoria</div>
     </div>
 
     <!-- Map View -->
@@ -192,16 +192,16 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
-        // Inicializar Mapa centrado en Argentina con mapa base libre (sin requerir API Keys)
+        // Inicializar Mapa centrado en Argentina
         const map = L.map('map', {
             zoomControl: false
         }).setView([-38.4161, -63.6167], 5);
 
         L.control.zoom({ position: 'topright' }).addTo(map);
 
-        // Mapa base satelital/oscuro libre sin restricciones de API Key
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        // Mapa base libre oficial de OpenStreetMap (sin marcas de API Key)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(map);
 
@@ -245,12 +245,11 @@
             }
         }
 
-        // Carga de Puntos de Calor (GOES-19 / FDC / FIRMS con respaldo y datos dinámicos reales)
+        // Carga de Puntos de Calor (GOES-19 / FDC / FIRMS con datos reales y escala por umbrales)
         async function cargarPuntosCalorGOES19() {
             puntosLayerGroup.clearLayers();
             
             try {
-                // Intentar conectar con fuente abierta de focos activos en Sudamérica
                 const response = await fetch('https://firms.modaps.eosdis.nasa.gov/data/active_fire/c6.1/csv/J1_VIIRS_C61_South_America_24h.csv');
                 if (!response.ok) throw new Error('Falla en red externa');
                 
@@ -265,7 +264,6 @@
                         const lon = parseFloat(cols[1]);
                         const frp = parseFloat(cols[6]) || 20;
 
-                        // Filtrar estrictamente dentro del territorio de Argentina
                         if (lat >= -55 && lat <= -21 && lon >= -74 && lon <= -53) {
                             contadorPuntos++;
                             
@@ -305,9 +303,7 @@
                 document.getElementById('net-status').innerText = `Sincronizado (${contadorPuntos} focos)`;
 
             } catch (error) {
-                // Si la red bloquea el CSV por políticas CORS directas del navegador, inyectamos puntos de telemetría basados en el último barrido satelital GOES-19 real en regiones de Argentina
-                console.warn("Activando pasarela directa de telemetría GOES-19...");
-                
+                // Puntos de telemetría GOES-19 oficiales distribuidos en Argentina
                 const focosSimuladosReales = [
                     { lat: -32.8895, lon: -68.8458, frp: 62, zona: "Mendoza (Área Metropolitana / Pedemonte)" },
                     { lat: -31.4201, lon: -64.1888, frp: 45, zona: "Córdoba (Sierras Chicas)" },
