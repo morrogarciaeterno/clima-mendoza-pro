@@ -597,7 +597,7 @@ function renderSatelliteWorkspace(){
  set('satViirsTotalLeft',viirs.length+' detectados');set('satGoesTotalLeft',modis.length+' anomalías');set('satGoes19TotalLeft',goes19.length+' anomalías');set('satNearTotalLeft',near.length+' / '+r+' km');set('satGpsDetailLeft',`GPS ${lat.toFixed(4)}, ${lon.toFixed(4)} · ±${Math.round(acc||0)} m`);
  set('satViirsTotal',viirs.length+' detectados');set('satGoesTotal',modis.length+' anomalías');set('satNearTotal',near.length+' dentro de '+r+' km');
  set('satWorkspaceTime','Actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}));
- const lightningState=lightning.length?`${lightning.length} rayos / 15 min`:'sin rayos recientes';
+ const lightningState=lightning.length?`${lightning.length} rayos / 5 min`:'sin rayos recientes';
  const rainState=rain.length?`${rain.length} celdas de lluvia`:'sin lluvia RRQPE';
  const timeEl=$('satWorkspaceTime');if(timeEl)timeEl.title=`GLM: ${lightningState} · RRQPE: ${rainState}`;
 }
@@ -626,9 +626,13 @@ async function loadGoes19Rain(){
 }
 function formatLightningTime(v){const t=Date.parse(v||'');return Number.isFinite(t)?new Date(t).toLocaleString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit'}):'hora no disponible'}
 function toggleSatelliteLightning(){satelliteLightningVisible=!satelliteLightningVisible;if(satelliteMap&&satelliteLightningLayer){if(satelliteLightningVisible&&!satelliteMap.hasLayer(satelliteLightningLayer))satelliteLightningLayer.addTo(satelliteMap);if(!satelliteLightningVisible&&satelliteMap.hasLayer(satelliteLightningLayer))satelliteMap.removeLayer(satelliteLightningLayer)}$('satLightningBtn')?.classList.toggle('active',satelliteLightningVisible);set('satLightningBtn',satelliteLightningVisible?'⚡ RAYOS ON':'⚡ RAYOS OFF')}
+let lightningRequestSeq=0,lightningAbortController=null,lightningLastSuccessAt=0;
 async function loadGoes19Lightning(){
+ const requestId=++lightningRequestSeq;
+ if(lightningAbortController)lightningAbortController.abort();
+ lightningAbortController=new AbortController();
+ if(!lightningDetections.length)set('satLightningTotalLeft','CONSULTANDO...');
  try{
-  set('satLightningTotalLeft','CONSULTANDO…');
   const u=new URL('/lightning',GOES19_WORKER_URL);
   u.searchParams.set('lat',String(lat));
   u.searchParams.set('lon',String(lon));
@@ -636,23 +640,25 @@ async function loadGoes19Lightning(){
   u.searchParams.set('radius','2000');
   u.searchParams.set('argentina','true');
   u.searchParams.set('max_flashes','300');
-  const r=await fetch(u.toString(),{cache:'no-store',headers:{Accept:'application/json'}});
+  u.searchParams.set('_t',String(Date.now()));
+  const r=await fetch(u.toString(),{cache:'no-store',headers:{Accept:'application/json'},signal:lightningAbortController.signal});
   const text=await r.text();
-  let j;try{j=JSON.parse(text)}catch{throw Error(`HTTP ${r.status} · respuesta no JSON`)}
-  if(!r.ok||j.ok===false)throw Error(j.error||`HTTP ${r.status}`);
+  if(requestId!==lightningRequestSeq)return;
+  let j;try{j=JSON.parse(text)}catch{throw Error('HTTP '+r.status+' respuesta no JSON')}
+  if(!r.ok||j.ok===false)throw Error(j.error||('HTTP '+r.status));
   const raw=Array.isArray(j.flashes)?j.flashes:[];
   const nowMs=Date.now(),windowMs=5*60*1000;
-  lightningDetections=raw.map((d,i)=>{
-    const time=d.time||d.datetime||d.timestamp||'',timeMs=Date.parse(time);
-    return{id:d.id||`GLM-${i}`,lat:Number(d.lat??d.latitude),lon:Number(d.lon??d.longitude),energyJ:Number(d.energyJ??d.energy??0),time,timeMs:Number.isFinite(timeMs)?timeMs:nowMs,distanceKm:Number.isFinite(Number(d.distanceKm))?Number(d.distanceKm):distance(lat,lon,Number(d.lat??d.latitude),Number(d.lon??d.longitude))}
-  }).filter(d=>Number.isFinite(d.lat)&&Number.isFinite(d.lon)&&(!Number.isFinite(d.timeMs)||Math.abs(nowMs-d.timeMs)<=windowMs));
+  const parsed=raw.map((d,i)=>{const time=d.time||d.datetime||d.timestamp||'',timeMs=Date.parse(time);return{id:d.id||('GLM-'+i),lat:Number(d.lat??d.latitude),lon:Number(d.lon??d.longitude),energyJ:Number(d.energyJ??d.energy??0),time,timeMs:Number.isFinite(timeMs)?timeMs:nowMs,distanceKm:Number.isFinite(Number(d.distanceKm))?Number(d.distanceKm):distance(lat,lon,Number(d.lat??d.latitude),Number(d.lon??d.longitude))}}).filter(d=>Number.isFinite(d.lat)&&Number.isFinite(d.lon)&&Math.abs(nowMs-d.timeMs)<=windowMs);
+  if(requestId!==lightningRequestSeq)return;
+  lightningDetections=parsed;
+  lightningLastSuccessAt=Date.now();
   set('satLightningTotalLeft',lightningDetections.length+' rayos / 5 min');
   if($('satelliteModal')?.style.display==='flex')renderSatelliteWorkspace();
  }catch(e){
-  lightningDetections=[];
-  set('satLightningTotalLeft','REINTENTAR · '+String(e.message||e).slice(0,34));
-  if($('satelliteModal')?.style.display==='flex')renderSatelliteWorkspace();
-  console.error('GOES-19 GLM',e);
+  if(e?.name==='AbortError'||requestId!==lightningRequestSeq)return;
+  console.warn('GOES-19 GLM actualización transitoria:',e.message||e);
+  if(lightningDetections.length){const age=Math.max(0,Math.round((Date.now()-lightningLastSuccessAt)/60000));set('satLightningTotalLeft',lightningDetections.length+' rayos · lectura '+age+' min');}
+  else set('satLightningTotalLeft','SIN DATOS · reintento automático');
  }
 }
 async function loadGoes19(){
