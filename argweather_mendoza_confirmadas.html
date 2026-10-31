@@ -50,8 +50,8 @@ function lightningColor(e){if(Number.isFinite(e)){if(e>80)return'#ff00ff';if(e>4
 async function updateLightning(){
  const box=document.getElementById('lightningStatus');
  try{
-  const r=await fetch('https://www2.contingencias.mendoza.gov.ar/rayos/rayos.json?nocache='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);
-  const data=await r.json();lightningLayer.clearLayers();let visible=0;
+  const r=await fetch('https://radar-mendoza.elexpreso17.workers.dev/rayos-mendoza?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);
+  const payload=await r.json();if(!payload.ok)throw Error(payload.error||'respuesta rayos inválida');const data=payload.items||[];lightningLayer.clearLayers();let visible=0;
   for(const x of data){const lat=Number(x.lat),lon=Number(x.lng),e=Number(x.e);if(!Number.isFinite(lat)||!Number.isFinite(lon))continue;const c=lightningColor(e);const m=L.circleMarker([lat,lon],{radius:4,color:c,weight:1.5,fillColor:c,fillOpacity:.85,pane:'markerPane'}).bindPopup(`<b>⚡ Rayo GLM</b><br>Hora: ${x.fecha||'--'}<br>Valor fuente: ${Number.isFinite(e)?e.toFixed(2):'--'}`);m.addTo(lightningLayer);const pt=map.latLngToContainerPoint([lat,lon]),sz=map.getSize();if(pt.x>=0&&pt.x<=sz.x&&pt.y>=0&&pt.y<=sz.y)visible++}
   box.innerHTML=`<b>⚡ Rayos:</b> ${visible} visibles en el mapa`;
  }catch(e){box.innerHTML='<b>⚡ Rayos:</b> fuente no disponible';}
