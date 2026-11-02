@@ -1012,7 +1012,7 @@ async function loadGoes(){
   if(!response.ok)throw Error('NASA FIRMS MODIS HTTP '+response.status);
   const text=await response.text();
   const lines=text.trim().split(/\r?\n/);
-  if(lines.length<2){goesDetections=[];throw Error('Sin registros MODIS para el área consultada')}
+  if(lines.length<2){goesDetections=[];closestGoes=[];currentGoesIndex=0;set('goesCount','0');set('goesCardState','SIN FOCOS');set('goesDistance','-- km');set('goesIndex','0 de 0');set('goesDetail','NASA FIRMS MODIS: sin detecciones para el área consultada');set('goesDots','○ ○ ○');setGoesCardLevel(null);renderGoesLayer();if($('satelliteModal')?.style.display==='flex')renderSatelliteWorkspace();return}
   const headers=lines[0].split(',').map(x=>x.trim());
   const col=name=>headers.indexOf(name);
   const iLat=col('latitude'),iLon=col('longitude'),iBright=col('brightness'),iConf=col('confidence'),iDate=col('acq_date'),iTime=col('acq_time'),iFrp=col('frp'),iSatellite=col('satellite');
