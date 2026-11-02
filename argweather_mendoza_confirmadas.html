@@ -1160,4 +1160,33 @@ function gpsOk(p){lat=p.coords.latitude;lon=p.coords.longitude;acc=p.coords.accu
  function syncRainHailRects(){copy('rainText','rhRain');copy('precipNow','rhNow');copy('precipAccum','rhAccum');copy('hailText','rhHail');copy('convectiveLightning','rhLightning');copy('convectiveNearest','rhNearest');const r=document.getElementById('rhRainBar'),h=document.getElementById('rhHailBar');if(r)r.style.width=pc('rainText')+'%';if(h)h.style.width=pc('hailText')+'%'}
  setInterval(syncRainHailRects,1000);setTimeout(syncRainHailRects,1200);
 })();
-</script><div id="goesListModal" onclick="if(event.target===this)closeGoesList()"><div class="goes-list-box"><div class="goes-list-head"><div><b>🛰️ Detecciones MODIS</b><div class="muted">Listado de los registros recibidos por Territoria</div></div><button onclick="closeGoesList()">✕ Cerrar</button></div><input class="goes-search" id="goesSearch" oninput="renderGoesListModal()" placeholder="🔎 Buscar país, clasificación, coordenada o distancia…"/><div class="goes-list-meta" id="goesListMeta">--</div><div class="goes-list-body" id="goesListBody"></div></div></div><div class="rain-radar-modal" id="rainRadarModal"><div class="rain-radar-shell"><div class="rain-radar-head"><div><strong>🌩️ Monitor de lluvia y contingencias</strong><div class="muted">Radar DCC · dBZ · rayos GLM · análisis por ubicación</div></div><button class="danger" onclick="closeRainRadarPopup()">✕ Cerrar</button></div><iframe class="rain-radar-frame" id="rainRadarPopupFrame" title="Monitor radar Territoria" allow="geolocation *; fullscreen *"></iframe></div></div></body></html>
+</script><div id="goesListModal" onclick="if(event.target===this)closeGoesList()"><div class="goes-list-box"><div class="goes-list-head"><div><b>🛰️ Detecciones MODIS</b><div class="muted">Listado de los registros recibidos por Territoria</div></div><button onclick="closeGoesList()">✕ Cerrar</button></div><input class="goes-search" id="goesSearch" oninput="renderGoesListModal()" placeholder="🔎 Buscar país, clasificación, coordenada o distancia…"/><div class="goes-list-meta" id="goesListMeta">--</div><div class="goes-list-body" id="goesListBody"></div></div></div><div class="rain-radar-modal" id="rainRadarModal"><div class="rain-radar-shell"><div class="rain-radar-head"><div><strong>🌩️ Monitor de lluvia y contingencias</strong><div class="muted">Radar DCC · dBZ · rayos GLM · análisis por ubicación</div></div><button class="danger" onclick="closeRainRadarPopup()">✕ Cerrar</button></div><iframe class="rain-radar-frame" id="rainRadarPopupFrame" title="Monitor radar Territoria" allow="geolocation *; fullscreen *"></iframe></div></div>
+<script id="territoria-basic-source-protection">
+(() => {
+  "use strict";
+
+  const blockedKey = (event) => {
+    const key = String(event.key || "").toUpperCase();
+    const ctrlOrMeta = event.ctrlKey || event.metaKey;
+
+    return key === "F12" ||
+      (ctrlOrMeta && event.shiftKey && ["I", "J", "C", "K"].includes(key)) ||
+      (ctrlOrMeta && ["U", "S"].includes(key));
+  };
+
+  document.addEventListener("keydown", (event) => {
+    if (!blockedKey(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+
+  document.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+  }, true);
+
+  document.addEventListener("dragstart", (event) => {
+    if (event.target && event.target.tagName === "IMG") event.preventDefault();
+  }, true);
+})();
+</script>
+</body></html>
