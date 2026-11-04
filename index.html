@@ -1103,7 +1103,55 @@ function centerLotGps(){if(!lotMap)return;updateLotGps();lotMap.setView([lat,lon
 async function searchLotPlace(){const input=$('lotSearchInput'),q=input?.value.trim();if(!q||!lotMap)return;set('lotSearchResult','Buscando…');try{const params=new URLSearchParams({q,format:'jsonv2',limit:'5',countrycodes:'ar'}),r=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status);const results=await r.json();if(!results.length){set('lotSearchResult','Sin resultados para esa búsqueda.');return}const x=results[0],a=Number(x.lat),b=Number(x.lon);if(!Number.isFinite(a)||!Number.isFinite(b))throw Error('Coordenadas inválidas');if(lotSearchMarker)lotMap.removeLayer(lotSearchMarker);lotSearchMarker=L.marker([a,b]).addTo(lotMap).bindPopup(`<div style="color:#111827"><b>🔎 Resultado</b><br>${esc(x.display_name||q)}</div>`).openPopup();if(Array.isArray(x.boundingbox)&&x.boundingbox.length===4){const bounds=L.latLngBounds([[Number(x.boundingbox[0]),Number(x.boundingbox[2])],[Number(x.boundingbox[1]),Number(x.boundingbox[3])]]);lotMap.fitBounds(bounds,{padding:[30,30],maxZoom:18})}else lotMap.setView([a,b],17);set('lotSearchResult',x.display_name||q)}catch(e){set('lotSearchResult','Error de búsqueda: '+e.message)}}
 function clearLotSearch(){if(lotSearchMarker&&lotMap){lotMap.removeLayer(lotSearchMarker);lotSearchMarker=null}if($('lotSearchInput'))$('lotSearchInput').value='';set('lotSearchResult','Sin búsqueda activa.');centerLotGps()}
 async function openLots(){$('lotModal').style.display='flex';await loadLeaflet();if(!window.L.Control?.Draw){await new Promise((ok,no)=>{let c=document.createElement('link');c.rel='stylesheet';c.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css';document.head.appendChild(c);let s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)})}setTimeout(()=>{if(!lotMap){lotMap=L.map('lotMap').setView([lat,lon],16);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20}).addTo(lotMap);drawn=L.featureGroup().addTo(lotMap);lotMap.addControl(new L.Control.Draw({draw:{polygon:true,rectangle:true,polyline:false,circle:false,marker:false,circlemarker:false},edit:{featureGroup:drawn}}));lotMap.on(L.Draw.Event.CREATED,e=>{drawn.clearLayers();drawn.addLayer(e.layer);let ll=e.layer.getLatLngs()[0],area=L.GeometryUtil.geodesicArea(ll),c=e.layer.getBounds().getCenter();lotReport(c.lat,c.lng,area/10000)})}updateLotGps();lotMap.invalidateSize()},100)}
-async function lotReport(a,b,ha){let p=$('lotReport');p.innerHTML=`<h3>📊 Procesando ${ha.toFixed(2)} ha…</h3>`;try{let q=new URLSearchParams({latitude:a,longitude:b,current:'temperature_2m,relative_humidity_2m,wind_speed_10m',daily:'precipitation_sum,et0_fao_evapotranspiration,temperature_2m_min',forecast_days:'7',timezone:'auto'}),r=await fetch('https://api.open-meteo.com/v1/forecast?'+q),j=await r.json(),rain=(j.daily.precipitation_sum||[]).reduce((x,y)=>x+num(y),0),et=(j.daily.et0_fao_evapotranspiration||[]).reduce((x,y)=>x+num(y),0),tm=Math.min(...j.daily.temperature_2m_min);p.innerHTML=`<h3>📊 Reporte del lote</h3><div class="row"><span>Superficie</span><strong>${ha.toFixed(2)} ha</strong></div><div class="row"><span>Temperatura</span><strong>${j.current.temperature_2m} °C</strong></div><div class="row"><span>Humedad</span><strong>${j.current.relative_humidity_2m}%</strong></div><div class="row"><span>Lluvia 7 días</span><strong>${rain.toFixed(1)} mm</strong></div><div class="row"><span>ET₀ 7 días</span><strong>${et.toFixed(1)} mm</strong></div><div class="row"><span>Balance</span><strong>${(rain-et).toFixed(1)} mm</strong></div><div class="row"><span>Mínima</span><strong>${tm.toFixed(1)} °C</strong></div>`}catch(e){p.textContent='Error al analizar: '+e.message}}
+async function lotReport(a,b,ha){
+ let p=$('lotReport');p.innerHTML=`<h3>📊 Procesando ${ha.toFixed(2)} ha…</h3>`;
+ try{
+  let q=new URLSearchParams({latitude:a,longitude:b,current:'temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m',daily:'precipitation_sum,et0_fao_evapotranspiration,temperature_2m_min',forecast_days:'7',timezone:'auto'}),
+      r=await fetch('https://api.open-meteo.com/v1/forecast?'+q),j=await r.json(),
+      rain=(j.daily.precipitation_sum||[]).reduce((x,y)=>x+num(y),0),
+      et=(j.daily.et0_fao_evapotranspiration||[]).reduce((x,y)=>x+num(y),0),
+      tm=Math.min(...j.daily.temperature_2m_min),balance=rain-et,
+      wind=num(j.current?.wind_speed_10m),gust=num(j.current?.wind_gusts_10m);
+  p.innerHTML=`<h3>📊 Reporte del lote</h3>
+  <div class="row"><span>Superficie</span><strong>${ha.toFixed(2)} ha</strong></div>
+  <div class="row"><span>Temperatura</span><strong>${j.current.temperature_2m} °C</strong></div>
+  <div class="row"><span>Humedad</span><strong>${j.current.relative_humidity_2m}%</strong></div>
+  <div class="row"><span>Lluvia 7 días</span><strong>${rain.toFixed(1)} mm</strong></div>
+  <div class="row"><span>ET₀ 7 días</span><strong>${et.toFixed(1)} mm</strong></div>
+  <div class="row"><span>Balance</span><strong>${balance.toFixed(1)} mm</strong></div>
+  <div class="row"><span>Mínima</span><strong>${tm.toFixed(1)} °C</strong></div>
+  <div id="lotSoilGrid" style="margin-top:12px;padding-top:10px;border-top:1px solid #334155"><h3 style="margin:0 0 8px">🌱 Suelo · SoilGrids</h3><div class="muted">Consultando el centro del lote: ${a.toFixed(5)}, ${b.toFixed(5)}…</div></div>`;
+  loadLotSoilGrids(a,b,balance,wind,gust);
+ }catch(e){p.textContent='Error al analizar: '+e.message}
+}
+
+const SOILGRIDS_WCS='https://maps.isric.org/mapserv';
+const SOILGRIDS_PROPS=[
+ {key:'phh2o',label:'pH',unit:'',factor:.1},
+ {key:'soc',label:'Carbono orgánico',unit:' g/kg',factor:.1},
+ {key:'nitrogen',label:'Nitrógeno total',unit:' g/kg',factor:.01},
+ {key:'sand',label:'Arena',unit:' %',factor:.1},
+ {key:'silt',label:'Limo',unit:' %',factor:.1},
+ {key:'clay',label:'Arcilla',unit:' %',factor:.1},
+ {key:'cec',label:'CEC',unit:' cmol(c)/kg',factor:.1}
+];
+async function soilGridPoint(prop,lat0,lon0){
+ const d=.0016,params=new URLSearchParams({map:`/map/${prop}.map`,SERVICE:'WCS',VERSION:'2.0.1',REQUEST:'GetCoverage',COVERAGEID:`${prop}_5-15cm_mean`,FORMAT:'GEOTIFF_INT16',SUBSET:`X(${lon0-d},${lon0+d})`});
+ params.append('SUBSET',`Y(${lat0-d},${lat0+d})`);params.set('SUBSETTINGCRS','http://www.opengis.net/def/crs/EPSG/0/4326');params.set('OUTPUTCRS','http://www.opengis.net/def/crs/EPSG/0/4326');
+ const u=SOILGRIDS_WCS+'?'+params.toString(),rr=await fetch(u,{cache:'no-store'});if(!rr.ok)throw Error(`${prop} HTTP ${rr.status}`);
+ const blob=await rr.blob();return{url:u,blob};
+}
+async function loadLotSoilGrids(a,b,balance,wind,gust){
+ const box=$('lotSoilGrid');if(!box)return;
+ /* WCS devuelve GeoTIFF. El navegador no lo decodifica de forma nativa, por eso dejamos el bloque listo y comprobamos disponibilidad. */
+ const checks=await Promise.allSettled(SOILGRIDS_PROPS.map(async x=>({prop:x,...await soilGridPoint(x.key,a,b)})));
+ const ok=checks.filter(x=>x.status==='fulfilled');
+ const appState=gust>=60?'POSPONER':gust>=40?'PRECAUCIÓN':'FAVORABLE';
+ const waterState=balance<=-30?'DÉFICIT ALTO':balance<0?'DÉFICIT':'EQUILIBRADO / POSITIVO';
+ if(!ok.length){box.innerHTML=`<h3 style="margin:0 0 8px">🌱 Suelo · SoilGrids</h3><div class="row"><span>Servicio WCS</span><strong>NO DISPONIBLE</strong></div><div class="row"><span>Estado hídrico</span><strong>${waterState}</strong></div><div class="row"><span>Aplicación por viento</span><strong>${appState}</strong></div><div class="muted" style="margin-top:8px">SoilGrids no respondió desde el navegador. Los datos edáficos no se estiman ni se inventan.</div>`;return}
+ box.innerHTML=`<h3 style="margin:0 0 8px">🌱 Suelo · SoilGrids</h3><div class="row"><span>Centro analizado</span><strong>${a.toFixed(5)}, ${b.toFixed(5)}</strong></div><div class="row"><span>WCS SoilGrids</span><strong>${ok.length}/${SOILGRIDS_PROPS.length} capas disponibles</strong></div><div class="row"><span>Estado hídrico</span><strong>${waterState}</strong></div><div class="row"><span>Aplicación por viento</span><strong>${appState}</strong></div><div class="muted" style="margin-top:8px">Los mapas SoilGrids son estimaciones cartográficas. Para mostrar pH, carbono, nitrógeno y textura numéricos, el GeoTIFF WCS debe decodificarse en backend. No sustituye análisis de laboratorio.</div>`;
+}
+
 function activateManualTree(){manualTree=true;const b=$('manualTreeBanner'),btn=$('manualTreeBtn');if(b)b.style.display='block';if(btn){btn.classList.add('active');set('manualTreeBtn','📍 Toca el mapa…')}if(treeMap){treeMap.getContainer().style.cursor='crosshair';treeMap.closePopup()}}
 function cancelManualTree(){manualTree=false;const b=$('manualTreeBanner'),btn=$('manualTreeBtn');if(b)b.style.display='none';if(btn){btn.classList.remove('active');set('manualTreeBtn','📍 Marcar manualmente')}if(treeMap)treeMap.getContainer().style.cursor=''}
 async function openTrees(){$('treeModal').style.display='flex';await loadLeaflet();set('treeStorageState','CARGANDO NUBE…');setTimeout(async()=>{if(!treeMap){treeMap=L.map('treeMap',{maxZoom:20}).setView([lat,lon],18);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxNativeZoom:19,maxZoom:20,attribution:'&copy; OpenStreetMap contributors'}).addTo(treeMap);treeGroup=L.layerGroup().addTo(treeMap);treeMap.on('click',e=>{if(!manualTree)return;const a=e.latlng.lat,b=e.latlng.lng;cancelManualTree();setTimeout(()=>openTreeForm(a,b,null,'Manual'),50)})}updateTreeGps();treeMap.invalidateSize();await loadTreesFromFirestore()},100)}
