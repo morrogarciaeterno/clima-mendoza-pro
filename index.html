@@ -144,6 +144,89 @@
       filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
     }
 
+    /* POPUP OSCURO DE POZO */
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: rgba(15, 23, 42, 0.97);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+    }
+
+    .leaflet-popup-content {
+      margin: 10px 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      min-width: 195px;
+    }
+
+    .popup-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .popup-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: #fff;
+    }
+
+    .popup-rate {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.16);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .popup-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 7px;
+    }
+
+    .popup-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      margin-bottom: 8px;
+    }
+
+    .popup-cell {
+      background: rgba(30, 41, 59, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 5px;
+      padding: 4px 6px;
+    }
+
+    .popup-cell span {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    .popup-btn {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--accent-cyan);
+      background: rgba(14, 165, 233, 0.22);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
     .kpi-carousel {
       position: absolute;
       top: 10px;
@@ -285,7 +368,7 @@
       border-top: 1px solid var(--border-color);
       border-radius: 16px 16px 0 0;
       z-index: 900;
-      max-height: 76dvh;
+      max-height: 72dvh;
       display: flex;
       flex-direction: column;
       transform: translateY(calc(100% - 68px));
@@ -433,11 +516,12 @@
     }
 
     .bars-container {
-      height: 92px;
+      height: 102px;
       display: flex;
       align-items: flex-end;
       gap: 7px;
       padding-top: 14px;
+      padding-bottom: 4px;
       border-bottom: 1px solid rgba(148, 163, 184, 0.25);
     }
 
@@ -446,7 +530,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
     }
 
     .bar-fill {
@@ -575,7 +659,7 @@
 
         <div class="sheet-tabs">
           <button class="sheet-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Ficha & Fractura</button>
-          <button class="sheet-tab" id="tab-btn-alertas" onclick="switchTab('alertas')" id="alerts-tab-btn">Alertas</button>
+          <button class="sheet-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas</button>
         </div>
 
         <div class="sheet-body">
@@ -640,7 +724,7 @@
 
     const map = L.map('map', {
       zoomControl: false
-    }).setView([-38.32, -68.85], 10);
+    }).setView([-38.32, -68.85], 11);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap | Territoria',
@@ -660,7 +744,7 @@
         name: 'VM Sur · Añelo',
         lat: -38.32,
         lon: -68.85,
-        zoom: 10,
+        zoom: 11,
         pozos: '142',
         pozosSub: '+6 en fractura',
         prod: '14.820 m³/d',
@@ -671,7 +755,7 @@
         name: 'VM Norte · Malargüe',
         lat: -37.02,
         lon: -69.56,
-        zoom: 10,
+        zoom: 11,
         pozos: '14',
         pozosSub: '2 pilotos activos',
         prod: '940 m³/d',
@@ -682,7 +766,7 @@
         name: 'Cuyana · Mendoza',
         lat: -33.12,
         lon: -68.82,
-        zoom: 10,
+        zoom: 11,
         pozos: '318',
         pozosSub: 'Recuperación 2ª',
         prod: '4.650 m³/d',
@@ -762,14 +846,40 @@
       }
     ];
 
-    wellsData.forEach(w => {
+    function buildWellPopupHtml(w, idx) {
+      return `
+        <div class="popup-head">
+          <div class="popup-title">${w.id}</div>
+          <div class="popup-rate">${w.rate}</div>
+        </div>
+        <div class="popup-sub">${w.operadora} · ${w.area}</div>
+        <div class="popup-grid">
+          <div class="popup-cell"><span>TVD</span>${w.tvd}</div>
+          <div class="popup-cell"><span>Rama</span>${w.lat}</div>
+          <div class="popup-cell"><span>Etapas</span>${w.stages}</div>
+          <div class="popup-cell"><span>Formación</span>${w.formacion}</div>
+        </div>
+        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Ver ficha completa</button>
+      `;
+    }
+
+    function openWellDetailByIndex(idx) {
+      const w = wellsData[idx];
+      if (!w) return;
+      map.closePopup();
+      selectWell(w, true);
+    }
+
+    wellsData.forEach((w, idx) => {
+      const popupHtml = buildWellPopupHtml(w, idx);
+
       if (w.lat !== 'Vertical') {
         const line = L.polyline([w.surface, w.bottom], {
           color: w.color,
           weight: 4,
           opacity: 0.9
-        }).addTo(layers.pozos);
-        line.on('click', () => selectWell(w, true));
+        }).bindPopup(popupHtml).addTo(layers.pozos);
+        line.on('click', () => selectWell(w, false));
       }
 
       const marker = L.circleMarker(w.surface, {
@@ -778,9 +888,9 @@
         color: '#ffffff',
         weight: 2,
         fillOpacity: 0.95
-      }).bindPopup(`<b>${w.id}</b><br>${w.area}<br>Caudal: ${w.rate}`).addTo(layers.pozos);
+      }).bindPopup(popupHtml).addTo(layers.pozos);
 
-      marker.on('click', () => selectWell(w, true));
+      marker.on('click', () => selectWell(w, false));
     });
 
     [
@@ -965,9 +1075,12 @@
       document.getElementById('spec-rate').textContent = w.rate;
 
       renderChart(w.history);
-      switchTab('ficha');
 
       if (expandSheet) {
+        document.getElementById('tab-btn-ficha').classList.add('active');
+        document.getElementById('tab-btn-alertas').classList.remove('active');
+        document.getElementById('pane-ficha').classList.add('active');
+        document.getElementById('pane-alertas').classList.remove('active');
         document.getElementById('bottom-sheet').classList.add('expanded');
       }
     }
@@ -979,7 +1092,7 @@
       const maxVal = Math.max(...values, 1);
 
       values.forEach((v, i) => {
-        const h = Math.round((v / maxVal) * 70);
+        const h = Math.max(12, Math.round((v / maxVal) * 62));
         const col = document.createElement('div');
         col.className = 'bar-col';
         col.innerHTML = `
