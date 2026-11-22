@@ -50,7 +50,6 @@
     .brand-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
     .brand-sub{color:var(--muted);font-size:9.5px;letter-spacing:.15em;margin-top:4px;font-weight:600;text-transform:uppercase}
 
-    /* En la portada inicial (cuando el logo principal está al centro), dejamos solo el emblema + UPSTREAM arriba */
     body.on-home .brand-wordmark,
     body.on-home .brand-divider,
     body.on-home .brand-sub{display:none}
@@ -60,7 +59,7 @@
     .status-pill{color:#bffbd8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px var(--green)}
     .clock{font-family:"JetBrains Mono";color:var(--text)}
 
-    /* Pantalla de inicio con el logo Territoria Energy en el centro */
+    /* Portada inicial con el logo Territoria Energy en el centro */
     .home-stage{
       position:relative;min-height:0;padding:18px;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -131,9 +130,10 @@
     .launch-card small{display:block;font-size:10px;color:var(--muted);line-height:1.35}
 
     /* Formularios y componentes internos */
-    .toolbar{display:grid;grid-template-columns:1.25fr repeat(4,minmax(130px,.55fr)) auto;gap:8px;padding:10px 12px;background:#08131d;border-bottom:1px solid var(--line)}
-    .field{position:relative}.field label{position:absolute;left:11px;top:6px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);z-index:1}.field input,.field select{width:100%;height:46px;padding:18px 32px 5px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);outline:none;font-size:12px}.field input:focus,.field select:focus{border-color:var(--cyan)}
-    .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:12px;top:16px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:19px;top:11px}
+    .toolbar{display:grid;grid-template-columns:150px 1.15fr repeat(4,minmax(120px,.5fr)) auto;gap:8px;padding:10px 12px;background:#08131d;border-bottom:1px solid var(--line)}
+    .field{position:relative}.field label{position:absolute;left:11px;top:6px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);z-index:1}.field input,.field select{width:100%;height:46px;padding:18px 30px 5px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);outline:none;font-size:12px}.field input:focus,.field select:focus{border-color:var(--cyan)}
+    .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:11px;top:16px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:19px;top:11px}
+    .field.prov-field select{border-color:rgba(36,214,208,.45);font-weight:700;color:#d6ffff}
     .btn{height:46px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text);padding:0 14px;cursor:pointer;font-weight:700;font-size:11px}.btn:hover{border-color:var(--cyan);color:var(--cyan)}.btn.primary{background:linear-gradient(135deg,#167f92,#0b6475);border-color:#2499aa}
 
     .map-shell{position:relative;min-height:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel)}
@@ -189,14 +189,13 @@
     #infra-map{width:100%;height:100%}
     .modal-side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px}
 
-    @media(max-width:1100px){.top-status .source-pill{display:none}.pozos-body,.modal-body{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(3,1fr)}.launcher-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:1180px){.top-status .source-pill{display:none}.pozos-body,.modal-body{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(3,1fr)}.launcher-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}.brand-sub{display:none}.launcher-grid{grid-template-columns:1fr}.hero-emblem-wrap{width:150px;height:150px}.hero-emblem-wrap svg{width:146px;height:146px}}
   </style>
 </head>
 <body class="on-home">
 <div class="app">
   <header>
-    <!-- Margen superior izquierdo: Emblema + UPSTREAM (en portada) / Marca completa + UPSTREAM (en visores) -->
     <a class="brand" href="#top" onclick="closeAllModals();return false;">
       <div class="logo-emblem" aria-hidden="true">
         <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -244,7 +243,7 @@
           <span class="brand-divider"></span>
           <span class="brand-tag">UPSTREAM</span>
         </div>
-        <div class="brand-sub">Plataforma Inteligente de Gestión · Cuenca Neuquina</div>
+        <div class="brand-sub">Plataforma Inteligente de Gestión · Neuquén · Mendoza · Río Negro</div>
       </div>
     </a>
 
@@ -341,12 +340,12 @@
       </h1>
       <div class="hero-energy">ENERGY</div>
       <div class="hero-subtitle">Plataforma Inteligente de Gestión</div>
-      <div class="hero-tagline">Datos para un mejor territorio</div>
+      <div class="hero-tagline">Neuquén · Mendoza · Río Negro</div>
 
       <div class="launcher-grid">
         <button class="launch-card" onclick="openPozosModal()">
           <div class="launch-top"><div class="l-ico">⌖</div><span class="launch-arrow">↗</span></div>
-          <div><b>POZOS</b><small>Padrón GIS oficial + producción Res. 319/93</small></div>
+          <div><b>POZOS</b><small>Padrón GIS + Res. 319/93 (NQN · MZA · RN)</small></div>
         </button>
         <button class="launch-card" onclick="openInfraModal('ductos')">
           <div class="launch-top"><div class="l-ico">⌇</div><span class="launch-arrow">↗</span></div>
@@ -364,7 +363,7 @@
     </div>
   </section>
 
-  <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>TERRITORIOS MÁS SEGUROS, SOSTENIBLES Y RESILIENTES</span><span id="footer-state">SISTEMA LISTO · SELECCIONÁ UN MÓDULO</span></footer>
+  <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>CUENCAS NEUQUINA Y CUYANA · DATOS OFICIALES</span><span id="footer-state">SISTEMA LISTO · SELECCIONÁ UN MÓDULO</span></footer>
 </div>
 
 <!-- Popup operativo de POZOS -->
@@ -372,8 +371,8 @@
   <div class="modal-window pozos-win">
     <div class="modal-head">
       <div class="modal-title">
-        <h3>PADRÓN DE POZOS · CUENCA NEUQUINA</h3>
-        <span id="pozos-modal-sub">GIS OFICIAL NEUQUÉN + PRODUCCIÓN RES. 319/93</span>
+        <h3>PADRÓN DE POZOS · <span id="pozos-prov-title">NEUQUÉN</span></h3>
+        <span id="pozos-modal-sub">GIS OFICIAL + PRODUCCIÓN RES. 319/93</span>
       </div>
       <div class="modal-actions">
         <button class="modal-switch active" onclick="openPozosModal()">POZOS</button>
@@ -385,6 +384,14 @@
     </div>
 
     <section class="toolbar">
+      <div class="field prov-field">
+        <label>Provincia</label>
+        <select id="province" onchange="onProvinceChange(this.value)">
+          <option value="Neuquén" selected>Neuquén</option>
+          <option value="Mendoza">Mendoza</option>
+          <option value="Río Negro">Río Negro</option>
+        </select>
+      </div>
       <div class="field search"><label>Buscar pozo o UWI</label><input id="search" placeholder="Ej.: P13794 o La Caverna" /></div>
       <div class="field"><label>Operadora</label><select id="operator"><option value="">Todas</option></select></div>
       <div class="field"><label>Área legal</label><select id="area"><option value="">Todas</option></select></div>
@@ -440,7 +447,7 @@
         </section>
 
         <section class="card">
-          <div class="card-head"><h2>Datos técnicos del pozo</h2><span class="mono" id="wfs-updated">WFS · NEUQUÉN</span></div>
+          <div class="card-head"><h2>Datos técnicos del pozo</h2><span class="mono" id="wfs-updated">GIS · OFICIAL</span></div>
           <div class="card-body"><div class="kv" id="tech-kv">
             <div class="kv-row"><span>Esperando selección</span><b>—</b></div>
           </div></div>
@@ -472,7 +479,7 @@
     <div class="modal-head">
       <div class="modal-title">
         <h3 id="infra-modal-title">OLEODUCTOS TRONCALES</h3>
-        <span id="infra-modal-sub">RED DE TRANSPORTE E INFRAESTRUCTURA · CUENCA NEUQUINA</span>
+        <span id="infra-modal-sub">RED DE TRANSPORTE E INFRAESTRUCTURA</span>
       </div>
       <div class="modal-actions">
         <button class="modal-switch" onclick="openPozosModal()">POZOS</button>
@@ -490,9 +497,18 @@
         <div class="card">
           <div class="card-head"><h2>Filtro de capa</h2><span class="mono" id="infra-count">0 ELEMENTOS</span></div>
           <div class="card-body">
+            <div class="field prov-field" style="margin-bottom:8px">
+              <label>Provincia / Jurisdicción</label>
+              <select id="infra-prov" onchange="onInfraProvinceChange(this.value)">
+                <option value="Neuquén" selected>Neuquén</option>
+                <option value="Mendoza">Mendoza</option>
+                <option value="Río Negro">Río Negro</option>
+                <option value="Todas">Todas (NQN + MZA + RN)</option>
+              </select>
+            </div>
             <div class="field search" style="margin-bottom:8px">
               <label>Buscar tramo / planta / operadora</label>
-              <input id="infra-search" placeholder="Ej.: Oldelval, Vaca Muerta Norte, Loma Campana…" oninput="filterInfraLayer()" />
+              <input id="infra-search" placeholder="Ej.: Oldelval, Luján de Cuyo, Catriel, Loma Campana…" oninput="filterInfraLayer()" />
             </div>
             <div class="field">
               <label>Operadora</label>
@@ -501,7 +517,7 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-head"><h2>Detalle del elemento</h2><span class="mono" id="infra-layer-tag">WFS</span></div>
+          <div class="card-head"><h2>Detalle del elemento</h2><span class="mono" id="infra-layer-tag">GIS</span></div>
           <div class="card-body" id="infra-detail">
             <div class="empty" style="min-height:140px"><div><b>Tocá un tramo o instalación en el mapa</b>Los atributos técnicos aparecerán aquí.</div></div>
           </div>
@@ -527,15 +543,22 @@
 
   const CACHE_DB_NAME = 'territoria_energy_cache';
   const CACHE_STORE_NAME = 'pozos_store';
-  const CACHE_KEY = 'neuquen_pozos_v2';
   const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
+  const PROV_CENTERS = {
+    'Neuquén': [-38.4, -69.1, 7],
+    'Mendoza': [-34.6, -68.8, 7],
+    'Río Negro': [-39.0, -67.8, 7],
+    'Todas': [-36.8, -68.6, 6]
+  };
+
   const state = {
+    province: 'Neuquén',
     all: [],
     filtered: [],
     selected: null,
     hasFittedOnce: false,
-    pozosInitialized: false,
+    loadedProvinces: {},
     catalogUpdatedAt: null,
     api: 'https://territoria-energy-api.elexpreso17.workers.dev'
   };
@@ -548,6 +571,10 @@
   let infraLayerGroup = null;
   let infraRawFeatures = [];
   let infraCurrentType = null;
+
+  function cacheKeyFor(prov) {
+    return 'pozos_v3_' + String(prov || 'Neuquén').toLowerCase().replace(/\s+/g, '_');
+  }
 
   function closeAllModals(){
     const pm = $('pozos-modal');
@@ -566,13 +593,14 @@
 
     if(!map){
       canvasRenderer = L.canvas({ padding: 0.4 });
+      const [lat, lon, z] = PROV_CENTERS[state.province] || [-38.4, -69.1, 7];
       map = L.map('map', {
         zoomControl: true,
         minZoom: 4,
         maxZoom: 18,
         preferCanvas: true,
         renderer: canvasRenderer
-      }).setView([-38.4,-69.1],7);
+      }).setView([lat, lon], z);
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
@@ -583,10 +611,21 @@
 
     setTimeout(() => map.invalidateSize(), 60);
 
-    if(!state.pozosInitialized){
-      state.pozosInitialized = true;
+    if(!state.loadedProvinces[state.province]){
+      state.loadedProvinces[state.province] = true;
       loadData(false);
     }
+  }
+
+  function onProvinceChange(newProv){
+    state.province = newProv || 'Neuquén';
+    setText('pozos-prov-title', state.province.toUpperCase());
+    if($('infra-prov')) $('infra-prov').value = state.province;
+    state.hasFittedOnce = false;
+    state.loadedProvinces[state.province] = true;
+    const [lat, lon, z] = PROV_CENTERS[state.province] || [-38.4, -69.1, 7];
+    if(map) map.setView([lat, lon], z);
+    loadData(false);
   }
 
   async function openInfraModal(tipo){
@@ -598,13 +637,15 @@
       const btn = $('sw-' + k);
       if(btn) btn.classList.toggle('active', k === tipo);
     });
+
+    const selectedProv = $('infra-prov')?.value || state.province || 'Neuquén';
     const titles = {
       ductos: ['OLEODUCTOS Y DUCTOS TRONCALES', 'RED DE TRANSPORTE DE HIDROCARBUROS'],
       plantas: ['PLANTAS E INSTALACIONES DE SUPERFICIE', 'BATERÍAS, PTC, PLANTAS DE TRATAMIENTO Y COMPRESIÓN'],
       areas: ['ÁREAS Y CONCESIONES HIDROCARBURÍFERAS', 'BLOQUES EXPLORATORIOS Y DE EXPLOTACIÓN']
     };
     const [t, sub] = titles[tipo] || ['INFRAESTRUCTURA', ''];
-    setText('infra-modal-title', t);
+    setText('infra-modal-title', `${t} · ${selectedProv.toUpperCase()}`);
     setText('infra-modal-sub', sub);
     if($('infra-search')) $('infra-search').value = '';
     setHtml('infra-op', '<option value="">Todas</option>');
@@ -613,16 +654,18 @@
     if(im) im.classList.add('open');
 
     if(!infraMap){
-      infraMap = L.map('infra-map', { zoomControl:true, minZoom:4, maxZoom:18, preferCanvas:true }).setView([-38.4,-69.1],7);
+      const [lat, lon, z] = PROV_CENTERS[selectedProv] || [-38.4, -69.1, 7];
+      infraMap = L.map('infra-map', { zoomControl:true, minZoom:4, maxZoom:18, preferCanvas:true }).setView([lat, lon], z);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18 }).addTo(infraMap);
       infraLayerGroup = L.layerGroup().addTo(infraMap);
     }
     setTimeout(() => infraMap.invalidateSize(), 60);
 
     try{
-      const r = await fetch(state.api + '/api/infraestructura?tipo=' + encodeURIComponent(tipo), { cache:'no-store' });
+      const qs = new URLSearchParams({ tipo, provincia: selectedProv });
+      const r = await fetch(state.api + '/api/infraestructura?' + qs.toString(), { cache:'no-store' });
       const j = await r.json();
-      if(!r.ok || !j.ok) throw new Error(j.error || ('Endpoint /api/infraestructura (' + tipo + ') pendiente en Worker'));
+      if(!r.ok || !j.ok) throw new Error(j.error || ('Sin datos para ' + selectedProv));
       infraRawFeatures = Array.isArray(j.features) ? j.features : [];
       setText('infra-layer-tag', j.layer || tipo.toUpperCase());
 
@@ -634,9 +677,20 @@
 
       filterInfraLayer(true);
     }catch(e){
+      infraRawFeatures = [];
+      if(infraLayerGroup) infraLayerGroup.clearLayers();
       setText('infra-count', '0 ELEMENTOS');
-      setHtml('infra-detail', `<div class="empty" style="min-height:140px"><div><b>Capa lista para conectar</b>${escapeHtml(e.message)}</div></div>`);
+      setHtml('infra-detail', `<div class="empty" style="min-height:140px"><div><b>Sin elementos disponibles</b>${escapeHtml(e.message)}</div></div>`);
     }
+  }
+
+  function onInfraProvinceChange(newProv){
+    if(newProv && newProv !== 'Todas') {
+      state.province = newProv;
+      if($('province')) $('province').value = newProv;
+      setText('pozos-prov-title', newProv.toUpperCase());
+    }
+    if(infraCurrentType) openInfraModal(infraCurrentType);
   }
 
   function filterInfraLayer(shouldFit = false){
@@ -719,7 +773,7 @@
     state.catalogUpdatedAt = ts;
     const label = 'ACT. ' + fmtStamp(ts) + (sourceTag ? ' · ' + sourceTag : '');
     setText('tech-updated', label);
-    setText('wfs-updated', 'WFS · ' + fmtStamp(ts));
+    setText('wfs-updated', 'GIS · ' + fmtStamp(ts));
   }
   function getCoords(x){
     const lat = Number(x.LATITUD ?? x._geometry?.coordinates?.[1]);
@@ -742,13 +796,13 @@
     });
   }
 
-  async function readCachedWells(){
+  async function readCachedWells(prov){
     try{
       const db = await openCacheDB();
       return await new Promise((resolve, reject) => {
         const tx = db.transaction(CACHE_STORE_NAME, 'readonly');
         const store = tx.objectStore(CACHE_STORE_NAME);
-        const req = store.get(CACHE_KEY);
+        const req = store.get(cacheKeyFor(prov));
         req.onsuccess = () => resolve(req.result || null);
         req.onerror = () => reject(req.error);
       });
@@ -757,13 +811,13 @@
     }
   }
 
-  async function writeCachedWells(records, savedAt = Date.now()){
+  async function writeCachedWells(prov, records, savedAt = Date.now()){
     try{
       const db = await openCacheDB();
       await new Promise((resolve, reject) => {
         const tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
         const store = tx.objectStore(CACHE_STORE_NAME);
-        const req = store.put({ savedAt, records }, CACHE_KEY);
+        const req = store.put({ savedAt, records }, cacheKeyFor(prov));
         req.onsuccess = () => resolve();
         req.onerror = () => reject(req.error);
       });
@@ -782,10 +836,15 @@
     if(el) el.addEventListener(id==='search'?'input':'change', () => applyFilters(true));
   });
 
-  async function fetchBatch(inicio, limite){
+  async function fetchBatch(prov, inicio, limite){
     for(let intento=1; intento<=2; intento++){
       try{
-        const r = await fetch(state.api+'/api/pozos?inicio='+inicio+'&limite='+limite, {cache:'no-store'});
+        const qs = new URLSearchParams({
+          provincia: prov,
+          inicio: String(inicio),
+          limite: String(limite)
+        });
+        const r = await fetch(state.api+'/api/pozos?'+qs.toString(), {cache:'no-store'});
         const data = await r.json();
         if(!r.ok || !data.ok) throw new Error(data.error || 'Respuesta inválida');
         return data;
@@ -798,9 +857,10 @@
 
   async function loadData(forceRefresh = false){
     if(!state.api) return;
+    const prov = state.province || 'Neuquén';
 
     if(!forceRefresh){
-      const cached = await readCachedWells();
+      const cached = await readCachedWells(prov);
       const isFresh = cached && Array.isArray(cached.records) && cached.records.length > 0 &&
         (Date.now() - Number(cached.savedAt || 0) < CACHE_TTL_MS);
 
@@ -808,18 +868,18 @@
         state.all = cached.records;
         populateFilters();
         applyFilters(!state.hasFittedOnce);
-        setConnection('API ONLINE · CACHÉ', true);
+        setConnection(`API ONLINE · ${prov.toUpperCase()}`, true);
         setCatalogTimestamp(cached.savedAt, 'CACHÉ');
         const horaCache = new Date(cached.savedAt).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-        setText('footer-state', `CACHÉ LOCAL (${horaCache}) · ${state.all.length} POZOS`);
-        toast(`${state.all.length} pozos cargados desde caché local`);
+        setText('footer-state', `CACHÉ ${prov.toUpperCase()} (${horaCache}) · ${state.all.length} POZOS`);
+        toast(`${state.all.length} pozos de ${prov} cargados desde caché`);
         return;
       }
     }
 
-    setConnection('CONECTANDO…',false);
+    setConnection(`CONECTANDO ${prov.toUpperCase()}…`,false);
     setText('tech-updated', 'ACTUALIZANDO…');
-    setText('footer-state', 'CONSULTANDO FUENTE OFICIAL');
+    setText('footer-state', `CONSULTANDO PADRÓN ${prov.toUpperCase()}`);
     state.all=[];
     if(markerLayer) markerLayer.clearLayers();
     updateCounters();
@@ -830,10 +890,10 @@
     let cargaParcial = false;
 
     try{
-      const primero = await fetchBatch(0, limite);
+      const primero = await fetchBatch(prov, 0, limite);
       const lote0 = (primero.registros || []).map(x => ({id:x.id, ...(x.datos||{}), _geometry:x.geometria}));
       state.all.push(...lote0);
-      setConnection('API ONLINE', true);
+      setConnection(`API ONLINE · ${prov.toUpperCase()}`, true);
       populateFilters();
       applyFilters(true);
 
@@ -847,9 +907,9 @@
         }
         if(!offsets.length) break;
 
-        setText('footer-state', `CARGANDO POZOS · ${state.all.length} / ${totalEstimado}`);
+        setText('footer-state', `CARGANDO ${prov.toUpperCase()} · ${state.all.length} / ${totalEstimado}`);
 
-        const resultados = await Promise.allSettled(offsets.map(off => fetchBatch(off, limite)));
+        const resultados = await Promise.allSettled(offsets.map(off => fetchBatch(prov, off, limite)));
         let finAlcanzado = false;
 
         for(const res of resultados){
@@ -871,14 +931,14 @@
       if(state.all.length){
         const now = Date.now();
         if(!cargaParcial){
-          await writeCachedWells(state.all, now);
+          await writeCachedWells(prov, state.all, now);
         }
-        setCatalogTimestamp(now, cargaParcial ? 'PARCIAL' : 'WFS');
-        setConnection(cargaParcial?'API ONLINE · PARCIAL':'API ONLINE',true);
-        setText('footer-state', (cargaParcial?'CARGA PARCIAL · ':'CARGA COMPLETA · ')+state.all.length+' POZOS');
+        setCatalogTimestamp(now, cargaParcial ? 'PARCIAL' : (prov === 'Neuquén' ? 'WFS' : 'SEN'));
+        setConnection(cargaParcial ? 'API ONLINE · PARCIAL' : `API ONLINE · ${prov.toUpperCase()}`, true);
+        setText('footer-state', `${prov.toUpperCase()} · ${state.all.length} POZOS CARGADOS`);
         populateFilters();
         applyFilters(false);
-        if(!cargaParcial) toast(state.all.length+' pozos reales cargados');
+        if(!cargaParcial) toast(`${state.all.length} pozos reales de ${prov} cargados`);
       }else{
         setConnection('API SIN RESPUESTA',false);
         setText('tech-updated', 'SIN DATOS');
@@ -1050,6 +1110,7 @@
 
     const coords = getCoords(x);
     const pairs=[
+      ['Provincia',x.PROVINCIA || state.province],
       ['Operadora',x.OPERADOR],
       ['Operadora original',x.OPERADOR_ORIGINAL],
       ['Área legal',x.AREA_LEGAL],
