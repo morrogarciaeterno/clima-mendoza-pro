@@ -209,7 +209,7 @@
       </div>
     </div>
     <section class="toolbar">
-      <div class="field search"><label>Buscar pozo o UWI</label><input id="search" placeholder="Ej.: P13794 o La Caverna" /></div>
+      <div class="field search"><label>Buscar operadora, pozo o UWI</label><input id="search" placeholder="Ej.: PAE, YPF, Vista, P13794…" /></div>
       <div class="field"><label>Operadora</label><select id="operator"><option value="">Todas</option></select></div>
       <div class="field"><label>Área legal</label><select id="area"><option value="">Todas</option></select></div>
       <div class="field"><label>Yacimiento</label><select id="field"><option value="">Todos</option></select></div>
@@ -256,7 +256,7 @@
         <div class="card">
           <div class="card-head"><h2>Filtro de capa</h2><span class="mono" id="infra-count">0 ELEMENTOS</span></div>
           <div class="card-body">
-            <div class="field search" style="margin-bottom:8px"><label>Buscar locación / tramo / instalación</label><input id="infra-search" placeholder="Ej.: TA.Nq.AP, NQ.LOC, Loma Campana, YPF…" oninput="filterInfraLayer()" /></div>
+            <div class="field search" style="margin-bottom:8px"><label>Buscar operadora / locación / instalación</label><input id="infra-search" placeholder="Ej.: PAE, YPF, Vista, PAE.Nq.LA-90…" oninput="filterInfraLayer()" /></div>
             <div class="field"><label>Tipo / Operadora</label><select id="infra-op" onchange="filterInfraLayer()"><option value="">Todas</option></select></div>
           </div>
         </div>
@@ -416,7 +416,13 @@
       const p = f.properties || {};
       if(op && getInfraGroupKey(p) !== op) return false;
       if(!q) return true;
-      return Object.values(p).some(v => String(v || '').toLowerCase().includes(q));
+      const searchable = [
+        getInfraOperator(p),
+        p.LOC_NOMBRE, p.LOC_ID, p.LOC_TIPO, p.LOC_AGRUPA,
+        p.NOMBRE, p.CAPA,
+        ...Object.values(p)
+      ];
+      return searchable.some(v => String(v || '').toLowerCase().includes(q));
     });
     setText('infra-count', filtered.length + ' ELEMENTOS');
     if(!filtered.length){
@@ -677,7 +683,7 @@
     populateFilters();
     const q=($('search')?.value || '').trim().toLowerCase(), op=$('operator')?.value || '', ar=$('area')?.value || '', fi=$('field')?.value || '', st=$('state')?.value || '';
     state.filtered=state.all.filter(x =>
-      (!q || [x.UWI_NQN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME].some(v => String(v||'').toLowerCase().includes(q))) &&
+      (!q || [x.OPERADOR,x.OPERADOR_ORIGINAL,x.UWI_NQN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME,x.AREA_LEGAL,x.YACIMIENTO].some(v => String(v||'').toLowerCase().includes(q))) &&
       (!op || x.OPERADOR===op) && (!ar || x.AREA_LEGAL===ar) && (!fi || x.YACIMIENTO===fi) && (!st || x.ESTADO_GIS===st)
     );
     renderMarkers(shouldFit);
