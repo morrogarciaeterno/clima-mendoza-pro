@@ -48,7 +48,6 @@
       position: relative;
     }
 
-    /* HEADER MÓVIL COMPACTO */
     header {
       background: #0b111e;
       border-bottom: 1px solid var(--border-color);
@@ -89,17 +88,16 @@
       color: var(--accent-amber);
     }
 
-    .demo-tag {
+    .status-pill {
       font-family: 'JetBrains Mono', monospace;
       font-size: 9.5px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 999px;
-      background: rgba(245, 158, 11, 0.16);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.45);
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.45);
     }
 
-    /* SELECTOR DE SECTORES SCROLLABLE */
     .sector-bar {
       display: flex;
       gap: 6px;
@@ -129,7 +127,6 @@
       font-weight: 600;
     }
 
-    /* MAPA PRINCIPAL */
     .map-stage {
       position: relative;
       flex: 1;
@@ -147,7 +144,6 @@
       filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
     }
 
-    /* TIRA DE KPIs DESLIZABLE SOBRE EL MAPA */
     .kpi-carousel {
       position: absolute;
       top: 10px;
@@ -162,7 +158,7 @@
     .kpi-carousel::-webkit-scrollbar { display: none; }
 
     .kpi-card {
-      flex: 0 0 132px;
+      flex: 0 0 136px;
       background: var(--panel-bg);
       backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
@@ -179,7 +175,7 @@
 
     .kpi-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 700;
       color: #fff;
       margin-top: 2px;
@@ -196,7 +192,6 @@
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
-    /* BOTONES FLOTANTES TÁCTILES (CAPAS / FICHA / ALERTAS) */
     .fab-stack {
       position: absolute;
       right: 12px;
@@ -227,12 +222,11 @@
       background: rgba(14, 165, 233, 0.3);
     }
 
-    /* PANEL FLOTANTE DE CAPAS */
     .layers-drawer {
       position: absolute;
       left: 12px;
       bottom: 84px;
-      width: 235px;
+      width: 240px;
       background: var(--panel-bg);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border-color);
@@ -281,7 +275,6 @@
       margin-right: 7px;
     }
 
-    /* BOTTOM SHEET DESLIZABLE / PLEGABLE */
     .bottom-sheet {
       position: absolute;
       left: 0;
@@ -482,6 +475,11 @@
       border-left-color: var(--accent-amber);
     }
 
+    .alert-item.ok {
+      background: rgba(16, 185, 129, 0.1);
+      border-left-color: var(--accent-emerald);
+    }
+
     .alert-time {
       font-family: 'JetBrains Mono', monospace;
       font-size: 9.5px;
@@ -492,14 +490,13 @@
 </head>
 <body>
   <div class="app-shell">
-    <!-- HEADER MÓVIL -->
     <header>
       <div class="header-top">
         <div class="brand">
           <div class="brand-badge">NT</div>
           <div class="brand-title">TERRITORIA <span>UPSTREAM</span></div>
         </div>
-        <span class="demo-tag">SIMULACIÓN</span>
+        <span class="status-pill" id="live-status">USGS + OPEN-METEO LIVE</span>
       </div>
 
       <div class="sector-bar">
@@ -509,9 +506,7 @@
       </div>
     </header>
 
-    <!-- ESCENARIO DE MAPA -->
     <div class="map-stage">
-      <!-- KPIs HORIZONTALES -->
       <div class="kpi-carousel">
         <div class="kpi-card">
           <div class="kpi-label">Pozos Shale</div>
@@ -524,27 +519,25 @@
           <div class="kpi-sub up" id="kpi-prod-sub">▲ 4.2% mensual</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">VIIRS Flaring</div>
-          <div class="kpi-value" id="kpi-viirs">3 Focos</div>
-          <div class="kpi-sub warn" id="kpi-viirs-sub">Máx 18.4 MW</div>
+          <div class="kpi-label">Viento / Zonda</div>
+          <div class="kpi-value" id="kpi-viento">-- km/h</div>
+          <div class="kpi-sub warn" id="kpi-viento-sub">Consultando Open-Meteo</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Sismo / Rutas</div>
-          <div class="kpi-value" id="kpi-sismo">2.4 Ml</div>
-          <div class="kpi-sub warn" id="kpi-sismo-sub">Zonda RP 180/RP 7</div>
+          <div class="kpi-label">Sismos USGS</div>
+          <div class="kpi-value" id="kpi-sismo">--</div>
+          <div class="kpi-sub warn" id="kpi-sismo-sub">Consultando USGS</div>
         </div>
       </div>
 
-      <!-- MAPA LEAFLET -->
       <div id="map"></div>
 
-      <!-- BOTÓN FLOTANTE DE CAPAS -->
       <div class="fab-stack">
         <button class="fab-btn" id="btn-layers" title="Capas" onclick="toggleLayersDrawer()">🗂️</button>
+        <button class="fab-btn" id="btn-refresh" title="Actualizar telemetría" onclick="refreshTelemetry()">🔄</button>
         <button class="fab-btn" id="btn-center" title="Centrar sector" onclick="recenterCurrentSector()">🎯</button>
       </div>
 
-      <!-- MENÚ DESPLEGABLE DE CAPAS -->
       <div class="layers-drawer" id="layers-drawer">
         <div class="drawer-title">
           <span>Capas del Mapa</span>
@@ -563,16 +556,11 @@
           <input type="checkbox" checked onchange="toggleLayer('ductos', this.checked)">
         </label>
         <label class="layer-row">
-          <span><span class="dot" style="background:#f59e0b;"></span>VIIRS Antorchas</span>
-          <input type="checkbox" checked onchange="toggleLayer('viirs', this.checked)">
-        </label>
-        <label class="layer-row">
-          <span><span class="dot" style="background:#ef4444;"></span>Sismos INPRES</span>
+          <span><span class="dot" style="background:#ef4444;"></span>Sismos USGS (7d)</span>
           <input type="checkbox" checked onchange="toggleLayer('sismos', this.checked)">
         </label>
       </div>
 
-      <!-- BOTTOM SHEET: FICHA TÉCNICA + ALERTAS -->
       <div class="bottom-sheet" id="bottom-sheet">
         <div class="sheet-handle-bar" onclick="toggleSheet()">
           <div class="pill-grip"></div>
@@ -587,11 +575,10 @@
 
         <div class="sheet-tabs">
           <button class="sheet-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Ficha & Fractura</button>
-          <button class="sheet-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas (3)</button>
+          <button class="sheet-tab" id="tab-btn-alertas" onclick="switchTab('alertas')" id="alerts-tab-btn">Alertas</button>
         </div>
 
         <div class="sheet-body">
-          <!-- PESTAÑA FICHA TÉCNICA -->
           <div class="tab-pane active" id="pane-ficha">
             <div>
               <span class="status-badge" id="well-status">EXTRACCIÓN EFECTIVA · SHALE OIL</span>
@@ -634,19 +621,12 @@
             </div>
           </div>
 
-          <!-- PESTAÑA ALERTAS -->
           <div class="tab-pane" id="pane-alertas">
-            <div class="alert-item">
-              <div class="alert-time">HACE 14 MIN · VIIRS NASA FIRMS</div>
-              <strong>PTC Loma Campana:</strong> FRP 18.4 MW en antorcha operativa. Sin propagación externa.
-            </div>
-            <div class="alert-item amber">
-              <div class="alert-time">HACE 42 MIN · CORREDOR PATA MORA / RP 180</div>
-              <strong>Viento Zonda (65 km/h):</strong> Precaución para transporte de arena y equipos en CN VII A.
-            </div>
-            <div class="alert-item amber">
-              <div class="alert-time">HACE 1 HORA · INPRES / USGS</div>
-              <strong>Sismo 2.4 Ml (Prof. 6 km):</strong> A 4.8 km al NO de Sauzal Bonito. Sin novedad en baterías.
+            <div id="alerts-list">
+              <div class="alert-item ok">
+                <div class="alert-time">SISTEMA</div>
+                Cargando telemetría meteorológica y sísmica...
+              </div>
             </div>
           </div>
         </div>
@@ -654,14 +634,13 @@
     </div>
   </div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     let currentSector = 'vmSur';
 
     const map = L.map('map', {
       zoomControl: false
-    }).setView([-38.32, -68.85], 11);
+    }).setView([-38.32, -68.85], 10);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap | Territoria',
@@ -673,48 +652,41 @@
       areas: L.layerGroup().addTo(map),
       pozos: L.layerGroup().addTo(map),
       ductos: L.layerGroup().addTo(map),
-      viirs: L.layerGroup().addTo(map),
       sismos: L.layerGroup().addTo(map)
     };
 
     const sectorConfig = {
       vmSur: {
-        center: [-38.32, -68.85],
-        zoom: 11,
+        name: 'VM Sur · Añelo',
+        lat: -38.32,
+        lon: -68.85,
+        zoom: 10,
         pozos: '142',
         pozosSub: '+6 en fractura',
         prod: '14.820 m³/d',
         prodSub: '▲ 4.2% mensual',
-        viirs: '3 Focos',
-        viirsSub: 'Máx 18.4 MW',
-        sismo: '2.4 Ml',
-        sismoSub: 'Zonda RP 180/RP 7',
         wellIndex: 0
       },
       vmNorte: {
-        center: [-37.02, -69.56],
-        zoom: 11,
+        name: 'VM Norte · Malargüe',
+        lat: -37.02,
+        lon: -69.56,
+        zoom: 10,
         pozos: '14',
         pozosSub: '2 pilotos activos',
         prod: '940 m³/d',
         prodSub: '▲ 1.8% mensual',
-        viirs: '1 Foco',
-        viirsSub: 'Máx 6.8 MW',
-        sismo: '1.9 Ml',
-        sismoSub: 'Viento 58 km/h RP 180',
         wellIndex: 2
       },
       cuyana: {
-        center: [-33.12, -68.82],
-        zoom: 11,
+        name: 'Cuyana · Mendoza',
+        lat: -33.12,
+        lon: -68.82,
+        zoom: 10,
         pozos: '318',
         pozosSub: 'Recuperación 2ª',
         prod: '4.650 m³/d',
         prodSub: '▲ 0.9% mensual',
-        viirs: '0 Focos',
-        viirsSub: 'Sin anomalías térmicas',
-        sismo: '2.1 Ml',
-        sismoSub: 'Normal · RN 40',
         wellIndex: 3
       }
     };
@@ -806,12 +778,11 @@
         color: '#ffffff',
         weight: 2,
         fillOpacity: 0.95
-      }).addTo(layers.pozos);
+      }).bindPopup(`<b>${w.id}</b><br>${w.area}<br>Caudal: ${w.rate}`).addTo(layers.pozos);
 
       marker.on('click', () => selectWell(w, true));
     });
 
-    // Concesiones
     [
       { name: 'Loma Campana', coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]], color: '#38bdf8' },
       { name: 'Bajada del Palo Oeste', coords: [[-38.28, -69.00], [-38.18, -69.00], [-38.18, -68.88], [-38.28, -68.88]], color: '#0ea5e9' },
@@ -825,7 +796,6 @@
       }).bindPopup(`<b>Área:</b> ${c.name}`).addTo(layers.areas);
     });
 
-    // Ductos
     [
       { name: 'Oleoducto VM Norte', coords: [[-38.31, -68.81], [-37.75, -69.15], [-37.02, -69.52], [-35.45, -69.30], [-33.08, -68.92]], color: '#a855f7' }
     ].forEach(p => {
@@ -836,32 +806,149 @@
       }).bindPopup(`<b>Ducto:</b> ${p.name}`).addTo(layers.ductos);
     });
 
-    // Focos VIIRS
-    [
-      { coords: [-38.308, -68.802], label: 'PTC Loma Campana · 18.4 MW' },
-      { coords: [-36.980, -69.532], label: 'Batería CN VII A · 6.8 MW' }
-    ].forEach(f => {
-      L.circleMarker(f.coords, {
-        radius: 9,
-        fillColor: '#f59e0b',
-        color: '#fef08a',
-        weight: 2,
-        fillOpacity: 0.8
-      }).bindPopup(`🔥 <b>VIIRS</b><br>${f.label}`).addTo(layers.viirs);
-    });
+    async function fetchWindOpenMeteo(cfg) {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${cfg.lat}&longitude=${cfg.lon}&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m&timezone=America%2FArgentina%2FMendoza`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const curr = data.current || {};
+        const wind = Math.round(curr.wind_speed_10m ?? 0);
+        const gust = Math.round(curr.wind_gusts_10m ?? 0);
+        const dir = curr.wind_direction_10m ?? 0;
 
-    // Sismos
-    [
-      { coords: [-38.49, -69.05], label: 'Sismo 2.4 Ml · Prof 6 km' }
-    ].forEach(q => {
-      L.circle(q.coords, {
-        radius: 3000,
-        color: '#ef4444',
-        weight: 1.5,
-        fillColor: '#ef4444',
-        fillOpacity: 0.2
-      }).bindPopup(`⚠️ ${q.label}`).addTo(layers.sismos);
-    });
+        document.getElementById('kpi-viento').textContent = `${wind} km/h`;
+        const subEl = document.getElementById('kpi-viento-sub');
+        subEl.textContent = `Ráfagas ${gust} km/h · ${dir}°`;
+        subEl.className = 'kpi-sub ' + (gust >= 45 ? 'warn' : 'up');
+
+        return { ok: true, wind, gust, dir };
+      } catch (err) {
+        document.getElementById('kpi-viento').textContent = 'Sin señal';
+        document.getElementById('kpi-viento-sub').textContent = 'Error Open-Meteo';
+        document.getElementById('kpi-viento-sub').className = 'kpi-sub warn';
+        return { ok: false, error: err.message };
+      }
+    }
+
+    async function fetchEarthquakesUSGS() {
+      layers.sismos.clearLayers();
+      try {
+        const end = new Date().toISOString();
+        const start = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${encodeURIComponent(start)}&endtime=${encodeURIComponent(end)}&minmagnitude=1.5&minlatitude=-40.0&maxlatitude=-31.5&minlongitude=-71.5&maxlongitude=-66.5`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const geo = await res.json();
+        const features = geo.features || [];
+
+        features.forEach(f => {
+          const coords = f.geometry?.coordinates;
+          if (!coords || coords.length < 2) return;
+          const [lon, lat, depth] = coords;
+          const mag = f.properties?.mag ?? 0;
+          const place = f.properties?.place || 'Región Cuyo / Neuquén';
+          const dt = new Date(f.properties?.time || Date.now()).toLocaleString('es-AR', { hour12: false });
+
+          const radiusMeters = Math.max(2500, mag * 2200);
+          L.circle([lat, lon], {
+            radius: radiusMeters,
+            color: '#ef4444',
+            weight: 1.5,
+            fillColor: '#ef4444',
+            fillOpacity: 0.22
+          }).bindPopup(`⚠️ <b>Sismo ${mag.toFixed(1)} Ml</b><br>${place}<br>Prof: ${Number(depth ?? 0).toFixed(1)} km<br><small>${dt}</small>`).addTo(layers.sismos);
+        });
+
+        const kpiVal = document.getElementById('kpi-sismo');
+        const kpiSub = document.getElementById('kpi-sismo-sub');
+
+        if (features.length > 0) {
+          const maxMag = Math.max(...features.map(f => f.properties?.mag ?? 0));
+          kpiVal.textContent = `${maxMag.toFixed(1)} Ml (${features.length})`;
+          kpiSub.textContent = features[0].properties?.place || 'Últimos 7 días';
+          kpiSub.className = 'kpi-sub warn';
+        } else {
+          kpiVal.textContent = '0 (7d)';
+          kpiSub.textContent = 'Sin M≥1.5 en región';
+          kpiSub.className = 'kpi-sub up';
+        }
+
+        return { ok: true, features };
+      } catch (err) {
+        document.getElementById('kpi-sismo').textContent = 'Sin señal';
+        document.getElementById('kpi-sismo-sub').textContent = 'Error USGS';
+        document.getElementById('kpi-sismo-sub').className = 'kpi-sub warn';
+        return { ok: false, error: err.message, features: [] };
+      }
+    }
+
+    function renderAlerts(cfg, windRes, eqRes) {
+      const list = document.getElementById('alerts-list');
+      const items = [];
+
+      if (windRes.ok) {
+        const isHigh = windRes.gust >= 45;
+        items.push(`
+          <div class="alert-item ${isHigh ? 'amber' : 'ok'}">
+            <div class="alert-time">OPEN-METEO · ${cfg.name.toUpperCase()}</div>
+            <strong>Viento ${windRes.wind} km/h</strong> (ráfagas ${windRes.gust} km/h, dir ${windRes.dir}°). ${isHigh ? 'Precaución operativa en rutas y equipos.' : 'Condiciones de viento dentro de rango normal.'}
+          </div>
+        `);
+      } else {
+        items.push(`
+          <div class="alert-item amber">
+            <div class="alert-time">OPEN-METEO · SIN CONEXIÓN</div>
+            No se pudo consultar viento en ${cfg.name} (${windRes.error}).
+          </div>
+        `);
+      }
+
+      if (eqRes.ok) {
+        if (eqRes.features.length > 0) {
+          eqRes.features.slice(0, 4).forEach(f => {
+            const mag = (f.properties?.mag ?? 0).toFixed(1);
+            const place = f.properties?.place || 'Región';
+            const depth = Number(f.geometry?.coordinates?.[2] ?? 0).toFixed(1);
+            const when = new Date(f.properties?.time || Date.now()).toLocaleString('es-AR', { hour12: false });
+            items.push(`
+              <div class="alert-item">
+                <div class="alert-time">USGS · ${when}</div>
+                <strong>Sismo ${mag} Ml</strong> (Prof. ${depth} km) · ${place}.
+              </div>
+            `);
+          });
+        } else {
+          items.push(`
+            <div class="alert-item ok">
+              <div class="alert-time">USGS · ÚLTIMOS 7 DÍAS</div>
+              Sin sismos M≥1.5 reportados en el cuadrante Neuquén–Mendoza.
+            </div>
+          `);
+        }
+      } else {
+        items.push(`
+          <div class="alert-item amber">
+            <div class="alert-time">USGS · SIN CONEXIÓN</div>
+            No se pudo consultar el catálogo sísmico (${eqRes.error}).
+          </div>
+        `);
+      }
+
+      list.innerHTML = items.join('');
+    }
+
+    async function refreshTelemetry() {
+      const cfg = sectorConfig[currentSector];
+      if (!cfg) return;
+      document.getElementById('live-status').textContent = 'ACTUALIZANDO...';
+      const [windRes, eqRes] = await Promise.all([
+        fetchWindOpenMeteo(cfg),
+        fetchEarthquakesUSGS()
+      ]);
+      renderAlerts(cfg, windRes, eqRes);
+      document.getElementById('live-status').textContent = 'USGS + OPEN-METEO LIVE';
+    }
 
     function selectWell(w, expandSheet = false) {
       document.getElementById('peek-title').textContent = w.id;
@@ -937,17 +1024,14 @@
         b.classList.toggle('active', b === btn || b.dataset.sector === sector);
       });
 
-      map.flyTo(cfg.center, cfg.zoom);
+      map.flyTo([cfg.lat, cfg.lon], cfg.zoom);
       document.getElementById('kpi-pozos').textContent = cfg.pozos;
       document.getElementById('kpi-pozos-sub').textContent = cfg.pozosSub;
       document.getElementById('kpi-prod').textContent = cfg.prod;
       document.getElementById('kpi-prod-sub').textContent = cfg.prodSub;
-      document.getElementById('kpi-viirs').textContent = cfg.viirs;
-      document.getElementById('kpi-viirs-sub').textContent = cfg.viirsSub;
-      document.getElementById('kpi-sismo').textContent = cfg.sismo;
-      document.getElementById('kpi-sismo-sub').textContent = cfg.sismoSub;
 
       selectWell(wellsData[cfg.wellIndex], false);
+      refreshTelemetry();
     }
 
     function recenterCurrentSector() {
@@ -955,6 +1039,7 @@
     }
 
     renderChart(wellsData[0].history);
+    refreshTelemetry();
   </script>
 </body>
 </html>
