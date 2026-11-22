@@ -330,6 +330,35 @@
     return [sumLat / pts.length, sumLon / pts.length];
   }
 
+  function findNearestWellMeta(geom){
+    const center = getFeatureCenter(geom);
+    if(!center || !Array.isArray(state.all) || !state.all.length) return null;
+    const [lat0, lon0] = center;
+    let best = null;
+    let bestDistSq = Infinity;
+
+    for(const w of state.all){
+      const coords = getCoords(w);
+      if(!coords) continue;
+      const dLat = coords[0] - lat0;
+      const dLon = coords[1] - lon0;
+      const distSq = dLat * dLat + dLon * dLon;
+      if(distSq < bestDistSq){
+        bestDistSq = distSq;
+        best = w;
+      }
+    }
+    if(!best || bestDistSq > 0.0025) return null;
+    const distKm = Math.round(Math.sqrt(bestDistSq) * 111 * 10) / 10;
+    return {
+      operador: best.OPERADOR || null,
+      area: best.AREA_LEGAL || null,
+      yacimiento: best.YACIMIENTO || null,
+      pozoReferencia: best.WELL_NAME || best.UWI_NQN || null,
+      distKm
+    };
+  }
+
   function getInfraGroupKey(p){
     return p.OPERADOR || p.OPERADORA || p.EMPRESA || p.LOC_TIPO || p.CAPA || '';
   }
@@ -396,10 +425,21 @@
     }
 
     const showDetails = feat => {
-      const p = feat.properties || {};
-      const title = p.LOC_NOMBRE || p.NOMBRE || p.OPERADOR || p.CAPA || 'Elemento GIS';
+      const p = { ...(feat.properties || {}) };
+      const refMeta = findNearestWellMeta(feat.geometry);
+      if(!p.OPERADOR && !p.OPERADORA && !p.EMPRESA && refMeta?.operador){
+        p.OPERADORA_ESTIMADA = `${refMeta.operador} (pozo ${refMeta.pozoReferencia} a ${refMeta.distKm} km)`;
+      }
+      if(!p.AREA && !p.AREA_LEGAL && refMeta?.area){
+        p.AREA_ENTORNO = refMeta.area;
+      }
+      if(!p.YACIMIENTO && refMeta?.yacimiento){
+        p.YACIMIENTO_ENTORNO = refMeta.yacimiento;
+      }
+
+      const title = p.LOC_NOMBRE || p.NOMBRE || p.OPERADOR || p.OPERADORA_ESTIMADA || p.CAPA || 'Elemento GIS';
       const sub = [p.LOC_TIPO, p.LOC_ID ? 'ID ' + p.LOC_ID : '', p.CAPA].filter(Boolean).join(' · ');
-      const rows = Object.entries(p).filter(([,v]) => v !== null && v !== '' && String(v).trim() !== '').slice(0, 20);
+      const rows = Object.entries(p).filter(([,v]) => v !== null && v !== '' && String(v).trim() !== '').slice(0, 22);
       setHtml('infra-detail',
         `<div class="infra-banner"><b>${escapeHtml(String(title))}</b><small>${escapeHtml(String(sub || 'Neuquén · GIS'))}</small></div>` +
         '<div class="kv" style="grid-template-columns:1fr">' +
