@@ -359,8 +359,28 @@
     };
   }
 
+  function getInfraOperator(p){
+    return p.OPERADOR || p.OPERADORA || p.EMPRESA ||
+      p.operador || p.operadora || p.empresa ||
+      p.TITULAR || p.titular || p.RAZON_SOCIAL || p.razon_social ||
+      p.OPERADORA_ESTIMADA || '';
+  }
+
+  function enrichInfraFeature(f){
+    const p = f.properties || (f.properties = {});
+    if(!getInfraOperator(p)){
+      const refMeta = findNearestWellMeta(f.geometry);
+      if(refMeta?.operador){
+        p.OPERADORA_ESTIMADA = refMeta.operador;
+        p.POZO_REFERENCIA = refMeta.pozoReferencia || '';
+        p.DISTANCIA_REFERENCIA_KM = refMeta.distKm;
+      }
+    }
+    return f;
+  }
+
   function getInfraGroupKey(p){
-    return p.OPERADOR || p.OPERADORA || p.EMPRESA || p.LOC_TIPO || p.CAPA || '';
+    return getInfraOperator(p) || p.LOC_TIPO || p.CAPA || '';
   }
 
   async function openInfraModal(tipo){
@@ -393,7 +413,7 @@
       const r = await fetch(state.api + '/api/infraestructura?tipo=' + encodeURIComponent(tipo), { cache:'no-store' });
       const j = await r.json();
       if(!r.ok || !j.ok) throw new Error(j.error || 'Error consultando capa');
-      infraRawFeatures = Array.isArray(j.features) ? j.features : [];
+      infraRawFeatures = (Array.isArray(j.features) ? j.features : []).map(enrichInfraFeature);
       setText('infra-layer-tag', j.layer || tipo.toUpperCase());
 
       const ops = [...new Set(infraRawFeatures.map(f => getInfraGroupKey(f.properties || {})).filter(Boolean))].sort();
