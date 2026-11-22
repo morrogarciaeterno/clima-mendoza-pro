@@ -156,7 +156,7 @@
       font-family: 'Inter', sans-serif;
       font-size: 11.5px;
       line-height: 1.35;
-      min-width: 185px;
+      min-width: 195px;
     }
 
     .popup-head {
@@ -252,7 +252,7 @@
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
-    /* BOTONES FLOTANTES A LA IZQUIERDA PARA NO CHOCAR CON LA FICHA DERECHA */
+    /* BOTONES FLOTANTES A LA IZQUIERDA */
     .fab-stack {
       position: absolute;
       left: 12px;
@@ -288,7 +288,7 @@
       position: absolute;
       left: 62px;
       bottom: 24px;
-      width: 225px;
+      width: 230px;
       background: var(--panel-bg);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border-color);
@@ -337,13 +337,13 @@
       margin-right: 7px;
     }
 
-    /* FICHA TÉCNICA POPUP LATERAL AL COSTADITO CON SCROLL PROLIJO */
+    /* FICHA TÉCNICA POPUP LATERAL CON SCROLL PROLIJO */
     .side-popup-card {
       position: absolute;
       top: 74px;
       right: 12px;
       bottom: 24px;
-      width: min(350px, calc(100vw - 24px));
+      width: min(355px, calc(100vw - 24px));
       background: var(--panel-bg);
       backdrop-filter: blur(14px);
       border: 1px solid var(--border-color);
@@ -432,7 +432,6 @@
       border-bottom-color: var(--accent-cyan);
     }
 
-    /* SCROLL INTERNO PROLIJO */
     .card-scroll-body {
       padding: 12px 13px;
       overflow-y: auto;
@@ -467,17 +466,22 @@
       display: flex;
     }
 
+    .section-mini-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
     .well-pills {
       display: flex;
       gap: 5px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 2px;
+      flex-wrap: wrap;
     }
-    .well-pills::-webkit-scrollbar { display: none; }
 
     .well-chip {
-      flex: 0 0 auto;
       background: rgba(30, 41, 59, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.22);
       color: var(--text-main);
@@ -635,7 +639,7 @@
     <div class="map-stage">
       <div class="kpi-carousel">
         <div class="kpi-card">
-          <div class="kpi-label">Pozos Shale (Ref)</div>
+          <div class="kpi-label">Pozos / Áreas (Ref)</div>
           <div class="kpi-value" id="kpi-pozos">142</div>
           <div class="kpi-sub up" id="kpi-pozos-sub">+6 en fractura</div>
         </div>
@@ -673,11 +677,11 @@
           <span style="cursor:pointer; color:#94a3b8;" onclick="toggleLayersDrawer()">✕</span>
         </div>
         <label class="layer-row">
-          <span><span class="dot" style="background:#38bdf8;"></span>Concesiones</span>
+          <span><span class="dot" style="background:#38bdf8;"></span>Yacimientos / Áreas</span>
           <input type="checkbox" checked onchange="toggleLayer('areas', this.checked)">
         </label>
         <label class="layer-row">
-          <span><span class="dot" style="background:#10b981;"></span>Pozos Shale + Ramas</span>
+          <span><span class="dot" style="background:#10b981;"></span>Pozos + Ramas</span>
           <input type="checkbox" checked onchange="toggleLayer('pozos', this.checked)">
         </label>
         <label class="layer-row">
@@ -701,13 +705,16 @@
         </div>
 
         <div class="card-tabs">
-          <button class="card-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Ficha Técnica</button>
+          <button class="card-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Yacimientos & Pozos</button>
           <button class="card-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas en Vivo</button>
         </div>
 
         <div class="card-scroll-body">
           <div class="tab-pane active" id="pane-ficha">
-            <div class="well-pills" id="well-pills"></div>
+            <div>
+              <div class="section-mini-label">Yacimientos / Pozos del Sector</div>
+              <div class="well-pills" id="well-pills"></div>
+            </div>
 
             <div class="meta-row">
               <span class="status-badge" id="well-status">EXTRACCIÓN EFECTIVA · SHALE OIL</span>
@@ -807,30 +814,32 @@
       },
       vmNorte: {
         name: 'VM Norte · Malargüe',
-        lat: -36.98,
-        lon: -69.53,
-        zoom: 11,
-        pozos: '14',
-        pozosSub: '2 pilotos activos',
-        prod: '940 m³/d',
-        prodSub: '▲ 1.8% mensual',
+        lat: -36.45,
+        lon: -69.40,
+        zoom: 8,
+        pozos: '6 Áreas',
+        pozosSub: 'Malargüe / Sur Mza',
+        prod: '1.840 m³/d',
+        prodSub: 'No Conv. + Conv.',
         wellIndex: 3
       },
       cuyana: {
         name: 'Cuyana · Mendoza',
-        lat: -33.125,
-        lon: -68.780,
-        zoom: 11,
-        pozos: '318',
-        pozosSub: 'Recuperación 2ª',
+        lat: -33.25,
+        lon: -68.72,
+        zoom: 10,
+        pozos: '6 Áreas',
+        pozosSub: 'Luján / Tupungato / Riv.',
         prod: '4.650 m³/d',
-        prodSub: '▲ 0.9% mensual',
-        wellIndex: 4
+        prodSub: 'Recuperación 2ª',
+        wellIndex: 9
       }
     };
 
     const wellsData = [
+      // VM SUR - AÑELO (0..2)
       {
+        sector: 'vmSur',
         id: 'YPF.Nq.LCa-314(h)',
         shortLabel: 'LCa-314(h)',
         operadora: 'YPF S.A.',
@@ -852,6 +861,7 @@
         history: [260, 240, 215, 202, 194, 186]
       },
       {
+        sector: 'vmSur',
         id: 'YPF.Nq.LCa-409(h)',
         shortLabel: 'LCa-409(h)',
         operadora: 'YPF S.A.',
@@ -873,6 +883,7 @@
         history: [230, 210, 195, 180, 170, 162]
       },
       {
+        sector: 'vmSur',
         id: 'VIS.Nq.BPO-2108(h)',
         shortLabel: 'BPO-2108(h)',
         operadora: 'Vista Energy',
@@ -893,13 +904,16 @@
         color: '#10b981',
         history: [295, 270, 250, 236, 222, 214]
       },
+
+      // VM NORTE - MALARGÜE (3..8)
       {
-        id: 'YPF.Md.CN7A-102(h)',
-        shortLabel: 'CN7A-102(h)',
+        sector: 'vmNorte',
+        id: 'Yac. CN VII A · Pozo CN7A-102(h)',
+        shortLabel: 'CN VII A',
         operadora: 'YPF S.A.',
-        area: 'CN VII A - Malargüe (Mendoza)',
+        area: 'CN VII A · Malargüe (Mendoza)',
         formacion: 'Vaca Muerta Norte · Shale',
-        status: 'PILOTO NO CONVENCIONAL · EVALUACIÓN',
+        status: 'PILOTO NO CONVENCIONAL · SHALE',
         surface: [-36.985, -69.540],
         bottom: [-36.962, -69.525],
         tvd: '2.640 m',
@@ -915,12 +929,125 @@
         history: [145, 138, 130, 124, 118, 112]
       },
       {
-        id: 'YPF.Md.Barr-812',
-        shortLabel: 'Barr-812',
+        sector: 'vmNorte',
+        id: 'Yac. Paso de las Bardas Norte',
+        shortLabel: 'P. Bardas Norte',
         operadora: 'YPF S.A.',
-        area: 'Barrancas / Luján de Cuyo (Mendoza)',
-        formacion: 'Cuenca Cuyana · Convencional',
-        status: 'EXTRACCIÓN SECUNDARIA · POLÍMEROS',
+        area: 'Paso de las Bardas Norte · Malargüe',
+        formacion: 'Vaca Muerta Norte · No Conv.',
+        status: 'PILOTO HORIZONTAL · LÍMITE NQN',
+        surface: [-37.145, -69.620],
+        bottom: [-37.122, -69.605],
+        tvd: '2.710 m',
+        lat: '2.480 m',
+        stages: '30 etapas',
+        sand: '7.900 tn',
+        waterInj: '39.800 m³',
+        gasRate: '48k m³/d',
+        waterRate: '16 m³/d',
+        pressure: '575 bar',
+        rate: '98 m³/d',
+        color: '#f59e0b',
+        history: [128, 121, 115, 109, 103, 98]
+      },
+      {
+        sector: 'vmNorte',
+        id: 'Yac. Chachahuén Sur / Cerro Morado',
+        shortLabel: 'Chachahuén',
+        operadora: 'YPF / Kilwer',
+        area: 'Chachahuén · Malargüe (Mendoza)',
+        formacion: 'Grupo Rayoso / Centenario',
+        status: 'PRODUCCIÓN ACTIVA · CUENCA NQN MZA',
+        surface: [-37.310, -68.920],
+        bottom: [-37.310, -68.920],
+        tvd: '1.180 m',
+        lat: 'Vertical / Dir.',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Secundaria',
+        gasRate: '22k m³/d',
+        waterRate: '185 m³/d',
+        pressure: '165 bar',
+        rate: '64 m³/d',
+        color: '#10b981',
+        history: [68, 67, 66, 65, 64, 64]
+      },
+      {
+        sector: 'vmNorte',
+        id: 'Yac. Puesto Rojas',
+        shortLabel: 'Puesto Rojas',
+        operadora: 'El Trébol / Phoenix',
+        area: 'Puesto Rojas · Malargüe (Mendoza)',
+        formacion: 'Agrio / Chachao · Fracturado',
+        status: 'EXTRACCIÓN ACTIVA · FAJA PLEGADA',
+        surface: [-35.580, -69.660],
+        bottom: [-35.580, -69.660],
+        tvd: '1.940 m',
+        lat: 'Direccional',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Natural',
+        gasRate: '34k m³/d',
+        waterRate: '42 m³/d',
+        pressure: '290 bar',
+        rate: '78 m³/d',
+        color: '#10b981',
+        history: [85, 83, 81, 80, 79, 78]
+      },
+      {
+        sector: 'vmNorte',
+        id: 'Yac. El Sosneado',
+        shortLabel: 'El Sosneado',
+        operadora: 'Petroquímica Comodoro Rivadavia',
+        area: 'El Sosneado · San Rafael / Malargüe',
+        formacion: 'Huitrín / Troncoso',
+        status: 'PRODUCCIÓN CONVENCIONAL · MZA SUR',
+        surface: [-35.120, -69.560],
+        bottom: [-35.120, -69.560],
+        tvd: '1.620 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Iny. Agua',
+        gasRate: '15k m³/d',
+        waterRate: '110 m³/d',
+        pressure: '180 bar',
+        rate: '41 m³/d',
+        color: '#38bdf8',
+        history: [44, 43, 42, 42, 41, 41]
+      },
+      {
+        sector: 'vmNorte',
+        id: 'Yac. Cerro Fortunoso',
+        shortLabel: 'Cerro Fortunoso',
+        operadora: 'YPF S.A.',
+        area: 'Cerro Fortunoso · Malargüe (Mendoza)',
+        formacion: 'Grupo Neuquén / Quintuco',
+        status: 'RECUPERACIÓN SECUNDARIA · MZA SUR',
+        surface: [-36.320, -69.180],
+        bottom: [-36.320, -69.180],
+        tvd: '1.850 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Secundaria',
+        gasRate: '19k m³/d',
+        waterRate: '140 m³/d',
+        pressure: '210 bar',
+        rate: '52 m³/d',
+        color: '#38bdf8',
+        history: [55, 54, 54, 53, 52, 52]
+      },
+
+      // CUENCA CUYANA - MENDOZA (9..14)
+      {
+        sector: 'cuyana',
+        id: 'Yac. Barrancas · Pozo Barr-812',
+        shortLabel: 'Barrancas',
+        operadora: 'YPF S.A.',
+        area: 'Barrancas · Maipú / Luján (Mendoza)',
+        formacion: 'Cuenca Cuyana · Río Blanco / Barrancas',
+        status: 'RECUPERACIÓN TERCIARIA · POLÍMEROS',
         surface: [-33.125, -68.780],
         bottom: [-33.125, -68.780],
         tvd: '2.150 m',
@@ -929,11 +1056,121 @@
         sand: 'N/A',
         waterInj: 'Polímeros',
         gasRate: '12k m³/d',
-        waterRate: 'Polímeros',
+        waterRate: '240 m³/d',
         pressure: '210 bar',
         rate: '34 m³/d',
-        color: '#38bdf8',
+        color: '#10b981',
         history: [31, 32, 33, 35, 34, 34]
+      },
+      {
+        sector: 'cuyana',
+        id: 'Yac. Vizcacheras',
+        shortLabel: 'Vizcacheras',
+        operadora: 'YPF / Petróleos Sudamericanos',
+        area: 'Vizcacheras · Rivadavia (Mendoza)',
+        formacion: 'Cuenca Cuyana · Papagayos / Barrancas',
+        status: 'EXTRACCIÓN ACTIVA · CUENCA CUYANA',
+        surface: [-33.360, -68.520],
+        bottom: [-33.360, -68.520],
+        tvd: '1.980 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Secundaria',
+        gasRate: '9k m³/d',
+        waterRate: '310 m³/d',
+        pressure: '195 bar',
+        rate: '46 m³/d',
+        color: '#10b981',
+        history: [49, 48, 47, 47, 46, 46]
+      },
+      {
+        sector: 'cuyana',
+        id: 'Yac. La Ventana',
+        shortLabel: 'La Ventana',
+        operadora: 'YPF S.A.',
+        area: 'La Ventana · Rivadavia / Tunuyán (Mendoza)',
+        formacion: 'Cuenca Cuyana · Víctor / Río Blanco',
+        status: 'PRODUCCIÓN ACTIVA · CUENCA CUYANA',
+        surface: [-33.480, -68.640],
+        bottom: [-33.480, -68.640],
+        tvd: '2.290 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Secundaria',
+        gasRate: '14k m³/d',
+        waterRate: '280 m³/d',
+        pressure: '225 bar',
+        rate: '39 m³/d',
+        color: '#10b981',
+        history: [42, 41, 40, 40, 39, 39]
+      },
+      {
+        sector: 'cuyana',
+        id: 'Yac. Tupungato / Refugio',
+        shortLabel: 'Tupungato',
+        operadora: 'YPF S.A.',
+        area: 'Tupungato · Valle de Uco (Mendoza)',
+        formacion: 'Cuenca Cuyana · Potrerillos / Cacheuta',
+        status: 'YACIMIENTO HISTÓRICO · CUYANA',
+        surface: [-33.310, -69.080],
+        bottom: [-33.310, -69.080],
+        tvd: '2.420 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Secundaria',
+        gasRate: '11k m³/d',
+        waterRate: '190 m³/d',
+        pressure: '235 bar',
+        rate: '29 m³/d',
+        color: '#38bdf8',
+        history: [31, 31, 30, 30, 29, 29]
+      },
+      {
+        sector: 'cuyana',
+        id: 'Yac. Piedras Coloradas',
+        shortLabel: 'Piedras Coloradas',
+        operadora: 'Sinopec / CGC',
+        area: 'Piedras Coloradas · Luján de Cuyo',
+        formacion: 'Cuenca Cuyana · Cacheuta',
+        status: 'PRODUCCIÓN CONVENCIONAL · CUYANA',
+        surface: [-33.190, -68.960],
+        bottom: [-33.190, -68.960],
+        tvd: '2.080 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Secundaria',
+        gasRate: '8k m³/d',
+        waterRate: '175 m³/d',
+        pressure: '190 bar',
+        rate: '27 m³/d',
+        color: '#38bdf8',
+        history: [29, 28, 28, 27, 27, 27]
+      },
+      {
+        sector: 'cuyana',
+        id: 'Yac. Río Tunuyán',
+        shortLabel: 'Río Tunuyán',
+        operadora: 'YPF S.A.',
+        area: 'Río Tunuyán · Rivadavia (Mendoza)',
+        formacion: 'Cuenca Cuyana · Barrancas',
+        status: 'RECUPERACIÓN SECUNDARIA · CUYANA',
+        surface: [-33.420, -68.450],
+        bottom: [-33.420, -68.450],
+        tvd: '2.040 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        waterInj: 'Secundaria',
+        gasRate: '7k m³/d',
+        waterRate: '215 m³/d',
+        pressure: '185 bar',
+        rate: '25 m³/d',
+        color: '#38bdf8',
+        history: [27, 26, 26, 25, 25, 25]
       }
     ];
 
@@ -959,7 +1196,7 @@
       const w = wellsData[idx];
       if (!w) return;
       selectWell(w, true);
-      map.flyTo([w.surface[0], w.surface[1] + 0.035], 13);
+      map.flyTo([w.surface[0], w.surface[1] + 0.04], 11);
       if (wellMarkers[idx]) {
         setTimeout(() => wellMarkers[idx].openPopup(), 350);
       }
@@ -968,7 +1205,7 @@
     wellsData.forEach((w, idx) => {
       const popupHtml = buildWellPopupHtml(w, idx);
 
-      if (w.lat !== 'Vertical') {
+      if (w.lat.includes('m')) {
         const line = L.polyline([w.surface, w.bottom], {
           color: w.color,
           weight: 5,
@@ -1000,6 +1237,7 @@
       const container = document.getElementById('well-pills');
       container.innerHTML = '';
       wellsData.forEach((w, idx) => {
+        if (w.sector !== currentSector) return;
         const btn = document.createElement('button');
         btn.className = 'well-chip' + (w.id === activeId ? ' active' : '');
         btn.textContent = `${w.shortLabel} · ${w.rate}`;
@@ -1014,7 +1252,9 @@
     [
       { name: 'Loma Campana', coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]], color: '#38bdf8' },
       { name: 'Bajada del Palo Oeste', coords: [[-38.28, -69.00], [-38.18, -69.00], [-38.18, -68.88], [-38.28, -68.88]], color: '#0ea5e9' },
-      { name: 'CN VII A - Malargüe', coords: [[-37.06, -69.63], [-36.92, -69.63], [-36.92, -69.46], [-37.06, -69.46]], color: '#f59e0b' }
+      { name: 'CN VII A - Malargüe', coords: [[-37.06, -69.63], [-36.92, -69.63], [-36.92, -69.46], [-37.06, -69.46]], color: '#f59e0b' },
+      { name: 'Chachahuén - Malargüe', coords: [[-37.40, -69.05], [-37.22, -69.05], [-37.22, -68.80], [-37.40, -68.80]], color: '#10b981' },
+      { name: 'Barrancas / Vizcacheras - Cuyana', coords: [[-33.52, -68.85], [-33.08, -68.85], [-33.08, -68.42], [-33.52, -68.42]], color: '#38bdf8' }
     ].forEach(c => {
       L.polygon(c.coords, {
         color: c.color,
@@ -1026,7 +1266,7 @@
     });
 
     [
-      { name: 'Oleoducto VM Norte', coords: [[-38.31, -68.81], [-37.75, -69.15], [-37.02, -69.52], [-35.45, -69.30], [-33.08, -68.92]], color: '#a855f7' }
+      { name: 'Oleoducto Puesto Hernández – Luján de Cuyo', coords: [[-38.31, -68.81], [-37.31, -68.92], [-36.32, -69.18], [-35.12, -69.56], [-33.12, -68.92]], color: '#a855f7' }
     ].forEach(p => {
       L.polyline(p.coords, {
         color: p.color,
