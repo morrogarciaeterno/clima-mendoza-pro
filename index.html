@@ -5,15 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Territoria Upstream Mobile | Nova Territoria</title>
 
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --bg-dark: #090d16;
-      --panel-bg: rgba(15, 23, 42, 0.95);
+      --panel-bg: rgba(15, 23, 42, 0.96);
       --border-color: rgba(56, 189, 248, 0.25);
       --accent-cyan: #38bdf8;
       --accent-amber: #f59e0b;
@@ -144,13 +142,12 @@
       filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
     }
 
-    /* POPUP OSCURO DE POZO */
     .leaflet-popup-content-wrapper,
     .leaflet-popup-tip {
-      background: rgba(15, 23, 42, 0.97);
+      background: rgba(15, 23, 42, 0.98);
       color: var(--text-main);
       border: 1px solid var(--border-color);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
     }
 
     .leaflet-popup-content {
@@ -158,7 +155,7 @@
       font-family: 'Inter', sans-serif;
       font-size: 12px;
       line-height: 1.4;
-      min-width: 195px;
+      min-width: 215px;
     }
 
     .popup-head {
@@ -202,8 +199,8 @@
     }
 
     .popup-cell {
-      background: rgba(30, 41, 59, 0.75);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.16);
       border-radius: 5px;
       padding: 4px 6px;
     }
@@ -220,7 +217,7 @@
       padding: 6px 8px;
       border-radius: 6px;
       border: 1px solid var(--accent-cyan);
-      background: rgba(14, 165, 233, 0.22);
+      background: rgba(14, 165, 233, 0.24);
       color: #fff;
       font-size: 11px;
       font-weight: 600;
@@ -368,7 +365,7 @@
       border-top: 1px solid var(--border-color);
       border-radius: 16px 16px 0 0;
       z-index: 900;
-      max-height: 72dvh;
+      max-height: 75dvh;
       display: flex;
       flex-direction: column;
       transform: translateY(calc(100% - 68px));
@@ -468,6 +465,34 @@
     }
     .tab-pane.active {
       display: flex;
+    }
+
+    .well-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .well-pills::-webkit-scrollbar { display: none; }
+
+    .well-chip {
+      flex: 0 0 auto;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text-main);
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      cursor: pointer;
+    }
+
+    .well-chip.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--accent-emerald);
+      color: #34d399;
+      font-weight: 600;
     }
 
     .status-badge {
@@ -632,7 +657,7 @@
           <input type="checkbox" checked onchange="toggleLayer('areas', this.checked)">
         </label>
         <label class="layer-row">
-          <span><span class="dot" style="background:#10b981;"></span>Pozos + Ramas</span>
+          <span><span class="dot" style="background:#10b981;"></span>Pozos Shale + Ramas</span>
           <input type="checkbox" checked onchange="toggleLayer('pozos', this.checked)">
         </label>
         <label class="layer-row">
@@ -651,25 +676,35 @@
           <div class="sheet-peek-row">
             <div>
               <div class="peek-well-name" id="peek-title">YPF.Nq.LCa-314(h)</div>
-              <div class="peek-well-sub" id="peek-sub">Loma Campana · Toca para abrir ficha</div>
+              <div class="peek-well-sub" id="peek-sub">Loma Campana · Toca para ficha y pozos</div>
             </div>
             <div class="peek-rate" id="peek-rate">186 m³/d</div>
           </div>
         </div>
 
         <div class="sheet-tabs">
-          <button class="sheet-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Ficha & Fractura</button>
+          <button class="sheet-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Pozos Shale & Fractura</button>
           <button class="sheet-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas</button>
         </div>
 
         <div class="sheet-body">
           <div class="tab-pane active" id="pane-ficha">
+            <div class="well-pills" id="well-pills"></div>
+
             <div>
-              <span class="status-badge" id="well-status">EXTRACCIÓN EFECTIVA · SHALE OIL</span>
+              <span class="status-badge" id="well-status">SHALE OIL · HORIZONTAL</span>
               <div style="font-size:12px; color:var(--text-muted);" id="well-area-line">Área: Loma Campana (Neuquén) · Vaca Muerta</div>
             </div>
 
             <div class="spec-grid">
+              <div class="spec-box">
+                <div class="spec-k">Petróleo / Gas</div>
+                <div class="spec-v" id="spec-gas">186 m³/d · 94k m³/d</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Agua / Presión Est.</div>
+                <div class="spec-v" id="spec-pres">22 m³/d · 640 bar</div>
+              </div>
               <div class="spec-box">
                 <div class="spec-k">Prof. Vertical (TVD)</div>
                 <div class="spec-v" id="spec-tvd">2.980 m</div>
@@ -683,22 +718,14 @@
                 <div class="spec-v" id="spec-stages">44 etapas</div>
               </div>
               <div class="spec-box">
-                <div class="spec-k">Arena Bombeada</div>
-                <div class="spec-v" id="spec-sand">11.400 tn</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Agua Inyectada</div>
-                <div class="spec-v" id="spec-water">58.200 m³</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Caudal Actual</div>
-                <div class="spec-v" id="spec-rate" style="color:#34d399;">186 m³/d</div>
+                <div class="spec-k">Arena / Agua Iny.</div>
+                <div class="spec-v" id="spec-sand">11.4k tn · 58.2k m³</div>
               </div>
             </div>
 
             <div class="chart-box">
               <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
-                <span style="font-weight:600;">Declinación Mensual</span>
+                <span style="font-weight:600;">Producción Mensual Petróleo (m³/d)</span>
                 <span style="color:var(--text-muted); font-family:'JetBrains Mono', monospace;">Jun–Nov</span>
               </div>
               <div class="bars-container" id="prod-chart"></div>
@@ -721,10 +748,11 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     let currentSector = 'vmSur';
+    const wellMarkers = [];
 
     const map = L.map('map', {
       zoomControl: false
-    }).setView([-38.32, -68.85], 11);
+    }).setView([-38.30, -68.86], 11);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap | Territoria',
@@ -742,8 +770,8 @@
     const sectorConfig = {
       vmSur: {
         name: 'VM Sur · Añelo',
-        lat: -38.32,
-        lon: -68.85,
+        lat: -38.30,
+        lon: -68.86,
         zoom: 11,
         pozos: '142',
         pozosSub: '+6 en fractura',
@@ -753,85 +781,115 @@
       },
       vmNorte: {
         name: 'VM Norte · Malargüe',
-        lat: -37.02,
-        lon: -69.56,
+        lat: -36.98,
+        lon: -69.53,
         zoom: 11,
         pozos: '14',
         pozosSub: '2 pilotos activos',
         prod: '940 m³/d',
         prodSub: '▲ 1.8% mensual',
-        wellIndex: 2
+        wellIndex: 3
       },
       cuyana: {
         name: 'Cuyana · Mendoza',
-        lat: -33.12,
-        lon: -68.82,
+        lat: -33.125,
+        lon: -68.780,
         zoom: 11,
         pozos: '318',
         pozosSub: 'Recuperación 2ª',
         prod: '4.650 m³/d',
         prodSub: '▲ 0.9% mensual',
-        wellIndex: 3
+        wellIndex: 4
       }
     };
 
     const wellsData = [
       {
         id: 'YPF.Nq.LCa-314(h)',
+        shortLabel: 'LCa-314(h)',
         operadora: 'YPF S.A.',
         area: 'Loma Campana (Neuquén)',
-        formacion: 'Vaca Muerta',
+        formacion: 'Vaca Muerta · Shale Oil',
         status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
         surface: [-38.315, -68.810],
         bottom: [-38.288, -68.795],
         tvd: '2.980 m',
         lat: '3.250 m',
         stages: '44 etapas',
-        sand: '11.400 tn',
-        water: '58.200 m³',
+        sand: '11.4k tn · 58.2k m³',
+        gasRate: '94k m³/d',
+        waterRate: '22 m³/d',
+        pressure: '640 bar',
         rate: '186 m³/d',
         color: '#10b981',
         history: [260, 240, 215, 202, 194, 186]
       },
       {
+        id: 'YPF.Nq.LCa-409(h)',
+        shortLabel: 'LCa-409(h)',
+        operadora: 'YPF S.A.',
+        area: 'Loma Campana (Neuquén)',
+        formacion: 'Vaca Muerta · Shale Oil',
+        status: 'EN PRODUCCIÓN · PAD HORIZONTAL',
+        surface: [-38.332, -68.785],
+        bottom: [-38.305, -68.770],
+        tvd: '3.010 m',
+        lat: '2.950 m',
+        stages: '40 etapas',
+        sand: '10.2k tn · 51.4k m³',
+        gasRate: '81k m³/d',
+        waterRate: '18 m³/d',
+        pressure: '615 bar',
+        rate: '162 m³/d',
+        color: '#10b981',
+        history: [230, 210, 195, 180, 170, 162]
+      },
+      {
         id: 'VIS.Nq.BPO-2108(h)',
+        shortLabel: 'BPO-2108(h)',
         operadora: 'Vista Energy',
         area: 'Bajada del Palo Oeste (Neuquén)',
-        formacion: 'Vaca Muerta',
+        formacion: 'Vaca Muerta · Shale Oil',
         status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
         surface: [-38.240, -68.930],
         bottom: [-38.212, -68.918],
         tvd: '2.890 m',
         lat: '3.100 m',
         stages: '42 etapas',
-        sand: '10.950 tn',
-        water: '54.800 m³',
+        sand: '10.9k tn · 54.8k m³',
+        gasRate: '108k m³/d',
+        waterRate: '16 m³/d',
+        pressure: '680 bar',
         rate: '214 m³/d',
         color: '#10b981',
         history: [295, 270, 250, 236, 222, 214]
       },
       {
         id: 'YPF.Md.CN7A-102(h)',
+        shortLabel: 'CN7A-102(h)',
         operadora: 'YPF S.A.',
         area: 'CN VII A - Malargüe (Mendoza)',
-        formacion: 'Vaca Muerta Norte',
+        formacion: 'Vaca Muerta Norte · Shale',
         status: 'PILOTO NO CONVENCIONAL · EVALUACIÓN',
         surface: [-36.985, -69.540],
         bottom: [-36.962, -69.525],
         tvd: '2.640 m',
         lat: '2.510 m',
         stages: '32 etapas',
-        sand: '8.200 tn',
-        water: '41.500 m³',
+        sand: '8.2k tn · 41.5k m³',
+        gasRate: '56k m³/d',
+        waterRate: '14 m³/d',
+        pressure: '590 bar',
         rate: '112 m³/d',
         color: '#f59e0b',
         history: [145, 138, 130, 124, 118, 112]
       },
       {
         id: 'YPF.Md.Barr-812',
+        shortLabel: 'Barr-812',
         operadora: 'YPF S.A.',
         area: 'Barrancas / Luján de Cuyo (Mendoza)',
-        formacion: 'Cuenca Cuyana',
+        formacion: 'Cuenca Cuyana · Convencional',
         status: 'EXTRACCIÓN SECUNDARIA · POLÍMEROS',
         surface: [-33.125, -68.780],
         bottom: [-33.125, -68.780],
@@ -839,9 +897,11 @@
         lat: 'Vertical',
         stages: 'N/A',
         sand: 'N/A',
-        water: 'Polímeros',
+        gasRate: '12k m³/d',
+        waterRate: 'Polímeros',
+        pressure: '210 bar',
         rate: '34 m³/d',
-        color: '#10b981',
+        color: '#38bdf8',
         history: [31, 32, 33, 35, 34, 34]
       }
     ];
@@ -854,12 +914,12 @@
         </div>
         <div class="popup-sub">${w.operadora} · ${w.area}</div>
         <div class="popup-grid">
-          <div class="popup-cell"><span>TVD</span>${w.tvd}</div>
-          <div class="popup-cell"><span>Rama</span>${w.lat}</div>
-          <div class="popup-cell"><span>Etapas</span>${w.stages}</div>
-          <div class="popup-cell"><span>Formación</span>${w.formacion}</div>
+          <div class="popup-cell"><span>Gas</span>${w.gasRate}</div>
+          <div class="popup-cell"><span>Agua / Presión</span>${w.waterRate} · ${w.pressure}</div>
+          <div class="popup-cell"><span>TVD / Rama</span>${w.tvd} · ${w.lat}</div>
+          <div class="popup-cell"><span>Fractura</span>${w.stages}</div>
         </div>
-        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Ver ficha completa</button>
+        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Ver ficha y curva</button>
       `;
     }
 
@@ -870,28 +930,61 @@
       selectWell(w, true);
     }
 
+    function focusWellOnMap(idx, openPopup = true) {
+      const w = wellsData[idx];
+      if (!w) return;
+      selectWell(w, false);
+      map.flyTo(w.surface, 13);
+      if (openPopup && wellMarkers[idx]) {
+        setTimeout(() => wellMarkers[idx].openPopup(), 350);
+      }
+    }
+
     wellsData.forEach((w, idx) => {
       const popupHtml = buildWellPopupHtml(w, idx);
 
       if (w.lat !== 'Vertical') {
         const line = L.polyline([w.surface, w.bottom], {
           color: w.color,
-          weight: 4,
-          opacity: 0.9
+          weight: 5,
+          opacity: 0.95
         }).bindPopup(popupHtml).addTo(layers.pozos);
-        line.on('click', () => selectWell(w, false));
+        line.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          selectWell(w, false);
+        });
       }
 
       const marker = L.circleMarker(w.surface, {
-        radius: 8,
+        radius: 9,
         fillColor: w.color,
         color: '#ffffff',
-        weight: 2,
-        fillOpacity: 0.95
+        weight: 2.5,
+        fillOpacity: 1
       }).bindPopup(popupHtml).addTo(layers.pozos);
 
-      marker.on('click', () => selectWell(w, false));
+      marker.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+        selectWell(w, false);
+      });
+
+      wellMarkers[idx] = marker;
     });
+
+    function renderWellPills(activeId) {
+      const container = document.getElementById('well-pills');
+      container.innerHTML = '';
+      wellsData.forEach((w, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'well-chip' + (w.id === activeId ? ' active' : '');
+        btn.textContent = `${w.shortLabel} · ${w.rate}`;
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          focusWellOnMap(idx, true);
+        };
+        container.appendChild(btn);
+      });
+    }
 
     [
       { name: 'Loma Campana', coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]], color: '#38bdf8' },
@@ -902,8 +995,9 @@
         color: c.color,
         weight: 1.5,
         fillColor: c.color,
-        fillOpacity: 0.12
-      }).bindPopup(`<b>Área:</b> ${c.name}`).addTo(layers.areas);
+        fillOpacity: 0.08,
+        interactive: false
+      }).addTo(layers.areas);
     });
 
     [
@@ -1062,18 +1156,19 @@
 
     function selectWell(w, expandSheet = false) {
       document.getElementById('peek-title').textContent = w.id;
-      document.getElementById('peek-sub').textContent = `${w.area} · Toca para ficha`;
+      document.getElementById('peek-sub').textContent = `${w.area} · ${w.operadora}`;
       document.getElementById('peek-rate').textContent = w.rate;
 
       document.getElementById('well-status').textContent = w.status;
-      document.getElementById('well-area-line').textContent = `Área: ${w.area} · ${w.formacion}`;
+      document.getElementById('well-area-line').textContent = `Área: ${w.area} · ${w.formacion} (${w.operadora})`;
+      document.getElementById('spec-gas').textContent = `${w.rate} · ${w.gasRate}`;
+      document.getElementById('spec-pres').textContent = `${w.waterRate} · ${w.pressure}`;
       document.getElementById('spec-tvd').textContent = w.tvd;
       document.getElementById('spec-lat').textContent = w.lat;
       document.getElementById('spec-stages').textContent = w.stages;
       document.getElementById('spec-sand').textContent = w.sand;
-      document.getElementById('spec-water').textContent = w.water;
-      document.getElementById('spec-rate').textContent = w.rate;
 
+      renderWellPills(w.id);
       renderChart(w.history);
 
       if (expandSheet) {
@@ -1151,7 +1246,7 @@
       flyToSector(currentSector, null);
     }
 
-    renderChart(wellsData[0].history);
+    selectWell(wellsData[0], false);
     refreshTelemetry();
   </script>
 </body>
