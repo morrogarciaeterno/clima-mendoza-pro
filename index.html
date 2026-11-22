@@ -143,6 +143,10 @@
       background: var(--bg-dark);
     }
 
+    .dark-tiles {
+      filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
+    }
+
     /* TIRA DE KPIs DESLIZABLE SOBRE EL MAPA */
     .kpi-carousel {
       position: absolute;
@@ -192,7 +196,7 @@
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
-    /* BOTONES FLOTANTES TÁCTILES */
+    /* BOTONES FLOTANTES TÁCTILES (CAPAS / FICHA / ALERTAS) */
     .fab-stack {
       position: absolute;
       right: 12px;
@@ -659,24 +663,11 @@
       zoomControl: false
     }).setView([-38.32, -68.85], 11);
 
-    const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO | Territoria',
-      subdomains: 'abcd',
-      maxZoom: 18
-    });
-
-    const osmFallback = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap | Territoria',
-      maxZoom: 18
-    });
-
-    cartoDark.on('tileerror', () => {
-      if (!map.hasLayer(osmFallback)) {
-        osmFallback.addTo(map);
-      }
-    });
-
-    cartoDark.addTo(map);
+      maxZoom: 18,
+      className: 'dark-tiles'
+    }).addTo(map);
 
     const layers = {
       areas: L.layerGroup().addTo(map),
