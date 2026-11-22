@@ -359,8 +359,13 @@
     };
   }
 
+  function getInfraOperator(p){
+    return p.OPERADOR || p.OPERADORA || p.EMPRESA ||
+      p.operador || p.operadora || p.empresa ||
+      p.TITULAR || p.titular || p.RAZON_SOCIAL || p.razon_social || '';
+  }
   function getInfraGroupKey(p){
-    return p.OPERADOR || p.OPERADORA || p.EMPRESA || p.LOC_TIPO || p.CAPA || '';
+    return getInfraOperator(p) || p.LOC_TIPO || p.CAPA || '';
   }
 
   async function openInfraModal(tipo){
