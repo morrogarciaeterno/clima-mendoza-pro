@@ -32,7 +32,7 @@
     main{min-height:0;display:grid;grid-template-columns:minmax(0,58%) minmax(410px,42%);gap:10px;padding:10px}
     .map-shell{position:relative;min-height:0;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
     #map{height:100%;width:100%;background:#0b151d}
-    .map-overlay{position:absolute;z-index:600;left:14px;top:14px;display:flex;gap:8px;pointer-events:none}.badge{background:rgba(8,18,27,.9);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:10px;color:var(--muted);backdrop-filter:blur(10px)}.badge b{color:var(--text);font-size:13px;margin-right:4px}
+    .map-overlay{position:absolute;z-index:600;left:56px;top:10px;display:flex;flex-wrap:wrap;gap:8px;pointer-events:none}.badge{background:rgba(8,18,27,.9);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:10px;color:var(--muted);backdrop-filter:blur(10px)}.badge b{color:var(--text);font-size:13px;margin-right:4px}
     .legend{position:absolute;z-index:600;left:14px;bottom:14px;background:rgba(8,18,27,.92);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:7px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
     .side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px;padding-right:3px}.side::-webkit-scrollbar{width:5px}.side::-webkit-scrollbar-thumb{background:#28485d;border-radius:9px}
     .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);overflow:hidden}.card-head{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}.card-head h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#a8c0ce}.card-head span{font-size:10px;color:var(--muted)}.card-body{padding:14px}
@@ -43,8 +43,7 @@
     .risk{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #245b4a;background:linear-gradient(100deg,#10352b,#0a211e);border-radius:10px}.risk strong{font-size:12px;letter-spacing:.12em}.risk span{font-size:10px;color:#9adbb5}
     .empty{min-height:170px;display:grid;place-items:center;text-align:center;color:var(--muted)}.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:7px}.empty .circle{width:54px;height:54px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;font-size:22px;color:var(--cyan)}
     footer{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-top:1px solid var(--line);background:#070f16;color:#647f8f;font-size:9px;letter-spacing:.09em;text-transform:uppercase}
-    .leaflet-container{font-family:Inter;background:#071018}.leaflet-control-zoom a{background:#0c1b26!important;color:#dff!important;border-color:#203a4a!important}.leaflet-control-attribution{background:rgba(8,18,27,.78)!important;color:#7f9aaa!important}.leaflet-control-attribution a{color:#64b8d0!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1f2b;color:var(--text);border:1px solid var(--line)}
-    .marker{width:8px;height:8px;border-radius:50%;background:var(--cyan);border:3px solid #d7ffff;box-shadow:0 0 0 2px rgba(36,214,208,.18),0 0 9px rgba(36,214,208,.55)}.marker.ab{background:var(--red);border-color:#ffd4d7}.marker.in{background:var(--amber);border-color:#fff0c8}
+    .leaflet-container{font-family:Inter;background:#071018}.leaflet-control-zoom{border:1px solid var(--line)!important;border-radius:9px!important;overflow:hidden;box-shadow:var(--shadow)}.leaflet-control-zoom a{background:rgba(8,18,27,.92)!important;color:var(--cyan)!important;border-color:var(--line)!important;width:32px!important;height:32px!important;line-height:30px!important;font-size:18px!important}.leaflet-control-zoom a:hover{background:#122938!important}.leaflet-control-attribution{background:rgba(8,18,27,.78)!important;color:#7f9aaa!important}.leaflet-control-attribution a{color:#64b8d0!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1f2b;color:var(--text);border:1px solid var(--line)}
     .toast{position:fixed;z-index:2000;right:18px;bottom:45px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#102330;color:var(--text);box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8b3d48}
     @media(max-width:1050px){html,body{overflow:auto}.app{height:auto;min-height:100%;grid-template-rows:auto auto auto 30px}.toolbar{grid-template-columns:repeat(3,1fr)}main{grid-template-columns:1fr}.map-shell{height:58vh}.side{overflow:visible}.top-status .source-pill{display:none}}
     @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}main{padding:6px}.brand small{display:none}}
@@ -93,7 +92,7 @@
       </section>
 
       <section class="card">
-        <div class="card-head"><h2>Indicadores técnicos</h2><span>DATOS OFICIALES</span></div>
+        <div class="card-head"><h2>Indicadores técnicos</h2><span class="mono" id="tech-updated">ACT. PENDIENTE</span></div>
         <div class="card-body"><div class="metrics">
           <div class="metric"><span>Clase</span><strong id="m-class">—</strong></div>
           <div class="metric"><span>Formación</span><strong class="cyan" id="m-formation">—</strong></div>
@@ -120,7 +119,7 @@
       </section>
 
       <section class="card">
-        <div class="card-head"><h2>Datos técnicos del pozo</h2><span>WFS · NEUQUÉN</span></div>
+        <div class="card-head"><h2>Datos técnicos del pozo</h2><span class="mono" id="wfs-updated">WFS · NEUQUÉN</span></div>
         <div class="card-body"><div class="kv" id="tech-kv">
           <div class="kv-row"><span>Esperando selección</span><b>—</b></div>
         </div></div>
@@ -153,21 +152,29 @@
   const $ = id => document.getElementById(id);
   const CACHE_DB_NAME = 'territoria_energy_cache';
   const CACHE_STORE_NAME = 'pozos_store';
-  const CACHE_KEY = 'neuquen_pozos_v1';
+  const CACHE_KEY = 'neuquen_pozos_v2';
   const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
   const state = {
     all: [],
     filtered: [],
-    markers: [],
     selected: null,
     hasFittedOnce: false,
+    catalogUpdatedAt: null,
     api: 'https://territoria-energy-api.elexpreso17.workers.dev'
   };
 
-  const map = L.map('map', { zoomControl:true, preferCanvas:true }).setView([-38.4,-69.1],7);
+  const canvasRenderer = L.canvas({ padding: 0.4 });
+  const map = L.map('map', {
+    zoomControl: true,
+    minZoom: 4,
+    maxZoom: 18,
+    preferCanvas: true,
+    renderer: canvasRenderer
+  }).setView([-38.4,-69.1],7);
+
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+    maxZoom: 18,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
   const markerLayer = L.layerGroup().addTo(map);
@@ -184,6 +191,21 @@
   }
   function safe(v,fallback='Sin dato'){ return v===null||v===undefined||v===''?fallback:String(v); }
   function fmtDate(v){ if(!v)return 'Sin dato'; const d=new Date(v); return isNaN(d)?String(v):new Intl.DateTimeFormat('es-AR').format(d); }
+  function fmtStamp(ts){
+    if(!ts) return 'SIN FECHA';
+    const d = new Date(ts);
+    if(isNaN(d)) return 'SIN FECHA';
+    return new Intl.DateTimeFormat('es-AR',{
+      day:'2-digit', month:'2-digit', year:'numeric',
+      hour:'2-digit', minute:'2-digit'
+    }).format(d);
+  }
+  function setCatalogTimestamp(ts, sourceTag){
+    state.catalogUpdatedAt = ts;
+    const label = 'ACT. ' + fmtStamp(ts) + (sourceTag ? ' · ' + sourceTag : '');
+    $('tech-updated').textContent = label;
+    $('wfs-updated').textContent = 'WFS · ' + fmtStamp(ts);
+  }
   function getCoords(x){
     const lat = Number(x.LATITUD ?? x._geometry?.coordinates?.[1]);
     const lon = Number(x.LONGITUD ?? x._geometry?.coordinates?.[0]);
@@ -220,13 +242,13 @@
     }
   }
 
-  async function writeCachedWells(records){
+  async function writeCachedWells(records, savedAt = Date.now()){
     try{
       const db = await openCacheDB();
       await new Promise((resolve, reject) => {
         const tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
         const store = tx.objectStore(CACHE_STORE_NAME);
-        const req = store.put({ savedAt: Date.now(), records }, CACHE_KEY);
+        const req = store.put({ savedAt, records }, CACHE_KEY);
         req.onsuccess = () => resolve();
         req.onerror = () => reject(req.error);
       });
@@ -242,6 +264,20 @@
     $(id).addEventListener(id==='search'?'input':'change', () => applyFilters(true));
   });
 
+  async function fetchBatch(inicio, limite){
+    for(let intento=1; intento<=2; intento++){
+      try{
+        const r = await fetch(state.api+'/api/pozos?inicio='+inicio+'&limite='+limite, {cache:'no-store'});
+        const data = await r.json();
+        if(!r.ok || !data.ok) throw new Error(data.error || 'Respuesta inválida');
+        return data;
+      }catch(e){
+        if(intento === 2) throw e;
+        await new Promise(res => setTimeout(res, 1000));
+      }
+    }
+  }
+
   async function loadData(forceRefresh = false){
     if(!state.api) return;
 
@@ -255,6 +291,7 @@
         populateFilters();
         applyFilters(!state.hasFittedOnce);
         setConnection('API ONLINE · CACHÉ', true);
+        setCatalogTimestamp(cached.savedAt, 'CACHÉ');
         const horaCache = new Date(cached.savedAt).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
         $('footer-state').textContent = `CACHÉ LOCAL (${horaCache}) · ${state.all.length} POZOS`;
         toast(`${state.all.length} pozos cargados desde caché local`);
@@ -263,87 +300,84 @@
     }
 
     setConnection('CONECTANDO…',false);
+    $('tech-updated').textContent = 'ACTUALIZANDO…';
     $('footer-state').textContent='CONSULTANDO FUENTE OFICIAL';
     state.all=[];
     markerLayer.clearLayers();
     updateCounters();
 
-    let inicio=0;
-    const limite=100;
-    let pagina=0;
-    let cargaParcial=false;
+    const limite = 1000;
+    const concurrencia = 3;
+    let inicio = 0;
+    let cargaParcial = false;
 
     try{
-      while(true){
-        pagina++;
-        $('footer-state').textContent='CARGANDO POZOS · LOTE '+pagina+' · '+state.all.length+' CARGADOS';
+      const primero = await fetchBatch(0, limite);
+      const lote0 = (primero.registros || []).map(x => ({id:x.id, ...(x.datos||{}), _geometry:x.geometria}));
+      state.all.push(...lote0);
+      setConnection('API ONLINE', true);
+      populateFilters();
+      applyFilters(true);
 
-        let j=null;
-        let ultimoError=null;
+      const totalEstimado = Number(primero.total) || 21000;
+      inicio = lote0.length;
 
-        for(let intento=1; intento<=2; intento++){
-          try{
-            const r=await fetch(state.api+'/api/pozos?inicio='+inicio+'&limite='+limite, {cache:'no-store'});
-            const data=await r.json();
-            if(!r.ok||!data.ok) throw new Error(data.error||'Respuesta inválida');
-            j=data;
-            break;
-          }catch(e){
-            ultimoError=e;
-            if(intento<2){
-              $('footer-state').textContent='REINTENTANDO LOTE '+pagina+' · '+state.all.length+' CARGADOS';
-              await new Promise(resolve=>setTimeout(resolve,1800));
-            }
+      while(primero.hayMas && inicio < totalEstimado){
+        const offsets = [];
+        for(let i = 0; i < concurrencia && (inicio + i * limite) < totalEstimado; i++){
+          offsets.push(inicio + i * limite);
+        }
+        if(!offsets.length) break;
+
+        $('footer-state').textContent = `CARGANDO POZOS · ${state.all.length} / ${totalEstimado}`;
+
+        const resultados = await Promise.allSettled(offsets.map(off => fetchBatch(off, limite)));
+        let finAlcanzado = false;
+
+        for(const res of resultados){
+          if(res.status === 'fulfilled'){
+            const j = res.value;
+            const lote = (j.registros || []).map(x => ({id:x.id, ...(x.datos||{}), _geometry:x.geometria}));
+            state.all.push(...lote);
+            if(!j.hayMas || lote.length < limite) finAlcanzado = true;
+          }else{
+            cargaParcial = true;
           }
         }
 
-        if(!j){
-          cargaParcial=true;
-          toast('Carga parcial: '+state.all.length+' pozos conservados. '+(ultimoError?.message||'Fuente temporalmente sin respuesta'),true);
-          break;
-        }
-
-        const lote=(j.registros||[]).map(x=>({id:x.id,...(x.datos||{}),_geometry:x.geometria}));
-        state.all.push(...lote);
-
-        populateFilters();
         applyFilters(false);
-        setConnection('API ONLINE',true);
-
-        if(!j.hayMas || lote.length<limite || lote.length===0) break;
-        inicio=j.siguienteInicio ?? (inicio+lote.length);
-
-        await new Promise(resolve=>setTimeout(resolve,450));
-
-        if(pagina>=250){
-          cargaParcial=true;
-          toast('Carga detenida por límite preventivo. Se mantienen '+state.all.length+' pozos.',true);
-          break;
-        }
+        inicio += offsets.length * limite;
+        if(finAlcanzado || cargaParcial) break;
       }
 
       if(state.all.length){
+        const now = Date.now();
         if(!cargaParcial){
-          await writeCachedWells(state.all);
+          await writeCachedWells(state.all, now);
         }
+        setCatalogTimestamp(now, cargaParcial ? 'PARCIAL' : 'WFS');
         setConnection(cargaParcial?'API ONLINE · PARCIAL':'API ONLINE',true);
         $('footer-state').textContent=(cargaParcial?'CARGA PARCIAL · ':'CARGA COMPLETA · ')+state.all.length+' POZOS';
         populateFilters();
-        applyFilters(!state.hasFittedOnce);
+        applyFilters(false);
         if(!cargaParcial) toast(state.all.length+' pozos reales cargados');
       }else{
         setConnection('API SIN RESPUESTA',false);
+        $('tech-updated').textContent = 'SIN DATOS';
         $('footer-state').textContent='SIN DATOS CARGADOS';
       }
     }catch(e){
       if(state.all.length){
+        const now = Date.now();
+        setCatalogTimestamp(now, 'PARCIAL');
         setConnection('API ONLINE · PARCIAL',true);
         $('footer-state').textContent='CARGA PARCIAL · '+state.all.length+' POZOS';
         populateFilters();
-        applyFilters(!state.hasFittedOnce);
+        applyFilters(false);
         toast('Se conservaron '+state.all.length+' pozos cargados.',true);
       }else{
         setConnection('API SIN RESPUESTA',false);
+        $('tech-updated').textContent = 'ERROR DE CONEXIÓN';
         $('footer-state').textContent='ERROR DE CONEXIÓN';
         toast(e.message,true);
       }
@@ -382,27 +416,34 @@
     updateCounters();
   }
 
-  function markerClass(x){
+  function markerColors(x){
     const s=(x.ESTADO_GIS||'').toLowerCase();
-    return s.includes('abandon')?'ab':s.includes('inactiv')?'in':'';
+    if(s.includes('abandon')) return { fill:'#ff5e68', stroke:'#ffd4d7' };
+    if(s.includes('inactiv')) return { fill:'#f4b544', stroke:'#fff0c8' };
+    return { fill:'#24d6d0', stroke:'#d7ffff' };
   }
 
   function renderMarkers(shouldFit=false){
     markerLayer.clearLayers();
-    state.markers=[];
     const bounds=[];
     state.filtered.forEach(x => {
       const coords = getCoords(x);
       if(!coords) return;
       const [lat, lon] = coords;
-      const icon=L.divIcon({className:'',html:'<div class="marker '+markerClass(x)+'"></div>',iconSize:[8,8],iconAnchor:[4,4]});
-      const m=L.marker([lat,lon],{icon,title:safe(x.FIELD_NAME)}).on('click',()=>selectWell(x));
+      const c = markerColors(x);
+      const m = L.circleMarker([lat,lon],{
+        renderer: canvasRenderer,
+        radius: 4.5,
+        color: c.stroke,
+        weight: 1.5,
+        fillColor: c.fill,
+        fillOpacity: 0.9
+      }).on('click',()=>selectWell(x));
       m.addTo(markerLayer);
-      state.markers.push(m);
       bounds.push([lat,lon]);
     });
     if(bounds.length && (shouldFit || !state.hasFittedOnce)){
-      map.fitBounds(bounds,{padding:[45,45],maxZoom:13});
+      map.fitBounds(bounds,{padding:[45,45],maxZoom:14});
       state.hasFittedOnce = true;
     }
   }
@@ -472,7 +513,8 @@
 
   async function selectWell(x){
     state.selected=x;
-    const statusClass=markerClass(x)==='ab'?'abandoned':markerClass(x)==='in'?'inactive':x.ESTADO_GIS?'active':'none';
+    const s=(x.ESTADO_GIS||'').toLowerCase();
+    const statusClass=s.includes('abandon')?'abandoned':s.includes('inactiv')?'inactive':x.ESTADO_GIS?'active':'none';
     $('asset-card').innerHTML=`<div class="asset-title"><div class="asset-icon">◩</div><div class="asset-name"><h3>${escapeHtml(safe(x.FIELD_NAME))}</h3><p>${escapeHtml(safe(x.WELL_NAME))} · ${escapeHtml(safe(x.UWI_NQN))}</p></div><div class="state ${statusClass}">${escapeHtml(safe(x.ESTADO_GIS).toUpperCase())}</div></div>`;
     $('last-update').textContent='SELECCIONADO '+new Date().toLocaleTimeString('es-AR');
     $('m-class').textContent=safe(x.CLASS_NAME,'—');
@@ -505,7 +547,7 @@
 
     if(coords){
       const [lat, lon] = coords;
-      map.flyTo([lat,lon],13,{duration:.7});
+      map.flyTo([lat,lon],15,{duration:.7});
       await Promise.all([loadWeather(lat,lon), loadProduction(x)]);
     }else{
       await loadProduction(x);
