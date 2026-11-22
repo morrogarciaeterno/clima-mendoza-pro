@@ -2,1619 +2,220 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Territoria Upstream | Nova Territoria</title>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Territoria Energy | Centro de Operaciones No Convencionales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <style>
     :root {
-      --bg-dark: #090d16;
-      --panel-bg: rgba(15, 23, 42, 0.96);
-      --border-color: rgba(56, 189, 248, 0.25);
-      --accent-cyan: #38bdf8;
-      --accent-amber: #f59e0b;
-      --accent-emerald: #10b981;
-      --accent-red: #ef4444;
-      --accent-purple: #a855f7;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-    }
-
-    .app-shell {
-      display: flex;
-      flex-direction: column;
-      height: 100dvh;
-      width: 100%;
-      position: relative;
-    }
-
-    header {
-      background: #0b111e;
-      border-bottom: 1px solid var(--border-color);
-      padding: 8px 12px;
-      z-index: 1000;
-      flex-shrink: 0;
-    }
-
-    .header-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand-badge {
-      background: linear-gradient(135deg, #0284c7, #0ea5e9);
-      color: #fff;
-      font-weight: 700;
-      font-size: 12px;
-      padding: 4px 7px;
-      border-radius: 5px;
-    }
-
-    .brand-title {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-
-    .brand-title span {
-      color: var(--accent-amber);
-    }
-
-    .status-pill {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9.5px;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: rgba(16, 185, 129, 0.16);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.45);
-    }
-
-    .sector-bar {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 2px;
-    }
-    .sector-bar::-webkit-scrollbar { display: none; }
-
-    .sector-btn {
-      flex: 0 0 auto;
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      color: var(--text-main);
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 11.5px;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .sector-btn.active {
-      background: rgba(14, 165, 233, 0.22);
-      border-color: var(--accent-cyan);
-      color: #fff;
-      font-weight: 600;
-    }
-
-    .map-stage {
-      position: relative;
-      flex: 1;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    #map {
-      height: 100%;
-      width: 100%;
-      background: var(--bg-dark);
-    }
-
-    .dark-tiles {
-      filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
-    }
-
-    /* POPUP COMPACTO EN EL MARCADOR DEL MAPA */
-    .leaflet-popup-content-wrapper,
-    .leaflet-popup-tip {
-      background: rgba(15, 23, 42, 0.98);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
-    }
-
-    .leaflet-popup-content {
-      margin: 9px 11px;
-      font-family: 'Inter', sans-serif;
-      font-size: 11.5px;
-      line-height: 1.35;
-      min-width: 195px;
-    }
-
-    .popup-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 3px;
-    }
-
-    .popup-title {
-      font-weight: 700;
-      font-size: 12.5px;
-      color: #fff;
-    }
-
-    .popup-rate {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #34d399;
-      background: rgba(16, 185, 129, 0.16);
-      padding: 2px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
-    }
-
-    .popup-sub {
-      font-size: 10.5px;
-      color: var(--text-muted);
-      margin-bottom: 7px;
-    }
-
-    .popup-btn {
-      width: 100%;
-      padding: 5px 8px;
-      border-radius: 5px;
-      border: 1px solid var(--accent-cyan);
-      background: rgba(14, 165, 233, 0.22);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* KPIs SUPERIORES (OCULTOS POR DEFECTO PARA ARRANCAR LIMPIO) */
-    .kpi-carousel {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      display: none;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      z-index: 800;
-    }
-    .kpi-carousel.open {
-      display: flex;
-    }
-    .kpi-carousel::-webkit-scrollbar { display: none; }
-
-    .kpi-card {
-      flex: 0 0 134px;
-      background: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 7px 9px;
-    }
-
-    .kpi-label {
-      font-size: 9px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .kpi-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #fff;
-      margin-top: 2px;
-    }
-
-    .kpi-sub {
-      font-size: 9.5px;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .up { color: var(--accent-emerald); }
-    .warn { color: var(--accent-amber); }
-
-    /* BOTONES FLOTANTES A LA IZQUIERDA */
-    .fab-stack {
-      position: absolute;
-      left: 12px;
-      bottom: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      z-index: 850;
-    }
-
-    .fab-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      color: #fff;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-      cursor: pointer;
-    }
-
-    .fab-btn.active {
-      border-color: var(--accent-cyan);
-      background: rgba(14, 165, 233, 0.3);
-    }
-
-    /* DRAWER DE CAPAS */
-    .layers-drawer {
-      position: absolute;
-      left: 62px;
-      bottom: 24px;
-      width: 230px;
-      background: var(--panel-bg);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 11px 12px;
-      z-index: 860;
-      display: none;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
-    }
-
-    .layers-drawer.open {
-      display: block;
-    }
-
-    .drawer-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      margin-bottom: 7px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .layer-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 0;
-      font-size: 12px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-    }
-    .layer-row:last-child { border-bottom: none; }
-
-    .layer-row input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--accent-cyan);
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 7px;
-    }
-
-    /* FICHA TÉCNICA POPUP LATERAL (OCULTA HASTA PRESIONAR UN POZO) */
-    .side-popup-card {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      bottom: 24px;
-      width: min(355px, calc(100vw - 24px));
-      background: var(--panel-bg);
-      backdrop-filter: blur(14px);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      z-index: 900;
-      display: flex;
-      flex-direction: column;
-      box-shadow: -6px 10px 30px rgba(0, 0, 0, 0.72);
-      transform: translateX(calc(100% + 20px));
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, top 0.2s ease;
-    }
-
-    .side-popup-card.with-kpis {
-      top: 74px;
-    }
-
-    .side-popup-card.open {
-      transform: translateX(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .card-header {
-      padding: 11px 13px 9px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.16);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .card-well-id {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.25;
-    }
-
-    .card-well-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .card-close-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      background: rgba(30, 41, 59, 0.8);
-      color: var(--text-muted);
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .card-close-btn:hover {
-      color: #fff;
-      border-color: var(--accent-cyan);
-    }
-
-    .card-tabs {
-      display: flex;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-      flex-shrink: 0;
-      background: rgba(11, 17, 30, 0.6);
-    }
-
-    .card-tab {
-      flex: 1;
-      padding: 8px 6px;
-      text-align: center;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      cursor: pointer;
-    }
-
-    .card-tab.active {
-      color: var(--accent-cyan);
-      border-bottom-color: var(--accent-cyan);
-    }
-
-    .card-scroll-body {
-      padding: 12px 13px;
-      overflow-y: auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 11px;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.4);
-    }
-
-    .card-scroll-body::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    .card-scroll-body::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.4);
-      border-radius: 999px;
-    }
-
-    .card-scroll-body::-webkit-scrollbar-thumb {
-      background: rgba(56, 189, 248, 0.38);
-      border-radius: 999px;
-    }
-
-    .tab-pane {
-      display: none;
-      flex-direction: column;
-      gap: 11px;
-    }
-    .tab-pane.active {
-      display: flex;
-    }
-
-    .section-mini-label {
-      font-size: 9.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      font-weight: 600;
-    }
-
-    .well-pills {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .well-chip {
-      background: rgba(30, 41, 59, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      color: var(--text-main);
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      cursor: pointer;
-    }
-
-    .well-chip.active {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: var(--accent-emerald);
-      color: #34d399;
-      font-weight: 600;
-    }
-
-    .meta-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .status-badge {
-      display: inline-block;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9.5px;
-      padding: 3px 7px;
-      border-radius: 4px;
-      background: rgba(16, 185, 129, 0.16);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.35);
-    }
-
-    .ref-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(245, 158, 11, 0.14);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-
-    .spec-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 7px;
-    }
-
-    .spec-box {
-      background: rgba(30, 41, 59, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      border-radius: 7px;
-      padding: 7px 9px;
-    }
-
-    .spec-k {
-      font-size: 9.5px;
-      color: var(--text-muted);
-    }
-
-    .spec-v {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 2px;
-      color: #f8fafc;
-    }
-
-    .chart-box {
-      background: rgba(30, 41, 59, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      border-radius: 8px;
-      padding: 9px 10px;
-    }
-
-    .bars-container {
-      height: 92px;
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      padding-top: 12px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-    }
-
-    .bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .bar-fill {
-      width: 100%;
-      background: linear-gradient(180deg, #38bdf8, #0284c7);
-      border-radius: 3px 3px 0 0;
-    }
-
-    .bar-lbl {
-      font-size: 9px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-muted);
-    }
-
-    .alert-item {
-      background: rgba(239, 68, 68, 0.12);
-      border-left: 3px solid var(--accent-red);
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 11.5px;
-      line-height: 1.35;
-    }
-
-    .alert-item.amber {
-      background: rgba(245, 158, 11, 0.12);
-      border-left-color: var(--accent-amber);
-    }
-
-    .alert-item.ok {
-      background: rgba(16, 185, 129, 0.1);
-      border-left-color: var(--accent-emerald);
-    }
-
-    .alert-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      color: var(--text-muted);
-      margin-bottom: 3px;
-    }
+      --bg:#071018; --panel:#0b1722; --panel2:#0e1c28; --panel3:#102332;
+      --line:#1f3545; --text:#eaf4f8; --muted:#7f9aaa; --cyan:#24d6d0;
+      --cyan2:#0ea5b7; --green:#31d67b; --amber:#f4b544; --red:#ff5e68;
+      --blue:#5aa7ff; --purple:#9b88ff; --shadow:0 18px 50px rgba(0,0,0,.34);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
+    button,input,select{font:inherit}
+    .app{height:100%;display:grid;grid-template-rows:64px 74px 1fr 30px;background:radial-gradient(circle at 10% 0%,#10293a 0,transparent 26%),var(--bg)}
+    header{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(7,16,24,.94);backdrop-filter:blur(14px)}
+    .brand{display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(145deg,var(--cyan),#1478a1);display:grid;place-items:center;box-shadow:0 0 24px rgba(36,214,208,.28)}
+    .mark svg{width:24px;height:24px}.brand h1{font-size:18px;letter-spacing:.08em;margin:0}.brand h1 span{color:var(--cyan)}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.13em;margin-top:2px}
+    .top-status{display:flex;align-items:center;gap:10px}.status-pill,.clock,.source-pill{border:1px solid var(--line);background:var(--panel);padding:8px 11px;border-radius:9px;font-size:11px;color:var(--muted)}
+    .status-pill{color:#bffbd8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px var(--green)}
+    .clock{font-family:"JetBrains Mono";color:var(--text)}
+    .toolbar{display:grid;grid-template-columns:1.25fr repeat(4,minmax(140px,.55fr)) auto;gap:10px;padding:12px 16px;background:#08131d;border-bottom:1px solid var(--line)}
+    .field{position:relative}.field label{position:absolute;left:11px;top:7px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);z-index:1}.field input,.field select{width:100%;height:50px;padding:20px 34px 6px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);outline:none}.field input:focus,.field select:focus{border-color:var(--cyan)}
+    .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:12px;top:18px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:20px;top:13px}
+    .btn{height:50px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text);padding:0 16px;cursor:pointer;font-weight:700}.btn:hover{border-color:var(--cyan);color:var(--cyan)}.btn.primary{background:linear-gradient(135deg,#167f92,#0b6475);border-color:#2499aa}
+    main{min-height:0;display:grid;grid-template-columns:minmax(0,58%) minmax(410px,42%);gap:10px;padding:10px}
+    .map-shell{position:relative;min-height:0;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+    #map{height:100%;width:100%;background:#0b151d}
+    .map-overlay{position:absolute;z-index:600;left:14px;top:14px;display:flex;gap:8px;pointer-events:none}.badge{background:rgba(8,18,27,.9);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:10px;color:var(--muted);backdrop-filter:blur(10px)}.badge b{color:var(--text);font-size:13px;margin-right:4px}
+    .legend{position:absolute;z-index:600;left:14px;bottom:14px;background:rgba(8,18,27,.92);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:7px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
+    .side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px;padding-right:3px}.side::-webkit-scrollbar{width:5px}.side::-webkit-scrollbar-thumb{background:#28485d;border-radius:9px}
+    .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);overflow:hidden}.card-head{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}.card-head h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#a8c0ce}.card-body{padding:14px}
+    .asset-title{display:grid;grid-template-columns:52px 1fr auto;gap:13px;align-items:center}.asset-icon{width:52px;height:52px;border:1px solid #245266;background:#0e2937;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:25px}.asset-name h3{margin:0;font-size:21px;line-height:1.2}.asset-name p{margin:5px 0 0;color:var(--muted);font-family:"JetBrains Mono";font-size:11px}.state{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid}.state.active{color:#bffbd8;border-color:#2b8655;background:#103724}.state.inactive{color:#ffe3a7;border-color:#7d6330;background:#332711}.state.abandoned{color:#ffc2c6;border-color:#87414a;background:#381b20}.state.none{color:#aac0cc;border-color:#385163;background:#132431}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{min-width:0;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.metric span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:7px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong.cyan{color:var(--cyan)}
+    .kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}.kv-row{padding:9px 0;border-bottom:1px solid rgba(47,75,91,.55);display:flex;align-items:center;justify-content:space-between;gap:12px}.kv-row span{font-size:10px;color:var(--muted)}.kv-row b{font-size:11px;text-align:right;max-width:66%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mono{font-family:"JetBrains Mono"}
+    .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.weather{padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.weather .ico{font-size:17px}.weather strong{display:block;font-size:17px;margin:7px 0 2px}.weather span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.weather small{color:#9fc2d2}
+    .risk{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #245b4a;background:linear-gradient(100deg,#10352b,#0a211e);border-radius:10px}.risk strong{font-size:12px;letter-spacing:.12em}.risk span{font-size:10px;color:#9adbb5}
+    .empty{min-height:170px;display:grid;place-items:center;text-align:center;color:var(--muted)}.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:7px}.empty .circle{width:54px;height:54px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;font-size:22px;color:var(--cyan)}
+    footer{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-top:1px solid var(--line);background:#070f16;color:#647f8f;font-size:9px;letter-spacing:.09em;text-transform:uppercase}
+    .leaflet-container{font-family:Inter;background:#071018}.leaflet-control-zoom a{background:#0c1b26!important;color:#dff!important;border-color:#203a4a!important}.leaflet-control-attribution{background:rgba(8,18,27,.78)!important;color:#7f9aaa!important}.leaflet-control-attribution a{color:#64b8d0!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1f2b;color:var(--text);border:1px solid var(--line)}
+    .marker{width:16px;height:16px;border-radius:50%;background:var(--cyan);border:3px solid #d7ffff;box-shadow:0 0 0 4px rgba(36,214,208,.22),0 0 18px rgba(36,214,208,.7)}.marker.ab{background:var(--red);border-color:#ffd4d7}.marker.in{background:var(--amber);border-color:#fff0c8}
+    .toast{position:fixed;z-index:2000;right:18px;bottom:45px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#102330;color:var(--text);box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8b3d48}
+    dialog{border:1px solid var(--line);border-radius:14px;background:#0b1722;color:var(--text);padding:0;max-width:560px;width:calc(100% - 30px);box-shadow:0 30px 90px #000}dialog::backdrop{background:rgba(0,0,0,.68);backdrop-filter:blur(4px)}.modal-head{padding:16px 18px;border-bottom:1px solid var(--line)}.modal-head h3{margin:0}.modal-body{padding:18px}.modal-body p{font-size:12px;color:var(--muted);line-height:1.6}.modal-body input{width:100%;padding:13px;border-radius:9px;border:1px solid var(--line);background:#08131d;color:white}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}
+    @media(max-width:1050px){html,body{overflow:auto}.app{height:auto;min-height:100%;grid-template-rows:auto auto auto 30px}.toolbar{grid-template-columns:repeat(3,1fr)}main{grid-template-columns:1fr}.map-shell{height:58vh}.side{overflow:visible}.top-status .source-pill{display:none}}
+    @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}main{padding:6px}.brand small{display:none}}
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header>
-      <div class="header-top">
-        <div class="brand">
-          <div class="brand-badge">NT</div>
-          <div class="brand-title">TERRITORIA <span>UPSTREAM</span></div>
-        </div>
-        <span class="status-pill" id="live-status">USGS + OPEN-METEO LIVE</span>
-      </div>
-
-      <div class="sector-bar">
-        <button class="sector-btn active" data-sector="vmSur" onclick="flyToSector('vmSur', this)">VM Sur · Añelo (Nqn)</button>
-        <button class="sector-btn" data-sector="vmNorte" onclick="flyToSector('vmNorte', this)">VM Norte · Malargüe</button>
-        <button class="sector-btn" data-sector="cuyana" onclick="flyToSector('cuyana', this)">Cuyana · Mendoza</button>
-      </div>
-    </header>
-
-    <div class="map-stage">
-      <!-- KPIs SUPERIORES (OCULTOS AL ARRANCAR) -->
-      <div class="kpi-carousel" id="kpi-carousel">
-        <div class="kpi-card">
-          <div class="kpi-label">Pozos / Áreas (Ref)</div>
-          <div class="kpi-value" id="kpi-pozos">6 Áreas</div>
-          <div class="kpi-sub up" id="kpi-pozos-sub">Cuenca Neuquina · Nqn</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Prod. Bloque (Ref)</div>
-          <div class="kpi-value" id="kpi-prod">14.820 m³/d</div>
-          <div class="kpi-sub up" id="kpi-prod-sub">▲ 4.2% mensual</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Viento / Zonda</div>
-          <div class="kpi-value" id="kpi-viento">-- km/h</div>
-          <div class="kpi-sub warn" id="kpi-viento-sub">Consultando Open-Meteo</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Sismos USGS</div>
-          <div class="kpi-value" id="kpi-sismo">--</div>
-          <div class="kpi-sub warn" id="kpi-sismo-sub">Consultando USGS</div>
-        </div>
-      </div>
-
-      <div id="map"></div>
-
-      <!-- BOTONES FLOTANTES A LA IZQUIERDA -->
-      <div class="fab-stack">
-        <button class="fab-btn" id="btn-kpi-toggle" title="Mostrar/Ocultar KPIs del bloque" onclick="toggleKpis()">📊</button>
-        <button class="fab-btn" id="btn-ficha-toggle" title="Abrir/Cerrar Ficha Técnica" onclick="toggleSideCard()">📋</button>
-        <button class="fab-btn" id="btn-layers" title="Capas" onclick="toggleLayersDrawer()">🗂️</button>
-        <button class="fab-btn" id="btn-refresh" title="Actualizar telemetría" onclick="refreshTelemetry()">🔄</button>
-        <button class="fab-btn" id="btn-center" title="Centrar sector" onclick="recenterCurrentSector()">🎯</button>
-      </div>
-
-      <!-- PANEL DE CAPAS -->
-      <div class="layers-drawer" id="layers-drawer">
-        <div class="drawer-title">
-          <span>Capas del Mapa</span>
-          <span style="cursor:pointer; color:#94a3b8;" onclick="toggleLayersDrawer()">✕</span>
-        </div>
-        <label class="layer-row">
-          <span><span class="dot" style="background:#38bdf8;"></span>Yacimientos / Áreas</span>
-          <input type="checkbox" checked onchange="toggleLayer('areas', this.checked)">
-        </label>
-        <label class="layer-row">
-          <span><span class="dot" style="background:#10b981;"></span>Pozos + Ramas</span>
-          <input type="checkbox" checked onchange="toggleLayer('pozos', this.checked)">
-        </label>
-        <label class="layer-row">
-          <span><span class="dot" style="background:#a855f7;"></span>Ductos</span>
-          <input type="checkbox" checked onchange="toggleLayer('ductos', this.checked)">
-        </label>
-        <label class="layer-row">
-          <span><span class="dot" style="background:#ef4444;"></span>Sismos USGS (7d)</span>
-          <input type="checkbox" checked onchange="toggleLayer('sismos', this.checked)">
-        </label>
-      </div>
-
-      <!-- FICHA TÉCNICA POPUP LATERAL (OCULTA HASTA PRESIONAR UN POZO) -->
-      <aside class="side-popup-card" id="side-popup-card">
-        <div class="card-header">
-          <div>
-            <div class="card-well-id" id="card-title">Yac. Loma Campana · LCa-314(h)</div>
-            <div class="card-well-sub" id="card-sub">Loma Campana (Neuquén) · YPF S.A.</div>
-          </div>
-          <button class="card-close-btn" title="Cerrar ficha" onclick="closeSideCard()">✕</button>
-        </div>
-
-        <div class="card-tabs">
-          <button class="card-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Yacimientos & Pozos</button>
-          <button class="card-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas en Vivo</button>
-        </div>
-
-        <div class="card-scroll-body">
-          <div class="tab-pane active" id="pane-ficha">
-            <div>
-              <div class="section-mini-label">Yacimientos / Pozos del Sector</div>
-              <div class="well-pills" id="well-pills"></div>
-            </div>
-
-            <div class="meta-row">
-              <span class="status-badge" id="well-status">EXTRACCIÓN EFECTIVA · SHALE OIL</span>
-              <span class="ref-tag">DATO REF.</span>
-            </div>
-
-            <div class="spec-grid">
-              <div class="spec-box">
-                <div class="spec-k">Petróleo Actual</div>
-                <div class="spec-v" id="spec-oil" style="color:#34d399;">186 m³/d</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Gas Asociado</div>
-                <div class="spec-v" id="spec-gas">94k m³/d</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Agua / Presión Est.</div>
-                <div class="spec-v" id="spec-pres">22 m³/d · 640 bar</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Prof. Vertical (TVD)</div>
-                <div class="spec-v" id="spec-tvd">2.980 m</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Rama Horizontal</div>
-                <div class="spec-v" id="spec-lat">3.250 m</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Etapas Fractura</div>
-                <div class="spec-v" id="spec-stages">44 etapas</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Arena Bombeada</div>
-                <div class="spec-v" id="spec-sand">11.400 tn</div>
-              </div>
-              <div class="spec-box">
-                <div class="spec-k">Agua Inyectada</div>
-                <div class="spec-v" id="spec-water">58.200 m³</div>
-              </div>
-            </div>
-
-            <div class="chart-box">
-              <div style="display:flex; justify-content:space-between; font-size:10.5px; margin-bottom:2px;">
-                <span style="font-weight:600;">Curva Mensual Petróleo (m³/d)</span>
-                <span style="color:var(--text-muted); font-family:'JetBrains Mono', monospace;">Jun–Nov</span>
-              </div>
-              <div class="bars-container" id="prod-chart"></div>
-            </div>
-          </div>
-
-          <div class="tab-pane" id="pane-alertas">
-            <div id="alerts-list">
-              <div class="alert-item ok">
-                <div class="alert-time">SISTEMA</div>
-                Cargando telemetría meteorológica y sísmica...
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 18 8.2 7l3.1 6.3L14.7 4 21 18" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18h14" stroke="#bafff6" stroke-width="1.8"/></svg></div>
+      <div><h1>TERRITORIA <span>ENERGY</span></h1><small>CENTRO DE OPERACIONES NO CONVENCIONALES</small></div>
     </div>
-  </div>
+    <div class="top-status">
+      <div class="source-pill">FUENTE · GIS OFICIAL NEUQUÉN</div>
+      <div class="status-pill"><i class="dot"></i><span id="api-status">API SIN CONFIGURAR</span></div>
+      <div class="clock" id="clock">--:--:--</div>
+      <button class="btn" id="config-btn" style="height:36px">⚙ API</button>
+    </div>
+  </header>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    let currentSector = 'vmSur';
-    const wellMarkers = [];
+  <section class="toolbar">
+    <div class="field search"><label>Buscar pozo o UWI</label><input id="search" placeholder="Ej.: P13794 o La Caverna" /></div>
+    <div class="field"><label>Operadora</label><select id="operator"><option value="">Todas</option></select></div>
+    <div class="field"><label>Área legal</label><select id="area"><option value="">Todas</option></select></div>
+    <div class="field"><label>Yacimiento</label><select id="field"><option value="">Todos</option></select></div>
+    <div class="field"><label>Estado</label><select id="state"><option value="">Todos</option></select></div>
+    <button class="btn primary" id="reload">ACTUALIZAR</button>
+  </section>
 
-    const map = L.map('map', {
-      zoomControl: false
-    }).setView([-38.30, -68.82], 10);
+  <main>
+    <section class="map-shell">
+      <div id="map"></div>
+      <div class="map-overlay">
+        <div class="badge"><b id="visible-count">0</b> POZOS VISIBLES</div>
+        <div class="badge"><b id="operator-count">0</b> OPERADORAS</div>
+        <div class="badge"><b id="nc-count">0</b> SHALE / VMUT</div>
+      </div>
+      <div class="legend"><span><i style="background:var(--cyan)"></i>Activo</span><span><i style="background:var(--amber)"></i>Inactivo</span><span><i style="background:var(--red)"></i>Abandonado</span></div>
+    </section>
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap | Territoria',
-      maxZoom: 18,
-      className: 'dark-tiles'
-    }).addTo(map);
-
-    map.on('click', () => {
-      closeSideCard();
-    });
-
-    const layers = {
-      areas: L.layerGroup().addTo(map),
-      pozos: L.layerGroup().addTo(map),
-      ductos: L.layerGroup().addTo(map),
-      sismos: L.layerGroup().addTo(map)
-    };
-
-    const sectorConfig = {
-      vmSur: {
-        name: 'VM Sur · Añelo (Nqn)',
-        lat: -38.30,
-        lon: -68.82,
-        zoom: 10,
-        pozos: '6 Áreas',
-        pozosSub: 'Cuenca Neuquina · Nqn',
-        prod: '14.820 m³/d',
-        prodSub: '▲ 4.2% mensual',
-        wellIndex: 0
-      },
-      vmNorte: {
-        name: 'VM Norte · Malargüe',
-        lat: -36.45,
-        lon: -69.40,
-        zoom: 8,
-        pozos: '6 Áreas',
-        pozosSub: 'Malargüe / Sur Mza',
-        prod: '1.840 m³/d',
-        prodSub: 'No Conv. + Conv.',
-        wellIndex: 6
-      },
-      cuyana: {
-        name: 'Cuyana · Mendoza',
-        lat: -33.25,
-        lon: -68.72,
-        zoom: 10,
-        pozos: '6 Áreas',
-        pozosSub: 'Luján / Tupungato / Riv.',
-        prod: '4.650 m³/d',
-        prodSub: 'Recuperación 2ª',
-        wellIndex: 12
-      }
-    };
-
-    const wellsData = [
-      // NEUQUÉN - VACA MUERTA / CUENCA NEUQUINA (0..5)
-      {
-        sector: 'vmSur',
-        id: 'Yac. Loma Campana · LCa-314(h)',
-        shortLabel: 'Loma Campana',
-        operadora: 'YPF S.A.',
-        area: 'Loma Campana · Añelo (Neuquén)',
-        formacion: 'Vaca Muerta · Shale Oil',
-        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
-        surface: [-38.315, -68.810],
-        bottom: [-38.288, -68.795],
-        tvd: '2.980 m',
-        lat: '3.250 m',
-        stages: '44 etapas',
-        sand: '11.400 tn',
-        waterInj: '58.200 m³',
-        gasRate: '94k m³/d',
-        waterRate: '22 m³/d',
-        pressure: '640 bar',
-        rate: '186 m³/d',
-        color: '#10b981',
-        history: [260, 240, 215, 202, 194, 186]
-      },
-      {
-        sector: 'vmSur',
-        id: 'Yac. Bajada del Palo Oeste · BPO-2108(h)',
-        shortLabel: 'Bajada del Palo O.',
-        operadora: 'Vista Energy',
-        area: 'Bajada del Palo Oeste · Añelo (Neuquén)',
-        formacion: 'Vaca Muerta · Shale Oil',
-        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
-        surface: [-38.240, -68.930],
-        bottom: [-38.212, -68.918],
-        tvd: '2.890 m',
-        lat: '3.100 m',
-        stages: '42 etapas',
-        sand: '10.950 tn',
-        waterInj: '54.800 m³',
-        gasRate: '108k m³/d',
-        waterRate: '16 m³/d',
-        pressure: '680 bar',
-        rate: '214 m³/d',
-        color: '#10b981',
-        history: [295, 270, 250, 236, 222, 214]
-      },
-      {
-        sector: 'vmSur',
-        id: 'Yac. Fortín de Piedra · FdP-204(h)',
-        shortLabel: 'Fortín de Piedra',
-        operadora: 'Tecpetrol',
-        area: 'Fortín de Piedra · Añelo (Neuquén)',
-        formacion: 'Vaca Muerta · Tight / Shale Gas',
-        status: 'DESARROLLO ACTIVO · SHALE GAS',
-        surface: [-38.445, -68.860],
-        bottom: [-38.420, -68.842],
-        tvd: '3.060 m',
-        lat: '2.800 m',
-        stages: '38 etapas',
-        sand: '9.800 tn',
-        waterInj: '49.200 m³',
-        gasRate: '420k m³/d',
-        waterRate: '12 m³/d',
-        pressure: '710 bar',
-        rate: '92 m³/d',
-        color: '#38bdf8',
-        history: [104, 100, 97, 95, 93, 92]
-      },
-      {
-        sector: 'vmSur',
-        id: 'Yac. La Amarga Chica · LACh-118(h)',
-        shortLabel: 'La Amarga Chica',
-        operadora: 'YPF / Petronas',
-        area: 'La Amarga Chica · Añelo (Neuquén)',
-        formacion: 'Vaca Muerta · Shale Oil',
-        status: 'DESARROLLO SHALE · AÑELO NQN',
-        surface: [-38.205, -68.765],
-        bottom: [-38.178, -68.750],
-        tvd: '2.940 m',
-        lat: '3.020 m',
-        stages: '40 etapas',
-        sand: '10.500 tn',
-        waterInj: '52.600 m³',
-        gasRate: '88k m³/d',
-        waterRate: '19 m³/d',
-        pressure: '650 bar',
-        rate: '174 m³/d',
-        color: '#10b981',
-        history: [198, 192, 185, 180, 177, 174]
-      },
-      {
-        sector: 'vmSur',
-        id: 'Yac. Bandurria Sur · BdS-215(h)',
-        shortLabel: 'Bandurria Sur',
-        operadora: 'YPF / Equinor / Shell',
-        area: 'Bandurria Sur · Añelo (Neuquén)',
-        formacion: 'Vaca Muerta · Shale Oil',
-        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
-        surface: [-38.375, -68.965],
-        bottom: [-38.350, -68.950],
-        tvd: '2.910 m',
-        lat: '2.880 m',
-        stages: '39 etapas',
-        sand: '10.100 tn',
-        waterInj: '50.900 m³',
-        gasRate: '79k m³/d',
-        waterRate: '17 m³/d',
-        pressure: '625 bar',
-        rate: '158 m³/d',
-        color: '#10b981',
-        history: [182, 176, 171, 166, 162, 158]
-      },
-      {
-        sector: 'vmSur',
-        id: 'Yac. Sierras Blancas · SB-109(h)',
-        shortLabel: 'Sierras Blancas',
-        operadora: 'Shell Argentina',
-        area: 'Sierras Blancas · Añelo (Neuquén)',
-        formacion: 'Vaca Muerta · Shale Oil',
-        status: 'PRODUCCIÓN ACTIVA · AÑELO NQN',
-        surface: [-38.285, -68.675],
-        bottom: [-38.260, -68.660],
-        tvd: '3.020 m',
-        lat: '2.920 m',
-        stages: '41 etapas',
-        sand: '10.400 tn',
-        waterInj: '53.100 m³',
-        gasRate: '84k m³/d',
-        waterRate: '15 m³/d',
-        pressure: '660 bar',
-        rate: '169 m³/d',
-        color: '#10b981',
-        history: [192, 186, 180, 176, 172, 169]
-      },
-
-      // VM NORTE - MALARGÜE (6..11)
-      {
-        sector: 'vmNorte',
-        id: 'Yac. CN VII A · Pozo CN7A-102(h)',
-        shortLabel: 'CN VII A',
-        operadora: 'YPF S.A.',
-        area: 'CN VII A · Malargüe (Mendoza)',
-        formacion: 'Vaca Muerta Norte · Shale',
-        status: 'PILOTO NO CONVENCIONAL · SHALE',
-        surface: [-36.985, -69.540],
-        bottom: [-36.962, -69.525],
-        tvd: '2.640 m',
-        lat: '2.510 m',
-        stages: '32 etapas',
-        sand: '8.200 tn',
-        waterInj: '41.500 m³',
-        gasRate: '56k m³/d',
-        waterRate: '14 m³/d',
-        pressure: '590 bar',
-        rate: '112 m³/d',
-        color: '#f59e0b',
-        history: [145, 138, 130, 124, 118, 112]
-      },
-      {
-        sector: 'vmNorte',
-        id: 'Yac. Paso de las Bardas Norte',
-        shortLabel: 'P. Bardas Norte',
-        operadora: 'YPF S.A.',
-        area: 'Paso de las Bardas Norte · Malargüe',
-        formacion: 'Vaca Muerta Norte · No Conv.',
-        status: 'PILOTO HORIZONTAL · LÍMITE NQN',
-        surface: [-37.145, -69.620],
-        bottom: [-37.122, -69.605],
-        tvd: '2.710 m',
-        lat: '2.480 m',
-        stages: '30 etapas',
-        sand: '7.900 tn',
-        waterInj: '39.800 m³',
-        gasRate: '48k m³/d',
-        waterRate: '16 m³/d',
-        pressure: '575 bar',
-        rate: '98 m³/d',
-        color: '#f59e0b',
-        history: [128, 121, 115, 109, 103, 98]
-      },
-      {
-        sector: 'vmNorte',
-        id: 'Yac. Chachahuén Sur / Cerro Morado',
-        shortLabel: 'Chachahuén',
-        operadora: 'YPF / Kilwer',
-        area: 'Chachahuén · Malargüe (Mendoza)',
-        formacion: 'Grupo Rayoso / Centenario',
-        status: 'PRODUCCIÓN ACTIVA · CUENCA NQN MZA',
-        surface: [-37.310, -68.920],
-        bottom: [-37.310, -68.920],
-        tvd: '1.180 m',
-        lat: 'Vertical / Dir.',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Secundaria',
-        gasRate: '22k m³/d',
-        waterRate: '185 m³/d',
-        pressure: '165 bar',
-        rate: '64 m³/d',
-        color: '#10b981',
-        history: [68, 67, 66, 65, 64, 64]
-      },
-      {
-        sector: 'vmNorte',
-        id: 'Yac. Puesto Rojas',
-        shortLabel: 'Puesto Rojas',
-        operadora: 'El Trébol / Phoenix',
-        area: 'Puesto Rojas · Malargüe (Mendoza)',
-        formacion: 'Agrio / Chachao · Fracturado',
-        status: 'EXTRACCIÓN ACTIVA · FAJA PLEGADA',
-        surface: [-35.580, -69.660],
-        bottom: [-35.580, -69.660],
-        tvd: '1.940 m',
-        lat: 'Direccional',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Natural',
-        gasRate: '34k m³/d',
-        waterRate: '42 m³/d',
-        pressure: '290 bar',
-        rate: '78 m³/d',
-        color: '#10b981',
-        history: [85, 83, 81, 80, 79, 78]
-      },
-      {
-        sector: 'vmNorte',
-        id: 'Yac. El Sosneado',
-        shortLabel: 'El Sosneado',
-        operadora: 'Petroquímica Comodoro Rivadavia',
-        area: 'El Sosneado · San Rafael / Malargüe',
-        formacion: 'Huitrín / Troncoso',
-        status: 'PRODUCCIÓN CONVENCIONAL · MZA SUR',
-        surface: [-35.120, -69.560],
-        bottom: [-35.120, -69.560],
-        tvd: '1.620 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Iny. Agua',
-        gasRate: '15k m³/d',
-        waterRate: '110 m³/d',
-        pressure: '180 bar',
-        rate: '41 m³/d',
-        color: '#38bdf8',
-        history: [44, 43, 42, 42, 41, 41]
-      },
-      {
-        sector: 'vmNorte',
-        id: 'Yac. Cerro Fortunoso',
-        shortLabel: 'Cerro Fortunoso',
-        operadora: 'YPF S.A.',
-        area: 'Cerro Fortunoso · Malargüe (Mendoza)',
-        formacion: 'Grupo Neuquén / Quintuco',
-        status: 'RECUPERACIÓN SECUNDARIA · MZA SUR',
-        surface: [-36.320, -69.180],
-        bottom: [-36.320, -69.180],
-        tvd: '1.850 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Secundaria',
-        gasRate: '19k m³/d',
-        waterRate: '140 m³/d',
-        pressure: '210 bar',
-        rate: '52 m³/d',
-        color: '#38bdf8',
-        history: [55, 54, 54, 53, 52, 52]
-      },
-
-      // CUENCA CUYANA - MENDOZA (12..17)
-      {
-        sector: 'cuyana',
-        id: 'Yac. Barrancas · Pozo Barr-812',
-        shortLabel: 'Barrancas',
-        operadora: 'YPF S.A.',
-        area: 'Barrancas · Maipú / Luján (Mendoza)',
-        formacion: 'Cuenca Cuyana · Río Blanco / Barrancas',
-        status: 'RECUPERACIÓN TERCIARIA · POLÍMEROS',
-        surface: [-33.125, -68.780],
-        bottom: [-33.125, -68.780],
-        tvd: '2.150 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Polímeros',
-        gasRate: '12k m³/d',
-        waterRate: '240 m³/d',
-        pressure: '210 bar',
-        rate: '34 m³/d',
-        color: '#10b981',
-        history: [31, 32, 33, 35, 34, 34]
-      },
-      {
-        sector: 'cuyana',
-        id: 'Yac. Vizcacheras',
-        shortLabel: 'Vizcacheras',
-        operadora: 'YPF / Petróleos Sudamericanos',
-        area: 'Vizcacheras · Rivadavia (Mendoza)',
-        formacion: 'Cuenca Cuyana · Papagayos / Barrancas',
-        status: 'EXTRACCIÓN ACTIVA · CUENCA CUYANA',
-        surface: [-33.360, -68.520],
-        bottom: [-33.360, -68.520],
-        tvd: '1.980 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Secundaria',
-        gasRate: '9k m³/d',
-        waterRate: '310 m³/d',
-        pressure: '195 bar',
-        rate: '46 m³/d',
-        color: '#10b981',
-        history: [49, 48, 47, 47, 46, 46]
-      },
-      {
-        sector: 'cuyana',
-        id: 'Yac. La Ventana',
-        shortLabel: 'La Ventana',
-        operadora: 'YPF S.A.',
-        area: 'La Ventana · Rivadavia / Tunuyán (Mendoza)',
-        formacion: 'Cuenca Cuyana · Víctor / Río Blanco',
-        status: 'PRODUCCIÓN ACTIVA · CUENCA CUYANA',
-        surface: [-33.480, -68.640],
-        bottom: [-33.480, -68.640],
-        tvd: '2.290 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Secundaria',
-        gasRate: '14k m³/d',
-        waterRate: '280 m³/d',
-        pressure: '225 bar',
-        rate: '39 m³/d',
-        color: '#10b981',
-        history: [42, 41, 40, 40, 39, 39]
-      },
-      {
-        sector: 'cuyana',
-        id: 'Yac. Tupungato / Refugio',
-        shortLabel: 'Tupungato',
-        operadora: 'YPF S.A.',
-        area: 'Tupungato · Valle de Uco (Mendoza)',
-        formacion: 'Cuenca Cuyana · Potrerillos / Cacheuta',
-        status: 'YACIMIENTO HISTÓRICO · CUYANA',
-        surface: [-33.310, -69.080],
-        bottom: [-33.310, -69.080],
-        tvd: '2.420 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Secundaria',
-        gasRate: '11k m³/d',
-        waterRate: '190 m³/d',
-        pressure: '235 bar',
-        rate: '29 m³/d',
-        color: '#38bdf8',
-        history: [31, 31, 30, 30, 29, 29]
-      },
-      {
-        sector: 'cuyana',
-        id: 'Yac. Piedras Coloradas',
-        shortLabel: 'Piedras Coloradas',
-        operadora: 'Sinopec / CGC',
-        area: 'Piedras Coloradas · Luján de Cuyo',
-        formacion: 'Cuenca Cuyana · Cacheuta',
-        status: 'PRODUCCIÓN CONVENCIONAL · CUYANA',
-        surface: [-33.190, -68.960],
-        bottom: [-33.190, -68.960],
-        tvd: '2.080 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Secundaria',
-        gasRate: '8k m³/d',
-        waterRate: '175 m³/d',
-        pressure: '190 bar',
-        rate: '27 m³/d',
-        color: '#38bdf8',
-        history: [29, 28, 28, 27, 27, 27]
-      },
-      {
-        sector: 'cuyana',
-        id: 'Yac. Río Tunuyán',
-        shortLabel: 'Río Tunuyán',
-        operadora: 'YPF S.A.',
-        area: 'Río Tunuyán · Rivadavia (Mendoza)',
-        formacion: 'Cuenca Cuyana · Barrancas',
-        status: 'RECUPERACIÓN SECUNDARIA · CUYANA',
-        surface: [-33.420, -68.450],
-        bottom: [-33.420, -68.450],
-        tvd: '2.040 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        waterInj: 'Secundaria',
-        gasRate: '7k m³/d',
-        waterRate: '215 m³/d',
-        pressure: '185 bar',
-        rate: '25 m³/d',
-        color: '#38bdf8',
-        history: [27, 26, 26, 25, 25, 25]
-      }
-    ];
-
-    function buildWellPopupHtml(w, idx) {
-      return `
-        <div class="popup-head">
-          <div class="popup-title">${w.id}</div>
-          <div class="popup-rate">${w.rate}</div>
+    <aside class="side">
+      <section class="card">
+        <div class="card-head"><h2>Activo seleccionado</h2><span class="mono" id="last-update">SIN SELECCIÓN</span></div>
+        <div class="card-body" id="asset-card">
+          <div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica y ambiental aparecerá en este panel.</div></div>
         </div>
-        <div class="popup-sub">${w.operadora} · ${w.area}</div>
-        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Ver ficha completa</button>
-      `;
-    }
+      </section>
 
-    function openWellDetailByIndex(idx) {
-      const w = wellsData[idx];
-      if (!w) return;
-      map.closePopup();
-      selectWell(w, true);
-    }
+      <section class="card">
+        <div class="card-head"><h2>Indicadores técnicos</h2><span>DATOS OFICIALES</span></div>
+        <div class="card-body"><div class="metrics">
+          <div class="metric"><span>Clase</span><strong id="m-class">—</strong></div>
+          <div class="metric"><span>Formación</span><strong class="cyan" id="m-formation">—</strong></div>
+          <div class="metric"><span>Reservorio</span><strong id="m-reservoir">—</strong></div>
+          <div class="metric"><span>Año perforación</span><strong id="m-year">—</strong></div>
+        </div></div>
+      </section>
 
-    function focusWellOnMap(idx) {
-      const w = wellsData[idx];
-      if (!w) return;
-      selectWell(w, true);
-      map.flyTo([w.surface[0], w.surface[1] + 0.04], 11);
-      if (wellMarkers[idx]) {
-        setTimeout(() => wellMarkers[idx].openPopup(), 350);
-      }
-    }
+      <section class="card">
+        <div class="card-head"><h2>Datos técnicos del pozo</h2><span>WFS · NEUQUÉN</span></div>
+        <div class="card-body"><div class="kv" id="tech-kv">
+          <div class="kv-row"><span>Esperando selección</span><b>—</b></div>
+        </div></div>
+      </section>
 
-    wellsData.forEach((w, idx) => {
-      const popupHtml = buildWellPopupHtml(w, idx);
-
-      if (w.lat.includes('m')) {
-        const line = L.polyline([w.surface, w.bottom], {
-          color: w.color,
-          weight: 5,
-          opacity: 0.95
-        }).bindPopup(popupHtml).addTo(layers.pozos);
-        line.on('click', (e) => {
-          L.DomEvent.stopPropagation(e);
-          selectWell(w, true);
-        });
-      }
-
-      const marker = L.circleMarker(w.surface, {
-        radius: 9,
-        fillColor: w.color,
-        color: '#ffffff',
-        weight: 2.5,
-        fillOpacity: 1
-      }).bindPopup(popupHtml).addTo(layers.pozos);
-
-      marker.on('click', (e) => {
-        L.DomEvent.stopPropagation(e);
-        selectWell(w, true);
-      });
-
-      wellMarkers[idx] = marker;
-    });
-
-    function renderWellPills(activeId) {
-      const container = document.getElementById('well-pills');
-      container.innerHTML = '';
-      wellsData.forEach((w, idx) => {
-        if (w.sector !== currentSector) return;
-        const btn = document.createElement('button');
-        btn.className = 'well-chip' + (w.id === activeId ? ' active' : '');
-        btn.textContent = `${w.shortLabel} · ${w.rate}`;
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          focusWellOnMap(idx);
-        };
-        container.appendChild(btn);
-      });
-    }
-
-    [
-      { name: 'Loma Campana (Nqn)', coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]], color: '#38bdf8' },
-      { name: 'Bajada del Palo Oeste (Nqn)', coords: [[-38.28, -69.00], [-38.18, -69.00], [-38.18, -68.88], [-38.28, -68.88]], color: '#0ea5e9' },
-      { name: 'Fortín de Piedra (Nqn)', coords: [[-38.50, -68.93], [-38.40, -68.93], [-38.40, -68.79], [-38.50, -68.79]], color: '#38bdf8' },
-      { name: 'La Amarga Chica (Nqn)', coords: [[-38.23, -68.82], [-38.14, -68.82], [-38.14, -68.70], [-38.23, -68.70]], color: '#10b981' },
-      { name: 'Bandurria Sur (Nqn)', coords: [[-38.42, -69.03], [-38.32, -69.03], [-38.32, -68.90], [-38.42, -68.90]], color: '#10b981' },
-      { name: 'Sierras Blancas (Nqn)', coords: [[-38.33, -68.73], [-38.23, -68.73], [-38.23, -68.61], [-38.33, -68.61]], color: '#38bdf8' },
-      { name: 'CN VII A - Malargüe', coords: [[-37.06, -69.63], [-36.92, -69.63], [-36.92, -69.46], [-37.06, -69.46]], color: '#f59e0b' },
-      { name: 'Chachahuén - Malargüe', coords: [[-37.40, -69.05], [-37.22, -69.05], [-37.22, -68.80], [-37.40, -68.80]], color: '#10b981' },
-      { name: 'Barrancas / Vizcacheras - Cuyana', coords: [[-33.52, -68.85], [-33.08, -68.85], [-33.08, -68.42], [-33.52, -68.42]], color: '#38bdf8' }
-    ].forEach(c => {
-      L.polygon(c.coords, {
-        color: c.color,
-        weight: 1.5,
-        fillColor: c.color,
-        fillOpacity: 0.08,
-        interactive: false
-      }).addTo(layers.areas);
-    });
-
-    [
-      { name: 'Oleoducto Puesto Hernández – Luján de Cuyo', coords: [[-38.31, -68.81], [-37.31, -68.92], [-36.32, -69.18], [-35.12, -69.56], [-33.12, -68.92]], color: '#a855f7' }
-    ].forEach(p => {
-      L.polyline(p.coords, {
-        color: p.color,
-        weight: 3,
-        dashArray: '8, 6'
-      }).bindPopup(`<b>Ducto:</b> ${p.name}`).addTo(layers.ductos);
-    });
-
-    async function fetchWindOpenMeteo(cfg) {
-      try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${cfg.lat}&longitude=${cfg.lon}&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m&timezone=America%2FArgentina%2FMendoza`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        const curr = data.current || {};
-        const wind = Math.round(curr.wind_speed_10m ?? 0);
-        const gust = Math.round(curr.wind_gusts_10m ?? 0);
-        const dir = curr.wind_direction_10m ?? 0;
-
-        document.getElementById('kpi-viento').textContent = `${wind} km/h`;
-        const subEl = document.getElementById('kpi-viento-sub');
-        subEl.textContent = `Ráfagas ${gust} km/h · ${dir}°`;
-        subEl.className = 'kpi-sub ' + (gust >= 45 ? 'warn' : 'up');
-
-        return { ok: true, wind, gust, dir };
-      } catch (err) {
-        document.getElementById('kpi-viento').textContent = 'Sin señal';
-        document.getElementById('kpi-viento-sub').textContent = 'Error Open-Meteo';
-        document.getElementById('kpi-viento-sub').className = 'kpi-sub warn';
-        return { ok: false, error: err.message };
-      }
-    }
-
-    async function fetchEarthquakesUSGS() {
-      layers.sismos.clearLayers();
-      try {
-        const end = new Date().toISOString();
-        const start = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-        const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${encodeURIComponent(start)}&endtime=${encodeURIComponent(end)}&minmagnitude=1.5&minlatitude=-40.0&maxlatitude=-31.5&minlongitude=-71.5&maxlongitude=-66.5`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const geo = await res.json();
-        const features = geo.features || [];
-
-        features.forEach(f => {
-          const coords = f.geometry?.coordinates;
-          if (!coords || coords.length < 2) return;
-          const [lon, lat, depth] = coords;
-          const mag = f.properties?.mag ?? 0;
-          const place = f.properties?.place || 'Región Cuyo / Neuquén';
-          const dt = new Date(f.properties?.time || Date.now()).toLocaleString('es-AR', { hour12: false });
-
-          const radiusMeters = Math.max(2500, mag * 2200);
-          L.circle([lat, lon], {
-            radius: radiusMeters,
-            color: '#ef4444',
-            weight: 1.5,
-            fillColor: '#ef4444',
-            fillOpacity: 0.22
-          }).bindPopup(`⚠️ <b>Sismo ${mag.toFixed(1)} Ml</b><br>${place}<br>Prof: ${Number(depth ?? 0).toFixed(1)} km<br><small>${dt}</small>`).addTo(layers.sismos);
-        });
-
-        const kpiVal = document.getElementById('kpi-sismo');
-        const kpiSub = document.getElementById('kpi-sismo-sub');
-
-        if (features.length > 0) {
-          const maxMag = Math.max(...features.map(f => f.properties?.mag ?? 0));
-          kpiVal.textContent = `${maxMag.toFixed(1)} Ml (${features.length})`;
-          kpiSub.textContent = features[0].properties?.place || 'Últimos 7 días';
-          kpiSub.className = 'kpi-sub warn';
-        } else {
-          kpiVal.textContent = '0 (7d)';
-          kpiSub.textContent = 'Sin M≥1.5 en región';
-          kpiSub.className = 'kpi-sub up';
-        }
-
-        return { ok: true, features };
-      } catch (err) {
-        document.getElementById('kpi-sismo').textContent = 'Sin señal';
-        document.getElementById('kpi-sismo-sub').textContent = 'Error USGS';
-        document.getElementById('kpi-sismo-sub').className = 'kpi-sub warn';
-        return { ok: false, error: err.message, features: [] };
-      }
-    }
-
-    function renderAlerts(cfg, windRes, eqRes) {
-      const list = document.getElementById('alerts-list');
-      const items = [];
-
-      if (windRes.ok) {
-        const isHigh = windRes.gust >= 45;
-        items.push(`
-          <div class="alert-item ${isHigh ? 'amber' : 'ok'}">
-            <div class="alert-time">OPEN-METEO · ${cfg.name.toUpperCase()}</div>
-            <strong>Viento ${windRes.wind} km/h</strong> (ráfagas ${windRes.gust} km/h, dir ${windRes.dir}°). ${isHigh ? 'Precaución operativa en rutas y equipos.' : 'Condiciones de viento dentro de rango normal.'}
+      <section class="card">
+        <div class="card-head"><h2>Condición ambiental del punto</h2><span id="weather-time">SIN DATOS</span></div>
+        <div class="card-body">
+          <div class="weather-grid">
+            <div class="weather"><span>Temperatura</span><strong id="w-temp">—</strong><small>2 m</small></div>
+            <div class="weather"><span>Viento</span><strong id="w-wind">—</strong><small id="w-dir">Dirección —</small></div>
+            <div class="weather"><span>Ráfagas</span><strong id="w-gust">—</strong><small>10 m</small></div>
+            <div class="weather"><span>Precipitación</span><strong id="w-rain">—</strong><small>actual</small></div>
+            <div class="weather"><span>Humedad</span><strong id="w-hum">—</strong><small>relativa</small></div>
+            <div class="weather"><span>Presión</span><strong id="w-press">—</strong><small>superficie</small></div>
           </div>
-        `);
-      } else {
-        items.push(`
-          <div class="alert-item amber">
-            <div class="alert-time">OPEN-METEO · SIN CONEXIÓN</div>
-            No se pudo consultar viento en ${cfg.name} (${windRes.error}).
-          </div>
-        `);
-      }
+          <div style="height:9px"></div>
+          <div class="risk"><div><strong id="risk-title">TERRITORIA · SIN EVALUAR</strong><br><span id="risk-text">Seleccioná un pozo para consultar su entorno.</span></div><div style="font-size:24px" id="risk-icon">○</div></div>
+        </div>
+      </section>
+    </aside>
+  </main>
 
-      if (eqRes.ok) {
-        if (eqRes.features.length > 0) {
-          eqRes.features.slice(0, 4).forEach(f => {
-            const mag = (f.properties?.mag ?? 0).toFixed(1);
-            const place = f.properties?.place || 'Región';
-            const depth = Number(f.geometry?.coordinates?.[2] ?? 0).toFixed(1);
-            const when = new Date(f.properties?.time || Date.now()).toLocaleString('es-AR', { hour12: false });
-            items.push(`
-              <div class="alert-item">
-                <div class="alert-time">USGS · ${when}</div>
-                <strong>Sismo ${mag} Ml</strong> (Prof. ${depth} km) · ${place}.
-              </div>
-            `);
-          });
-        } else {
-          items.push(`
-            <div class="alert-item ok">
-              <div class="alert-time">USGS · ÚLTIMOS 7 DÍAS</div>
-              Sin sismos M≥1.5 reportados en el cuadrante Neuquén–Mendoza.
-            </div>
-          `);
-        }
-      } else {
-        items.push(`
-          <div class="alert-item amber">
-            <div class="alert-time">USGS · SIN CONEXIÓN</div>
-            No se pudo consultar el catálogo sísmico (${eqRes.error}).
-          </div>
-        `);
-      }
+  <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>DATOS PÚBLICOS · SIN TELEMETRÍA PRIVADA</span><span id="footer-state">SISTEMA EN ESPERA</span></footer>
+</div>
 
-      list.innerHTML = items.join('');
-    }
+<dialog id="config-dialog">
+  <div class="modal-head"><h3>Conectar Territoria Energy API</h3></div>
+  <div class="modal-body">
+    <p>Pegá la dirección base completa de tu Worker, sin rutas al final. Ejemplo: <b>https://territoria-energy-api.tu-cuenta.workers.dev</b>. La dirección se guarda solamente en este navegador.</p>
+    <input id="api-url" placeholder="https://territoria-energy-api....workers.dev" autocomplete="off" />
+    <div class="modal-actions"><button class="btn" id="cancel-config">Cancelar</button><button class="btn primary" id="save-config">Guardar y conectar</button></div>
+  </div>
+</dialog>
+<div class="toast" id="toast"></div>
 
-    async function refreshTelemetry() {
-      const cfg = sectorConfig[currentSector];
-      if (!cfg) return;
-      document.getElementById('live-status').textContent = 'ACTUALIZANDO...';
-      const [windRes, eqRes] = await Promise.all([
-        fetchWindOpenMeteo(cfg),
-        fetchEarthquakesUSGS()
-      ]);
-      renderAlerts(cfg, windRes, eqRes);
-      document.getElementById('live-status').textContent = 'USGS + OPEN-METEO LIVE';
-    }
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const state = { all: [], filtered: [], markers: [], selected: null, api: localStorage.getItem('territoriaEnergyApi') || '' };
+  const map = L.map('map', { zoomControl:true, preferCanvas:true }).setView([-38.4,-69.1],7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO'
+  }).addTo(map);
+  const markerLayer = L.layerGroup().addTo(map);
 
-    function toggleKpis() {
-      const kpis = document.getElementById('kpi-carousel');
-      const btn = document.getElementById('btn-kpi-toggle');
-      const card = document.getElementById('side-popup-card');
-      const isOpen = kpis.classList.toggle('open');
-      btn.classList.toggle('active', isOpen);
-      card.classList.toggle('with-kpis', isOpen);
-    }
+  function tick(){ $('clock').textContent = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date()) + ' ART'; }
+  tick(); setInterval(tick,1000);
+  function toast(msg,error=false){const t=$('toast');t.textContent=msg;t.className='toast show'+(error?' error':'');setTimeout(()=>t.className='toast',3800)}
+  function cleanBase(v){return v.trim().replace(/\/+$/,'')}
+  function safe(v,fallback='Sin dato'){return v===null||v===undefined||v===''?fallback:String(v)}
+  function fmtDate(v){if(!v)return 'Sin dato';const d=new Date(v);return isNaN(d)?String(v):new Intl.DateTimeFormat('es-AR').format(d)}
 
-    function openSideCard() {
-      document.getElementById('side-popup-card').classList.add('open');
-      document.getElementById('btn-ficha-toggle').classList.add('active');
-    }
+  $('config-btn').onclick=()=>{ $('api-url').value=state.api; $('config-dialog').showModal(); };
+  $('cancel-config').onclick=()=>$('config-dialog').close();
+  $('save-config').onclick=()=>{const value=cleanBase($('api-url').value);if(!/^https?:\/\//i.test(value)){toast('La URL debe comenzar con https://',true);return;}state.api=value;localStorage.setItem('territoriaEnergyApi',value);$('config-dialog').close();loadData();};
+  $('reload').onclick=loadData;
+  ['search','operator','area','field','state'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',applyFilters));
 
-    function closeSideCard() {
-      document.getElementById('side-popup-card').classList.remove('open');
-      document.getElementById('btn-ficha-toggle').classList.remove('active');
-    }
-
-    function toggleSideCard() {
-      const card = document.getElementById('side-popup-card');
-      const isOpen = card.classList.toggle('open');
-      document.getElementById('btn-ficha-toggle').classList.toggle('active', isOpen);
-    }
-
-    function selectWell(w, showCard = false) {
-      document.getElementById('card-title').textContent = w.id;
-      document.getElementById('card-sub').textContent = `${w.area} · ${w.operadora}`;
-
-      document.getElementById('well-status').textContent = w.status;
-      document.getElementById('spec-oil').textContent = w.rate;
-      document.getElementById('spec-gas').textContent = w.gasRate;
-      document.getElementById('spec-pres').textContent = `${w.waterRate} · ${w.pressure}`;
-      document.getElementById('spec-tvd').textContent = w.tvd;
-      document.getElementById('spec-lat').textContent = w.lat;
-      document.getElementById('spec-stages').textContent = w.stages;
-      document.getElementById('spec-sand').textContent = w.sand;
-      document.getElementById('spec-water').textContent = w.waterInj;
-
-      renderWellPills(w.id);
-      renderChart(w.history);
-
-      if (showCard) {
-        switchTab('ficha');
-        openSideCard();
-      }
-    }
-
-    function renderChart(values) {
-      const container = document.getElementById('prod-chart');
-      container.innerHTML = '';
-      const months = ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov'];
-      const maxVal = Math.max(...values, 1);
-
-      values.forEach((v, i) => {
-        const h = Math.max(12, Math.round((v / maxVal) * 56));
-        const col = document.createElement('div');
-        col.className = 'bar-col';
-        col.innerHTML = `
-          <span class="bar-lbl" style="color:#e2e8f0;">${v}</span>
-          <div class="bar-fill" style="height:${h}px;"></div>
-          <span class="bar-lbl">${months[i]}</span>
-        `;
-        container.appendChild(col);
-      });
-    }
-
-    function switchTab(tabName) {
-      document.getElementById('tab-btn-ficha').classList.toggle('active', tabName === 'ficha');
-      document.getElementById('tab-btn-alertas').classList.toggle('active', tabName === 'alertas');
-      document.getElementById('pane-ficha').classList.toggle('active', tabName === 'ficha');
-      document.getElementById('pane-alertas').classList.toggle('active', tabName === 'alertas');
-      openSideCard();
-    }
-
-    function toggleLayersDrawer() {
-      const drawer = document.getElementById('layers-drawer');
-      const btn = document.getElementById('btn-layers');
-      drawer.classList.toggle('open');
-      btn.classList.toggle('active');
-    }
-
-    function toggleLayer(name, visible) {
-      if (visible) map.addLayer(layers[name]);
-      else map.removeLayer(layers[name]);
-    }
-
-    function flyToSector(sector, btn) {
-      const cfg = sectorConfig[sector];
-      if (!cfg) return;
-
-      currentSector = sector;
-      document.querySelectorAll('.sector-btn').forEach(b => {
-        b.classList.toggle('active', b === btn || b.dataset.sector === sector);
-      });
-
-      map.closePopup();
-      closeSideCard();
-      map.flyTo([cfg.lat, cfg.lon], cfg.zoom);
-      document.getElementById('kpi-pozos').textContent = cfg.pozos;
-      document.getElementById('kpi-pozos-sub').textContent = cfg.pozosSub;
-      document.getElementById('kpi-prod').textContent = cfg.prod;
-      document.getElementById('kpi-prod-sub').textContent = cfg.prodSub;
-
-      selectWell(wellsData[cfg.wellIndex], false);
-      refreshTelemetry();
-    }
-
-    function recenterCurrentSector() {
-      flyToSector(currentSector, null);
-    }
-
-    selectWell(wellsData[0], false);
-    refreshTelemetry();
-  </script>
+  async function loadData(){
+    if(!state.api){$('config-dialog').showModal();return;}
+    setConnection('CONECTANDO…',false); $('footer-state').textContent='CONSULTANDO FUENTE OFICIAL';
+    try{
+      const r=await fetch(state.api+'/api/pozos?limite=100');
+      const j=await r.json();
+      if(!r.ok||!j.ok) throw new Error(j.error||'Respuesta inválida');
+      state.all=(j.registros||[]).map(x=>({id:x.id,...(x.datos||{}),_geometry:x.geometria}));
+      setConnection('API ONLINE',true); $('footer-state').textContent='ÚLTIMA ACTUALIZACIÓN '+new Date().toLocaleTimeString('es-AR');
+      populateFilters(); applyFilters(); toast(state.all.length+' pozos reales cargados');
+    }catch(e){setConnection('API SIN RESPUESTA',false);$('footer-state').textContent='ERROR DE CONEXIÓN';toast(e.message,true)}
+  }
+  function setConnection(text,ok){$('api-status').textContent=text;document.querySelector('.dot').style.background=ok?'var(--green)':'var(--red)';}
+  function options(id,values,label){const el=$(id),cur=el.value;el.innerHTML='<option value="">'+label+'</option>'+[...new Set(values.filter(Boolean))].sort().map(v=>'<option>'+escapeHtml(v)+'</option>').join('');el.value=cur;}
+  function populateFilters(){options('operator',state.all.map(x=>x.OPERADOR),'Todas');options('area',state.all.map(x=>x.AREA_LEGAL),'Todas');options('field',state.all.map(x=>x.YACIMIENTO),'Todos');options('state',state.all.map(x=>x.ESTADO_GIS),'Todos');}
+  function applyFilters(){
+    const q=$('search').value.trim().toLowerCase(),op=$('operator').value,ar=$('area').value,fi=$('field').value,st=$('state').value;
+    state.filtered=state.all.filter(x=>(!q||[x.UWI_NQN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME].some(v=>String(v||'').toLowerCase().includes(q)))&&(!op||x.OPERADOR===op)&&(!ar||x.AREA_LEGAL===ar)&&(!fi||x.YACIMIENTO===fi)&&(!st||x.ESTADO_GIS===st));
+    renderMarkers(); updateCounters();
+  }
+  function markerClass(x){const s=(x.ESTADO_GIS||'').toLowerCase();return s.includes('abandon')?'ab':s.includes('inactiv')?'in':''}
+  function renderMarkers(){
+    markerLayer.clearLayers();state.markers=[];
+    const bounds=[];
+    state.filtered.forEach(x=>{const lat=Number(x.LATITUD??x._geometry?.coordinates?.[1]),lon=Number(x.LONGITUD??x._geometry?.coordinates?.[0]);if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
+      const icon=L.divIcon({className:'',html:'<div class="marker '+markerClass(x)+'"></div>',iconSize:[16,16],iconAnchor:[8,8]});
+      const m=L.marker([lat,lon],{icon,title:safe(x.FIELD_NAME)}).on('click',()=>selectWell(x));m.addTo(markerLayer);state.markers.push(m);bounds.push([lat,lon]);
+    });
+    if(bounds.length) map.fitBounds(bounds,{padding:[45,45],maxZoom:13});
+  }
+  function updateCounters(){$('visible-count').textContent=state.filtered.length;$('operator-count').textContent=new Set(state.filtered.map(x=>x.OPERADOR).filter(Boolean)).size;$('nc-count').textContent=state.filtered.filter(x=>x.RESERVORIO==='SH'||x.FORM_PROD==='VMUT').length;}
+  async function selectWell(x){
+    state.selected=x;const statusClass=markerClass(x)==='ab'?'abandoned':markerClass(x)==='in'?'inactive':x.ESTADO_GIS?'active':'none';
+    $('asset-card').innerHTML=`<div class="asset-title"><div class="asset-icon">◩</div><div class="asset-name"><h3>${escapeHtml(safe(x.FIELD_NAME))}</h3><p>${escapeHtml(safe(x.WELL_NAME))} · ${escapeHtml(safe(x.UWI_NQN))}</p></div><div class="state ${statusClass}">${escapeHtml(safe(x.ESTADO_GIS).toUpperCase())}</div></div>`;
+    $('last-update').textContent='SELECCIONADO '+new Date().toLocaleTimeString('es-AR');$('m-class').textContent=safe(x.CLASS_NAME,'—');$('m-formation').textContent=safe(x.FORM_PROD,'—');$('m-reservoir').textContent=safe(x.RESERVORIO,'—');$('m-year').textContent=safe(x['AÑO_PERF'],'—');
+    const pairs=[['Operadora',x.OPERADOR],['Operadora original',x.OPERADOR_ORIGINAL],['Área legal',x.AREA_LEGAL],['Yacimiento',x.YACIMIENTO],['Fluido',x.FLUIDO],['Sistema de extracción',x.SIST_EXTRACCION],['Tipo',x.TYPE_NAME],['Elevación',x.ELEVACION!=null?x.ELEVACION+' m':null],['Profundidad medida',x.PROFUNDIDAD_MEDIDA!=null?x.PROFUNDIDAD_MEDIDA+' m':null],['Inicio perforación',fmtDate(x.INICIO_PERF)],['Fin perforación',fmtDate(x.FIN_PERF)],['Inicio terminación',fmtDate(x.INICIO_TERM)],['Fin terminación',fmtDate(x.FIN_TERM)],['Latitud',x.LATITUD],['Longitud',x.LONGITUD],['Legajo',x.LEGAJO],['Perfiles',x.PERFILES],['Observaciones',x.OBSERVACIONES?.trim()||null]];
+    $('tech-kv').innerHTML=pairs.map(([k,v])=>`<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(safe(v))}">${escapeHtml(safe(v))}</b></div>`).join('');
+    const lat=Number(x.LATITUD),lon=Number(x.LONGITUD);if(Number.isFinite(lat)&&Number.isFinite(lon)){map.flyTo([lat,lon],13,{duration:.7});await loadWeather(lat,lon)}
+  }
+  async function loadWeather(lat,lon){
+    resetWeather('CONSULTANDO…');
+    const vars='temperature_2m,relative_humidity_2m,precipitation,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m';
+    try{const u=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=${vars}&timezone=America%2FArgentina%2FBuenos_Aires&wind_speed_unit=kmh&precipitation_unit=mm`;const r=await fetch(u);const j=await r.json();if(!r.ok||!j.current)throw new Error('Meteorología no disponible');const c=j.current;
+      $('w-temp').textContent=val(c.temperature_2m,'°C');$('w-wind').textContent=val(c.wind_speed_10m,'km/h');$('w-dir').textContent='Dirección '+cardinal(c.wind_direction_10m)+' · '+Math.round(c.wind_direction_10m||0)+'°';$('w-gust').textContent=val(c.wind_gusts_10m,'km/h');$('w-rain').textContent=val(c.precipitation,'mm');$('w-hum').textContent=val(c.relative_humidity_2m,'%');$('w-press').textContent=val(c.surface_pressure,'hPa');$('weather-time').textContent=safe(c.time).replace('T',' ');evaluateRisk(c);
+    }catch(e){resetWeather('SIN RESPUESTA');toast(e.message,true)}
+  }
+  function val(v,u){return v==null?'—':Math.round(v*10)/10+' '+u}function cardinal(d){if(d==null)return '—';return ['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8]}
+  function resetWeather(label){['w-temp','w-wind','w-gust','w-rain','w-hum','w-press'].forEach(id=>$(id).textContent='—');$('weather-time').textContent=label;$('risk-title').textContent='TERRITORIA · EVALUANDO';$('risk-text').textContent='Procesando condiciones ambientales del punto.';$('risk-icon').textContent='◌'}
+  function evaluateRisk(c){const gust=Number(c.wind_gusts_10m||0),rain=Number(c.precipitation||0),wind=Number(c.wind_speed_10m||0);let level='NORMAL',text='Sin umbrales ambientales relevantes en la lectura actual.',icon='●',color='#31d67b';if(gust>=70||rain>=15){level='ALERTA',text=gust>=70?'Ráfagas muy fuertes en el entorno del activo.':'Precipitación intensa en la lectura actual.';icon='▲';color='#ff5e68'}else if(gust>=45||wind>=35||rain>=5){level='ATENCIÓN',text=gust>=45?'Ráfagas elevadas en el entorno del activo.':rain>=5?'Precipitación relevante en el punto.':'Viento sostenido elevado.';icon='◆';color='#f4b544'}$('risk-title').textContent='TERRITORIA · '+level;$('risk-text').textContent=text;$('risk-icon').textContent=icon;$('risk-icon').style.color=color;}
+  function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}
+  if(state.api) loadData(); else setTimeout(()=>$('config-dialog').showModal(),350);
+</script>
 </body>
 </html>
