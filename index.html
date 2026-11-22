@@ -256,7 +256,7 @@
         <div class="card">
           <div class="card-head"><h2>Filtro de capa</h2><span class="mono" id="infra-count">0 ELEMENTOS</span></div>
           <div class="card-body">
-            <div class="field search" style="margin-bottom:8px"><label>Buscar operadora / locación / instalación</label><input id="infra-search" placeholder="Ej.: PAE, YPF, Vista, PAE.Nq.LA-90…" oninput="filterInfraLayer()" /></div>
+            <div class="field search" style="margin-bottom:8px"><label>Buscar locación / tramo / instalación</label><input id="infra-search" placeholder="Ej.: TA.Nq.AP, NQ.LOC, Loma Campana, YPF…" oninput="filterInfraLayer()" /></div>
             <div class="field"><label>Tipo / Operadora</label><select id="infra-op" onchange="filterInfraLayer()"><option value="">Todas</option></select></div>
           </div>
         </div>
@@ -362,10 +362,36 @@
   function getInfraOperator(p){
     return p.OPERADOR || p.OPERADORA || p.EMPRESA ||
       p.operador || p.operadora || p.empresa ||
-      p.TITULAR || p.titular || p.RAZON_SOCIAL || p.razon_social || '';
+      p.TITULAR || p.titular || p.RAZON_SOCIAL || p.razon_social ||
+      p.OPERADORA_ESTIMADA || '';
   }
+
+  function enrichInfraFeature(f){
+    const p = f.properties || (f.properties = {});
+    if(!getInfraOperator(p)){
+      const refMeta = findNearestWellMeta(f.geometry);
+      if(refMeta?.operador){
+        p.OPERADORA_ESTIMADA = refMeta.operador;
+        p.POZO_REFERENCIA = refMeta.pozoReferencia || '';
+        p.DISTANCIA_REFERENCIA_KM = refMeta.distKm;
+      }
+    }
+    return f;
+  }
+
   function getInfraGroupKey(p){
     return getInfraOperator(p) || p.LOC_TIPO || p.CAPA || '';
+  }
+
+  async function ensureWellsForInfra(){
+    if(Array.isArray(state.all) && state.all.length) return;
+    const cached = await readCachedWells();
+    if(cached && Array.isArray(cached.records) && cached.records.length){
+      state.all = cached.records;
+      return;
+    }
+    const first = await fetchBatch(0, 1000);
+    state.all = (first.registros || []).map(x => ({id:x.id, ...(x.datos||{}), _geometry:x.geometria}));
   }
 
   async function openInfraModal(tipo){
@@ -398,7 +424,8 @@
       const r = await fetch(state.api + '/api/infraestructura?tipo=' + encodeURIComponent(tipo), { cache:'no-store' });
       const j = await r.json();
       if(!r.ok || !j.ok) throw new Error(j.error || 'Error consultando capa');
-      infraRawFeatures = Array.isArray(j.features) ? j.features : [];
+      if(tipo === 'locaciones') await ensureWellsForInfra();
+      infraRawFeatures = (Array.isArray(j.features) ? j.features : []).map(enrichInfraFeature);
       setText('infra-layer-tag', j.layer || tipo.toUpperCase());
 
       const ops = [...new Set(infraRawFeatures.map(f => getInfraGroupKey(f.properties || {})).filter(Boolean))].sort();
@@ -421,13 +448,7 @@
       const p = f.properties || {};
       if(op && getInfraGroupKey(p) !== op) return false;
       if(!q) return true;
-      const searchable = [
-        getInfraOperator(p),
-        p.LOC_NOMBRE, p.LOC_ID, p.LOC_TIPO, p.LOC_AGRUPA,
-        p.NOMBRE, p.CAPA,
-        ...Object.values(p)
-      ];
-      return searchable.some(v => String(v || '').toLowerCase().includes(q));
+      return Object.values(p).some(v => String(v || '').toLowerCase().includes(q));
     });
     setText('infra-count', filtered.length + ' ELEMENTOS');
     if(!filtered.length){
