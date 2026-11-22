@@ -21,7 +21,6 @@
     .app{height:100%;display:grid;grid-template-rows:68px 1fr 30px;background:radial-gradient(circle at 50% 28%,rgba(36,214,208,.09) 0%,transparent 48%),radial-gradient(circle at 10% 0%,#10293a 0%,transparent 28%),var(--bg)}
     header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(7,16,24,.96);backdrop-filter:blur(14px)}
 
-    /* Logo compacto + Upstream en margen superior izquierdo */
     .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;user-select:none}
     .logo-emblem{
       width:44px;height:44px;border-radius:50%;
@@ -59,7 +58,6 @@
     .status-pill{color:#bffbd8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px var(--green)}
     .clock{font-family:"JetBrains Mono";color:var(--text)}
 
-    /* Portada inicial con el logo Territoria Energy en el centro */
     .home-stage{
       position:relative;min-height:0;padding:18px;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -129,7 +127,6 @@
     .launch-card b{display:block;font-size:12px;letter-spacing:.07em}
     .launch-card small{display:block;font-size:10px;color:var(--muted);line-height:1.35}
 
-    /* Formularios y componentes internos */
     .toolbar{display:grid;grid-template-columns:150px 1.15fr repeat(4,minmax(120px,.5fr)) auto;gap:8px;padding:10px 12px;background:#08131d;border-bottom:1px solid var(--line)}
     .field{position:relative}.field label{position:absolute;left:11px;top:6px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);z-index:1}.field input,.field select{width:100%;height:46px;padding:18px 30px 5px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);outline:none;font-size:12px}.field input:focus,.field select:focus{border-color:var(--cyan)}
     .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:11px;top:16px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:19px;top:11px}
@@ -152,7 +149,6 @@
     .leaflet-container{font-family:Inter;background:#071018}.leaflet-control-zoom{border:1px solid var(--line)!important;border-radius:9px!important;overflow:hidden;box-shadow:var(--shadow)}.leaflet-control-zoom a{background:rgba(8,18,27,.92)!important;color:var(--cyan)!important;border-color:var(--line)!important;width:32px!important;height:32px!important;line-height:30px!important;font-size:18px!important}.leaflet-control-zoom a:hover{background:#122938!important}.leaflet-control-attribution{background:rgba(8,18,27,.78)!important;color:#7f9aaa!important}.leaflet-control-attribution a{color:#64b8d0!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1f2b;color:var(--text);border:1px solid var(--line)}
     .toast{position:fixed;z-index:3500;right:18px;bottom:45px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#102330;color:var(--text);box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8b3d48}
 
-    /* Popups operativos */
     .modal-backdrop{
       position:fixed;inset:0;z-index:2500;background:rgba(3,9,14,.84);backdrop-filter:blur(8px);
       display:none;place-items:center;padding:14px;
@@ -544,6 +540,8 @@
   const CACHE_DB_NAME = 'territoria_energy_cache';
   const CACHE_STORE_NAME = 'pozos_store';
   const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
+  const CKAN_DATASTORE_URL = 'https://datos.energia.gob.ar/api/3/action/datastore_search';
+  const CAP_IV_POZOS_RESOURCE_ID = 'cb5c0f04-7835-45cd-b982-3e25ca7d7751';
 
   const PROV_CENTERS = {
     'Neuquén': [-38.4, -69.1, 7],
@@ -560,6 +558,8 @@
     hasFittedOnce: false,
     loadedProvinces: {},
     catalogUpdatedAt: null,
+    activeAbort: null,
+    requestSeq: 0,
     api: 'https://territoria-energy-api.elexpreso17.workers.dev'
   };
 
@@ -573,7 +573,82 @@
   let infraCurrentType = null;
 
   function cacheKeyFor(prov) {
-    return 'pozos_v3_' + String(prov || 'Neuquén').toLowerCase().replace(/\s+/g, '_');
+    return 'pozos_v4_' + String(prov || 'Neuquén').toLowerCase().replace(/\s+/g, '_');
+  }
+
+  function normText(s) {
+    return String(s || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+  }
+
+  function mapEstadoToGis(rawEstado) {
+    const e = normText(rawEstado);
+    if (e.includes('abandon')) return 'Abandonado';
+    if (e.includes('efectiv') || e.includes('produc') || e.includes('inyec') || e.includes('activ')) return 'Activo';
+    if (e.includes('parado') || e.includes('inactiv') || e.includes('estudio') || e.includes('reserva')) return 'Inactivo';
+    return rawEstado || 'Sin dato';
+  }
+
+  function normalizeCkanRow(r, idx, offset, provinciaLabel) {
+    const lon = Number(String(r.coordenadax ?? r.longitud ?? r.lon ?? '').replace(',', '.'));
+    const lat = Number(String(r.coordenaday ?? r.latitud ?? r.lat ?? '').replace(',', '.'));
+    const hasCoords = Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) > 1 && Math.abs(lon) > 1;
+    const sigla = r.sigla || r.pozo || r.nombre || '';
+    const idPozo = r.idpozo || r.id_pozo || '';
+    const form = String(r.formprod || r.formacion || '').toUpperCase();
+    const tipoRec = String(r.tipo_de_recurso || r.tiporecurso || '').toUpperCase();
+    const reservorio = tipoRec.includes('NO CONV') || tipoRec.includes('SHALE') || form === 'VMUT'
+      ? 'SH'
+      : (r.sub_tipo_recurso || tipoRec || 'CONV');
+
+    return {
+      id: idPozo || r._id || (offset + idx + 1),
+      PROVINCIA: r.provincia || provinciaLabel,
+      WELL_NAME: sigla,
+      FIELD_NAME: sigla,
+      UWI_NQN: idPozo ? `SEN-${idPozo}` : sigla,
+      UWI_SEN: idPozo,
+      OPERADOR: r.empresa || r.operador || '',
+      OPERADOR_ORIGINAL: r.empresa || '',
+      AREA_LEGAL: r.areapermisoconcesion || r.area || '',
+      YACIMIENTO: r.areayacimiento || r.yacimiento || '',
+      ESTADO_GIS: mapEstadoToGis(r.tipoestado || r.estado),
+      CLASS_NAME: r.clasificacion || r.tipopozo || '',
+      FORM_PROD: form || '—',
+      RESERVORIO: reservorio,
+      'AÑO_PERF': String(r.fecha_perf || r.fechaperforacion || '').slice(0, 4) || '—',
+      FLUIDO: r.tipopozo || r.fluido || '',
+      SIST_EXTRACCION: r.tipoextraccion || '',
+      TYPE_NAME: r.subclasificacion || r.tipo_de_recurso || '',
+      ELEVACION: r.cota ?? null,
+      PROFUNDIDAD_MEDIDA: r.profundidad ?? null,
+      INICIO_PERF: r.fecha_perf || null,
+      FIN_PERF: r.fecha_term || null,
+      LATITUD: hasCoords ? lat : null,
+      LONGITUD: hasCoords ? lon : null,
+      OBSERVACIONES: r.cuenca ? `Cuenca ${r.cuenca} · Cap. IV SEN` : 'Cap. IV SEN',
+      _geometry: hasCoords ? { type: 'Point', coordinates: [lon, lat] } : null
+    };
+  }
+
+  function resetAllFiltersUI() {
+    if ($('search')) $('search').value = '';
+    options('operator', [], 'Todas');
+    options('area', [], 'Todas');
+    options('field', [], 'Todos');
+    options('state', [], 'Todos');
+    setHtml('asset-card', '<div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica, productiva y ambiental aparecerá en este panel.</div></div>');
+    setText('last-update', 'SIN SELECCIÓN');
+    setText('m-class', '—');
+    setText('m-formation', '—');
+    setText('m-reservoir', '—');
+    setText('m-year', '—');
+    resetProduction('Esperando selección');
+    setHtml('tech-kv', '<div class="kv-row"><span>Esperando selección</span><b>—</b></div>');
+    resetWeather('SIN DATOS');
   }
 
   function closeAllModals(){
@@ -618,11 +693,22 @@
   }
 
   function onProvinceChange(newProv){
+    if (state.activeAbort) {
+      try { state.activeAbort.abort(); } catch {}
+    }
     state.province = newProv || 'Neuquén';
     setText('pozos-prov-title', state.province.toUpperCase());
     if($('infra-prov')) $('infra-prov').value = state.province;
+
+    state.all = [];
+    state.filtered = [];
+    state.selected = null;
     state.hasFittedOnce = false;
     state.loadedProvinces[state.province] = true;
+    if (markerLayer) markerLayer.clearLayers();
+    resetAllFiltersUI();
+    updateCounters();
+
     const [lat, lon, z] = PROV_CENTERS[state.province] || [-38.4, -69.1, 7];
     if(map) map.setView([lat, lon], z);
     loadData(false);
@@ -662,12 +748,53 @@
     setTimeout(() => infraMap.invalidateSize(), 60);
 
     try{
-      const qs = new URLSearchParams({ tipo, provincia: selectedProv });
-      const r = await fetch(state.api + '/api/infraestructura?' + qs.toString(), { cache:'no-store' });
-      const j = await r.json();
-      if(!r.ok || !j.ok) throw new Error(j.error || ('Sin datos para ' + selectedProv));
-      infraRawFeatures = Array.isArray(j.features) ? j.features : [];
-      setText('infra-layer-tag', j.layer || tipo.toUpperCase());
+      // Si es Áreas en Mendoza o Río Negro, consultamos directo CKAN DataStore desde el navegador
+      if (tipo === 'areas' && normText(selectedProv) !== 'neuquen') {
+        const filters = selectedProv !== 'Todas' ? `&filters=${encodeURIComponent(JSON.stringify({ provincia: selectedProv }))}` : '';
+        const r = await fetch(`${CKAN_DATASTORE_URL}?resource_id=${CAP_IV_POZOS_RESOURCE_ID}${filters}&limit=5000`);
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error('No se pudieron obtener áreas desde Secretaría de Energía');
+
+        const areasMap = new Map();
+        for (const row of (j.result?.records || [])) {
+          const areaName = String(row.areapermisoconcesion || row.area || '').trim();
+          const lon = Number(String(row.coordenadax ?? '').replace(',', '.'));
+          const lat = Number(String(row.coordenaday ?? '').replace(',', '.'));
+          if (!areaName || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+          if (!areasMap.has(areaName)) {
+            areasMap.set(areaName, {
+              area: areaName,
+              operador: row.empresa || '',
+              provincia: row.provincia || selectedProv,
+              cuenca: row.cuenca || '',
+              pozos: 0, sumLat: 0, sumLon: 0
+            });
+          }
+          const item = areasMap.get(areaName);
+          item.pozos += 1; item.sumLat += lat; item.sumLon += lon;
+        }
+
+        infraRawFeatures = [...areasMap.values()].map((a, idx) => ({
+          type: 'Feature',
+          id: idx + 1,
+          properties: {
+            AREA_CONCESION: a.area,
+            OPERADOR: a.operador,
+            PROVINCIA: a.provincia,
+            CUENCA: a.cuenca,
+            POZOS_REGISTRADOS: a.pozos
+          },
+          geometry: { type: 'Point', coordinates: [a.sumLon / a.pozos, a.sumLat / a.pozos] }
+        }));
+        setText('infra-layer-tag', 'SEN · CAP. IV');
+      } else {
+        const qs = new URLSearchParams({ tipo, provincia: selectedProv });
+        const r = await fetch(state.api + '/api/infraestructura?' + qs.toString(), { cache:'no-store' });
+        const j = await r.json();
+        if(!r.ok || !j.ok) throw new Error(j.error || ('Sin datos para ' + selectedProv));
+        infraRawFeatures = Array.isArray(j.features) ? j.features : [];
+        setText('infra-layer-tag', j.layer || tipo.toUpperCase());
+      }
 
       const ops = [...new Set(infraRawFeatures.map(f => {
         const p = f.properties || {};
@@ -836,7 +963,32 @@
     if(el) el.addEventListener(id==='search'?'input':'change', () => applyFilters(true));
   });
 
-  async function fetchBatch(prov, inicio, limite){
+  /* Neuquén vía Worker WFS | Mendoza y Río Negro directo desde navegador a CKAN DataStore */
+  async function fetchBatch(prov, inicio, limite, signal){
+    if (normText(prov) !== 'neuquen') {
+      const dsUrl =
+        `${CKAN_DATASTORE_URL}?resource_id=${encodeURIComponent(CAP_IV_POZOS_RESOURCE_ID)}` +
+        `&filters=${encodeURIComponent(JSON.stringify({ provincia: prov }))}` +
+        `&offset=${inicio}&limit=${limite}`;
+
+      const r = await fetch(dsUrl, { signal });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error('Error consultando Secretaría de Energía');
+      const rows = j.result?.records || [];
+      const total = Number(j.result?.total) || rows.length;
+      const registros = rows.map((row, idx) => ({
+        id: row.idpozo || row._id || (inicio + idx + 1),
+        datos: normalizeCkanRow(row, idx, inicio, prov),
+        geometria: normalizeCkanRow(row, idx, inicio, prov)._geometry
+      }));
+      return {
+        ok: true,
+        total,
+        registros,
+        hayMas: (inicio + registros.length) < total
+      };
+    }
+
     for(let intento=1; intento<=2; intento++){
       try{
         const qs = new URLSearchParams({
@@ -844,23 +996,26 @@
           inicio: String(inicio),
           limite: String(limite)
         });
-        const r = await fetch(state.api+'/api/pozos?'+qs.toString(), {cache:'no-store'});
+        const r = await fetch(state.api+'/api/pozos?'+qs.toString(), {cache:'no-store', signal});
         const data = await r.json();
         if(!r.ok || !data.ok) throw new Error(data.error || 'Respuesta inválida');
         return data;
       }catch(e){
-        if(intento === 2) throw e;
+        if(e?.name === 'AbortError' || intento === 2) throw e;
         await new Promise(res => setTimeout(res, 1000));
       }
     }
   }
 
   async function loadData(forceRefresh = false){
-    if(!state.api) return;
     const prov = state.province || 'Neuquén';
+    const seq = ++state.requestSeq;
+    const controller = new AbortController();
+    state.activeAbort = controller;
 
     if(!forceRefresh){
       const cached = await readCachedWells(prov);
+      if(seq !== state.requestSeq) return;
       const isFresh = cached && Array.isArray(cached.records) && cached.records.length > 0 &&
         (Date.now() - Number(cached.savedAt || 0) < CACHE_TTL_MS);
 
@@ -890,7 +1045,9 @@
     let cargaParcial = false;
 
     try{
-      const primero = await fetchBatch(prov, 0, limite);
+      const primero = await fetchBatch(prov, 0, limite, controller.signal);
+      if(seq !== state.requestSeq) return;
+
       const lote0 = (primero.registros || []).map(x => ({id:x.id, ...(x.datos||{}), _geometry:x.geometria}));
       state.all.push(...lote0);
       setConnection(`API ONLINE · ${prov.toUpperCase()}`, true);
@@ -901,6 +1058,7 @@
       inicio = lote0.length;
 
       while(primero.hayMas && inicio < totalEstimado){
+        if(seq !== state.requestSeq) return;
         const offsets = [];
         for(let i = 0; i < concurrencia && (inicio + i * limite) < totalEstimado; i++){
           offsets.push(inicio + i * limite);
@@ -909,9 +1067,10 @@
 
         setText('footer-state', `CARGANDO ${prov.toUpperCase()} · ${state.all.length} / ${totalEstimado}`);
 
-        const resultados = await Promise.allSettled(offsets.map(off => fetchBatch(prov, off, limite)));
-        let finAlcanzado = false;
+        const resultados = await Promise.allSettled(offsets.map(off => fetchBatch(prov, off, limite, controller.signal)));
+        if(seq !== state.requestSeq) return;
 
+        let finAlcanzado = false;
         for(const res of resultados){
           if(res.status === 'fulfilled'){
             const j = res.value;
@@ -928,6 +1087,8 @@
         if(finAlcanzado || cargaParcial) break;
       }
 
+      if(seq !== state.requestSeq) return;
+
       if(state.all.length){
         const now = Date.now();
         if(!cargaParcial){
@@ -942,9 +1103,10 @@
       }else{
         setConnection('API SIN RESPUESTA',false);
         setText('tech-updated', 'SIN DATOS');
-        setText('footer-state', 'SIN DATOS CARGADOS');
+        setText('footer-state', `SIN DATOS PARA ${prov.toUpperCase()}`);
       }
     }catch(e){
+      if(e?.name === 'AbortError' || seq !== state.requestSeq) return;
       if(state.all.length){
         const now = Date.now();
         setCatalogTimestamp(now, 'PARCIAL');
@@ -974,17 +1136,30 @@
     const cur=el.value;
     const unique=[...new Set(values.filter(Boolean))].sort();
     el.innerHTML='<option value="">'+label+'</option>'+unique.map(v=>'<option value="'+escapeHtml(v)+'">'+v.replace(/</g,'&lt;')+'</option>').join('');
-    if(unique.includes(cur)) el.value=cur;
+    el.value = unique.includes(cur) ? cur : '';
   }
 
   function populateFilters(){
-    options('operator',state.all.map(x=>x.OPERADOR),'Todas');
-    options('area',state.all.map(x=>x.AREA_LEGAL),'Todas');
-    options('field',state.all.map(x=>x.YACIMIENTO),'Todos');
-    options('state',state.all.map(x=>x.ESTADO_GIS),'Todos');
+    const op = $('operator')?.value || '';
+    const ar = $('area')?.value || '';
+    const fi = $('field')?.value || '';
+
+    options('operator', state.all.map(x => x.OPERADOR), 'Todas');
+
+    const byOp = op ? state.all.filter(x => x.OPERADOR === op) : state.all;
+    options('area', byOp.map(x => x.AREA_LEGAL), 'Todas');
+
+    const arValid = $('area')?.value || '';
+    const byAr = arValid ? byOp.filter(x => x.AREA_LEGAL === arValid) : byOp;
+    options('field', byAr.map(x => x.YACIMIENTO), 'Todos');
+
+    const fiValid = $('field')?.value || '';
+    const byFi = fiValid ? byAr.filter(x => x.YACIMIENTO === fiValid) : byAr;
+    options('state', byFi.map(x => x.ESTADO_GIS), 'Todos');
   }
 
   function applyFilters(shouldFit=false){
+    populateFilters();
     const q=($('search')?.value || '').trim().toLowerCase();
     const op=$('operator')?.value || '';
     const ar=$('area')?.value || '';
