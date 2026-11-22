@@ -192,7 +192,7 @@
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
-    /* BOTONES FLOTANTES TÁCTILES (CAPAS / FICHA / ALERTAS) */
+    /* BOTONES FLOTANTES TÁCTILES */
     .fab-stack {
       position: absolute;
       right: 12px;
@@ -499,9 +499,9 @@
       </div>
 
       <div class="sector-bar">
-        <button class="sector-btn active" onclick="flyToSector('vmSur', this)">VM Sur · Añelo</button>
-        <button class="sector-btn" onclick="flyToSector('vmNorte', this)">VM Norte · Malargüe</button>
-        <button class="sector-btn" onclick="flyToSector('cuyana', this)">Cuyana · Mendoza</button>
+        <button class="sector-btn active" data-sector="vmSur" onclick="flyToSector('vmSur', this)">VM Sur · Añelo</button>
+        <button class="sector-btn" data-sector="vmNorte" onclick="flyToSector('vmNorte', this)">VM Norte · Malargüe</button>
+        <button class="sector-btn" data-sector="cuyana" onclick="flyToSector('cuyana', this)">Cuyana · Mendoza</button>
       </div>
     </header>
 
@@ -512,22 +512,22 @@
         <div class="kpi-card">
           <div class="kpi-label">Pozos Shale</div>
           <div class="kpi-value" id="kpi-pozos">142</div>
-          <div class="kpi-sub up">+6 en fractura</div>
+          <div class="kpi-sub up" id="kpi-pozos-sub">+6 en fractura</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Prod. Bloque</div>
           <div class="kpi-value" id="kpi-prod">14.820 m³/d</div>
-          <div class="kpi-sub up">▲ 4.2% mensual</div>
+          <div class="kpi-sub up" id="kpi-prod-sub">▲ 4.2% mensual</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">VIIRS Flaring</div>
           <div class="kpi-value" id="kpi-viirs">3 Focos</div>
-          <div class="kpi-sub warn">Máx 18.4 MW</div>
+          <div class="kpi-sub warn" id="kpi-viirs-sub">Máx 18.4 MW</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Sismo / Rutas</div>
           <div class="kpi-value" id="kpi-sismo">2.4 Ml</div>
-          <div class="kpi-sub warn">Zonda RP 180/RP 7</div>
+          <div class="kpi-sub warn" id="kpi-sismo-sub">Zonda RP 180/RP 7</div>
         </div>
       </div>
 
@@ -659,11 +659,24 @@
       zoomControl: false
     }).setView([-38.32, -68.85], 11);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; CARTO | Territoria',
+    const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO | Territoria',
       subdomains: 'abcd',
       maxZoom: 18
-    }).addTo(map);
+    });
+
+    const osmFallback = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap | Territoria',
+      maxZoom: 18
+    });
+
+    cartoDark.on('tileerror', () => {
+      if (!map.hasLayer(osmFallback)) {
+        osmFallback.addTo(map);
+      }
+    });
+
+    cartoDark.addTo(map);
 
     const layers = {
       areas: L.layerGroup().addTo(map),
@@ -671,6 +684,48 @@
       ductos: L.layerGroup().addTo(map),
       viirs: L.layerGroup().addTo(map),
       sismos: L.layerGroup().addTo(map)
+    };
+
+    const sectorConfig = {
+      vmSur: {
+        center: [-38.32, -68.85],
+        zoom: 11,
+        pozos: '142',
+        pozosSub: '+6 en fractura',
+        prod: '14.820 m³/d',
+        prodSub: '▲ 4.2% mensual',
+        viirs: '3 Focos',
+        viirsSub: 'Máx 18.4 MW',
+        sismo: '2.4 Ml',
+        sismoSub: 'Zonda RP 180/RP 7',
+        wellIndex: 0
+      },
+      vmNorte: {
+        center: [-37.02, -69.56],
+        zoom: 11,
+        pozos: '14',
+        pozosSub: '2 pilotos activos',
+        prod: '940 m³/d',
+        prodSub: '▲ 1.8% mensual',
+        viirs: '1 Foco',
+        viirsSub: 'Máx 6.8 MW',
+        sismo: '1.9 Ml',
+        sismoSub: 'Viento 58 km/h RP 180',
+        wellIndex: 2
+      },
+      cuyana: {
+        center: [-33.12, -68.82],
+        zoom: 11,
+        pozos: '318',
+        pozosSub: 'Recuperación 2ª',
+        prod: '4.650 m³/d',
+        prodSub: '▲ 0.9% mensual',
+        viirs: '0 Focos',
+        viirsSub: 'Sin anomalías térmicas',
+        sismo: '2.1 Ml',
+        sismoSub: 'Normal · RN 40',
+        wellIndex: 3
+      }
     };
 
     const wellsData = [
@@ -883,26 +938,25 @@
     }
 
     function flyToSector(sector, btn) {
-      currentSector = sector;
-      document.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
+      const cfg = sectorConfig[sector];
+      if (!cfg) return;
 
-      if (sector === 'vmSur') {
-        map.flyTo([-38.32, -68.85], 11);
-        document.getElementById('kpi-pozos').textContent = '142';
-        document.getElementById('kpi-prod').textContent = '14.820 m³/d';
-        selectWell(wellsData[0], false);
-      } else if (sector === 'vmNorte') {
-        map.flyTo([-37.02, -69.56], 11);
-        document.getElementById('kpi-pozos').textContent = '14';
-        document.getElementById('kpi-prod').textContent = '940 m³/d';
-        selectWell(wellsData[2], false);
-      } else if (sector === 'cuyana') {
-        map.flyTo([-33.12, -68.82], 11);
-        document.getElementById('kpi-pozos').textContent = '318';
-        document.getElementById('kpi-prod').textContent = '4.650 m³/d';
-        selectWell(wellsData[3], false);
-      }
+      currentSector = sector;
+      document.querySelectorAll('.sector-btn').forEach(b => {
+        b.classList.toggle('active', b === btn || b.dataset.sector === sector);
+      });
+
+      map.flyTo(cfg.center, cfg.zoom);
+      document.getElementById('kpi-pozos').textContent = cfg.pozos;
+      document.getElementById('kpi-pozos-sub').textContent = cfg.pozosSub;
+      document.getElementById('kpi-prod').textContent = cfg.prod;
+      document.getElementById('kpi-prod-sub').textContent = cfg.prodSub;
+      document.getElementById('kpi-viirs').textContent = cfg.viirs;
+      document.getElementById('kpi-viirs-sub').textContent = cfg.viirsSub;
+      document.getElementById('kpi-sismo').textContent = cfg.sismo;
+      document.getElementById('kpi-sismo-sub').textContent = cfg.sismoSub;
+
+      selectWell(wellsData[cfg.wellIndex], false);
     }
 
     function recenterCurrentSector() {
