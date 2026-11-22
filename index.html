@@ -6,7 +6,7 @@
   <title>Territoria Energy | Centro de Operaciones No Convencionales</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <style>
     :root {
@@ -18,10 +18,10 @@
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
     button,input,select{font:inherit}
-    .app{height:100%;display:grid;grid-template-rows:68px 74px 1fr 30px;background:radial-gradient(circle at 10% 0%,#10293a 0,transparent 26%),var(--bg)}
+    .app{height:100%;display:grid;grid-template-rows:68px 1fr 30px;background:radial-gradient(circle at 50% 28%,rgba(36,214,208,.09) 0%,transparent 48%),radial-gradient(circle at 10% 0%,#10293a 0%,transparent 28%),var(--bg)}
     header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(7,16,24,.96);backdrop-filter:blur(14px)}
 
-    /* Logo Territoria Energy */
+    /* Logo compacto en header */
     .brand{display:flex;align-items:center;gap:13px;text-decoration:none;color:inherit;user-select:none}
     .logo-emblem{
       width:44px;height:44px;border-radius:12px;
@@ -30,10 +30,6 @@
       display:grid;place-items:center;
       box-shadow:0 0 24px rgba(36,214,208,.22), inset 0 1px 0 rgba(255,255,255,.12);
       position:relative;flex-shrink:0;
-    }
-    .logo-emblem::after{
-      content:"";position:absolute;inset:2px;border-radius:9px;
-      border:1px solid rgba(36,214,208,.14);pointer-events:none;
     }
     .logo-emblem svg{width:32px;height:32px;display:block}
     .brand-copy{display:flex;flex-direction:column;justify-content:center}
@@ -65,45 +61,117 @@
     .status-pill{color:#bffbd8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px var(--green)}
     .clock{font-family:"JetBrains Mono";color:var(--text)}
 
-    .toolbar{display:grid;grid-template-columns:1.25fr repeat(4,minmax(140px,.55fr)) auto;gap:10px;padding:12px 16px;background:#08131d;border-bottom:1px solid var(--line)}
-    .field{position:relative}.field label{position:absolute;left:11px;top:7px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);z-index:1}.field input,.field select{width:100%;height:50px;padding:20px 34px 6px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);outline:none}.field input:focus,.field select:focus{border-color:var(--cyan)}
-    .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:12px;top:18px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:20px;top:13px}
-    .btn{height:50px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text);padding:0 16px;cursor:pointer;font-weight:700}.btn:hover{border-color:var(--cyan);color:var(--cyan)}.btn.primary{background:linear-gradient(135deg,#167f92,#0b6475);border-color:#2499aa}
-    main{min-height:0;display:grid;grid-template-columns:minmax(0,58%) minmax(410px,42%);gap:10px;padding:10px}
-    .map-shell{position:relative;min-height:0;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+    /* Pantalla de inicio con el logo Territoria Energy (sin mapa) */
+    .home-stage{
+      position:relative;min-height:0;padding:18px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      overflow:auto;
+      background-image:
+        linear-gradient(rgba(36,214,208,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(36,214,208,.03) 1px, transparent 1px);
+      background-size:42px 42px;
+    }
+    .hero-hub{
+      width:min(880px,96%);
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      padding:28px 26px 26px;
+      background:linear-gradient(170deg,rgba(14,28,40,.92),rgba(8,18,27,.95));
+      border:1px solid #223f52;border-radius:20px;
+      box-shadow:0 26px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter:blur(12px);
+    }
+    .hero-emblem-wrap{
+      position:relative;width:196px;height:196px;margin-bottom:14px;
+      display:grid;place-items:center;
+    }
+    .hero-emblem-wrap::before{
+      content:"";position:absolute;inset:10px;border-radius:50%;
+      background:radial-gradient(circle,rgba(36,214,208,.24),transparent 68%);
+      filter:blur(12px);pointer-events:none;
+    }
+    .hero-emblem-wrap svg{width:192px;height:192px;position:relative;z-index:1;filter:drop-shadow(0 12px 24px rgba(0,0,0,.55))}
+    .hero-wordmark{
+      font-size:clamp(30px,4.2vw,46px);font-weight:900;letter-spacing:.1em;line-height:1;
+      color:#f2f9fc;margin:0;display:flex;align-items:center;justify-content:center;
+    }
+    .hero-energy{
+      font-size:clamp(18px,2.4vw,26px);font-weight:800;letter-spacing:.26em;
+      color:var(--cyan);margin:6px 0 10px;padding-left:.26em;
+    }
+    .hero-subtitle{
+      font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+      color:#c5dce6;margin:0 0 8px;
+    }
+    .hero-tagline{
+      display:flex;align-items:center;gap:14px;width:min(520px,92%);
+      margin:4px 0 22px;color:var(--muted);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;
+    }
+    .hero-tagline::before,.hero-tagline::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,#2a4a5e,transparent)}
+
+    .launcher-grid{
+      width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+    }
+    .launch-card{
+      border:1px solid var(--line);background:rgba(11,23,34,.9);color:var(--text);
+      border-radius:12px;padding:13px 12px;text-align:left;cursor:pointer;transition:.2s;
+      display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
+    }
+    .launch-card:hover{
+      border-color:var(--cyan);background:#12293a;transform:translateY(-2px);
+      box-shadow:0 10px 24px rgba(0,0,0,.35);
+    }
+    .launch-top{display:flex;align-items:center;justify-content:space-between}
+    .launch-card .l-ico{
+      width:34px;height:34px;border-radius:9px;
+      background:rgba(36,214,208,.12);border:1px solid rgba(36,214,208,.35);
+      display:grid;place-items:center;color:var(--cyan);font-size:16px;
+    }
+    .launch-arrow{font-size:12px;color:var(--muted);transition:.2s}
+    .launch-card:hover .launch-arrow{color:var(--cyan);transform:translateX(2px)}
+    .launch-card b{display:block;font-size:12px;letter-spacing:.07em}
+    .launch-card small{display:block;font-size:10px;color:var(--muted);line-height:1.35}
+
+    /* Formularios y componentes internos */
+    .toolbar{display:grid;grid-template-columns:1.25fr repeat(4,minmax(130px,.55fr)) auto;gap:8px;padding:10px 12px;background:#08131d;border-bottom:1px solid var(--line)}
+    .field{position:relative}.field label{position:absolute;left:11px;top:6px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);z-index:1}.field input,.field select{width:100%;height:46px;padding:18px 32px 5px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);outline:none;font-size:12px}.field input:focus,.field select:focus{border-color:var(--cyan)}
+    .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:12px;top:16px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:19px;top:11px}
+    .btn{height:46px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text);padding:0 14px;cursor:pointer;font-weight:700;font-size:11px}.btn:hover{border-color:var(--cyan);color:var(--cyan)}.btn.primary{background:linear-gradient(135deg,#167f92,#0b6475);border-color:#2499aa}
+
+    .map-shell{position:relative;min-height:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel)}
     #map{height:100%;width:100%;background:#0b151d}
-    .map-overlay{position:absolute;z-index:600;left:56px;top:10px;display:flex;flex-wrap:wrap;gap:8px;pointer-events:none}.badge{background:rgba(8,18,27,.9);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:10px;color:var(--muted);backdrop-filter:blur(10px)}.badge b{color:var(--text);font-size:13px;margin-right:4px}
+    .map-overlay{position:absolute;z-index:600;left:56px;top:10px;display:flex;flex-wrap:wrap;gap:8px;pointer-events:none}.badge{background:rgba(8,18,27,.9);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:10px;color:var(--muted);backdrop-filter:blur(10px)}.badge b{color:var(--text);font-size:12px;margin-right:4px}
     .legend{position:absolute;z-index:600;left:14px;bottom:14px;background:rgba(8,18,27,.92);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:7px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
     .side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px;padding-right:3px}.side::-webkit-scrollbar{width:5px}.side::-webkit-scrollbar-thumb{background:#28485d;border-radius:9px}
-    .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);overflow:hidden}.card-head{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}.card-head h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#a8c0ce}.card-head span{font-size:10px;color:var(--muted)}.card-body{padding:14px}
-    .asset-title{display:grid;grid-template-columns:52px 1fr auto;gap:13px;align-items:center}.asset-icon{width:52px;height:52px;border:1px solid #245266;background:#0e2937;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:25px}.asset-name h3{margin:0;font-size:21px;line-height:1.2}.asset-name p{margin:5px 0 0;color:var(--muted);font-family:"JetBrains Mono";font-size:11px}.state{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid}.state.active{color:#bffbd8;border-color:#2b8655;background:#103724}.state.inactive{color:#ffe3a7;border-color:#7d6330;background:#332711}.state.abandoned{color:#ffc2c6;border-color:#87414a;background:#381b20}.state.none{color:#aac0cc;border-color:#385163;background:#132431}
-    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{min-width:0;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.metric span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:7px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong.cyan{color:var(--cyan)}.metric small{display:block;margin-top:3px;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}.kv-row{padding:9px 0;border-bottom:1px solid rgba(47,75,91,.55);display:flex;align-items:center;justify-content:space-between;gap:12px}.kv-row span{font-size:10px;color:var(--muted)}.kv-row b{font-size:11px;text-align:right;max-width:66%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mono{font-family:"JetBrains Mono"}
-    .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.weather{padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.weather strong{display:block;font-size:17px;margin:7px 0 2px}.weather span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.weather small{color:#9fc2d2}
-    .risk{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #245b4a;background:linear-gradient(100deg,#10352b,#0a211e);border-radius:10px}.risk strong{font-size:12px;letter-spacing:.12em}.risk span{font-size:10px;color:#9adbb5}
-    .empty{min-height:170px;display:grid;place-items:center;text-align:center;color:var(--muted)}.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:7px}.empty .circle{width:54px;height:54px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;font-size:22px;color:var(--cyan)}
+    .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);overflow:hidden}.card-head{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}.card-head h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#a8c0ce}.card-head span{font-size:10px;color:var(--muted)}.card-body{padding:12px}
+    .asset-title{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center}.asset-icon{width:48px;height:48px;border:1px solid #245266;background:#0e2937;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:23px}.asset-name h3{margin:0;font-size:19px;line-height:1.2}.asset-name p{margin:4px 0 0;color:var(--muted);font-family:"JetBrains Mono";font-size:11px}.state{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid}.state.active{color:#bffbd8;border-color:#2b8655;background:#103724}.state.inactive{color:#ffe3a7;border-color:#7d6330;background:#332711}.state.abandoned{color:#ffc2c6;border-color:#87414a;background:#381b20}.state.none{color:#aac0cc;border-color:#385163;background:#132431}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.metric span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:6px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong.cyan{color:var(--cyan)}.metric small{display:block;margin-top:3px;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}.kv-row{padding:8px 0;border-bottom:1px solid rgba(47,75,91,.55);display:flex;align-items:center;justify-content:space-between;gap:12px}.kv-row span{font-size:10px;color:var(--muted)}.kv-row b{font-size:11px;text-align:right;max-width:66%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mono{font-family:"JetBrains Mono"}
+    .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.weather{padding:10px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.weather strong{display:block;font-size:16px;margin:6px 0 2px}.weather span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.weather small{color:#9fc2d2}
+    .risk{display:flex;align-items:center;justify-content:space-between;padding:11px;border:1px solid #245b4a;background:linear-gradient(100deg,#10352b,#0a211e);border-radius:10px}.risk strong{font-size:12px;letter-spacing:.12em}.risk span{font-size:10px;color:#9adbb5}
+    .empty{min-height:150px;display:grid;place-items:center;text-align:center;color:var(--muted)}.empty b{display:block;color:var(--text);font-size:15px;margin-bottom:6px}.empty .circle{width:48px;height:48px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;margin:0 auto 10px;font-size:20px;color:var(--cyan)}
     footer{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-top:1px solid var(--line);background:#070f16;color:#647f8f;font-size:9px;letter-spacing:.09em;text-transform:uppercase}
     .leaflet-container{font-family:Inter;background:#071018}.leaflet-control-zoom{border:1px solid var(--line)!important;border-radius:9px!important;overflow:hidden;box-shadow:var(--shadow)}.leaflet-control-zoom a{background:rgba(8,18,27,.92)!important;color:var(--cyan)!important;border-color:var(--line)!important;width:32px!important;height:32px!important;line-height:30px!important;font-size:18px!important}.leaflet-control-zoom a:hover{background:#122938!important}.leaflet-control-attribution{background:rgba(8,18,27,.78)!important;color:#7f9aaa!important}.leaflet-control-attribution a{color:#64b8d0!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1f2b;color:var(--text);border:1px solid var(--line)}
-    .toast{position:fixed;z-index:3000;right:18px;bottom:45px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#102330;color:var(--text);box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8b3d48}
+    .toast{position:fixed;z-index:3500;right:18px;bottom:45px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#102330;color:var(--text);box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8b3d48}
 
-    /* Popup modal de infraestructura (Oleoductos / Plantas / Áreas) */
+    /* Popups operativos */
     .modal-backdrop{
-      position:fixed;inset:0;z-index:2500;background:rgba(3,9,14,.82);backdrop-filter:blur(8px);
-      display:none;place-items:center;padding:18px;
+      position:fixed;inset:0;z-index:2500;background:rgba(3,9,14,.84);backdrop-filter:blur(8px);
+      display:none;place-items:center;padding:14px;
     }
     .modal-backdrop.open{display:grid}
     .modal-window{
-      width:min(1440px,96vw);height:min(860px,92vh);
+      width:min(1560px,97vw);height:min(900px,94vh);
       background:var(--panel);border:1px solid #284b60;border-radius:14px;
       box-shadow:0 28px 80px rgba(0,0,0,.65);
-      display:grid;grid-template-rows:56px 1fr;overflow:hidden;
+      display:grid;grid-template-rows:52px 1fr;overflow:hidden;
     }
+    .modal-window.pozos-win{grid-template-rows:52px auto 1fr}
     .modal-head{
       display:flex;align-items:center;justify-content:space-between;padding:0 16px;
       background:#08141f;border-bottom:1px solid var(--line);
     }
     .modal-title{display:flex;align-items:center;gap:10px}
-    .modal-title h3{margin:0;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
+    .modal-title h3{margin:0;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
     .modal-title span{font-size:11px;color:var(--muted)}
     .modal-actions{display:flex;align-items:center;gap:8px}
     .modal-close{
@@ -111,20 +179,21 @@
       padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:11px;
     }
     .modal-close:hover{border-color:var(--red);color:#ffc2c6}
+    .pozos-body{min-height:0;display:grid;grid-template-columns:minmax(0,57%) minmax(400px,43%);gap:10px;padding:10px;background:var(--bg)}
     .modal-body{min-height:0;display:grid;grid-template-columns:1fr 380px;gap:10px;padding:10px;background:var(--bg)}
     .modal-map-wrap{position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#09141d}
     #infra-map{width:100%;height:100%}
     .modal-side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px}
 
     @media(max-width:1280px){.top-status .source-pill{display:none}}
-    @media(max-width:1050px){html,body{overflow:auto}.app{height:auto;min-height:100%;grid-template-rows:auto auto auto 30px}.toolbar{grid-template-columns:repeat(3,1fr)}main{grid-template-columns:1fr}.map-shell{height:58vh}.side{overflow:visible}.modal-body{grid-template-columns:1fr}}
-    @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}main{padding:6px}.brand-sub{display:none}}
+    @media(max-width:1050px){.pozos-body,.modal-body{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(3,1fr)}.launcher-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}.brand-sub{display:none}.launcher-grid{grid-template-columns:1fr}.hero-emblem-wrap{width:150px;height:150px}.hero-emblem-wrap svg{width:146px;height:146px}}
   </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <a class="brand" href="#top" onclick="closeInfraModal();return false;">
+    <a class="brand" href="#top" onclick="closeAllModals();return false;">
       <div class="logo-emblem" aria-hidden="true">
         <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -133,26 +202,15 @@
               <stop offset="55%" stop-color="#24d6d0"/>
               <stop offset="100%" stop-color="#0ea5b7"/>
             </linearGradient>
-            <linearGradient id="teAmber" x1="10" y1="28" x2="32" y2="34" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#f4b544"/>
-              <stop offset="100%" stop-color="#ff7b54"/>
-            </linearGradient>
           </defs>
-          <!-- Marco hexagonal técnico -->
-          <path d="M20 2.5L35 11.2V28.8L20 37.5L5 28.8V11.2L20 2.5Z" stroke="url(#teCyan)" stroke-width="1.5" stroke-opacity="0.7"/>
-          <!-- Torre / caballete del balancín -->
-          <path d="M17.5 27L20.5 14.5L23.5 27" stroke="#eaf4f8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M18.6 22.2H22.4" stroke="#eaf4f8" stroke-width="1.3" stroke-linecap="round"/>
-          <!-- Viga balancín y cabeza de caballo -->
-          <path d="M12.5 16.8L28.5 11.8" stroke="url(#teCyan)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M27.8 10.2C29.9 10.6 31.2 12.2 30.8 14.4L28.2 13.6Z" fill="url(#teCyan)"/>
-          <!-- Varilla de bombeo -->
-          <path d="M29.4 14.2V27" stroke="url(#teCyan)" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="2 1.5"/>
-          <!-- Contrapeso -->
-          <circle cx="13.2" cy="18.2" r="2.1" fill="#0b1722" stroke="url(#teCyan)" stroke-width="1.5"/>
-          <!-- Horizonte / estrato productivo Vaca Muerta -->
-          <path d="M9.5 27.2H30.5" stroke="#eaf4f8" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M11.5 30.6C15.5 29.4 18.5 31.8 22.5 30.6C25.2 29.8 27.2 30.2 28.8 30.8" stroke="url(#teAmber)" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="16.5" stroke="url(#teCyan)" stroke-width="1.6"/>
+          <path d="M12.5 26L15 16L17.5 26" stroke="#eaf4f8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.5 18L20.5 13.5" stroke="url(#teCyan)" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M20 12.2C21.6 12.6 22.5 13.8 22.2 15.5L20.2 14.8Z" fill="url(#teCyan)"/>
+          <path d="M21.2 15.3V26" stroke="url(#teCyan)" stroke-width="1.2" stroke-dasharray="1.8 1.4"/>
+          <path d="M24 14C26.2 14 28 15.8 28 18C28 21 24 25.5 24 25.5C24 25.5 20 21 20 18C20 15.8 21.8 14 24 14Z" fill="#0d2938" stroke="url(#teCyan)" stroke-width="1.3"/>
+          <circle cx="24" cy="18" r="1.4" fill="#eaf4f8"/>
+          <path d="M8.5 27.2C14 26 19 28.5 25.5 27.2C28 26.7 30 27 31.5 27.6" stroke="#31d67b" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
       <div class="brand-copy">
@@ -165,104 +223,248 @@
     </a>
 
     <nav class="nav-modules" aria-label="Módulos operativos">
-      <button class="nav-btn active" id="nav-pozos" onclick="closeInfraModal()"><span class="ico">⌖</span>POZOS</button>
+      <button class="nav-btn active" id="nav-inicio" onclick="closeAllModals()"><span class="ico">◈</span>INICIO</button>
+      <button class="nav-btn" id="nav-pozos" onclick="openPozosModal()"><span class="ico">⌖</span>POZOS</button>
       <button class="nav-btn" id="nav-ductos" onclick="openInfraModal('ductos')"><span class="ico">⌇</span>OLEODUCTOS</button>
       <button class="nav-btn" id="nav-plantas" onclick="openInfraModal('plantas')"><span class="ico">⬡</span>PLANTAS</button>
       <button class="nav-btn" id="nav-areas" onclick="openInfraModal('areas')"><span class="ico">▣</span>ÁREAS</button>
     </nav>
 
     <div class="top-status">
-      <div class="source-pill">GIS OFICIAL NEUQUÉN</div>
-      <div class="status-pill"><i class="dot"></i><span id="api-status">INICIANDO…</span></div>
+      <div class="source-pill">CUENCA NEUQUINA · GIS</div>
+      <div class="status-pill"><i class="dot"></i><span id="api-status">LISTO</span></div>
       <div class="clock" id="clock">--:--:--</div>
     </div>
   </header>
 
-  <section class="toolbar">
-    <div class="field search"><label>Buscar pozo o UWI</label><input id="search" placeholder="Ej.: P13794 o La Caverna" /></div>
-    <div class="field"><label>Operadora</label><select id="operator"><option value="">Todas</option></select></div>
-    <div class="field"><label>Área legal</label><select id="area"><option value="">Todas</option></select></div>
-    <div class="field"><label>Yacimiento</label><select id="field"><option value="">Todos</option></select></div>
-    <div class="field"><label>Estado</label><select id="state"><option value="">Todos</option></select></div>
-    <button class="btn primary" id="reload">ACTUALIZAR</button>
+  <!-- Portada inicial con el logo oficial de Territoria Energy -->
+  <section class="home-stage">
+    <div class="hero-hub">
+      <div class="hero-emblem-wrap" aria-hidden="true">
+        <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="badgeClip">
+              <circle cx="110" cy="112" r="82"/>
+            </clipPath>
+            <linearGradient id="skyBand1" x1="28" y1="30" x2="192" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#194256"/>
+              <stop offset="100%" stop-color="#2a687c"/>
+            </linearGradient>
+            <linearGradient id="sunGlow" x1="110" y1="45" x2="165" y2="125" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f6c667"/>
+              <stop offset="100%" stop-color="#d4933b"/>
+            </linearGradient>
+            <linearGradient id="riverGrad" x1="90" y1="125" x2="125" y2="195" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#33c2cf"/>
+              <stop offset="100%" stop-color="#105e78"/>
+            </linearGradient>
+            <linearGradient id="ringMetal" x1="25" y1="25" x2="195" y2="195" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#58e6e0"/>
+              <stop offset="50%" stop-color="#1c4a63"/>
+              <stop offset="100%" stop-color="#24d6d0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Interior del emblema circular -->
+          <g clip-path="url(#badgeClip)">
+            <rect x="24" y="26" width="172" height="172" fill="#0d2332"/>
+            <!-- Bandas atmosféricas superiores -->
+            <circle cx="110" cy="112" r="82" fill="url(#skyBand1)"/>
+            <circle cx="118" cy="108" r="64" fill="#23576b"/>
+            <circle cx="126" cy="104" r="48" fill="url(#sunGlow)" opacity="0.88"/>
+            <circle cx="130" cy="102" r="31" fill="#fbe1a1" opacity="0.72"/>
+
+            <!-- Nube estilizada izquierda -->
+            <path d="M52 84H98C103 84 106 80.5 106 76C106 71.8 102.8 68.5 98.6 68.2C97.2 61.5 91.2 56.5 84 56.5C77.5 56.5 72 60.5 69.8 66.2C68.6 65.8 67.3 65.5 66 65.5C59.4 65.5 54 70.9 54 77.5C54 79.8 54.7 82 55.8 83.8" fill="#d9eef5" stroke="#0b2230" stroke-width="2.2" stroke-linejoin="round"/>
+
+            <!-- Montañas / cordillera derecha -->
+            <path d="M122 128L150 76L176 112L194 94V146H122V128Z" fill="#6f6556" stroke="#0b2230" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M150 76L161 102L147 116L137 104L150 76Z" fill="#9a8d79"/>
+            <path d="M164 114L178 96L194 112V140H164V114Z" fill="#524a3f" stroke="#0b2230" stroke-width="2"/>
+
+            <!-- Pin de geolocalización central -->
+            <path d="M110 56C125.5 56 138 68.5 138 84C138 103.5 110 131 110 131C110 131 82 103.5 82 84C82 68.5 94.5 56 110 56Z" fill="#0b2434" stroke="#64efe9" stroke-width="2.4"/>
+            <circle cx="110" cy="84" r="11.5" fill="#eaf6fa"/>
+
+            <!-- Laderas / terrazas verdes y río -->
+            <path d="M26 134C54 128 84 134 106 144L92 196H26V134Z" fill="#3b5e47" stroke="#0b2230" stroke-width="2.2"/>
+            <path d="M194 116C168 118 144 130 130 148C118 164 114 180 112 196H194V116Z" fill="#4f7755" stroke="#0b2230" stroke-width="2.2"/>
+            <!-- Curvas topográficas en ladera derecha -->
+            <path d="M140 152C154 138 172 132 190 134" stroke="#8ab589" stroke-width="2" stroke-linecap="round"/>
+            <path d="M134 168C152 152 172 146 192 148" stroke="#8ab589" stroke-width="2" stroke-linecap="round"/>
+            <path d="M130 184C150 168 170 162 192 164" stroke="#8ab589" stroke-width="2" stroke-linecap="round"/>
+
+            <!-- Río sinuoso central -->
+            <path d="M104 136C116 144 96 158 104 172C110 182 102 190 94 196H122C130 186 132 174 124 162C116 150 128 140 120 134H104Z" fill="url(#riverGrad)" stroke="#0b2230" stroke-width="2"/>
+            <path d="M111 144C116 152 107 162 113 174" stroke="#a6f5fa" stroke-width="1.8" stroke-linecap="round"/>
+
+            <!-- Plataforma y balancín petrolero (Pumpjack) izquierda -->
+            <path d="M34 148L74 134L104 146V162L66 176L34 162V148Z" fill="#233746" stroke="#0b2230" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M34 148L66 161L104 146" stroke="#6894ad" stroke-width="1.6"/>
+            <!-- Caballete del balancín -->
+            <path d="M58 152L69 114L79 150" stroke="#d8e8f0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M62 136H75" stroke="#d8e8f0" stroke-width="2"/>
+            <!-- Viga y cabeza de caballo -->
+            <path d="M46 122L89 102" stroke="#f0c265" stroke-width="3.6" stroke-linecap="round"/>
+            <path d="M87 96C94 97.5 98 103 96.5 111L88.5 108Z" fill="#f0c265" stroke="#0b2230" stroke-width="1.8"/>
+            <!-- Varilla y contrapeso -->
+            <path d="M92 110V148" stroke="#eaf4f8" stroke-width="2" stroke-linecap="round"/>
+            <path d="M44 121L40 135H52L49 121Z" fill="#46687d" stroke="#0b2230" stroke-width="1.8"/>
+          </g>
+
+          <!-- Aro exterior principal -->
+          <circle cx="110" cy="112" r="82" stroke="url(#ringMetal)" stroke-width="5"/>
+          <circle cx="110" cy="112" r="86" stroke="#24d6d0" stroke-width="1" stroke-opacity="0.35"/>
+
+          <!-- Satélite de observación terrestre en borde superior derecho -->
+          <g transform="translate(166, 44) rotate(36)">
+            <!-- Paneles solares -->
+            <rect x="-34" y="-8" width="22" height="16" rx="2" fill="#2c7da0" stroke="#0b2230" stroke-width="2"/>
+            <line x1="-27" y1="-8" x2="-27" y2="8" stroke="#9be7ff" stroke-width="1.2"/>
+            <line x1="-20" y1="-8" x2="-20" y2="8" stroke="#9be7ff" stroke-width="1.2"/>
+            <line x1="-34" y1="0" x2="-12" y2="0" stroke="#9be7ff" stroke-width="1.2"/>
+
+            <rect x="12" y="-8" width="22" height="16" rx="2" fill="#2c7da0" stroke="#0b2230" stroke-width="2"/>
+            <line x1="19" y1="-8" x2="19" y2="8" stroke="#9be7ff" stroke-width="1.2"/>
+            <line x1="26" y1="-8" x2="26" y2="8" stroke="#9be7ff" stroke-width="1.2"/>
+            <line x1="12" y1="0" x2="34" y2="0" stroke="#9be7ff" stroke-width="1.2"/>
+
+            <!-- Cuerpo central y antena parabólica -->
+            <rect x="-9" y="-10" width="18" height="20" rx="3" fill="#dcebf2" stroke="#0b2230" stroke-width="2"/>
+            <path d="M-7 10C-7 16 7 16 7 10" stroke="#64efe9" stroke-width="2.2" fill="none"/>
+            <line x1="0" y1="10" x2="0" y2="17" stroke="#64efe9" stroke-width="1.8"/>
+          </g>
+        </svg>
+      </div>
+
+      <h1 class="hero-wordmark">
+        TERRITORI<span style="display:inline-flex;align-items:center;position:relative;color:#f2f9fc">A<svg viewBox="0 0 24 24" style="width:.52em;height:.52em;margin-left:-.34em;margin-top:.16em" fill="none"><path d="M4 18C4 10 11 5 20 5C20 14 15 20 7 20C5.8 20 4.8 19.3 4 18Z" fill="#31d67b"/><path d="M6 18C10 14 14 11 19 6" stroke="#071018" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      </h1>
+      <div class="hero-energy">ENERGY</div>
+      <div class="hero-subtitle">Plataforma Inteligente de Gestión</div>
+      <div class="hero-tagline">Datos para un mejor territorio</div>
+
+      <div class="launcher-grid">
+        <button class="launch-card" onclick="openPozosModal()">
+          <div class="launch-top"><div class="l-ico">⌖</div><span class="launch-arrow">↗</span></div>
+          <div><b>POZOS</b><small>Padrón GIS oficial + producción Res. 319/93</small></div>
+        </button>
+        <button class="launch-card" onclick="openInfraModal('ductos')">
+          <div class="launch-top"><div class="l-ico">⌇</div><span class="launch-arrow">↗</span></div>
+          <div><b>OLEODUCTOS</b><small>Ductos troncales y redes de transporte</small></div>
+        </button>
+        <button class="launch-card" onclick="openInfraModal('plantas')">
+          <div class="launch-top"><div class="l-ico">⬡</div><span class="launch-arrow">↗</span></div>
+          <div><b>PLANTAS</b><small>Baterías, PTC e instalaciones de superficie</small></div>
+        </button>
+        <button class="launch-card" onclick="openInfraModal('areas')">
+          <div class="launch-top"><div class="l-ico">▣</div><span class="launch-arrow">↗</span></div>
+          <div><b>ÁREAS</b><small>Concesiones, bloques y permisos vigentes</small></div>
+        </button>
+      </div>
+    </div>
   </section>
 
-  <main>
-    <section class="map-shell">
-      <div id="map"></div>
-      <div class="map-overlay">
-        <div class="badge"><b id="visible-count">0</b> POZOS VISIBLES</div>
-        <div class="badge"><b id="operator-count">0</b> OPERADORAS</div>
-        <div class="badge"><b id="nc-count">0</b> SHALE / VMUT</div>
+  <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>TERRITORIOS MÁS SEGUROS, SOSTENIBLES Y RESILIENTES</span><span id="footer-state">SISTEMA LISTO · SELECCIONÁ UN MÓDULO</span></footer>
+</div>
+
+<!-- Popup operativo de POZOS -->
+<div class="modal-backdrop" id="pozos-modal" onclick="if(event.target===this)closeAllModals()">
+  <div class="modal-window pozos-win">
+    <div class="modal-head">
+      <div class="modal-title">
+        <h3>PADRÓN DE POZOS · CUENCA NEUQUINA</h3>
+        <span id="pozos-modal-sub">GIS OFICIAL NEUQUÉN + PRODUCCIÓN RES. 319/93</span>
       </div>
-      <div class="legend"><span><i style="background:var(--cyan)"></i>Activo</span><span><i style="background:var(--amber)"></i>Inactivo</span><span><i style="background:var(--red)"></i>Abandonado</span></div>
+      <div class="modal-actions">
+        <button class="modal-close" onclick="closeAllModals()">✕ CERRAR POZOS</button>
+      </div>
+    </div>
+
+    <section class="toolbar">
+      <div class="field search"><label>Buscar pozo o UWI</label><input id="search" placeholder="Ej.: P13794 o La Caverna" /></div>
+      <div class="field"><label>Operadora</label><select id="operator"><option value="">Todas</option></select></div>
+      <div class="field"><label>Área legal</label><select id="area"><option value="">Todas</option></select></div>
+      <div class="field"><label>Yacimiento</label><select id="field"><option value="">Todos</option></select></div>
+      <div class="field"><label>Estado</label><select id="state"><option value="">Todos</option></select></div>
+      <button class="btn primary" id="reload">ACTUALIZAR</button>
     </section>
 
-    <aside class="side">
-      <section class="card">
-        <div class="card-head"><h2>Activo seleccionado</h2><span class="mono" id="last-update">SIN SELECCIÓN</span></div>
-        <div class="card-body" id="asset-card">
-          <div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica, productiva y ambiental aparecerá en este panel.</div></div>
+    <div class="pozos-body">
+      <section class="map-shell">
+        <div id="map"></div>
+        <div class="map-overlay">
+          <div class="badge"><b id="visible-count">0</b> POZOS VISIBLES</div>
+          <div class="badge"><b id="operator-count">0</b> OPERADORAS</div>
+          <div class="badge"><b id="nc-count">0</b> SHALE / VMUT</div>
         </div>
+        <div class="legend"><span><i style="background:var(--cyan)"></i>Activo</span><span><i style="background:var(--amber)"></i>Inactivo</span><span><i style="background:var(--red)"></i>Abandonado</span></div>
       </section>
 
-      <section class="card">
-        <div class="card-head"><h2>Indicadores técnicos</h2><span class="mono" id="tech-updated">ACT. PENDIENTE</span></div>
-        <div class="card-body"><div class="metrics">
-          <div class="metric"><span>Clase</span><strong id="m-class">—</strong></div>
-          <div class="metric"><span>Formación</span><strong class="cyan" id="m-formation">—</strong></div>
-          <div class="metric"><span>Reservorio</span><strong id="m-reservoir">—</strong></div>
-          <div class="metric"><span>Año perforación</span><strong id="m-year">—</strong></div>
-        </div></div>
-      </section>
-
-      <section class="card">
-        <div class="card-head"><h2>Producción declarada</h2><span class="mono" id="prod-period">RES. 319/93</span></div>
-        <div class="card-body">
-          <div class="metrics">
-            <div class="metric"><span>Petróleo</span><strong class="cyan" id="p-oil">—</strong><small id="p-oil-sub">m³/mes</small></div>
-            <div class="metric"><span>Gas</span><strong id="p-gas">—</strong><small id="p-gas-sub">Mm³/mes</small></div>
-            <div class="metric"><span>Agua</span><strong id="p-water">—</strong><small id="p-water-sub">m³/mes</small></div>
-            <div class="metric"><span>TEF</span><strong id="p-tef">—</strong><small id="p-tef-sub">horas</small></div>
+      <aside class="side">
+        <section class="card">
+          <div class="card-head"><h2>Activo seleccionado</h2><span class="mono" id="last-update">SIN SELECCIÓN</span></div>
+          <div class="card-body" id="asset-card">
+            <div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica, productiva y ambiental aparecerá en este panel.</div></div>
           </div>
-          <div style="height:8px"></div>
-          <div class="kv-row" style="padding-bottom:0;border-bottom:none">
-            <span>Estado de consulta</span>
-            <b class="mono" id="p-status">Esperando selección</b>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>Indicadores técnicos</h2><span class="mono" id="tech-updated">ACT. PENDIENTE</span></div>
+          <div class="card-body"><div class="metrics">
+            <div class="metric"><span>Clase</span><strong id="m-class">—</strong></div>
+            <div class="metric"><span>Formación</span><strong class="cyan" id="m-formation">—</strong></div>
+            <div class="metric"><span>Reservorio</span><strong id="m-reservoir">—</strong></div>
+            <div class="metric"><span>Año perforación</span><strong id="m-year">—</strong></div>
+          </div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>Producción declarada</h2><span class="mono" id="prod-period">RES. 319/93</span></div>
+          <div class="card-body">
+            <div class="metrics">
+              <div class="metric"><span>Petróleo</span><strong class="cyan" id="p-oil">—</strong><small id="p-oil-sub">m³/mes</small></div>
+              <div class="metric"><span>Gas</span><strong id="p-gas">—</strong><small id="p-gas-sub">Mm³/mes</small></div>
+              <div class="metric"><span>Agua</span><strong id="p-water">—</strong><small id="p-water-sub">m³/mes</small></div>
+              <div class="metric"><span>TEF</span><strong id="p-tef">—</strong><small id="p-tef-sub">horas</small></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="kv-row" style="padding-bottom:0;border-bottom:none">
+              <span>Estado de consulta</span>
+              <b class="mono" id="p-status">Esperando selección</b>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="card">
-        <div class="card-head"><h2>Datos técnicos del pozo</h2><span class="mono" id="wfs-updated">WFS · NEUQUÉN</span></div>
-        <div class="card-body"><div class="kv" id="tech-kv">
-          <div class="kv-row"><span>Esperando selección</span><b>—</b></div>
-        </div></div>
-      </section>
+        <section class="card">
+          <div class="card-head"><h2>Datos técnicos del pozo</h2><span class="mono" id="wfs-updated">WFS · NEUQUÉN</span></div>
+          <div class="card-body"><div class="kv" id="tech-kv">
+            <div class="kv-row"><span>Esperando selección</span><b>—</b></div>
+          </div></div>
+        </section>
 
-      <section class="card">
-        <div class="card-head"><h2>Condición ambiental del punto</h2><span id="weather-time">SIN DATOS</span></div>
-        <div class="card-body">
-          <div class="weather-grid">
-            <div class="weather"><span>Temperatura</span><strong id="w-temp">—</strong><small>2 m</small></div>
-            <div class="weather"><span>Viento</span><strong id="w-wind">—</strong><small id="w-dir">Dirección —</small></div>
-            <div class="weather"><span>Ráfagas</span><strong id="w-gust">—</strong><small>10 m</small></div>
-            <div class="weather"><span>Precipitación</span><strong id="w-rain">—</strong><small>actual</small></div>
-            <div class="weather"><span>Humedad</span><strong id="w-hum">—</strong><small>relativa</small></div>
-            <div class="weather"><span>Presión</span><strong id="w-press">—</strong><small>superficie</small></div>
+        <section class="card">
+          <div class="card-head"><h2>Condición ambiental del punto</h2><span id="weather-time">SIN DATOS</span></div>
+          <div class="card-body">
+            <div class="weather-grid">
+              <div class="weather"><span>Temperatura</span><strong id="w-temp">—</strong><small>2 m</small></div>
+              <div class="weather"><span>Viento</span><strong id="w-wind">—</strong><small>Dirección —</small></div>
+              <div class="weather"><span>Ráfagas</span><strong id="w-gust">—</strong><small>10 m</small></div>
+              <div class="weather"><span>Precipitación</span><strong id="w-rain">—</strong><small>actual</small></div>
+              <div class="weather"><span>Humedad</span><strong id="w-hum">—</strong><small>relativa</small></div>
+              <div class="weather"><span>Presión</span><strong id="w-press">—</strong><small>superficie</small></div>
+            </div>
+            <div style="height:9px"></div>
+            <div class="risk"><div><strong id="risk-title">TERRITORIA · SIN EVALUAR</strong><br><span id="risk-text">Seleccioná un pozo para consultar su entorno.</span></div><div style="font-size:24px" id="risk-icon">○</div></div>
           </div>
-          <div style="height:9px"></div>
-          <div class="risk"><div><strong id="risk-title">TERRITORIA · SIN EVALUAR</strong><br><span id="risk-text">Seleccioná un pozo para consultar su entorno.</span></div><div style="font-size:24px" id="risk-icon">○</div></div>
-        </div>
-      </section>
-    </aside>
-  </main>
-
-  <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>DATOS PÚBLICOS · SIN TELEMETRÍA PRIVADA</span><span id="footer-state">SISTEMA EN ESPERA</span></footer>
+        </section>
+      </aside>
+    </div>
+  </div>
 </div>
 
 <!-- Popup operativo de Infraestructura -->
-<div class="modal-backdrop" id="infra-modal" onclick="if(event.target===this)closeInfraModal()">
+<div class="modal-backdrop" id="infra-modal" onclick="if(event.target===this)closeAllModals()">
   <div class="modal-window">
     <div class="modal-head">
       <div class="modal-title">
@@ -270,7 +472,7 @@
         <span id="infra-modal-sub">RED DE TRANSPORTE E INFRAESTRUCTURA · CUENCA NEUQUINA</span>
       </div>
       <div class="modal-actions">
-        <button class="modal-close" onclick="closeInfraModal()">✕ CERRAR VISOR</button>
+        <button class="modal-close" onclick="closeAllModals()">✕ CERRAR VISOR</button>
       </div>
     </div>
     <div class="modal-body">
@@ -317,40 +519,66 @@
     filtered: [],
     selected: null,
     hasFittedOnce: false,
+    pozosInitialized: false,
     catalogUpdatedAt: null,
     api: 'https://territoria-energy-api.elexpreso17.workers.dev'
   };
 
-  const canvasRenderer = L.canvas({ padding: 0.4 });
-  const map = L.map('map', {
-    zoomControl: true,
-    minZoom: 4,
-    maxZoom: 18,
-    preferCanvas: true,
-    renderer: canvasRenderer
-  }).setView([-38.4,-69.1],7);
+  let map = null;
+  let canvasRenderer = null;
+  let markerLayer = null;
 
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(map);
-  const markerLayer = L.layerGroup().addTo(map);
-
-  /* Mapa secundario para el popup de Oleoductos / Plantas / Áreas */
   let infraMap = null;
   let infraLayerGroup = null;
   let infraRawFeatures = [];
   let infraCurrentType = null;
 
   function setActiveNav(key){
-    ['pozos','ductos','plantas','areas'].forEach(k => {
+    ['inicio','pozos','ductos','plantas','areas'].forEach(k => {
       const btn = $('nav-' + k);
       if(btn) btn.classList.toggle('active', k === key);
     });
   }
 
+  function closeAllModals(){
+    $('pozos-modal').classList.remove('open');
+    $('infra-modal').classList.remove('open');
+    setActiveNav('inicio');
+  }
+
+  function openPozosModal(){
+    $('infra-modal').classList.remove('open');
+    $('pozos-modal').classList.add('open');
+    setActiveNav('pozos');
+
+    if(!map){
+      canvasRenderer = L.canvas({ padding: 0.4 });
+      map = L.map('map', {
+        zoomControl: true,
+        minZoom: 4,
+        maxZoom: 18,
+        preferCanvas: true,
+        renderer: canvasRenderer
+      }).setView([-38.4,-69.1],7);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+      markerLayer = L.layerGroup().addTo(map);
+    }
+
+    setTimeout(() => map.invalidateSize(), 60);
+
+    if(!state.pozosInitialized){
+      state.pozosInitialized = true;
+      loadData(false);
+    }
+  }
+
   async function openInfraModal(tipo){
     infraCurrentType = tipo;
+    $('pozos-modal').classList.remove('open');
     setActiveNav(tipo);
     const titles = {
       ductos: ['OLEODUCTOS Y DUCTOS TRONCALES', 'RED DE TRANSPORTE DE HIDROCARBUROS'],
@@ -443,11 +671,6 @@
     if(shouldFit && layer.getBounds && layer.getBounds().isValid()){
       infraMap.fitBounds(layer.getBounds(), { padding:[30,30], maxZoom:13 });
     }
-  }
-
-  function closeInfraModal(){
-    $('infra-modal').classList.remove('open');
-    setActiveNav('pozos');
   }
 
   function tick(){
@@ -574,7 +797,7 @@
     $('tech-updated').textContent = 'ACTUALIZANDO…';
     $('footer-state').textContent='CONSULTANDO FUENTE OFICIAL';
     state.all=[];
-    markerLayer.clearLayers();
+    if(markerLayer) markerLayer.clearLayers();
     updateCounters();
 
     const limite = 1000;
@@ -695,6 +918,7 @@
   }
 
   function renderMarkers(shouldFit=false){
+    if(!markerLayer || !map) return;
     markerLayer.clearLayers();
     const bounds=[];
     state.filtered.forEach(x => {
@@ -818,7 +1042,7 @@
 
     if(coords){
       const [lat, lon] = coords;
-      map.flyTo([lat,lon],15,{duration:.7});
+      if(map) map.flyTo([lat,lon],15,{duration:.7});
       await Promise.all([loadWeather(lat,lon), loadProduction(x)]);
     }else{
       await loadProduction(x);
@@ -868,8 +1092,6 @@
     $('risk-icon').style.color=color;
   }
   function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}
-
-  loadData(false);
 </script>
 </body>
 </html>
