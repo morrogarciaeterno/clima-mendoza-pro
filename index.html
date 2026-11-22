@@ -142,7 +142,6 @@
       filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
     }
 
-    /* POPUP COMPACTO EN EL MARCADOR DEL MAPA */
     .leaflet-popup-content-wrapper,
     .leaflet-popup-tip {
       background: rgba(15, 23, 42, 0.98);
@@ -202,7 +201,6 @@
       cursor: pointer;
     }
 
-    /* KPIs SUPERIORES */
     .kpi-carousel {
       position: absolute;
       top: 10px;
@@ -252,7 +250,6 @@
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
-    /* BOTONES FLOTANTES A LA IZQUIERDA */
     .fab-stack {
       position: absolute;
       left: 12px;
@@ -283,7 +280,6 @@
       background: rgba(14, 165, 233, 0.3);
     }
 
-    /* DRAWER DE CAPAS */
     .layers-drawer {
       position: absolute;
       left: 62px;
@@ -337,7 +333,6 @@
       margin-right: 7px;
     }
 
-    /* FICHA TÉCNICA POPUP LATERAL CON SCROLL PROLIJO */
     .side-popup-card {
       position: absolute;
       top: 74px;
@@ -630,7 +625,7 @@
       </div>
 
       <div class="sector-bar">
-        <button class="sector-btn active" data-sector="vmSur" onclick="flyToSector('vmSur', this)">VM Sur · Añelo</button>
+        <button class="sector-btn active" data-sector="vmSur" onclick="flyToSector('vmSur', this)">VM Sur · Añelo (Nqn)</button>
         <button class="sector-btn" data-sector="vmNorte" onclick="flyToSector('vmNorte', this)">VM Norte · Malargüe</button>
         <button class="sector-btn" data-sector="cuyana" onclick="flyToSector('cuyana', this)">Cuyana · Mendoza</button>
       </div>
@@ -640,8 +635,8 @@
       <div class="kpi-carousel">
         <div class="kpi-card">
           <div class="kpi-label">Pozos / Áreas (Ref)</div>
-          <div class="kpi-value" id="kpi-pozos">142</div>
-          <div class="kpi-sub up" id="kpi-pozos-sub">+6 en fractura</div>
+          <div class="kpi-value" id="kpi-pozos">6 Áreas</div>
+          <div class="kpi-sub up" id="kpi-pozos-sub">Cuenca Neuquina · Nqn</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Prod. Bloque (Ref)</div>
@@ -662,15 +657,13 @@
 
       <div id="map"></div>
 
-      <!-- BOTONES FLOTANTES A LA IZQUIERDA -->
       <div class="fab-stack">
-        <button class="fab-btn active" id="btn-ficha-toggle" title="Abrir/Cerrar Ficha Técnica" onclick="toggleSideCard()">📋</button>
+        <button class="fab-btn" id="btn-ficha-toggle" title="Abrir/Cerrar Ficha Técnica" onclick="toggleSideCard()">📋</button>
         <button class="fab-btn" id="btn-layers" title="Capas" onclick="toggleLayersDrawer()">🗂️</button>
         <button class="fab-btn" id="btn-refresh" title="Actualizar telemetría" onclick="refreshTelemetry()">🔄</button>
         <button class="fab-btn" id="btn-center" title="Centrar sector" onclick="recenterCurrentSector()">🎯</button>
       </div>
 
-      <!-- PANEL DE CAPAS -->
       <div class="layers-drawer" id="layers-drawer">
         <div class="drawer-title">
           <span>Capas del Mapa</span>
@@ -694,11 +687,10 @@
         </label>
       </div>
 
-      <!-- FICHA TÉCNICA POPUP LATERAL CON SCROLL -->
-      <aside class="side-popup-card open" id="side-popup-card">
+      <aside class="side-popup-card" id="side-popup-card">
         <div class="card-header">
           <div>
-            <div class="card-well-id" id="card-title">YPF.Nq.LCa-314(h)</div>
+            <div class="card-well-id" id="card-title">Yac. Loma Campana · LCa-314(h)</div>
             <div class="card-well-sub" id="card-sub">Loma Campana (Neuquén) · YPF S.A.</div>
           </div>
           <button class="card-close-btn" title="Cerrar ficha" onclick="closeSideCard()">✕</button>
@@ -785,7 +777,7 @@
 
     const map = L.map('map', {
       zoomControl: false
-    }).setView([-38.30, -68.82], 11);
+    }).setView([-38.30, -68.82], 10);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap | Territoria',
@@ -802,12 +794,12 @@
 
     const sectorConfig = {
       vmSur: {
-        name: 'VM Sur · Añelo',
+        name: 'VM Sur · Añelo (Nqn)',
         lat: -38.30,
         lon: -68.82,
-        zoom: 11,
-        pozos: '142',
-        pozosSub: '+6 en fractura',
+        zoom: 10,
+        pozos: '6 Áreas',
+        pozosSub: 'Cuenca Neuquina · Nqn',
         prod: '14.820 m³/d',
         prodSub: '▲ 4.2% mensual',
         wellIndex: 0
@@ -821,7 +813,7 @@
         pozosSub: 'Malargüe / Sur Mza',
         prod: '1.840 m³/d',
         prodSub: 'No Conv. + Conv.',
-        wellIndex: 3
+        wellIndex: 6
       },
       cuyana: {
         name: 'Cuyana · Mendoza',
@@ -832,18 +824,18 @@
         pozosSub: 'Luján / Tupungato / Riv.',
         prod: '4.650 m³/d',
         prodSub: 'Recuperación 2ª',
-        wellIndex: 9
+        wellIndex: 12
       }
     };
 
     const wellsData = [
-      // VM SUR - AÑELO (0..2)
+      // NEUQUÉN - VACA MUERTA / CUENCA NEUQUINA (0..5)
       {
         sector: 'vmSur',
-        id: 'YPF.Nq.LCa-314(h)',
-        shortLabel: 'LCa-314(h)',
+        id: 'Yac. Loma Campana · LCa-314(h)',
+        shortLabel: 'Loma Campana',
         operadora: 'YPF S.A.',
-        area: 'Loma Campana (Neuquén)',
+        area: 'Loma Campana · Añelo (Neuquén)',
         formacion: 'Vaca Muerta · Shale Oil',
         status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
         surface: [-38.315, -68.810],
@@ -862,32 +854,10 @@
       },
       {
         sector: 'vmSur',
-        id: 'YPF.Nq.LCa-409(h)',
-        shortLabel: 'LCa-409(h)',
-        operadora: 'YPF S.A.',
-        area: 'Loma Campana (Neuquén)',
-        formacion: 'Vaca Muerta · Shale Oil',
-        status: 'EN PRODUCCIÓN · PAD HORIZONTAL',
-        surface: [-38.332, -68.785],
-        bottom: [-38.305, -68.770],
-        tvd: '3.010 m',
-        lat: '2.950 m',
-        stages: '40 etapas',
-        sand: '10.200 tn',
-        waterInj: '51.400 m³',
-        gasRate: '81k m³/d',
-        waterRate: '18 m³/d',
-        pressure: '615 bar',
-        rate: '162 m³/d',
-        color: '#10b981',
-        history: [230, 210, 195, 180, 170, 162]
-      },
-      {
-        sector: 'vmSur',
-        id: 'VIS.Nq.BPO-2108(h)',
-        shortLabel: 'BPO-2108(h)',
+        id: 'Yac. Bajada del Palo Oeste · BPO-2108(h)',
+        shortLabel: 'Bajada del Palo O.',
         operadora: 'Vista Energy',
-        area: 'Bajada del Palo Oeste (Neuquén)',
+        area: 'Bajada del Palo Oeste · Añelo (Neuquén)',
         formacion: 'Vaca Muerta · Shale Oil',
         status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
         surface: [-38.240, -68.930],
@@ -904,8 +874,96 @@
         color: '#10b981',
         history: [295, 270, 250, 236, 222, 214]
       },
+      {
+        sector: 'vmSur',
+        id: 'Yac. Fortín de Piedra · FdP-204(h)',
+        shortLabel: 'Fortín de Piedra',
+        operadora: 'Tecpetrol',
+        area: 'Fortín de Piedra · Añelo (Neuquén)',
+        formacion: 'Vaca Muerta · Tight / Shale Gas',
+        status: 'DESARROLLO ACTIVO · SHALE GAS',
+        surface: [-38.445, -68.860],
+        bottom: [-38.420, -68.842],
+        tvd: '3.060 m',
+        lat: '2.800 m',
+        stages: '38 etapas',
+        sand: '9.800 tn',
+        waterInj: '49.200 m³',
+        gasRate: '420k m³/d',
+        waterRate: '12 m³/d',
+        pressure: '710 bar',
+        rate: '92 m³/d',
+        color: '#38bdf8',
+        history: [104, 100, 97, 95, 93, 92]
+      },
+      {
+        sector: 'vmSur',
+        id: 'Yac. La Amarga Chica · LACh-118(h)',
+        shortLabel: 'La Amarga Chica',
+        operadora: 'YPF / Petronas',
+        area: 'La Amarga Chica · Añelo (Neuquén)',
+        formacion: 'Vaca Muerta · Shale Oil',
+        status: 'DESARROLLO SHALE · AÑELO NQN',
+        surface: [-38.205, -68.765],
+        bottom: [-38.178, -68.750],
+        tvd: '2.940 m',
+        lat: '3.020 m',
+        stages: '40 etapas',
+        sand: '10.500 tn',
+        waterInj: '52.600 m³',
+        gasRate: '88k m³/d',
+        waterRate: '19 m³/d',
+        pressure: '650 bar',
+        rate: '174 m³/d',
+        color: '#10b981',
+        history: [198, 192, 185, 180, 177, 174]
+      },
+      {
+        sector: 'vmSur',
+        id: 'Yac. Bandurria Sur · BdS-215(h)',
+        shortLabel: 'Bandurria Sur',
+        operadora: 'YPF / Equinor / Shell',
+        area: 'Bandurria Sur · Añelo (Neuquén)',
+        formacion: 'Vaca Muerta · Shale Oil',
+        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
+        surface: [-38.375, -68.965],
+        bottom: [-38.350, -68.950],
+        tvd: '2.910 m',
+        lat: '2.880 m',
+        stages: '39 etapas',
+        sand: '10.100 tn',
+        waterInj: '50.900 m³',
+        gasRate: '79k m³/d',
+        waterRate: '17 m³/d',
+        pressure: '625 bar',
+        rate: '158 m³/d',
+        color: '#10b981',
+        history: [182, 176, 171, 166, 162, 158]
+      },
+      {
+        sector: 'vmSur',
+        id: 'Yac. Sierras Blancas · SB-109(h)',
+        shortLabel: 'Sierras Blancas',
+        operadora: 'Shell Argentina',
+        area: 'Sierras Blancas · Añelo (Neuquén)',
+        formacion: 'Vaca Muerta · Shale Oil',
+        status: 'PRODUCCIÓN ACTIVA · AÑELO NQN',
+        surface: [-38.285, -68.675],
+        bottom: [-38.260, -68.660],
+        tvd: '3.020 m',
+        lat: '2.920 m',
+        stages: '41 etapas',
+        sand: '10.400 tn',
+        waterInj: '53.100 m³',
+        gasRate: '84k m³/d',
+        waterRate: '15 m³/d',
+        pressure: '660 bar',
+        rate: '169 m³/d',
+        color: '#10b981',
+        history: [192, 186, 180, 176, 172, 169]
+      },
 
-      // VM NORTE - MALARGÜE (3..8)
+      // VM NORTE - MALARGÜE (6..11)
       {
         sector: 'vmNorte',
         id: 'Yac. CN VII A · Pozo CN7A-102(h)',
@@ -1039,7 +1097,7 @@
         history: [55, 54, 54, 53, 52, 52]
       },
 
-      // CUENCA CUYANA - MENDOZA (9..14)
+      // CUENCA CUYANA - MENDOZA (12..17)
       {
         sector: 'cuyana',
         id: 'Yac. Barrancas · Pozo Barr-812',
@@ -1250,8 +1308,12 @@
     }
 
     [
-      { name: 'Loma Campana', coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]], color: '#38bdf8' },
-      { name: 'Bajada del Palo Oeste', coords: [[-38.28, -69.00], [-38.18, -69.00], [-38.18, -68.88], [-38.28, -68.88]], color: '#0ea5e9' },
+      { name: 'Loma Campana (Nqn)', coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]], color: '#38bdf8' },
+      { name: 'Bajada del Palo Oeste (Nqn)', coords: [[-38.28, -69.00], [-38.18, -69.00], [-38.18, -68.88], [-38.28, -68.88]], color: '#0ea5e9' },
+      { name: 'Fortín de Piedra (Nqn)', coords: [[-38.50, -68.93], [-38.40, -68.93], [-38.40, -68.79], [-38.50, -68.79]], color: '#38bdf8' },
+      { name: 'La Amarga Chica (Nqn)', coords: [[-38.23, -68.82], [-38.14, -68.82], [-38.14, -68.70], [-38.23, -68.70]], color: '#10b981' },
+      { name: 'Bandurria Sur (Nqn)', coords: [[-38.42, -69.03], [-38.32, -69.03], [-38.32, -68.90], [-38.42, -68.90]], color: '#10b981' },
+      { name: 'Sierras Blancas (Nqn)', coords: [[-38.33, -68.73], [-38.23, -68.73], [-38.23, -68.61], [-38.33, -68.61]], color: '#38bdf8' },
       { name: 'CN VII A - Malargüe', coords: [[-37.06, -69.63], [-36.92, -69.63], [-36.92, -69.46], [-37.06, -69.46]], color: '#f59e0b' },
       { name: 'Chachahuén - Malargüe', coords: [[-37.40, -69.05], [-37.22, -69.05], [-37.22, -68.80], [-37.40, -68.80]], color: '#10b981' },
       { name: 'Barrancas / Vizcacheras - Cuyana', coords: [[-33.52, -68.85], [-33.08, -68.85], [-33.08, -68.42], [-33.52, -68.42]], color: '#38bdf8' }
@@ -1435,7 +1497,7 @@
       document.getElementById('btn-ficha-toggle').classList.toggle('active', isOpen);
     }
 
-    function selectWell(w, showCard = true) {
+    function selectWell(w, showCard = false) {
       document.getElementById('card-title').textContent = w.id;
       document.getElementById('card-sub').textContent = `${w.area} · ${w.operadora}`;
 
@@ -1512,7 +1574,7 @@
       document.getElementById('kpi-prod').textContent = cfg.prod;
       document.getElementById('kpi-prod-sub').textContent = cfg.prodSub;
 
-      selectWell(wellsData[cfg.wellIndex], true);
+      selectWell(wellsData[cfg.wellIndex], false);
       refreshTelemetry();
     }
 
@@ -1520,7 +1582,7 @@
       flyToSector(currentSector, null);
     }
 
-    selectWell(wellsData[0], true);
+    selectWell(wellsData[0], false);
     refreshTelemetry();
   </script>
 </body>
