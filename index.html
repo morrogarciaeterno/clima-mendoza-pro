@@ -21,19 +21,19 @@
     .app{height:100%;display:grid;grid-template-rows:68px 1fr 30px;background:radial-gradient(circle at 50% 28%,rgba(36,214,208,.09) 0%,transparent 48%),radial-gradient(circle at 10% 0%,#10293a 0%,transparent 28%),var(--bg)}
     header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(7,16,24,.96);backdrop-filter:blur(14px)}
 
-    /* Logo homologado Territoria Energy + Upstream en zócalo superior */
-    .brand{display:flex;align-items:center;gap:13px;text-decoration:none;color:inherit;user-select:none}
+    /* Logo compacto + Upstream en margen superior izquierdo */
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;user-select:none}
     .logo-emblem{
-      width:46px;height:46px;border-radius:50%;
+      width:44px;height:44px;border-radius:50%;
       background:radial-gradient(circle at 35% 30%,#14394d,#081824);
       border:1.5px solid rgba(36,214,208,.55);
       display:grid;place-items:center;
       box-shadow:0 0 22px rgba(36,214,208,.22), inset 0 1px 0 rgba(255,255,255,.12);
       position:relative;flex-shrink:0;
     }
-    .logo-emblem svg{width:42px;height:42px;display:block}
+    .logo-emblem svg{width:40px;height:40px;display:block}
     .brand-copy{display:flex;flex-direction:column;justify-content:center}
-    .brand-title{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:900;letter-spacing:.09em;line-height:1.1;color:#f1f9fc}
+    .brand-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:900;letter-spacing:.09em;line-height:1.1;color:#f1f9fc}
     .brand-title .energy-word{
       font-weight:800;letter-spacing:.14em;
       background:linear-gradient(90deg,#24d6d0,#67f3ee);
@@ -41,21 +41,26 @@
     }
     .brand-divider{width:1px;height:16px;background:rgba(127,154,170,.35)}
     .brand-tag{
-      font-family:"JetBrains Mono",monospace;font-size:9.5px;font-weight:700;
-      padding:3px 7px;border-radius:5px;letter-spacing:.11em;
-      background:linear-gradient(135deg,rgba(36,214,208,.16),rgba(14,165,183,.08));
-      border:1px solid rgba(36,214,208,.4);color:var(--cyan);
-      display:inline-flex;align-items:center;gap:5px;
+      font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;
+      padding:4px 9px;border-radius:6px;letter-spacing:.13em;
+      background:linear-gradient(135deg,rgba(36,214,208,.18),rgba(14,165,183,.08));
+      border:1px solid rgba(36,214,208,.45);color:var(--cyan);
+      display:inline-flex;align-items:center;gap:6px;
     }
-    .brand-tag::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+    .brand-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
     .brand-sub{color:var(--muted);font-size:9.5px;letter-spacing:.15em;margin-top:4px;font-weight:600;text-transform:uppercase}
+
+    /* En la portada inicial (cuando el logo principal está al centro), dejamos solo el emblema + UPSTREAM arriba */
+    body.on-home .brand-wordmark,
+    body.on-home .brand-divider,
+    body.on-home .brand-sub{display:none}
 
     .top-status{display:flex;align-items:center;gap:9px}
     .status-pill,.clock,.source-pill{border:1px solid var(--line);background:var(--panel);padding:8px 11px;border-radius:9px;font-size:11px;color:var(--muted);white-space:nowrap}
     .status-pill{color:#bffbd8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px var(--green)}
     .clock{font-family:"JetBrains Mono";color:var(--text)}
 
-    /* Pantalla de inicio con el logo Territoria Energy */
+    /* Pantalla de inicio con el logo Territoria Energy en el centro */
     .home-stage{
       position:relative;min-height:0;padding:18px;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -188,9 +193,10 @@
     @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}.brand-sub{display:none}.launcher-grid{grid-template-columns:1fr}.hero-emblem-wrap{width:150px;height:150px}.hero-emblem-wrap svg{width:146px;height:146px}}
   </style>
 </head>
-<body>
+<body class="on-home">
 <div class="app">
   <header>
+    <!-- Margen superior izquierdo: Emblema + UPSTREAM (en portada) / Marca completa + UPSTREAM (en visores) -->
     <a class="brand" href="#top" onclick="closeAllModals();return false;">
       <div class="logo-emblem" aria-hidden="true">
         <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -234,7 +240,7 @@
       </div>
       <div class="brand-copy">
         <div class="brand-title">
-          <span>TERRITORI<span style="display:inline-flex;align-items:center">A<svg viewBox="0 0 24 24" style="width:.58em;height:.58em;margin-left:-.34em;margin-top:.14em" fill="none"><path d="M4 18C4 10 11 5 20 5C20 14 15 20 7 20C5.8 20 4.8 19.3 4 18Z" fill="#31d67b"/><path d="M6 18C10 14 14 11 19 6" stroke="#071018" stroke-width="2" stroke-linecap="round"/></svg></span> <span class="energy-word">ENERGY</span></span>
+          <span class="brand-wordmark">TERRITORI<span style="display:inline-flex;align-items:center">A<svg viewBox="0 0 24 24" style="width:.58em;height:.58em;margin-left:-.34em;margin-top:.14em" fill="none"><path d="M4 18C4 10 11 5 20 5C20 14 15 20 7 20C5.8 20 4.8 19.3 4 18Z" fill="#31d67b"/><path d="M6 18C10 14 14 11 19 6" stroke="#071018" stroke-width="2" stroke-linecap="round"/></svg></span> <span class="energy-word">ENERGY</span></span>
           <span class="brand-divider"></span>
           <span class="brand-tag">UPSTREAM</span>
         </div>
@@ -445,7 +451,7 @@
           <div class="card-body">
             <div class="weather-grid">
               <div class="weather"><span>Temperatura</span><strong id="w-temp">—</strong><small>2 m</small></div>
-              <div class="weather"><span>Viento</span><strong id="w-wind">—</strong><small id="w-dir">Dirección —</small></div>
+              <div class="weather"><span>Viento</span><strong id="w-wind">—</strong><small>Dirección —</small></div>
               <div class="weather"><span>Ráfagas</span><strong id="w-gust">—</strong><small>10 m</small></div>
               <div class="weather"><span>Precipitación</span><strong id="w-rain">—</strong><small>actual</small></div>
               <div class="weather"><span>Humedad</span><strong id="w-hum">—</strong><small>relativa</small></div>
@@ -548,6 +554,7 @@
     const im = $('infra-modal');
     if(pm) pm.classList.remove('open');
     if(im) im.classList.remove('open');
+    document.body.classList.add('on-home');
   }
 
   function openPozosModal(){
@@ -555,6 +562,7 @@
     const pm = $('pozos-modal');
     if(im) im.classList.remove('open');
     if(pm) pm.classList.add('open');
+    document.body.classList.remove('on-home');
 
     if(!map){
       canvasRenderer = L.canvas({ padding: 0.4 });
@@ -585,6 +593,7 @@
     infraCurrentType = tipo;
     const pm = $('pozos-modal');
     if(pm) pm.classList.remove('open');
+    document.body.classList.remove('on-home');
     ['ductos','plantas','areas'].forEach(k => {
       const btn = $('sw-' + k);
       if(btn) btn.classList.toggle('active', k === tipo);
