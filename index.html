@@ -9,137 +9,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <style>
-    :root {
-      --bg:#071018; --panel:#0b1722; --panel2:#0e1c28; --panel3:#102332;
-      --line:#1f3545; --text:#eaf4f8; --muted:#7f9aaa; --cyan:#24d6d0;
-      --cyan2:#0ea5b7; --green:#31d67b; --amber:#f4b544; --red:#ff5e68;
-      --blue:#5aa7ff; --purple:#9b88ff; --shadow:0 18px 50px rgba(0,0,0,.34);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
-    button,input,select{font:inherit}
+    :root{--bg:#071018;--panel:#0b1722;--panel2:#0e1c28;--panel3:#102332;--line:#1f3545;--text:#eaf4f8;--muted:#7f9aaa;--cyan:#24d6d0;--cyan2:#0ea5b7;--green:#31d67b;--amber:#f4b544;--red:#ff5e68;--blue:#5aa7ff;--purple:#9b88ff;--shadow:0 18px 50px rgba(0,0,0,.34)}
+    *{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}button,input,select{font:inherit}
     .app{height:100%;display:grid;grid-template-rows:68px 1fr 30px;background:radial-gradient(circle at 50% 28%,rgba(36,214,208,.09) 0%,transparent 48%),radial-gradient(circle at 10% 0%,#10293a 0%,transparent 28%),var(--bg)}
     header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(7,16,24,.96);backdrop-filter:blur(14px)}
-
     .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;user-select:none}
-    .logo-emblem{
-      width:44px;height:44px;border-radius:50%;
-      background:radial-gradient(circle at 35% 30%,#14394d,#081824);
-      border:1.5px solid rgba(36,214,208,.55);
-      display:grid;place-items:center;
-      box-shadow:0 0 22px rgba(36,214,208,.22), inset 0 1px 0 rgba(255,255,255,.12);
-      position:relative;flex-shrink:0;
-    }
-    .logo-emblem svg{width:40px;height:40px;display:block}
-    .brand-copy{display:flex;flex-direction:column;justify-content:center}
+    .logo-emblem{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#14394d,#081824);border:1.5px solid rgba(36,214,208,.55);display:grid;place-items:center;box-shadow:0 0 22px rgba(36,214,208,.22),inset 0 1px 0 rgba(255,255,255,.12);position:relative;flex-shrink:0}
+    .logo-emblem svg{width:40px;height:40px;display:block}.brand-copy{display:flex;flex-direction:column;justify-content:center}
     .brand-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:900;letter-spacing:.09em;line-height:1.1;color:#f1f9fc}
-    .brand-title .energy-word{
-      font-weight:800;letter-spacing:.14em;
-      background:linear-gradient(90deg,#24d6d0,#67f3ee);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    }
+    .brand-title .energy-word{font-weight:800;letter-spacing:.14em;background:linear-gradient(90deg,#24d6d0,#67f3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .brand-divider{width:1px;height:16px;background:rgba(127,154,170,.35)}
-    .brand-tag{
-      font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;
-      padding:4px 9px;border-radius:6px;letter-spacing:.13em;
-      background:linear-gradient(135deg,rgba(36,214,208,.18),rgba(14,165,183,.08));
-      border:1px solid rgba(36,214,208,.45);color:var(--cyan);
-      display:inline-flex;align-items:center;gap:6px;
-    }
+    .brand-tag{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;padding:4px 9px;border-radius:6px;letter-spacing:.13em;background:linear-gradient(135deg,rgba(36,214,208,.18),rgba(14,165,183,.08));border:1px solid rgba(36,214,208,.45);color:var(--cyan);display:inline-flex;align-items:center;gap:6px}
     .brand-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
     .brand-sub{color:var(--muted);font-size:9.5px;letter-spacing:.15em;margin-top:4px;font-weight:600;text-transform:uppercase}
-
-    body.on-home .brand-wordmark,
-    body.on-home .brand-divider,
-    body.on-home .brand-sub{display:none}
-
-    .top-status{display:flex;align-items:center;gap:9px}
-    .status-pill,.clock,.source-pill{border:1px solid var(--line);background:var(--panel);padding:8px 11px;border-radius:9px;font-size:11px;color:var(--muted);white-space:nowrap}
-    .status-pill{color:#bffbd8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px var(--green)}
-    .clock{font-family:"JetBrains Mono";color:var(--text)}
-
-    .home-stage{
-      position:relative;min-height:0;padding:18px;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      overflow:auto;
-      background-image:
-        linear-gradient(rgba(36,214,208,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(36,214,208,.03) 1px, transparent 1px);
-      background-size:42px 42px;
-    }
-    .hero-hub{
-      width:min(880px,96%);
-      display:flex;flex-direction:column;align-items:center;text-align:center;
-      padding:28px 26px 26px;
-      background:linear-gradient(170deg,rgba(14,28,40,.92),rgba(8,18,27,.95));
-      border:1px solid #223f52;border-radius:20px;
-      box-shadow:0 26px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
-      backdrop-filter:blur(12px);
-    }
-    .hero-emblem-wrap{
-      position:relative;width:196px;height:196px;margin-bottom:14px;
-      display:grid;place-items:center;
-    }
-    .hero-emblem-wrap::before{
-      content:"";position:absolute;inset:10px;border-radius:50%;
-      background:radial-gradient(circle,rgba(36,214,208,.24),transparent 68%);
-      filter:blur(12px);pointer-events:none;
-    }
+    body.on-home .brand-wordmark,body.on-home .brand-divider,body.on-home .brand-sub{display:none}
+    .top-status{display:flex;align-items:center;gap:9px}.status-pill,.clock,.source-pill{border:1px solid var(--line);background:var(--panel);padding:8px 11px;border-radius:9px;font-size:11px;color:var(--muted);white-space:nowrap}
+    .status-pill{color:#bffbd8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px var(--green)}.clock{font-family:"JetBrains Mono";color:var(--text)}
+    .home-stage{position:relative;min-height:0;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:auto;background-image:linear-gradient(rgba(36,214,208,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(36,214,208,.03) 1px,transparent 1px);background-size:42px 42px}
+    .hero-hub{width:min(880px,96%);display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 26px 26px;background:linear-gradient(170deg,rgba(14,28,40,.92),rgba(8,18,27,.95));border:1px solid #223f52;border-radius:20px;box-shadow:0 26px 70px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(12px)}
+    .hero-emblem-wrap{position:relative;width:196px;height:196px;margin-bottom:14px;display:grid;place-items:center}
+    .hero-emblem-wrap::before{content:"";position:absolute;inset:10px;border-radius:50%;background:radial-gradient(circle,rgba(36,214,208,.24),transparent 68%);filter:blur(12px);pointer-events:none}
     .hero-emblem-wrap svg{width:192px;height:192px;position:relative;z-index:1;filter:drop-shadow(0 12px 24px rgba(0,0,0,.55))}
-    .hero-wordmark{
-      font-size:clamp(30px,4.2vw,46px);font-weight:900;letter-spacing:.1em;line-height:1;
-      color:#f2f9fc;margin:0;display:flex;align-items:center;justify-content:center;
-    }
-    .hero-energy{
-      font-size:clamp(18px,2.4vw,26px);font-weight:800;letter-spacing:.26em;
-      color:var(--cyan);margin:6px 0 10px;padding-left:.26em;
-    }
-    .hero-subtitle{
-      font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
-      color:#c5dce6;margin:0 0 8px;
-    }
-    .hero-tagline{
-      display:flex;align-items:center;gap:14px;width:min(520px,92%);
-      margin:4px 0 22px;color:var(--muted);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;
-    }
+    .hero-wordmark{font-size:clamp(30px,4.2vw,46px);font-weight:900;letter-spacing:.1em;line-height:1;color:#f2f9fc;margin:0;display:flex;align-items:center;justify-content:center}
+    .hero-energy{font-size:clamp(18px,2.4vw,26px);font-weight:800;letter-spacing:.26em;color:var(--cyan);margin:6px 0 10px;padding-left:.26em}
+    .hero-subtitle{font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#c5dce6;margin:0 0 8px}
+    .hero-tagline{display:flex;align-items:center;gap:14px;width:min(520px,92%);margin:4px 0 22px;color:var(--muted);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase}
     .hero-tagline::before,.hero-tagline::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,#2a4a5e,transparent)}
-
-    .launcher-grid{
-      width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
-    }
-    .launch-card{
-      border:1px solid var(--line);background:rgba(11,23,34,.9);color:var(--text);
-      border-radius:12px;padding:13px 12px;text-align:left;cursor:pointer;transition:.2s;
-      display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
-    }
-    .launch-card:hover{
-      border-color:var(--cyan);background:#12293a;transform:translateY(-2px);
-      box-shadow:0 10px 24px rgba(0,0,0,.35);
-    }
-    .launch-top{display:flex;align-items:center;justify-content:space-between}
-    .launch-card .l-ico{
-      width:34px;height:34px;border-radius:9px;
-      background:rgba(36,214,208,.12);border:1px solid rgba(36,214,208,.35);
-      display:grid;place-items:center;color:var(--cyan);font-size:16px;
-    }
-    .launch-arrow{font-size:12px;color:var(--muted);transition:.2s}
-    .launch-card:hover .launch-arrow{color:var(--cyan);transform:translateX(2px)}
-    .launch-card b{display:block;font-size:12px;letter-spacing:.07em}
-    .launch-card small{display:block;font-size:10px;color:var(--muted);line-height:1.35}
-
+    .launcher-grid{width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .launch-card{border:1px solid var(--line);background:rgba(11,23,34,.9);color:var(--text);border-radius:12px;padding:13px 12px;text-align:left;cursor:pointer;transition:.2s;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+    .launch-card:hover{border-color:var(--cyan);background:#12293a;transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.35)}
+    .launch-top{display:flex;align-items:center;justify-content:space-between}.launch-card .l-ico{width:34px;height:34px;border-radius:9px;background:rgba(36,214,208,.12);border:1px solid rgba(36,214,208,.35);display:grid;place-items:center;color:var(--cyan);font-size:16px}
+    .launch-arrow{font-size:12px;color:var(--muted);transition:.2s}.launch-card:hover .launch-arrow{color:var(--cyan);transform:translateX(2px)}.launch-card b{display:block;font-size:12px;letter-spacing:.07em}.launch-card small{display:block;font-size:10px;color:var(--muted);line-height:1.35}
     .toolbar{display:grid;grid-template-columns:150px 1.15fr repeat(4,minmax(120px,.5fr)) auto;gap:8px;padding:10px 12px;background:#08131d;border-bottom:1px solid var(--line)}
     .field{position:relative}.field label{position:absolute;left:11px;top:6px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);z-index:1}.field input,.field select{width:100%;height:46px;padding:18px 30px 5px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);outline:none;font-size:12px}.field input:focus,.field select:focus{border-color:var(--cyan)}
-    .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:11px;top:16px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:19px;top:11px}
-    .field.prov-field select{border-color:rgba(36,214,208,.45);font-weight:700;color:#d6ffff}
+    .field select{appearance:none}.field:after{content:"⌄";position:absolute;right:11px;top:16px;color:var(--cyan);pointer-events:none}.field.search:after{content:"⌕";font-size:19px;top:11px}.field.prov-field select{border-color:rgba(36,214,208,.45);font-weight:700;color:#d6ffff}
     .btn{height:46px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text);padding:0 14px;cursor:pointer;font-weight:700;font-size:11px}.btn:hover{border-color:var(--cyan);color:var(--cyan)}.btn.primary{background:linear-gradient(135deg,#167f92,#0b6475);border-color:#2499aa}
-
-    .map-shell{position:relative;min-height:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel)}
-    #map{height:100%;width:100%;background:#0b151d}
+    .map-shell{position:relative;min-height:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel)}#map{height:100%;width:100%;background:#0b151d}
     .map-overlay{position:absolute;z-index:600;left:56px;top:10px;display:flex;flex-wrap:wrap;gap:8px;pointer-events:none}.badge{background:rgba(8,18,27,.9);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:10px;color:var(--muted);backdrop-filter:blur(10px)}.badge b{color:var(--text);font-size:12px;margin-right:4px}
     .legend{position:absolute;z-index:600;left:14px;bottom:14px;background:rgba(8,18,27,.92);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:7px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
     .side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px;padding-right:3px}.side::-webkit-scrollbar{width:5px}.side::-webkit-scrollbar-thumb{background:#28485d;border-radius:9px}
     .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);overflow:hidden}.card-head{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}.card-head h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#a8c0ce}.card-head span{font-size:10px;color:var(--muted)}.card-body{padding:12px}
-    .asset-title{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center}.asset-icon{width:48px;height:48px;border:1px solid #245266;background:#0e2937;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:23px}.asset-name h3{margin:0;font-size:19px;line-height:1.2}.asset-name p{margin:4px 0 0;color:var(--muted);font-family:"JetBrains Mono";font-size:11px}.state{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid}.state.active{color:#bffbd8;border-color:#2b8655;background:#103724}.state.inactive{color:#ffe3a7;border-color:#7d6330;background:#332711}.state.abandoned{color:#ffc2c6;border-color:#87414a;background:#381b20}.state.none{color:#aac0cc;border-color:#385163;background:#132431}
+    .asset-title{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center}.asset-icon{width:48px;height:48px;border:1px solid #245266;background:#0e2937;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:23px}.asset-name h3{margin:0;font-size:19px;line-height:1.2}.asset-name p{margin:4px 0 0;color:var(--muted);font-family:"JetBrains Mono";font-size:11px}
+    .state{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid}.state.active{color:#bffbd8;border-color:#2b8655;background:#103724}.state.inactive{color:#ffe3a7;border-color:#7d6330;background:#332711}.state.abandoned{color:#ffc2c6;border-color:#87414a;background:#381b20}.state.none{color:#aac0cc;border-color:#385163;background:#132431}
     .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.metric span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:6px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong.cyan{color:var(--cyan)}.metric small{display:block;margin-top:3px;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}.kv-row{padding:8px 0;border-bottom:1px solid rgba(47,75,91,.55);display:flex;align-items:center;justify-content:space-between;gap:12px}.kv-row span{font-size:10px;color:var(--muted)}.kv-row b{font-size:11px;text-align:right;max-width:66%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mono{font-family:"JetBrains Mono"}
     .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.weather{padding:10px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.weather strong{display:block;font-size:16px;margin:6px 0 2px}.weather span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.weather small{color:#9fc2d2}
@@ -148,43 +59,13 @@
     footer{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-top:1px solid var(--line);background:#070f16;color:#647f8f;font-size:9px;letter-spacing:.09em;text-transform:uppercase}
     .leaflet-container{font-family:Inter;background:#071018}.leaflet-control-zoom{border:1px solid var(--line)!important;border-radius:9px!important;overflow:hidden;box-shadow:var(--shadow)}.leaflet-control-zoom a{background:rgba(8,18,27,.92)!important;color:var(--cyan)!important;border-color:var(--line)!important;width:32px!important;height:32px!important;line-height:30px!important;font-size:18px!important}.leaflet-control-zoom a:hover{background:#122938!important}.leaflet-control-attribution{background:rgba(8,18,27,.78)!important;color:#7f9aaa!important}.leaflet-control-attribution a{color:#64b8d0!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1f2b;color:var(--text);border:1px solid var(--line)}
     .toast{position:fixed;z-index:3500;right:18px;bottom:45px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#102330;color:var(--text);box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8b3d48}
-
-    .modal-backdrop{
-      position:fixed;inset:0;z-index:2500;background:rgba(3,9,14,.84);backdrop-filter:blur(8px);
-      display:none;place-items:center;padding:14px;
-    }
-    .modal-backdrop.open{display:grid}
-    .modal-window{
-      width:min(1560px,97vw);height:min(900px,94vh);
-      background:var(--panel);border:1px solid #284b60;border-radius:14px;
-      box-shadow:0 28px 80px rgba(0,0,0,.65);
-      display:grid;grid-template-rows:52px 1fr;overflow:hidden;
-    }
-    .modal-window.pozos-win{grid-template-rows:52px auto 1fr}
-    .modal-head{
-      display:flex;align-items:center;justify-content:space-between;padding:0 16px;
-      background:#08141f;border-bottom:1px solid var(--line);
-    }
-    .modal-title{display:flex;align-items:center;gap:10px}
-    .modal-title h3{margin:0;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
-    .modal-title span{font-size:11px;color:var(--muted)}
-    .modal-actions{display:flex;align-items:center;gap:8px}
-    .modal-switch{
-      border:1px solid var(--line);background:var(--panel2);color:var(--muted);
-      padding:6px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-size:10px;letter-spacing:.05em;
-    }
-    .modal-switch:hover,.modal-switch.active{border-color:var(--cyan);color:var(--cyan);background:#122a3a}
-    .modal-close{
-      border:1px solid var(--line);background:var(--panel2);color:var(--text);
-      padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:11px;
-    }
-    .modal-close:hover{border-color:var(--red);color:#ffc2c6}
-    .pozos-body{min-height:0;display:grid;grid-template-columns:minmax(0,57%) minmax(400px,43%);gap:10px;padding:10px;background:var(--bg)}
-    .modal-body{min-height:0;display:grid;grid-template-columns:1fr 380px;gap:10px;padding:10px;background:var(--bg)}
-    .modal-map-wrap{position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#09141d}
-    #infra-map{width:100%;height:100%}
-    .modal-side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px}
-
+    .modal-backdrop{position:fixed;inset:0;z-index:2500;background:rgba(3,9,14,.84);backdrop-filter:blur(8px);display:none;place-items:center;padding:14px}.modal-backdrop.open{display:grid}
+    .modal-window{width:min(1560px,97vw);height:min(900px,94vh);background:var(--panel);border:1px solid #284b60;border-radius:14px;box-shadow:0 28px 80px rgba(0,0,0,.65);display:grid;grid-template-rows:52px 1fr;overflow:hidden}.modal-window.pozos-win{grid-template-rows:52px auto 1fr}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#08141f;border-bottom:1px solid var(--line)}.modal-title{display:flex;align-items:center;gap:10px}.modal-title h3{margin:0;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.modal-title span{font-size:11px;color:var(--muted)}
+    .modal-actions{display:flex;align-items:center;gap:8px}.modal-switch{border:1px solid var(--line);background:var(--panel2);color:var(--muted);padding:6px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-size:10px;letter-spacing:.05em}.modal-switch:hover,.modal-switch.active{border-color:var(--cyan);color:var(--cyan);background:#122a3a}
+    .modal-close{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:11px}.modal-close:hover{border-color:var(--red);color:#ffc2c6}
+    .pozos-body{min-height:0;display:grid;grid-template-columns:minmax(0,57%) minmax(400px,43%);gap:10px;padding:10px;background:var(--bg)}.modal-body{min-height:0;display:grid;grid-template-columns:1fr 380px;gap:10px;padding:10px;background:var(--bg)}
+    .modal-map-wrap{position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#09141d}#infra-map{width:100%;height:100%}.modal-side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px}
     @media(max-width:1180px){.top-status .source-pill{display:none}.pozos-body,.modal-body{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(3,1fr)}.launcher-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}.brand-sub{display:none}.launcher-grid{grid-template-columns:1fr}.hero-emblem-wrap{width:150px;height:150px}.hero-emblem-wrap svg{width:146px;height:146px}}
   </style>
@@ -197,19 +78,9 @@
         <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <clipPath id="hdrClip"><circle cx="110" cy="112" r="82"/></clipPath>
-            <linearGradient id="hdrSky" x1="28" y1="30" x2="192" y2="120" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#194256"/>
-              <stop offset="100%" stop-color="#2a687c"/>
-            </linearGradient>
-            <linearGradient id="hdrSun" x1="110" y1="45" x2="165" y2="125" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#f6c667"/>
-              <stop offset="100%" stop-color="#d4933b"/>
-            </linearGradient>
-            <linearGradient id="hdrRing" x1="25" y1="25" x2="195" y2="195" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#58e6e0"/>
-              <stop offset="50%" stop-color="#1c4a63"/>
-              <stop offset="100%" stop-color="#24d6d0"/>
-            </linearGradient>
+            <linearGradient id="hdrSky" x1="28" y1="30" x2="192" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#194256"/><stop offset="100%" stop-color="#2a687c"/></linearGradient>
+            <linearGradient id="hdrSun" x1="110" y1="45" x2="165" y2="125" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f6c667"/><stop offset="100%" stop-color="#d4933b"/></linearGradient>
+            <linearGradient id="hdrRing" x1="25" y1="25" x2="195" y2="195" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#58e6e0"/><stop offset="50%" stop-color="#1c4a63"/><stop offset="100%" stop-color="#24d6d0"/></linearGradient>
           </defs>
           <g clip-path="url(#hdrClip)">
             <rect x="24" y="26" width="172" height="172" fill="#0d2332"/>
@@ -242,7 +113,6 @@
         <div class="brand-sub">Plataforma Inteligente de Gestión · Neuquén · Mendoza · Río Negro</div>
       </div>
     </a>
-
     <div class="top-status">
       <div class="source-pill">GIS OFICIAL · RES. 319/93</div>
       <div class="status-pill"><i class="dot"></i><span id="api-status">LISTO</span></div>
@@ -255,53 +125,31 @@
       <div class="hero-emblem-wrap" aria-hidden="true">
         <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <clipPath id="badgeClip">
-              <circle cx="110" cy="112" r="82"/>
-            </clipPath>
-            <linearGradient id="skyBand1" x1="28" y1="30" x2="192" y2="120" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#194256"/>
-              <stop offset="100%" stop-color="#2a687c"/>
-            </linearGradient>
-            <linearGradient id="sunGlow" x1="110" y1="45" x2="165" y2="125" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#f6c667"/>
-              <stop offset="100%" stop-color="#d4933b"/>
-            </linearGradient>
-            <linearGradient id="riverGrad" x1="90" y1="125" x2="125" y2="195" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#33c2cf"/>
-              <stop offset="100%" stop-color="#105e78"/>
-            </linearGradient>
-            <linearGradient id="ringMetal" x1="25" y1="25" x2="195" y2="195" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#58e6e0"/>
-              <stop offset="50%" stop-color="#1c4a63"/>
-              <stop offset="100%" stop-color="#24d6d0"/>
-            </linearGradient>
+            <clipPath id="badgeClip"><circle cx="110" cy="112" r="82"/></clipPath>
+            <linearGradient id="skyBand1" x1="28" y1="30" x2="192" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#194256"/><stop offset="100%" stop-color="#2a687c"/></linearGradient>
+            <linearGradient id="sunGlow" x1="110" y1="45" x2="165" y2="125" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f6c667"/><stop offset="100%" stop-color="#d4933b"/></linearGradient>
+            <linearGradient id="riverGrad" x1="90" y1="125" x2="125" y2="195" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#33c2cf"/><stop offset="100%" stop-color="#105e78"/></linearGradient>
+            <linearGradient id="ringMetal" x1="25" y1="25" x2="195" y2="195" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#58e6e0"/><stop offset="50%" stop-color="#1c4a63"/><stop offset="100%" stop-color="#24d6d0"/></linearGradient>
           </defs>
-
           <g clip-path="url(#badgeClip)">
             <rect x="24" y="26" width="172" height="172" fill="#0d2332"/>
             <circle cx="110" cy="112" r="82" fill="url(#skyBand1)"/>
             <circle cx="118" cy="108" r="64" fill="#23576b"/>
             <circle cx="126" cy="104" r="48" fill="url(#sunGlow)" opacity="0.88"/>
             <circle cx="130" cy="102" r="31" fill="#fbe1a1" opacity="0.72"/>
-
             <path d="M52 84H98C103 84 106 80.5 106 76C106 71.8 102.8 68.5 98.6 68.2C97.2 61.5 91.2 56.5 84 56.5C77.5 56.5 72 60.5 69.8 66.2C68.6 65.8 67.3 65.5 66 65.5C59.4 65.5 54 70.9 54 77.5C54 79.8 54.7 82 55.8 83.8" fill="#d9eef5" stroke="#0b2230" stroke-width="2.2" stroke-linejoin="round"/>
-
             <path d="M122 128L150 76L176 112L194 94V146H122V128Z" fill="#6f6556" stroke="#0b2230" stroke-width="2.2" stroke-linejoin="round"/>
             <path d="M150 76L161 102L147 116L137 104L150 76Z" fill="#9a8d79"/>
             <path d="M164 114L178 96L194 112V140H164V114Z" fill="#524a3f" stroke="#0b2230" stroke-width="2"/>
-
             <path d="M110 56C125.5 56 138 68.5 138 84C138 103.5 110 131 110 131C110 131 82 103.5 82 84C82 68.5 94.5 56 110 56Z" fill="#0b2434" stroke="#64efe9" stroke-width="2.4"/>
             <circle cx="110" cy="84" r="11.5" fill="#eaf6fa"/>
-
             <path d="M26 134C54 128 84 134 106 144L92 196H26V134Z" fill="#3b5e47" stroke="#0b2230" stroke-width="2.2"/>
             <path d="M194 116C168 118 144 130 130 148C118 164 114 180 112 196H194V116Z" fill="#4f7755" stroke="#0b2230" stroke-width="2.2"/>
             <path d="M140 152C154 138 172 132 190 134" stroke="#8ab589" stroke-width="2" stroke-linecap="round"/>
             <path d="M134 168C152 152 172 146 192 148" stroke="#8ab589" stroke-width="2" stroke-linecap="round"/>
             <path d="M130 184C150 168 170 162 192 164" stroke="#8ab589" stroke-width="2" stroke-linecap="round"/>
-
             <path d="M104 136C116 144 96 158 104 172C110 182 102 190 94 196H122C130 186 132 174 124 162C116 150 128 140 120 134H104Z" fill="url(#riverGrad)" stroke="#0b2230" stroke-width="2"/>
             <path d="M111 144C116 152 107 162 113 174" stroke="#a6f5fa" stroke-width="1.8" stroke-linecap="round"/>
-
             <path d="M34 148L74 134L104 146V162L66 176L34 162V148Z" fill="#233746" stroke="#0b2230" stroke-width="2.2" stroke-linejoin="round"/>
             <path d="M34 148L66 161L104 146" stroke="#6894ad" stroke-width="1.6"/>
             <path d="M58 152L69 114L79 150" stroke="#d8e8f0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -311,10 +159,8 @@
             <path d="M92 110V148" stroke="#eaf4f8" stroke-width="2" stroke-linecap="round"/>
             <path d="M44 121L40 135H52L49 121Z" fill="#46687d" stroke="#0b2230" stroke-width="1.8"/>
           </g>
-
           <circle cx="110" cy="112" r="82" stroke="url(#ringMetal)" stroke-width="5"/>
           <circle cx="110" cy="112" r="86" stroke="#24d6d0" stroke-width="1" stroke-opacity="0.35"/>
-
           <g transform="translate(166, 44) rotate(36)">
             <rect x="-34" y="-8" width="22" height="16" rx="2" fill="#2c7da0" stroke="#0b2230" stroke-width="2"/>
             <line x1="-27" y1="-8" x2="-27" y2="8" stroke="#9be7ff" stroke-width="1.2"/>
@@ -330,31 +176,15 @@
           </g>
         </svg>
       </div>
-
-      <h1 class="hero-wordmark">
-        TERRITORI<span style="display:inline-flex;align-items:center;position:relative;color:#f2f9fc">A<svg viewBox="0 0 24 24" style="width:.52em;height:.52em;margin-left:-.34em;margin-top:.16em" fill="none"><path d="M4 18C4 10 11 5 20 5C20 14 15 20 7 20C5.8 20 4.8 19.3 4 18Z" fill="#31d67b"/><path d="M6 18C10 14 14 11 19 6" stroke="#071018" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-      </h1>
+      <h1 class="hero-wordmark">TERRITORI<span style="display:inline-flex;align-items:center;position:relative;color:#f2f9fc">A<svg viewBox="0 0 24 24" style="width:.52em;height:.52em;margin-left:-.34em;margin-top:.16em" fill="none"><path d="M4 18C4 10 11 5 20 5C20 14 15 20 7 20C5.8 20 4.8 19.3 4 18Z" fill="#31d67b"/><path d="M6 18C10 14 14 11 19 6" stroke="#071018" stroke-width="1.8" stroke-linecap="round"/></svg></span></h1>
       <div class="hero-energy">ENERGY</div>
       <div class="hero-subtitle">Plataforma Inteligente de Gestión</div>
       <div class="hero-tagline">Neuquén · Mendoza · Río Negro</div>
-
       <div class="launcher-grid">
-        <button class="launch-card" onclick="openPozosModal()">
-          <div class="launch-top"><div class="l-ico">⌖</div><span class="launch-arrow">↗</span></div>
-          <div><b>POZOS</b><small>Padrón GIS + Res. 319/93 (NQN · MZA · RN)</small></div>
-        </button>
-        <button class="launch-card" onclick="openInfraModal('ductos')">
-          <div class="launch-top"><div class="l-ico">⌇</div><span class="launch-arrow">↗</span></div>
-          <div><b>OLEODUCTOS</b><small>Ductos troncales y redes de transporte</small></div>
-        </button>
-        <button class="launch-card" onclick="openInfraModal('plantas')">
-          <div class="launch-top"><div class="l-ico">⬡</div><span class="launch-arrow">↗</span></div>
-          <div><b>PLANTAS</b><small>Baterías, PTC e instalaciones de superficie</small></div>
-        </button>
-        <button class="launch-card" onclick="openInfraModal('areas')">
-          <div class="launch-top"><div class="l-ico">▣</div><span class="launch-arrow">↗</span></div>
-          <div><b>ÁREAS</b><small>Concesiones, bloques y permisos vigentes</small></div>
-        </button>
+        <button class="launch-card" onclick="openPozosModal()"><div class="launch-top"><div class="l-ico">⌖</div><span class="launch-arrow">↗</span></div><div><b>POZOS</b><small>Padrón GIS + Res. 319/93 (NQN · MZA · RN)</small></div></button>
+        <button class="launch-card" onclick="openInfraModal('ductos')"><div class="launch-top"><div class="l-ico">⌇</div><span class="launch-arrow">↗</span></div><div><b>OLEODUCTOS</b><small>Ductos troncales y redes de transporte</small></div></button>
+        <button class="launch-card" onclick="openInfraModal('plantas')"><div class="launch-top"><div class="l-ico">⬡</div><span class="launch-arrow">↗</span></div><div><b>PLANTAS</b><small>Baterías, PTC e instalaciones de superficie</small></div></button>
+        <button class="launch-card" onclick="openInfraModal('areas')"><div class="launch-top"><div class="l-ico">▣</div><span class="launch-arrow">↗</span></div><div><b>ÁREAS</b><small>Concesiones, bloques y permisos vigentes</small></div></button>
       </div>
     </div>
   </section>
@@ -362,14 +192,10 @@
   <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>CUENCAS NEUQUINA Y CUYANA · DATOS OFICIALES</span><span id="footer-state">SISTEMA LISTO · SELECCIONÁ UN MÓDULO</span></footer>
 </div>
 
-<!-- Popup operativo de POZOS -->
 <div class="modal-backdrop" id="pozos-modal" onclick="if(event.target===this)closeAllModals()">
   <div class="modal-window pozos-win">
     <div class="modal-head">
-      <div class="modal-title">
-        <h3>PADRÓN DE POZOS · <span id="pozos-prov-title">NEUQUÉN</span></h3>
-        <span id="pozos-modal-sub">GIS OFICIAL + PRODUCCIÓN RES. 319/93</span>
-      </div>
+      <div class="modal-title"><h3>PADRÓN DE POZOS · <span id="pozos-prov-title">NEUQUÉN</span></h3><span id="pozos-modal-sub">GIS OFICIAL + PRODUCCIÓN RES. 319/93</span></div>
       <div class="modal-actions">
         <button class="modal-switch active" onclick="openPozosModal()">POZOS</button>
         <button class="modal-switch" onclick="openInfraModal('ductos')">OLEODUCTOS</button>
@@ -378,16 +204,8 @@
         <button class="modal-close" onclick="closeAllModals()">✕ CERRAR</button>
       </div>
     </div>
-
     <section class="toolbar">
-      <div class="field prov-field">
-        <label>Provincia</label>
-        <select id="province" onchange="onProvinceChange(this.value)">
-          <option value="Neuquén" selected>Neuquén</option>
-          <option value="Mendoza">Mendoza</option>
-          <option value="Río Negro">Río Negro</option>
-        </select>
-      </div>
+      <div class="field prov-field"><label>Provincia</label><select id="province" onchange="onProvinceChange(this.value)"><option value="Neuquén" selected>Neuquén</option><option value="Mendoza">Mendoza</option><option value="Río Negro">Río Negro</option></select></div>
       <div class="field search"><label>Buscar pozo o UWI</label><input id="search" placeholder="Ej.: P13794 o La Caverna" /></div>
       <div class="field"><label>Operadora</label><select id="operator"><option value="">Todas</option></select></div>
       <div class="field"><label>Área legal</label><select id="area"><option value="">Todas</option></select></div>
@@ -395,7 +213,6 @@
       <div class="field"><label>Estado</label><select id="state"><option value="">Todos</option></select></div>
       <button class="btn primary" id="reload">ACTUALIZAR</button>
     </section>
-
     <div class="pozos-body">
       <section class="map-shell">
         <div id="map"></div>
@@ -406,77 +223,21 @@
         </div>
         <div class="legend"><span><i style="background:var(--cyan)"></i>Activo</span><span><i style="background:var(--amber)"></i>Inactivo</span><span><i style="background:var(--red)"></i>Abandonado</span></div>
       </section>
-
       <aside class="side">
-        <section class="card">
-          <div class="card-head"><h2>Activo seleccionado</h2><span class="mono" id="last-update">SIN SELECCIÓN</span></div>
-          <div class="card-body" id="asset-card">
-            <div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica, productiva y ambiental aparecerá en este panel.</div></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-head"><h2>Indicadores técnicos</h2><span class="mono" id="tech-updated">ACT. PENDIENTE</span></div>
-          <div class="card-body"><div class="metrics">
-            <div class="metric"><span>Clase</span><strong id="m-class">—</strong></div>
-            <div class="metric"><span>Formación</span><strong class="cyan" id="m-formation">—</strong></div>
-            <div class="metric"><span>Reservorio</span><strong id="m-reservoir">—</strong></div>
-            <div class="metric"><span>Año perforación</span><strong id="m-year">—</strong></div>
-          </div></div>
-        </section>
-
-        <section class="card">
-          <div class="card-head"><h2>Producción declarada</h2><span class="mono" id="prod-period">RES. 319/93</span></div>
-          <div class="card-body">
-            <div class="metrics">
-              <div class="metric"><span>Petróleo</span><strong class="cyan" id="p-oil">—</strong><small id="p-oil-sub">m³/mes</small></div>
-              <div class="metric"><span>Gas</span><strong id="p-gas">—</strong><small id="p-gas-sub">Mm³/mes</small></div>
-              <div class="metric"><span>Agua</span><strong id="p-water">—</strong><small id="p-water-sub">m³/mes</small></div>
-              <div class="metric"><span>TEF</span><strong id="p-tef">—</strong><small id="p-tef-sub">horas</small></div>
-            </div>
-            <div style="height:8px"></div>
-            <div class="kv-row" style="padding-bottom:0;border-bottom:none">
-              <span>Estado de consulta</span>
-              <b class="mono" id="p-status">Esperando selección</b>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-head"><h2>Datos técnicos del pozo</h2><span class="mono" id="wfs-updated">GIS · OFICIAL</span></div>
-          <div class="card-body"><div class="kv" id="tech-kv">
-            <div class="kv-row"><span>Esperando selección</span><b>—</b></div>
-          </div></div>
-        </section>
-
-        <section class="card">
-          <div class="card-head"><h2>Condición ambiental del punto</h2><span id="weather-time">SIN DATOS</span></div>
-          <div class="card-body">
-            <div class="weather-grid">
-              <div class="weather"><span>Temperatura</span><strong id="w-temp">—</strong><small>2 m</small></div>
-              <div class="weather"><span>Viento</span><strong id="w-wind">—</strong><small>Dirección —</small></div>
-              <div class="weather"><span>Ráfagas</span><strong id="w-gust">—</strong><small>10 m</small></div>
-              <div class="weather"><span>Precipitación</span><strong id="w-rain">—</strong><small>actual</small></div>
-              <div class="weather"><span>Humedad</span><strong id="w-hum">—</strong><small>relativa</small></div>
-              <div class="weather"><span>Presión</span><strong id="w-press">—</strong><small>superficie</small></div>
-            </div>
-            <div style="height:9px"></div>
-            <div class="risk"><div><strong id="risk-title">TERRITORIA · SIN EVALUAR</strong><br><span id="risk-text">Seleccioná un pozo para consultar su entorno.</span></div><div style="font-size:24px" id="risk-icon">○</div></div>
-          </div>
-        </section>
+        <section class="card"><div class="card-head"><h2>Activo seleccionado</h2><span class="mono" id="last-update">SIN SELECCIÓN</span></div><div class="card-body" id="asset-card"><div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica, productiva y ambiental aparecerá en este panel.</div></div></div></section>
+        <section class="card"><div class="card-head"><h2>Indicadores técnicos</h2><span class="mono" id="tech-updated">ACT. PENDIENTE</span></div><div class="card-body"><div class="metrics"><div class="metric"><span>Clase</span><strong id="m-class">—</strong></div><div class="metric"><span>Formación</span><strong class="cyan" id="m-formation">—</strong></div><div class="metric"><span>Reservorio</span><strong id="m-reservoir">—</strong></div><div class="metric"><span>Año perforación</span><strong id="m-year">—</strong></div></div></div></section>
+        <section class="card"><div class="card-head"><h2>Producción declarada</h2><span class="mono" id="prod-period">RES. 319/93</span></div><div class="card-body"><div class="metrics"><div class="metric"><span>Petróleo</span><strong class="cyan" id="p-oil">—</strong><small id="p-oil-sub">m³/mes</small></div><div class="metric"><span>Gas</span><strong id="p-gas">—</strong><small id="p-gas-sub">Mm³/mes</small></div><div class="metric"><span>Agua</span><strong id="p-water">—</strong><small id="p-water-sub">m³/mes</small></div><div class="metric"><span>TEF</span><strong id="p-tef">—</strong><small id="p-tef-sub">horas</small></div></div><div style="height:8px"></div><div class="kv-row" style="padding-bottom:0;border-bottom:none"><span>Estado de consulta</span><b class="mono" id="p-status">Esperando selección</b></div></div></section>
+        <section class="card"><div class="card-head"><h2>Datos técnicos del pozo</h2><span class="mono" id="wfs-updated">GIS · OFICIAL</span></div><div class="card-body"><div class="kv" id="tech-kv"><div class="kv-row"><span>Esperando selección</span><b>—</b></div></div></div></section>
+        <section class="card"><div class="card-head"><h2>Condición ambiental del punto</h2><span id="weather-time">SIN DATOS</span></div><div class="card-body"><div class="weather-grid"><div class="weather"><span>Temperatura</span><strong id="w-temp">—</strong><small>2 m</small></div><div class="weather"><span>Viento</span><strong id="w-wind">—</strong><small>Dirección —</small></div><div class="weather"><span>Ráfagas</span><strong id="w-gust">—</strong><small>10 m</small></div><div class="weather"><span>Precipitación</span><strong id="w-rain">—</strong><small>actual</small></div><div class="weather"><span>Humedad</span><strong id="w-hum">—</strong><small>relativa</small></div><div class="weather"><span>Presión</span><strong id="w-press">—</strong><small>superficie</small></div></div><div style="height:9px"></div><div class="risk"><div><strong id="risk-title">TERRITORIA · SIN EVALUAR</strong><br><span id="risk-text">Seleccioná un pozo para consultar su entorno.</span></div><div style="font-size:24px" id="risk-icon">○</div></div></div></section>
       </aside>
     </div>
   </div>
 </div>
 
-<!-- Popup operativo de Infraestructura -->
 <div class="modal-backdrop" id="infra-modal" onclick="if(event.target===this)closeAllModals()">
   <div class="modal-window">
     <div class="modal-head">
-      <div class="modal-title">
-        <h3 id="infra-modal-title">OLEODUCTOS TRONCALES</h3>
-        <span id="infra-modal-sub">RED DE TRANSPORTE E INFRAESTRUCTURA</span>
-      </div>
+      <div class="modal-title"><h3 id="infra-modal-title">OLEODUCTOS TRONCALES</h3><span id="infra-modal-sub">RED DE TRANSPORTE E INFRAESTRUCTURA</span></div>
       <div class="modal-actions">
         <button class="modal-switch" onclick="openPozosModal()">POZOS</button>
         <button class="modal-switch" id="sw-ductos" onclick="openInfraModal('ductos')">OLEODUCTOS</button>
@@ -486,38 +247,17 @@
       </div>
     </div>
     <div class="modal-body">
-      <div class="modal-map-wrap">
-        <div id="infra-map"></div>
-      </div>
+      <div class="modal-map-wrap"><div id="infra-map"></div></div>
       <div class="modal-side">
         <div class="card">
           <div class="card-head"><h2>Filtro de capa</h2><span class="mono" id="infra-count">0 ELEMENTOS</span></div>
           <div class="card-body">
-            <div class="field prov-field" style="margin-bottom:8px">
-              <label>Provincia / Jurisdicción</label>
-              <select id="infra-prov" onchange="onInfraProvinceChange(this.value)">
-                <option value="Neuquén" selected>Neuquén</option>
-                <option value="Mendoza">Mendoza</option>
-                <option value="Río Negro">Río Negro</option>
-                <option value="Todas">Todas (NQN + MZA + RN)</option>
-              </select>
-            </div>
-            <div class="field search" style="margin-bottom:8px">
-              <label>Buscar tramo / planta / operadora</label>
-              <input id="infra-search" placeholder="Ej.: Oldelval, Luján de Cuyo, Catriel, Loma Campana…" oninput="filterInfraLayer()" />
-            </div>
-            <div class="field">
-              <label>Operadora</label>
-              <select id="infra-op" onchange="filterInfraLayer()"><option value="">Todas</option></select>
-            </div>
+            <div class="field prov-field" style="margin-bottom:8px"><label>Provincia / Jurisdicción</label><select id="infra-prov" onchange="onInfraProvinceChange(this.value)"><option value="Neuquén" selected>Neuquén</option><option value="Mendoza">Mendoza</option><option value="Río Negro">Río Negro</option><option value="Todas">Todas (NQN + MZA + RN)</option></select></div>
+            <div class="field search" style="margin-bottom:8px"><label>Buscar tramo / planta / operadora</label><input id="infra-search" placeholder="Ej.: Oldelval, Luján de Cuyo, Catriel, Loma Campana…" oninput="filterInfraLayer()" /></div>
+            <div class="field"><label>Operadora</label><select id="infra-op" onchange="filterInfraLayer()"><option value="">Todas</option></select></div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-head"><h2>Detalle del elemento</h2><span class="mono" id="infra-layer-tag">GIS</span></div>
-          <div class="card-body" id="infra-detail">
-            <div class="empty" style="min-height:140px"><div><b>Tocá un tramo o instalación en el mapa</b>Los atributos técnicos aparecerán aquí.</div></div>
-          </div>
-        </div>
+        <div class="card"><div class="card-head"><h2>Detalle del elemento</h2><span class="mono" id="infra-layer-tag">GIS</span></div><div class="card-body" id="infra-detail"><div class="empty" style="min-height:140px"><div><b>Tocá un tramo o instalación en el mapa</b>Los atributos técnicos aparecerán aquí.</div></div></div></div>
       </div>
     </div>
   </div>
@@ -528,71 +268,61 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
   const $ = id => document.getElementById(id);
-  function setText(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  }
-  function setHtml(id, html) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-  }
+  function setText(id, val){ const el = document.getElementById(id); if(el) el.textContent = val; }
+  function setHtml(id, html){ const el = document.getElementById(id); if(el) el.innerHTML = html; }
 
   const CACHE_DB_NAME = 'territoria_energy_cache';
   const CACHE_STORE_NAME = 'pozos_store';
   const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
   const CKAN_DATASTORE_URL = 'https://datos.energia.gob.ar/api/3/action/datastore_search';
   const CAP_IV_POZOS_RESOURCE_ID = 'cb5c0f04-7835-45cd-b982-3e25ca7d7751';
-
-  const PROV_CENTERS = {
-    'Neuquén': [-38.4, -69.1, 7],
-    'Mendoza': [-34.6, -68.8, 7],
-    'Río Negro': [-39.0, -67.8, 7],
-    'Todas': [-36.8, -68.6, 6]
-  };
+  const PROV_CENTERS = {'Neuquén':[-38.4,-69.1,7],'Mendoza':[-34.6,-68.8,7],'Río Negro':[-39.0,-67.8,7],'Todas':[-36.8,-68.6,6]};
 
   const state = {
-    province: 'Neuquén',
-    all: [],
-    filtered: [],
-    selected: null,
-    hasFittedOnce: false,
-    loadedProvinces: {},
-    catalogUpdatedAt: null,
-    activeAbort: null,
-    requestSeq: 0,
-    api: 'https://territoria-energy-api.elexpreso17.workers.dev'
+    province:'Neuquén', all:[], filtered:[], selected:null, hasFittedOnce:false,
+    loadedProvinces:{}, catalogUpdatedAt:null, activeAbort:null, requestSeq:0,
+    api:'https://territoria-energy-api.elexpreso17.workers.dev'
   };
 
-  let map = null;
-  let canvasRenderer = null;
-  let markerLayer = null;
+  let map=null, canvasRenderer=null, markerLayer=null, infraMap=null, infraLayerGroup=null, infraRawFeatures=[], infraCurrentType=null;
 
-  let infraMap = null;
-  let infraLayerGroup = null;
-  let infraRawFeatures = [];
-  let infraCurrentType = null;
+  function cacheKeyFor(prov){ return 'pozos_v5_' + String(prov || 'Neuquén').toLowerCase().replace(/\s+/g, '_'); }
+  function normText(s){ return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); }
 
-  function cacheKeyFor(prov) {
-    return 'pozos_v4_' + String(prov || 'Neuquén').toLowerCase().replace(/\s+/g, '_');
+  function ckanJsonp(paramsObj, timeoutMs = 20000){
+    return new Promise((resolve, reject) => {
+      const cbName = '__ckanCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+      const qs = new URLSearchParams({ ...paramsObj, callback: cbName });
+      const script = document.createElement('script');
+      let finished = false;
+      const cleanup = () => {
+        if(finished) return;
+        finished = true;
+        clearTimeout(timer);
+        delete window[cbName];
+        if(script.parentNode) script.parentNode.removeChild(script);
+      };
+      const timer = setTimeout(() => { cleanup(); reject(new Error('Tiempo de espera agotado consultando Secretaría de Energía')); }, timeoutMs);
+      window[cbName] = data => {
+        cleanup();
+        if(!data || !data.success) reject(new Error('La API oficial no devolvió registros válidos'));
+        else resolve(data.result);
+      };
+      script.onerror = () => { cleanup(); reject(new Error('No se pudo conectar con datos.energia.gob.ar')); };
+      script.src = `${CKAN_DATASTORE_URL}?${qs.toString()}`;
+      document.head.appendChild(script);
+    });
   }
 
-  function normText(s) {
-    return String(s || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim()
-      .toLowerCase();
-  }
-
-  function mapEstadoToGis(rawEstado) {
+  function mapEstadoToGis(rawEstado){
     const e = normText(rawEstado);
-    if (e.includes('abandon')) return 'Abandonado';
-    if (e.includes('efectiv') || e.includes('produc') || e.includes('inyec') || e.includes('activ')) return 'Activo';
-    if (e.includes('parado') || e.includes('inactiv') || e.includes('estudio') || e.includes('reserva')) return 'Inactivo';
+    if(e.includes('abandon')) return 'Abandonado';
+    if(e.includes('efectiv') || e.includes('produc') || e.includes('inyec') || e.includes('activ')) return 'Activo';
+    if(e.includes('parado') || e.includes('inactiv') || e.includes('estudio') || e.includes('reserva')) return 'Inactivo';
     return rawEstado || 'Sin dato';
   }
 
-  function normalizeCkanRow(r, idx, offset, provinciaLabel) {
+  function normalizeCkanRow(r, idx, offset, provinciaLabel){
     const lon = Number(String(r.coordenadax ?? r.longitud ?? r.lon ?? '').replace(',', '.'));
     const lat = Number(String(r.coordenaday ?? r.latitud ?? r.lat ?? '').replace(',', '.'));
     const hasCoords = Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) > 1 && Math.abs(lon) > 1;
@@ -600,10 +330,7 @@
     const idPozo = r.idpozo || r.id_pozo || '';
     const form = String(r.formprod || r.formacion || '').toUpperCase();
     const tipoRec = String(r.tipo_de_recurso || r.tiporecurso || '').toUpperCase();
-    const reservorio = tipoRec.includes('NO CONV') || tipoRec.includes('SHALE') || form === 'VMUT'
-      ? 'SH'
-      : (r.sub_tipo_recurso || tipoRec || 'CONV');
-
+    const reservorio = tipoRec.includes('NO CONV') || tipoRec.includes('SHALE') || form === 'VMUT' ? 'SH' : (r.sub_tipo_recurso || tipoRec || 'CONV');
     return {
       id: idPozo || r._id || (offset + idx + 1),
       PROVINCIA: r.provincia || provinciaLabel,
@@ -630,62 +357,42 @@
       LATITUD: hasCoords ? lat : null,
       LONGITUD: hasCoords ? lon : null,
       OBSERVACIONES: r.cuenca ? `Cuenca ${r.cuenca} · Cap. IV SEN` : 'Cap. IV SEN',
-      _geometry: hasCoords ? { type: 'Point', coordinates: [lon, lat] } : null
+      _geometry: hasCoords ? { type:'Point', coordinates:[lon, lat] } : null
     };
   }
 
-  function resetAllFiltersUI() {
-    if ($('search')) $('search').value = '';
+  function resetAllFiltersUI(){
+    if($('search')) $('search').value = '';
     options('operator', [], 'Todas');
     options('area', [], 'Todas');
     options('field', [], 'Todos');
     options('state', [], 'Todos');
     setHtml('asset-card', '<div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica, productiva y ambiental aparecerá en este panel.</div></div>');
     setText('last-update', 'SIN SELECCIÓN');
-    setText('m-class', '—');
-    setText('m-formation', '—');
-    setText('m-reservoir', '—');
-    setText('m-year', '—');
+    setText('m-class', '—'); setText('m-formation', '—'); setText('m-reservoir', '—'); setText('m-year', '—');
     resetProduction('Esperando selección');
     setHtml('tech-kv', '<div class="kv-row"><span>Esperando selección</span><b>—</b></div>');
     resetWeather('SIN DATOS');
   }
 
   function closeAllModals(){
-    const pm = $('pozos-modal');
-    const im = $('infra-modal');
-    if(pm) pm.classList.remove('open');
-    if(im) im.classList.remove('open');
+    if($('pozos-modal')) $('pozos-modal').classList.remove('open');
+    if($('infra-modal')) $('infra-modal').classList.remove('open');
     document.body.classList.add('on-home');
   }
 
   function openPozosModal(){
-    const im = $('infra-modal');
-    const pm = $('pozos-modal');
-    if(im) im.classList.remove('open');
-    if(pm) pm.classList.add('open');
+    if($('infra-modal')) $('infra-modal').classList.remove('open');
+    if($('pozos-modal')) $('pozos-modal').classList.add('open');
     document.body.classList.remove('on-home');
-
     if(!map){
       canvasRenderer = L.canvas({ padding: 0.4 });
       const [lat, lon, z] = PROV_CENTERS[state.province] || [-38.4, -69.1, 7];
-      map = L.map('map', {
-        zoomControl: true,
-        minZoom: 4,
-        maxZoom: 18,
-        preferCanvas: true,
-        renderer: canvasRenderer
-      }).setView([lat, lon], z);
-
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(map);
+      map = L.map('map', { zoomControl:true, minZoom:4, maxZoom:18, preferCanvas:true, renderer:canvasRenderer }).setView([lat, lon], z);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'&copy; OpenStreetMap' }).addTo(map);
       markerLayer = L.layerGroup().addTo(map);
     }
-
     setTimeout(() => map.invalidateSize(), 60);
-
     if(!state.loadedProvinces[state.province]){
       state.loadedProvinces[state.province] = true;
       loadData(false);
@@ -693,22 +400,15 @@
   }
 
   function onProvinceChange(newProv){
-    if (state.activeAbort) {
-      try { state.activeAbort.abort(); } catch {}
-    }
+    if(state.activeAbort){ try{ state.activeAbort.abort(); }catch{} }
     state.province = newProv || 'Neuquén';
     setText('pozos-prov-title', state.province.toUpperCase());
     if($('infra-prov')) $('infra-prov').value = state.province;
-
-    state.all = [];
-    state.filtered = [];
-    state.selected = null;
-    state.hasFittedOnce = false;
+    state.all = []; state.filtered = []; state.selected = null; state.hasFittedOnce = false;
     state.loadedProvinces[state.province] = true;
-    if (markerLayer) markerLayer.clearLayers();
+    if(markerLayer) markerLayer.clearLayers();
     resetAllFiltersUI();
     updateCounters();
-
     const [lat, lon, z] = PROV_CENTERS[state.province] || [-38.4, -69.1, 7];
     if(map) map.setView([lat, lon], z);
     loadData(false);
@@ -716,28 +416,22 @@
 
   async function openInfraModal(tipo){
     infraCurrentType = tipo;
-    const pm = $('pozos-modal');
-    if(pm) pm.classList.remove('open');
+    if($('pozos-modal')) $('pozos-modal').classList.remove('open');
     document.body.classList.remove('on-home');
-    ['ductos','plantas','areas'].forEach(k => {
-      const btn = $('sw-' + k);
-      if(btn) btn.classList.toggle('active', k === tipo);
-    });
-
+    ['ductos','plantas','areas'].forEach(k => { const btn = $('sw-' + k); if(btn) btn.classList.toggle('active', k === tipo); });
     const selectedProv = $('infra-prov')?.value || state.province || 'Neuquén';
     const titles = {
-      ductos: ['OLEODUCTOS Y DUCTOS TRONCALES', 'RED DE TRANSPORTE DE HIDROCARBUROS'],
-      plantas: ['PLANTAS E INSTALACIONES DE SUPERFICIE', 'BATERÍAS, PTC, PLANTAS DE TRATAMIENTO Y COMPRESIÓN'],
-      areas: ['ÁREAS Y CONCESIONES HIDROCARBURÍFERAS', 'BLOQUES EXPLORATORIOS Y DE EXPLOTACIÓN']
+      ductos:['OLEODUCTOS Y DUCTOS TRONCALES','RED DE TRANSPORTE DE HIDROCARBUROS'],
+      plantas:['PLANTAS E INSTALACIONES DE SUPERFICIE','BATERÍAS, PTC, PLANTAS DE TRATAMIENTO Y COMPRESIÓN'],
+      areas:['ÁREAS Y CONCESIONES HIDROCARBURÍFERAS','BLOQUES EXPLORATORIOS Y DE EXPLOTACIÓN']
     };
-    const [t, sub] = titles[tipo] || ['INFRAESTRUCTURA', ''];
+    const [t, sub] = titles[tipo] || ['INFRAESTRUCTURA',''];
     setText('infra-modal-title', `${t} · ${selectedProv.toUpperCase()}`);
     setText('infra-modal-sub', sub);
     if($('infra-search')) $('infra-search').value = '';
     setHtml('infra-op', '<option value="">Todas</option>');
     setHtml('infra-detail', '<div class="empty" style="min-height:140px"><div><b>Consultando capa oficial…</b>Descargando geometrías desde el servidor GIS.</div></div>');
-    const im = $('infra-modal');
-    if(im) im.classList.add('open');
+    if($('infra-modal')) $('infra-modal').classList.add('open');
 
     if(!infraMap){
       const [lat, lon, z] = PROV_CENTERS[selectedProv] || [-38.4, -69.1, 7];
@@ -748,46 +442,29 @@
     setTimeout(() => infraMap.invalidateSize(), 60);
 
     try{
-      // Si es Áreas en Mendoza o Río Negro, consultamos directo CKAN DataStore desde el navegador
-      if (tipo === 'areas' && normText(selectedProv) !== 'neuquen') {
-        const filters = selectedProv !== 'Todas' ? `&filters=${encodeURIComponent(JSON.stringify({ provincia: selectedProv }))}` : '';
-        const r = await fetch(`${CKAN_DATASTORE_URL}?resource_id=${CAP_IV_POZOS_RESOURCE_ID}${filters}&limit=5000`);
-        const j = await r.json();
-        if (!r.ok || !j.success) throw new Error('No se pudieron obtener áreas desde Secretaría de Energía');
-
+      if(tipo === 'areas' && normText(selectedProv) !== 'neuquen'){
+        const params = { resource_id: CAP_IV_POZOS_RESOURCE_ID, limit: '5000' };
+        if(selectedProv !== 'Todas') params.filters = JSON.stringify({ provincia: selectedProv });
+        const res = await ckanJsonp(params);
         const areasMap = new Map();
-        for (const row of (j.result?.records || [])) {
+        for(const row of (res.records || [])){
           const areaName = String(row.areapermisoconcesion || row.area || '').trim();
           const lon = Number(String(row.coordenadax ?? '').replace(',', '.'));
           const lat = Number(String(row.coordenaday ?? '').replace(',', '.'));
-          if (!areaName || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-          if (!areasMap.has(areaName)) {
-            areasMap.set(areaName, {
-              area: areaName,
-              operador: row.empresa || '',
-              provincia: row.provincia || selectedProv,
-              cuenca: row.cuenca || '',
-              pozos: 0, sumLat: 0, sumLon: 0
-            });
+          if(!areaName || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+          if(!areasMap.has(areaName)){
+            areasMap.set(areaName, { area:areaName, operador:row.empresa || '', provincia:row.provincia || selectedProv, cuenca:row.cuenca || '', pozos:0, sumLat:0, sumLon:0 });
           }
           const item = areasMap.get(areaName);
           item.pozos += 1; item.sumLat += lat; item.sumLon += lon;
         }
-
         infraRawFeatures = [...areasMap.values()].map((a, idx) => ({
-          type: 'Feature',
-          id: idx + 1,
-          properties: {
-            AREA_CONCESION: a.area,
-            OPERADOR: a.operador,
-            PROVINCIA: a.provincia,
-            CUENCA: a.cuenca,
-            POZOS_REGISTRADOS: a.pozos
-          },
-          geometry: { type: 'Point', coordinates: [a.sumLon / a.pozos, a.sumLat / a.pozos] }
+          type:'Feature', id:idx + 1,
+          properties:{ AREA_CONCESION:a.area, OPERADOR:a.operador, PROVINCIA:a.provincia, CUENCA:a.cuenca, POZOS_REGISTRADOS:a.pozos },
+          geometry:{ type:'Point', coordinates:[a.sumLon / a.pozos, a.sumLat / a.pozos] }
         }));
         setText('infra-layer-tag', 'SEN · CAP. IV');
-      } else {
+      }else{
         const qs = new URLSearchParams({ tipo, provincia: selectedProv });
         const r = await fetch(state.api + '/api/infraestructura?' + qs.toString(), { cache:'no-store' });
         const j = await r.json();
@@ -795,13 +472,8 @@
         infraRawFeatures = Array.isArray(j.features) ? j.features : [];
         setText('infra-layer-tag', j.layer || tipo.toUpperCase());
       }
-
-      const ops = [...new Set(infraRawFeatures.map(f => {
-        const p = f.properties || {};
-        return p.OPERADOR || p.EMPRESA || p.operador || p.empresa || '';
-      }).filter(Boolean))].sort();
+      const ops = [...new Set(infraRawFeatures.map(f => { const p = f.properties || {}; return p.OPERADOR || p.EMPRESA || p.operador || p.empresa || ''; }).filter(Boolean))].sort();
       setHtml('infra-op', '<option value="">Todas</option>' + ops.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join(''));
-
       filterInfraLayer(true);
     }catch(e){
       infraRawFeatures = [];
@@ -812,7 +484,7 @@
   }
 
   function onInfraProvinceChange(newProv){
-    if(newProv && newProv !== 'Todas') {
+    if(newProv && newProv !== 'Todas'){
       state.province = newProv;
       if($('province')) $('province').value = newProv;
       setText('pozos-prov-title', newProv.toUpperCase());
@@ -825,7 +497,6 @@
     infraLayerGroup.clearLayers();
     const q = ($('infra-search')?.value || '').trim().toLowerCase();
     const op = $('infra-op')?.value || '';
-
     const filtered = infraRawFeatures.filter(f => {
       const p = f.properties || {};
       const rowOp = p.OPERADOR || p.EMPRESA || p.operador || p.empresa || '';
@@ -833,169 +504,94 @@
       if(!q) return true;
       return Object.values(p).some(v => String(v || '').toLowerCase().includes(q));
     });
-
     setText('infra-count', filtered.length + ' ELEMENTOS');
     if(!filtered.length){
       setHtml('infra-detail', '<div class="empty" style="min-height:140px"><div><b>Sin coincidencias</b>Probá ajustando el filtro o la búsqueda.</div></div>');
       return;
     }
-
-    const layer = L.geoJSON({ type:'FeatureCollection', features: filtered }, {
+    const layer = L.geoJSON({ type:'FeatureCollection', features:filtered }, {
       style: feat => {
         const p = feat.properties || {};
-        const fluido = String(p.FLUIDO || p.TIPO || p.PRODUCTO || '').toUpperCase();
-        const isGas = /GAS/.test(fluido);
-        return {
-          color: isGas ? '#f4b544' : '#24d6d0',
-          weight: infraCurrentType === 'ductos' ? 3.2 : 1.8,
-          opacity: 0.9,
-          fillColor: '#24d6d0',
-          fillOpacity: 0.14
-        };
+        const isGas = /GAS/.test(String(p.FLUIDO || p.TIPO || p.PRODUCTO || '').toUpperCase());
+        return { color:isGas ? '#f4b544' : '#24d6d0', weight:infraCurrentType === 'ductos' ? 3.2 : 1.8, opacity:0.9, fillColor:'#24d6d0', fillOpacity:0.14 };
       },
-      pointToLayer: (feat, latlng) => L.circleMarker(latlng, {
-        radius: 6, color:'#ffffff', weight:1.5, fillColor:'#24d6d0', fillOpacity:0.95
-      }),
+      pointToLayer: (feat, latlng) => L.circleMarker(latlng, { radius:6, color:'#ffffff', weight:1.5, fillColor:'#24d6d0', fillOpacity:0.95 }),
       onEachFeature: (feat, lyr) => {
         lyr.on('click', () => {
           const p = feat.properties || {};
           const rows = Object.entries(p).filter(([,v]) => v !== null && v !== '' && String(v).trim() !== '').slice(0, 18);
-          setHtml('infra-detail', '<div class="kv" style="grid-template-columns:1fr">' +
-            rows.map(([k,v]) => `<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(String(v))}">${escapeHtml(String(v))}</b></div>`).join('') +
-            '</div>');
+          setHtml('infra-detail', '<div class="kv" style="grid-template-columns:1fr">' + rows.map(([k,v]) => `<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(String(v))}">${escapeHtml(String(v))}</b></div>`).join('') + '</div>');
         });
       }
     }).addTo(infraLayerGroup);
-
     setHtml('infra-detail', '<div class="empty" style="min-height:140px"><div><b>Tocá un tramo o instalación en el mapa</b>Los atributos técnicos aparecerán aquí.</div></div>');
-    if(shouldFit && layer.getBounds && layer.getBounds().isValid()){
-      infraMap.fitBounds(layer.getBounds(), { padding:[30,30], maxZoom:13 });
-    }
+    if(shouldFit && layer.getBounds && layer.getBounds().isValid()) infraMap.fitBounds(layer.getBounds(), { padding:[30,30], maxZoom:13 });
   }
 
-  function tick(){
-    setText('clock', new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date()) + ' ART');
-  }
+  function tick(){ setText('clock', new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date()) + ' ART'); }
   tick(); setInterval(tick,1000);
 
-  function toast(msg,error=false){
-    const t=$('toast');
-    if(!t) return;
-    t.textContent=msg;
-    t.className='toast show'+(error?' error':'');
-    setTimeout(()=>t.className='toast',3800);
-  }
+  function toast(msg,error=false){ const t=$('toast'); if(!t) return; t.textContent=msg; t.className='toast show'+(error?' error':''); setTimeout(()=>t.className='toast',3800); }
   function safe(v,fallback='Sin dato'){ return v===null||v===undefined||v===''?fallback:String(v); }
   function fmtDate(v){ if(!v)return 'Sin dato'; const d=new Date(v); return isNaN(d)?String(v):new Intl.DateTimeFormat('es-AR').format(d); }
-  function fmtStamp(ts){
-    if(!ts) return 'SIN FECHA';
-    const d = new Date(ts);
-    if(isNaN(d)) return 'SIN FECHA';
-    return new Intl.DateTimeFormat('es-AR',{
-      day:'2-digit', month:'2-digit', year:'numeric',
-      hour:'2-digit', minute:'2-digit'
-    }).format(d);
-  }
-  function setCatalogTimestamp(ts, sourceTag){
-    state.catalogUpdatedAt = ts;
-    const label = 'ACT. ' + fmtStamp(ts) + (sourceTag ? ' · ' + sourceTag : '');
-    setText('tech-updated', label);
-    setText('wfs-updated', 'GIS · ' + fmtStamp(ts));
-  }
-  function getCoords(x){
-    const lat = Number(x.LATITUD ?? x._geometry?.coordinates?.[1]);
-    const lon = Number(x.LONGITUD ?? x._geometry?.coordinates?.[0]);
-    return (Number.isFinite(lat) && Number.isFinite(lon)) ? [lat, lon] : null;
-  }
+  function fmtStamp(ts){ if(!ts) return 'SIN FECHA'; const d=new Date(ts); return isNaN(d)?'SIN FECHA':new Intl.DateTimeFormat('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(d); }
+  function setCatalogTimestamp(ts, sourceTag){ state.catalogUpdatedAt=ts; setText('tech-updated','ACT. '+fmtStamp(ts)+(sourceTag?' · '+sourceTag:'')); setText('wfs-updated','GIS · '+fmtStamp(ts)); }
+  function getCoords(x){ const lat=Number(x.LATITUD ?? x._geometry?.coordinates?.[1]), lon=Number(x.LONGITUD ?? x._geometry?.coordinates?.[0]); return (Number.isFinite(lat) && Number.isFinite(lon)) ? [lat, lon] : null; }
 
   function openCacheDB(){
     return new Promise((resolve, reject) => {
       if(!('indexedDB' in window)) return reject(new Error('IndexedDB no disponible'));
       const req = indexedDB.open(CACHE_DB_NAME, 1);
-      req.onupgradeneeded = () => {
-        const db = req.result;
-        if(!db.objectStoreNames.contains(CACHE_STORE_NAME)){
-          db.createObjectStore(CACHE_STORE_NAME);
-        }
-      };
+      req.onupgradeneeded = () => { const db = req.result; if(!db.objectStoreNames.contains(CACHE_STORE_NAME)) db.createObjectStore(CACHE_STORE_NAME); };
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
     });
   }
-
   async function readCachedWells(prov){
     try{
       const db = await openCacheDB();
       return await new Promise((resolve, reject) => {
         const tx = db.transaction(CACHE_STORE_NAME, 'readonly');
-        const store = tx.objectStore(CACHE_STORE_NAME);
-        const req = store.get(cacheKeyFor(prov));
+        const req = tx.objectStore(CACHE_STORE_NAME).get(cacheKeyFor(prov));
         req.onsuccess = () => resolve(req.result || null);
         req.onerror = () => reject(req.error);
       });
-    }catch{
-      return null;
-    }
+    }catch{ return null; }
   }
-
   async function writeCachedWells(prov, records, savedAt = Date.now()){
     try{
       const db = await openCacheDB();
       await new Promise((resolve, reject) => {
         const tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
-        const store = tx.objectStore(CACHE_STORE_NAME);
-        const req = store.put({ savedAt, records }, cacheKeyFor(prov));
+        const req = tx.objectStore(CACHE_STORE_NAME).put({ savedAt, records }, cacheKeyFor(prov));
         req.onsuccess = () => resolve();
         req.onerror = () => reject(req.error);
       });
     }catch{}
   }
 
-  if($('reload')){
-    $('reload').onclick = () => {
-      state.hasFittedOnce = false;
-      loadData(true);
-    };
-  }
+  if($('reload')) $('reload').onclick = () => { state.hasFittedOnce = false; loadData(true); };
+  ['search','operator','area','field','state'].forEach(id => { const el = $(id); if(el) el.addEventListener(id==='search'?'input':'change', () => applyFilters(true)); });
 
-  ['search','operator','area','field','state'].forEach(id => {
-    const el = $(id);
-    if(el) el.addEventListener(id==='search'?'input':'change', () => applyFilters(true));
-  });
-
-  /* Neuquén vía Worker WFS | Mendoza y Río Negro directo desde navegador a CKAN DataStore */
   async function fetchBatch(prov, inicio, limite, signal){
-    if (normText(prov) !== 'neuquen') {
-      const dsUrl =
-        `${CKAN_DATASTORE_URL}?resource_id=${encodeURIComponent(CAP_IV_POZOS_RESOURCE_ID)}` +
-        `&filters=${encodeURIComponent(JSON.stringify({ provincia: prov }))}` +
-        `&offset=${inicio}&limit=${limite}`;
-
-      const r = await fetch(dsUrl, { signal });
-      const j = await r.json();
-      if (!r.ok || !j.success) throw new Error('Error consultando Secretaría de Energía');
-      const rows = j.result?.records || [];
-      const total = Number(j.result?.total) || rows.length;
-      const registros = rows.map((row, idx) => ({
-        id: row.idpozo || row._id || (inicio + idx + 1),
-        datos: normalizeCkanRow(row, idx, inicio, prov),
-        geometria: normalizeCkanRow(row, idx, inicio, prov)._geometry
-      }));
-      return {
-        ok: true,
-        total,
-        registros,
-        hayMas: (inicio + registros.length) < total
-      };
+    if(normText(prov) !== 'neuquen'){
+      const res = await ckanJsonp({
+        resource_id: CAP_IV_POZOS_RESOURCE_ID,
+        filters: JSON.stringify({ provincia: prov }),
+        offset: String(inicio),
+        limit: String(limite)
+      });
+      const rows = res.records || [];
+      const total = Number(res.total) || rows.length;
+      const registros = rows.map((row, idx) => {
+        const norm = normalizeCkanRow(row, idx, inicio, prov);
+        return { id: norm.id, datos: norm, geometria: norm._geometry };
+      });
+      return { ok:true, total, registros, hayMas:(inicio + registros.length) < total };
     }
-
     for(let intento=1; intento<=2; intento++){
       try{
-        const qs = new URLSearchParams({
-          provincia: prov,
-          inicio: String(inicio),
-          limite: String(limite)
-        });
+        const qs = new URLSearchParams({ provincia:prov, inicio:String(inicio), limite:String(limite) });
         const r = await fetch(state.api+'/api/pozos?'+qs.toString(), {cache:'no-store', signal});
         const data = await r.json();
         if(!r.ok || !data.ok) throw new Error(data.error || 'Respuesta inválida');
@@ -1016,9 +612,7 @@
     if(!forceRefresh){
       const cached = await readCachedWells(prov);
       if(seq !== state.requestSeq) return;
-      const isFresh = cached && Array.isArray(cached.records) && cached.records.length > 0 &&
-        (Date.now() - Number(cached.savedAt || 0) < CACHE_TTL_MS);
-
+      const isFresh = cached && Array.isArray(cached.records) && cached.records.length > 0 && (Date.now() - Number(cached.savedAt || 0) < CACHE_TTL_MS);
       if(isFresh){
         state.all = cached.records;
         populateFilters();
@@ -1039,15 +633,12 @@
     if(markerLayer) markerLayer.clearLayers();
     updateCounters();
 
-    const limite = 1000;
-    const concurrencia = 3;
-    let inicio = 0;
-    let cargaParcial = false;
+    const limite = 1000, concurrencia = 3;
+    let inicio = 0, cargaParcial = false;
 
     try{
       const primero = await fetchBatch(prov, 0, limite, controller.signal);
       if(seq !== state.requestSeq) return;
-
       const lote0 = (primero.registros || []).map(x => ({id:x.id, ...(x.datos||{}), _geometry:x.geometria}));
       state.all.push(...lote0);
       setConnection(`API ONLINE · ${prov.toUpperCase()}`, true);
@@ -1060,13 +651,10 @@
       while(primero.hayMas && inicio < totalEstimado){
         if(seq !== state.requestSeq) return;
         const offsets = [];
-        for(let i = 0; i < concurrencia && (inicio + i * limite) < totalEstimado; i++){
-          offsets.push(inicio + i * limite);
-        }
+        for(let i = 0; i < concurrencia && (inicio + i * limite) < totalEstimado; i++) offsets.push(inicio + i * limite);
         if(!offsets.length) break;
 
         setText('footer-state', `CARGANDO ${prov.toUpperCase()} · ${state.all.length} / ${totalEstimado}`);
-
         const resultados = await Promise.allSettled(offsets.map(off => fetchBatch(prov, off, limite, controller.signal)));
         if(seq !== state.requestSeq) return;
 
@@ -1081,19 +669,15 @@
             cargaParcial = true;
           }
         }
-
         applyFilters(false);
         inicio += offsets.length * limite;
         if(finAlcanzado || cargaParcial) break;
       }
 
       if(seq !== state.requestSeq) return;
-
       if(state.all.length){
         const now = Date.now();
-        if(!cargaParcial){
-          await writeCachedWells(prov, state.all, now);
-        }
+        if(!cargaParcial) await writeCachedWells(prov, state.all, now);
         setCatalogTimestamp(now, cargaParcial ? 'PARCIAL' : (prov === 'Neuquén' ? 'WFS' : 'SEN'));
         setConnection(cargaParcial ? 'API ONLINE · PARCIAL' : `API ONLINE · ${prov.toUpperCase()}`, true);
         setText('footer-state', `${prov.toUpperCase()} · ${state.all.length} POZOS CARGADOS`);
@@ -1124,35 +708,22 @@
     }
   }
 
-  function setConnection(text,ok){
-    setText('api-status', text);
-    const dot = document.querySelector('.dot');
-    if(dot) dot.style.background=ok?'var(--green)':'var(--red)';
-  }
-
+  function setConnection(text,ok){ setText('api-status', text); const dot=document.querySelector('.dot'); if(dot) dot.style.background=ok?'var(--green)':'var(--red)'; }
   function options(id,values,label){
-    const el=$(id);
-    if(!el) return;
-    const cur=el.value;
-    const unique=[...new Set(values.filter(Boolean))].sort();
+    const el=$(id); if(!el) return;
+    const cur=el.value, unique=[...new Set(values.filter(Boolean))].sort();
     el.innerHTML='<option value="">'+label+'</option>'+unique.map(v=>'<option value="'+escapeHtml(v)+'">'+v.replace(/</g,'&lt;')+'</option>').join('');
     el.value = unique.includes(cur) ? cur : '';
   }
 
   function populateFilters(){
     const op = $('operator')?.value || '';
-    const ar = $('area')?.value || '';
-    const fi = $('field')?.value || '';
-
     options('operator', state.all.map(x => x.OPERADOR), 'Todas');
-
     const byOp = op ? state.all.filter(x => x.OPERADOR === op) : state.all;
     options('area', byOp.map(x => x.AREA_LEGAL), 'Todas');
-
     const arValid = $('area')?.value || '';
     const byAr = arValid ? byOp.filter(x => x.AREA_LEGAL === arValid) : byOp;
     options('field', byAr.map(x => x.YACIMIENTO), 'Todos');
-
     const fiValid = $('field')?.value || '';
     const byFi = fiValid ? byAr.filter(x => x.YACIMIENTO === fiValid) : byAr;
     options('state', byFi.map(x => x.ESTADO_GIS), 'Todos');
@@ -1160,17 +731,10 @@
 
   function applyFilters(shouldFit=false){
     populateFilters();
-    const q=($('search')?.value || '').trim().toLowerCase();
-    const op=$('operator')?.value || '';
-    const ar=$('area')?.value || '';
-    const fi=$('field')?.value || '';
-    const st=$('state')?.value || '';
+    const q=($('search')?.value || '').trim().toLowerCase(), op=$('operator')?.value || '', ar=$('area')?.value || '', fi=$('field')?.value || '', st=$('state')?.value || '';
     state.filtered=state.all.filter(x =>
       (!q || [x.UWI_NQN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME].some(v => String(v||'').toLowerCase().includes(q))) &&
-      (!op || x.OPERADOR===op) &&
-      (!ar || x.AREA_LEGAL===ar) &&
-      (!fi || x.YACIMIENTO===fi) &&
-      (!st || x.ESTADO_GIS===st)
+      (!op || x.OPERADOR===op) && (!ar || x.AREA_LEGAL===ar) && (!fi || x.YACIMIENTO===fi) && (!st || x.ESTADO_GIS===st)
     );
     renderMarkers(shouldFit);
     updateCounters();
@@ -1190,23 +754,11 @@
     state.filtered.forEach(x => {
       const coords = getCoords(x);
       if(!coords) return;
-      const [lat, lon] = coords;
-      const c = markerColors(x);
-      const m = L.circleMarker([lat,lon],{
-        renderer: canvasRenderer,
-        radius: 4.5,
-        color: c.stroke,
-        weight: 1.5,
-        fillColor: c.fill,
-        fillOpacity: 0.9
-      }).on('click',()=>selectWell(x));
-      m.addTo(markerLayer);
+      const [lat, lon] = coords, c = markerColors(x);
+      L.circleMarker([lat,lon],{ renderer:canvasRenderer, radius:4.5, color:c.stroke, weight:1.5, fillColor:c.fill, fillOpacity:0.9 }).on('click',()=>selectWell(x)).addTo(markerLayer);
       bounds.push([lat,lon]);
     });
-    if(bounds.length && (shouldFit || !state.hasFittedOnce)){
-      map.fitBounds(bounds,{padding:[45,45],maxZoom:14});
-      state.hasFittedOnce = true;
-    }
+    if(bounds.length && (shouldFit || !state.hasFittedOnce)){ map.fitBounds(bounds,{padding:[45,45],maxZoom:14}); state.hasFittedOnce = true; }
   }
 
   function updateCounters(){
@@ -1216,60 +768,36 @@
   }
 
   function resetProduction(statusText='Consultando…', periodText='RES. 319/93'){
-    setText('p-oil', '—');
-    setText('p-gas', '—');
-    setText('p-water', '—');
-    setText('p-tef', '—');
-    setText('p-oil-sub', 'm³/mes');
-    setText('p-gas-sub', 'Mm³/mes');
-    setText('p-water-sub', 'm³/mes');
-    setText('p-tef-sub', 'horas');
-    setText('prod-period', periodText);
-    setText('p-status', statusText);
+    setText('p-oil','—'); setText('p-gas','—'); setText('p-water','—'); setText('p-tef','—');
+    setText('p-oil-sub','m³/mes'); setText('p-gas-sub','Mm³/mes'); setText('p-water-sub','m³/mes'); setText('p-tef-sub','horas');
+    setText('prod-period',periodText); setText('p-status',statusText);
   }
 
   async function loadProduction(x){
     const sigla = String(x.WELL_NAME || x.SIGLA_NACION || '').trim();
     const idpozo = String(x.UWI_SEN || '').trim();
-    if(!sigla && !idpozo){
-      resetProduction('Sin sigla / UWI SEN disponible');
-      return;
-    }
+    if(!sigla && !idpozo){ resetProduction('Sin sigla / UWI SEN disponible'); return; }
     resetProduction('Consultando '+(sigla || idpozo)+'…');
     try{
       const qs = new URLSearchParams();
       if(sigla) qs.set('sigla', sigla);
       if(idpozo) qs.set('idpozo', idpozo);
-
       const r = await fetch(state.api+'/api/produccion?'+qs.toString(), {cache:'no-store'});
       const j = await r.json();
       if(!r.ok || j.ok === false) throw new Error(j.error || ('HTTP '+r.status));
-
       const rec = j.ultimo_mes || (Array.isArray(j.historial) ? j.historial[0] : null);
-      if(!rec){
-        resetProduction('Sin declaraciones registradas', j.recurso || 'RES. 319/93');
-        return;
-      }
-
-      const oil = Number(rec.prod_pet ?? rec.PROD_PET);
-      const gas = Number(rec.prod_gas ?? rec.PROD_GAS);
-      const water = Number(rec.prod_agua ?? rec.PROD_AGUA);
-      const tef = Number(rec.tef ?? rec.TEF);
-
+      if(!rec){ resetProduction('Sin declaraciones registradas', j.recurso || 'RES. 319/93'); return; }
+      const oil = Number(rec.prod_pet ?? rec.PROD_PET), gas = Number(rec.prod_gas ?? rec.PROD_GAS), water = Number(rec.prod_agua ?? rec.PROD_AGUA), tef = Number(rec.tef ?? rec.TEF);
       setText('p-oil', Number.isFinite(oil) ? oil.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—');
       setText('p-gas', Number.isFinite(gas) ? gas.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—');
       setText('p-water', Number.isFinite(water) ? water.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—');
       setText('p-tef', Number.isFinite(tef) ? tef.toLocaleString('es-AR',{maximumFractionDigits:1}) : '—');
-
-      const mes = rec.mes ?? rec.MES;
-      const anio = rec.anio ?? rec.ANIO;
+      const mes = rec.mes ?? rec.MES, anio = rec.anio ?? rec.ANIO;
       const periodo = (mes && anio) ? String(mes).padStart(2,'0')+'/'+anio : 'RES. 319/93';
       setText('prod-period', periodo);
       const fechaIng = rec.fechaingreso ?? rec.FECHAINGRESO;
       setText('p-status', fechaIng ? 'Declarado · Ingreso '+fmtDate(fechaIng) : 'Período '+periodo);
-    }catch(e){
-      resetProduction(e.message || 'Sin datos de producción');
-    }
+    }catch(e){ resetProduction(e.message || 'Sin datos de producción'); }
   }
 
   async function selectWell(x){
@@ -1278,35 +806,16 @@
     const statusClass=s.includes('abandon')?'abandoned':s.includes('inactiv')?'inactive':x.ESTADO_GIS?'active':'none';
     setHtml('asset-card', `<div class="asset-title"><div class="asset-icon">◩</div><div class="asset-name"><h3>${escapeHtml(safe(x.FIELD_NAME))}</h3><p>${escapeHtml(safe(x.WELL_NAME))} · ${escapeHtml(safe(x.UWI_NQN))}</p></div><div class="state ${statusClass}">${escapeHtml(safe(x.ESTADO_GIS).toUpperCase())}</div></div>`);
     setText('last-update', 'SELECCIONADO '+new Date().toLocaleTimeString('es-AR'));
-    setText('m-class', safe(x.CLASS_NAME,'—'));
-    setText('m-formation', safe(x.FORM_PROD,'—'));
-    setText('m-reservoir', safe(x.RESERVORIO,'—'));
-    setText('m-year', safe(x['AÑO_PERF'],'—'));
-
+    setText('m-class', safe(x.CLASS_NAME,'—')); setText('m-formation', safe(x.FORM_PROD,'—')); setText('m-reservoir', safe(x.RESERVORIO,'—')); setText('m-year', safe(x['AÑO_PERF'],'—'));
     const coords = getCoords(x);
     const pairs=[
-      ['Provincia',x.PROVINCIA || state.province],
-      ['Operadora',x.OPERADOR],
-      ['Operadora original',x.OPERADOR_ORIGINAL],
-      ['Área legal',x.AREA_LEGAL],
-      ['Yacimiento',x.YACIMIENTO],
-      ['Fluido',x.FLUIDO],
-      ['Sistema de extracción',x.SIST_EXTRACCION],
-      ['Tipo',x.TYPE_NAME],
-      ['Elevación',x.ELEVACION!=null?x.ELEVACION+' m':null],
-      ['Profundidad medida',x.PROFUNDIDAD_MEDIDA!=null?x.PROFUNDIDAD_MEDIDA+' m':null],
-      ['Inicio perforación',fmtDate(x.INICIO_PERF)],
-      ['Fin perforación',fmtDate(x.FIN_PERF)],
-      ['Inicio terminación',fmtDate(x.INICIO_TERM)],
-      ['Fin terminación',fmtDate(x.FIN_TERM)],
-      ['Latitud',coords?coords[0]:null],
-      ['Longitud',coords?coords[1]:null],
-      ['Legajo',x.LEGAJO],
-      ['Perfiles',x.PERFILES],
-      ['Observaciones',x.OBSERVACIONES?.trim()||null]
+      ['Provincia',x.PROVINCIA || state.province],['Operadora',x.OPERADOR],['Operadora original',x.OPERADOR_ORIGINAL],
+      ['Área legal',x.AREA_LEGAL],['Yacimiento',x.YACIMIENTO],['Fluido',x.FLUIDO],['Sistema de extracción',x.SIST_EXTRACCION],
+      ['Tipo',x.TYPE_NAME],['Elevación',x.ELEVACION!=null?x.ELEVACION+' m':null],['Profundidad medida',x.PROFUNDIDAD_MEDIDA!=null?x.PROFUNDIDAD_MEDIDA+' m':null],
+      ['Inicio perforación',fmtDate(x.INICIO_PERF)],['Fin perforación',fmtDate(x.FIN_PERF)],['Inicio terminación',fmtDate(x.INICIO_TERM)],['Fin terminación',fmtDate(x.FIN_TERM)],
+      ['Latitud',coords?coords[0]:null],['Longitud',coords?coords[1]:null],['Legajo',x.LEGAJO],['Perfiles',x.PERFILES],['Observaciones',x.OBSERVACIONES?.trim()||null]
     ];
     setHtml('tech-kv', pairs.map(([k,v])=>`<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(safe(v))}">${escapeHtml(safe(v))}</b></div>`).join(''));
-
     if(coords){
       const [lat, lon] = coords;
       if(map) map.flyTo([lat,lon],15,{duration:.7});
@@ -1324,40 +833,23 @@
       const r=await fetch(u); const j=await r.json();
       if(!r.ok||!j.current)throw new Error('Meteorología no disponible');
       const c=j.current;
-      setText('w-temp', val(c.temperature_2m,'°C'));
-      setText('w-wind', val(c.wind_speed_10m,'km/h'));
-      setText('w-dir', 'Dirección '+cardinal(c.wind_direction_10m)+' · '+Math.round(c.wind_direction_10m||0)+'°');
-      setText('w-gust', val(c.wind_gusts_10m,'km/h'));
-      setText('w-rain', val(c.precipitation,'mm'));
-      setText('w-hum', val(c.relative_humidity_2m,'%'));
-      setText('w-press', val(c.surface_pressure,'hPa'));
+      setText('w-temp', val(c.temperature_2m,'°C')); setText('w-wind', val(c.wind_speed_10m,'km/h'));
+      setText('w-gust', val(c.wind_gusts_10m,'km/h')); setText('w-rain', val(c.precipitation,'mm'));
+      setText('w-hum', val(c.relative_humidity_2m,'%')); setText('w-press', val(c.surface_pressure,'hPa'));
       setText('weather-time', safe(c.time).replace('T',' '));
       evaluateRisk(c);
-    }catch(e){
-      resetWeather('SIN RESPUESTA');
-      toast(e.message,true);
-    }
+    }catch(e){ resetWeather('SIN RESPUESTA'); toast(e.message,true); }
   }
 
   function val(v,u){return v==null?'—':Math.round(v*10)/10+' '+u}
-  function cardinal(d){if(d==null)return '—';return ['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8]}
-  function resetWeather(label){
-    ['w-temp','w-wind','w-gust','w-rain','w-hum','w-press'].forEach(id=>setText(id, '—'));
-    setText('weather-time', label);
-    setText('risk-title', 'TERRITORIA · EVALUANDO');
-    setText('risk-text', 'Procesando condiciones ambientales del punto.');
-    setText('risk-icon', '◌');
-  }
+  function resetWeather(label){ ['w-temp','w-wind','w-gust','w-rain','w-hum','w-press'].forEach(id=>setText(id,'—')); setText('weather-time',label); setText('risk-title','TERRITORIA · EVALUANDO'); setText('risk-text','Procesando condiciones ambientales del punto.'); setText('risk-icon','◌'); }
   function evaluateRisk(c){
     const gust=Number(c.wind_gusts_10m||0),rain=Number(c.precipitation||0),wind=Number(c.wind_speed_10m||0);
     let level='NORMAL',text='Sin umbrales ambientales relevantes en la lectura actual.',icon='●',color='#31d67b';
     if(gust>=70||rain>=15){level='ALERTA',text=gust>=70?'Ráfagas muy fuertes en el entorno del activo.':'Precipitación intensa en la lectura actual.';icon='▲',color='#ff5e68'}
     else if(gust>=45||wind>=35||rain>=5){level='ATENCIÓN',text=gust>=45?'Ráfagas elevadas en el entorno del activo.':rain>=5?'Precipitación relevante en el punto.':'Viento sostenido elevado.';icon='◆',color='#f4b544'}
-    setText('risk-title', 'TERRITORIA · '+level);
-    setText('risk-text', text);
-    setText('risk-icon', icon);
-    const rIcon = $('risk-icon');
-    if(rIcon) rIcon.style.color=color;
+    setText('risk-title','TERRITORIA · '+level); setText('risk-text',text); setText('risk-icon',icon);
+    const rIcon=$('risk-icon'); if(rIcon) rIcon.style.color=color;
   }
   function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}
 </script>
