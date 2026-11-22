@@ -60,7 +60,7 @@
     </div>
     <div class="top-status">
       <div class="source-pill">FUENTE · GIS OFICIAL NEUQUÉN</div>
-      <div class="status-pill"><i class="dot"></i><span id="api-status">MAPA LIBRE · OSM</span></div>
+      <div class="status-pill"><i class="dot"></i><span id="api-status">INICIANDO…</span></div>
       <div class="clock" id="clock">--:--:--</div>
       <button class="btn" id="config-btn" style="height:36px">⚙ API</button>
     </div>
@@ -129,14 +129,14 @@
     </aside>
   </main>
 
-  <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>MAPA SIN API KEY · OSM + OPEN-METEO</span><span id="footer-state">MAPA LISTO</span></footer>
+  <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>MAPA SIN API KEY · OSM + OPEN-METEO</span><span id="footer-state">SISTEMA EN ESPERA</span></footer>
 </div>
 
 <dialog id="config-dialog">
-  <div class="modal-head"><h3>Conectar Territoria Energy API (Opcional)</h3></div>
+  <div class="modal-head"><h3>Conectar Territoria Energy API</h3></div>
   <div class="modal-body">
-    <p>El mapa y la meteorología funcionan sin clave ni configuración previa. Si querés cargar pozos desde tu Worker, pegá la URL base sin rutas al final (ej.: <b>https://territoria-energy-api.tu-cuenta.workers.dev</b>).</p>
-    <input id="api-url" placeholder="https://territoria-energy-api....workers.dev" autocomplete="off" />
+    <p>Dirección base de tu Worker sin rutas al final. Predeterminada: <b>https://territoria-energy-api.elexpreso17.workers.dev</b>.</p>
+    <input id="api-url" placeholder="https://territoria-energy-api.elexpreso17.workers.dev" autocomplete="off" />
     <div class="modal-actions"><button class="btn" id="cancel-config">Cancelar</button><button class="btn primary" id="save-config">Guardar y conectar</button></div>
   </div>
 </dialog>
@@ -144,8 +144,18 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
+  const DEFAULT_API = 'https://territoria-energy-api.elexpreso17.workers.dev';
   const $ = id => document.getElementById(id);
-  const state = { all: [], filtered: [], markers: [], selected: null, api: localStorage.getItem('territoriaEnergyApi') || '' };
+  const state = {
+    all: [],
+    filtered: [],
+    markers: [],
+    selected: null,
+    api: localStorage.getItem('territoriaEnergyApi') || DEFAULT_API,
+    uwiLookupTimer: null,
+    searchedUwIs: new Set()
+  };
+
   const map = L.map('map', { zoomControl:true, preferCanvas:true }).setView([-38.4,-69.1],7);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -164,42 +174,76 @@
   $('cancel-config').onclick=()=>$('config-dialog').close();
   $('save-config').onclick=()=>{
     const raw = $('api-url').value.trim();
-    if (!raw) {
-      state.api = '';
-      localStorage.removeItem('territoriaEnergyApi');
-      $('config-dialog').close();
-      setConnection('MAPA LIBRE · OSM', true);
-      $('footer-state').textContent = 'MAPA LISTO · SIN API DE POZOS';
-      return;
-    }
-    const value = cleanBase(raw);
-    if (!/^https?:\/\//i.test(value)) { toast('La URL debe comenzar con http:// o https://', true); return; }
+    const value = cleanBase(raw || DEFAULT_API);
+    if(!/^https?:\/\//i.test(value)){toast('La URL debe comenzar con http:// o https://',true);return;}
     state.api = value;
     localStorage.setItem('territoriaEnergyApi', value);
+    state.searchedUwIs.clear();
     $('config-dialog').close();
     loadData();
   };
-  $('reload').onclick=()=>{ if (!state.api) { toast('Mapa activo sin API de pozos configurada. Usá ⚙ API si querés cargar datos.', false); return; } loadData(); };
-  ['search','operator','area','field','state'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',applyFilters));
+  $('reload').onclick=loadData;
+
+  $('search').addEventListener('input', () => {
+    applyFilters();
+    clearTimeout(state.uwiLookupTimer);
+    const q = $('search').value.trim();
+    if (q.length >= 4 && state.filtered.length === 0) {
+      state.uwiLookupTimer = setTimeout(() => searchByUwi(q), 350);
+    }
+  });
+  ['operator','area','field','state'].forEach(id=>$(id).addEventListener('change',applyFilters));
+
+  function mapRecords(registros) {
+    return (registros || []).map(x => ({ id: x.id, ...(x.datos || {}), _geometry: x.geometria }));
+  }
 
   async function loadData(){
-    if(!state.api) return;
     setConnection('CONECTANDO…',false); $('footer-state').textContent='CONSULTANDO FUENTE OFICIAL';
     try{
       const r=await fetch(state.api+'/api/pozos?limite=100');
       const j=await r.json();
       if(!r.ok||!j.ok) throw new Error(j.error||'Respuesta inválida');
-      state.all=(j.registros||[]).map(x=>({id:x.id,...(x.datos||{}),_geometry:x.geometria}));
+      state.all = mapRecords(j.registros);
+      state.searchedUwIs.clear();
       setConnection('API ONLINE',true); $('footer-state').textContent='ÚLTIMA ACTUALIZACIÓN '+new Date().toLocaleTimeString('es-AR');
       populateFilters(); applyFilters(); toast(state.all.length+' pozos reales cargados');
     }catch(e){setConnection('API SIN RESPUESTA',false);$('footer-state').textContent='ERROR DE CONEXIÓN';toast(e.message,true)}
   }
+
+  async function searchByUwi(uwiQuery) {
+    const uwi = uwiQuery.trim().toUpperCase();
+    if (!uwi || state.searchedUwIs.has(uwi)) return;
+    state.searchedUwIs.add(uwi);
+    try {
+      const r = await fetch(`${state.api}/api/pozos?uwi=${encodeURIComponent(uwi)}`);
+      const j = await r.json();
+      if (!r.ok || !j.ok || !Array.isArray(j.registros) || j.registros.length === 0) return;
+      const incoming = mapRecords(j.registros);
+      const existingKeys = new Set(state.all.map(item => `${item.id ?? ''}|${item.UWI_NQN ?? ''}`));
+      let added = 0;
+      for (const item of incoming) {
+        const key = `${item.id ?? ''}|${item.UWI_NQN ?? ''}`;
+        if (!existingKeys.has(key)) {
+          existingKeys.add(key);
+          state.all.push(item);
+          added++;
+        }
+      }
+      if (added > 0) {
+        populateFilters();
+        applyFilters();
+        toast(`Pozo ${uwi} encontrado en GeoServer`);
+      }
+    } catch (_) {}
+  }
+
   function setConnection(text,ok){$('api-status').textContent=text;document.querySelector('.dot').style.background=ok?'var(--green)':'var(--red)';}
   function options(id,values,label){const el=$(id),cur=el.value;el.innerHTML='<option value="">'+label+'</option>'+[...new Set(values.filter(Boolean))].sort().map(v=>'<option>'+escapeHtml(v)+'</option>').join('');el.value=cur;}
   function populateFilters(){options('operator',state.all.map(x=>x.OPERADOR),'Todas');options('area',state.all.map(x=>x.AREA_LEGAL),'Todas');options('field',state.all.map(x=>x.YACIMIENTO),'Todos');options('state',state.all.map(x=>x.ESTADO_GIS),'Todos');}
   function applyFilters(){
     const q=$('search').value.trim().toLowerCase(),op=$('operator').value,ar=$('area').value,fi=$('field').value,st=$('state').value;
-    state.filtered=state.all.filter(x=>(!q||[x.UWI_NQN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME].some(v=>String(v||'').toLowerCase().includes(q)))&&(!op||x.OPERADOR===op)&&(!ar||x.AREA_LEGAL===ar)&&(!fi||x.YACIMIENTO===fi)&&(!st||x.ESTADO_GIS===st));
+    state.filtered=state.all.filter(x=>(!q||[x.UWI_NQN,x.UWI_SEN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME].some(v=>String(v||'').toLowerCase().includes(q)))&&(!op||x.OPERADOR===op)&&(!ar||x.AREA_LEGAL===ar)&&(!fi||x.YACIMIENTO===fi)&&(!st||x.ESTADO_GIS===st));
     renderMarkers(); updateCounters();
   }
   function markerClass(x){const s=(x.ESTADO_GIS||'').toLowerCase();return s.includes('abandon')?'ab':s.includes('inactiv')?'in':''}
@@ -219,7 +263,7 @@
     $('last-update').textContent='SELECCIONADO '+new Date().toLocaleTimeString('es-AR');$('m-class').textContent=safe(x.CLASS_NAME,'—');$('m-formation').textContent=safe(x.FORM_PROD,'—');$('m-reservoir').textContent=safe(x.RESERVORIO,'—');$('m-year').textContent=safe(x['AÑO_PERF'],'—');
     const pairs=[['Operadora',x.OPERADOR],['Operadora original',x.OPERADOR_ORIGINAL],['Área legal',x.AREA_LEGAL],['Yacimiento',x.YACIMIENTO],['Fluido',x.FLUIDO],['Sistema de extracción',x.SIST_EXTRACCION],['Tipo',x.TYPE_NAME],['Elevación',x.ELEVACION!=null?x.ELEVACION+' m':null],['Profundidad medida',x.PROFUNDIDAD_MEDIDA!=null?x.PROFUNDIDAD_MEDIDA+' m':null],['Inicio perforación',fmtDate(x.INICIO_PERF)],['Fin perforación',fmtDate(x.FIN_PERF)],['Inicio terminación',fmtDate(x.INICIO_TERM)],['Fin terminación',fmtDate(x.FIN_TERM)],['Latitud',x.LATITUD],['Longitud',x.LONGITUD],['Legajo',x.LEGAJO],['Perfiles',x.PERFILES],['Observaciones',x.OBSERVACIONES?.trim()||null]];
     $('tech-kv').innerHTML=pairs.map(([k,v])=>`<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(safe(v))}">${escapeHtml(safe(v))}</b></div>`).join('');
-    const lat=Number(x.LATITUD),lon=Number(x.LONGITUD);if(Number.isFinite(lat)&&Number.isFinite(lon)){map.flyTo([lat,lon],13,{duration:.7});await loadWeather(lat,lon)}
+    const lat=Number(x.LATITUD??x._geometry?.coordinates?.[1]),lon=Number(x.LONGITUD??x._geometry?.coordinates?.[0]);if(Number.isFinite(lat)&&Number.isFinite(lon)){map.flyTo([lat,lon],13,{duration:.7});await loadWeather(lat,lon)}
   }
   async function loadWeather(lat,lon){
     resetWeather('CONSULTANDO…');
@@ -232,7 +276,7 @@
   function resetWeather(label){['w-temp','w-wind','w-gust','w-rain','w-hum','w-press'].forEach(id=>$(id).textContent='—');$('weather-time').textContent=label;$('risk-title').textContent='TERRITORIA · EVALUANDO';$('risk-text').textContent='Procesando condiciones ambientales del punto.';$('risk-icon').textContent='◌'}
   function evaluateRisk(c){const gust=Number(c.wind_gusts_10m||0),rain=Number(c.precipitation||0),wind=Number(c.wind_speed_10m||0);let level='NORMAL',text='Sin umbrales ambientales relevantes en la lectura actual.',icon='●',color='#31d67b';if(gust>=70||rain>=15){level='ALERTA',text=gust>=70?'Ráfagas muy fuertes en el entorno del activo.':'Precipitación intensa en la lectura actual.';icon='▲';color='#ff5e68'}else if(gust>=45||wind>=35||rain>=5){level='ATENCIÓN',text=gust>=45?'Ráfagas elevadas en el entorno del activo.':rain>=5?'Precipitación relevante en el punto.':'Viento sostenido elevado.';icon='◆';color='#f4b544'}$('risk-title').textContent='TERRITORIA · '+level;$('risk-text').textContent=text;$('risk-icon').textContent=icon;$('risk-icon').style.color=color;}
   function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}
-  if(state.api) loadData();
+  loadData();
 </script>
 </body>
 </html>
