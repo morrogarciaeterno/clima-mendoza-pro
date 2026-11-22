@@ -342,4 +342,574 @@
       font-size: 13px;
       font-weight: 700;
       color: var(--accent-emerald);
-      background: rgba(
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .sheet-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      flex-shrink: 0;
+    }
+
+    .sheet-tab {
+      flex: 1;
+      padding: 10px 6px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .sheet-tab.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+    }
+
+    .sheet-body {
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tab-pane.active {
+      display: flex;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      margin-bottom: 4px;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .spec-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 7px;
+      padding: 8px 10px;
+    }
+
+    .spec-k {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .spec-v {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+      color: #f8fafc;
+    }
+
+    .chart-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .bars-container {
+      height: 92px;
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+      padding-top: 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(180deg, #38bdf8, #0284c7);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .bar-lbl {
+      font-size: 9.5px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    .alert-item {
+      background: rgba(239, 68, 68, 0.12);
+      border-left: 3px solid var(--accent-red);
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .alert-item.amber {
+      background: rgba(245, 158, 11, 0.12);
+      border-left-color: var(--accent-amber);
+    }
+
+    .alert-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- HEADER MÓVIL -->
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <div class="brand-badge">NT</div>
+          <div class="brand-title">TERRITORIA <span>UPSTREAM</span></div>
+        </div>
+        <span class="demo-tag">SIMULACIÓN</span>
+      </div>
+
+      <div class="sector-bar">
+        <button class="sector-btn active" onclick="flyToSector('vmSur', this)">VM Sur · Añelo</button>
+        <button class="sector-btn" onclick="flyToSector('vmNorte', this)">VM Norte · Malargüe</button>
+        <button class="sector-btn" onclick="flyToSector('cuyana', this)">Cuyana · Mendoza</button>
+      </div>
+    </header>
+
+    <!-- ESCENARIO DE MAPA -->
+    <div class="map-stage">
+      <!-- KPIs HORIZONTALES -->
+      <div class="kpi-carousel">
+        <div class="kpi-card">
+          <div class="kpi-label">Pozos Shale</div>
+          <div class="kpi-value" id="kpi-pozos">142</div>
+          <div class="kpi-sub up">+6 en fractura</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Prod. Bloque</div>
+          <div class="kpi-value" id="kpi-prod">14.820 m³/d</div>
+          <div class="kpi-sub up">▲ 4.2% mensual</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">VIIRS Flaring</div>
+          <div class="kpi-value" id="kpi-viirs">3 Focos</div>
+          <div class="kpi-sub warn">Máx 18.4 MW</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Sismo / Rutas</div>
+          <div class="kpi-value" id="kpi-sismo">2.4 Ml</div>
+          <div class="kpi-sub warn">Zonda RP 180/RP 7</div>
+        </div>
+      </div>
+
+      <!-- MAPA LEAFLET -->
+      <div id="map"></div>
+
+      <!-- BOTÓN FLOTANTE DE CAPAS -->
+      <div class="fab-stack">
+        <button class="fab-btn" id="btn-layers" title="Capas" onclick="toggleLayersDrawer()">🗂️</button>
+        <button class="fab-btn" id="btn-center" title="Centrar sector" onclick="recenterCurrentSector()">🎯</button>
+      </div>
+
+      <!-- MENÚ DESPLEGABLE DE CAPAS -->
+      <div class="layers-drawer" id="layers-drawer">
+        <div class="drawer-title">
+          <span>Capas del Mapa</span>
+          <span style="cursor:pointer; color:#94a3b8;" onclick="toggleLayersDrawer()">✕</span>
+        </div>
+        <label class="layer-row">
+          <span><span class="dot" style="background:#38bdf8;"></span>Concesiones</span>
+          <input type="checkbox" checked onchange="toggleLayer('areas', this.checked)">
+        </label>
+        <label class="layer-row">
+          <span><span class="dot" style="background:#10b981;"></span>Pozos + Ramas</span>
+          <input type="checkbox" checked onchange="toggleLayer('pozos', this.checked)">
+        </label>
+        <label class="layer-row">
+          <span><span class="dot" style="background:#a855f7;"></span>Ductos</span>
+          <input type="checkbox" checked onchange="toggleLayer('ductos', this.checked)">
+        </label>
+        <label class="layer-row">
+          <span><span class="dot" style="background:#f59e0b;"></span>VIIRS Antorchas</span>
+          <input type="checkbox" checked onchange="toggleLayer('viirs', this.checked)">
+        </label>
+        <label class="layer-row">
+          <span><span class="dot" style="background:#ef4444;"></span>Sismos INPRES</span>
+          <input type="checkbox" checked onchange="toggleLayer('sismos', this.checked)">
+        </label>
+      </div>
+
+      <!-- BOTTOM SHEET: FICHA TÉCNICA + ALERTAS -->
+      <div class="bottom-sheet" id="bottom-sheet">
+        <div class="sheet-handle-bar" onclick="toggleSheet()">
+          <div class="pill-grip"></div>
+          <div class="sheet-peek-row">
+            <div>
+              <div class="peek-well-name" id="peek-title">YPF.Nq.LCa-314(h)</div>
+              <div class="peek-well-sub" id="peek-sub">Loma Campana · Toca para abrir ficha</div>
+            </div>
+            <div class="peek-rate" id="peek-rate">186 m³/d</div>
+          </div>
+        </div>
+
+        <div class="sheet-tabs">
+          <button class="sheet-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Ficha & Fractura</button>
+          <button class="sheet-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas (3)</button>
+        </div>
+
+        <div class="sheet-body">
+          <!-- PESTAÑA FICHA TÉCNICA -->
+          <div class="tab-pane active" id="pane-ficha">
+            <div>
+              <span class="status-badge" id="well-status">EXTRACCIÓN EFECTIVA · SHALE OIL</span>
+              <div style="font-size:12px; color:var(--text-muted);" id="well-area-line">Área: Loma Campana (Neuquén) · Vaca Muerta</div>
+            </div>
+
+            <div class="spec-grid">
+              <div class="spec-box">
+                <div class="spec-k">Prof. Vertical (TVD)</div>
+                <div class="spec-v" id="spec-tvd">2.980 m</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Rama Horizontal</div>
+                <div class="spec-v" id="spec-lat">3.250 m</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Etapas Fractura</div>
+                <div class="spec-v" id="spec-stages">44 etapas</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Arena Bombeada</div>
+                <div class="spec-v" id="spec-sand">11.400 tn</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Agua Inyectada</div>
+                <div class="spec-v" id="spec-water">58.200 m³</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Caudal Actual</div>
+                <div class="spec-v" id="spec-rate" style="color:#34d399;">186 m³/d</div>
+              </div>
+            </div>
+
+            <div class="chart-box">
+              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
+                <span style="font-weight:600;">Declinación Mensual</span>
+                <span style="color:var(--text-muted); font-family:'JetBrains Mono', monospace;">Jun–Nov</span>
+              </div>
+              <div class="bars-container" id="prod-chart"></div>
+            </div>
+          </div>
+
+          <!-- PESTAÑA ALERTAS -->
+          <div class="tab-pane" id="pane-alertas">
+            <div class="alert-item">
+              <div class="alert-time">HACE 14 MIN · VIIRS NASA FIRMS</div>
+              <strong>PTC Loma Campana:</strong> FRP 18.4 MW en antorcha operativa. Sin propagación externa.
+            </div>
+            <div class="alert-item amber">
+              <div class="alert-time">HACE 42 MIN · CORREDOR PATA MORA / RP 180</div>
+              <strong>Viento Zonda (65 km/h):</strong> Precaución para transporte de arena y equipos en CN VII A.
+            </div>
+            <div class="alert-item amber">
+              <div class="alert-time">HACE 1 HORA · INPRES / USGS</div>
+              <strong>Sismo 2.4 Ml (Prof. 6 km):</strong> A 4.8 km al NO de Sauzal Bonito. Sin novedad en baterías.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let currentSector = 'vmSur';
+
+    const map = L.map('map', {
+      zoomControl: false
+    }).setView([-38.32, -68.85], 11);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; CARTO | Territoria',
+      subdomains: 'abcd',
+      maxZoom: 18
+    }).addTo(map);
+
+    const layers = {
+      areas: L.layerGroup().addTo(map),
+      pozos: L.layerGroup().addTo(map),
+      ductos: L.layerGroup().addTo(map),
+      viirs: L.layerGroup().addTo(map),
+      sismos: L.layerGroup().addTo(map)
+    };
+
+    const wellsData = [
+      {
+        id: 'YPF.Nq.LCa-314(h)',
+        operadora: 'YPF S.A.',
+        area: 'Loma Campana (Neuquén)',
+        formacion: 'Vaca Muerta',
+        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
+        surface: [-38.315, -68.810],
+        bottom: [-38.288, -68.795],
+        tvd: '2.980 m',
+        lat: '3.250 m',
+        stages: '44 etapas',
+        sand: '11.400 tn',
+        water: '58.200 m³',
+        rate: '186 m³/d',
+        color: '#10b981',
+        history: [260, 240, 215, 202, 194, 186]
+      },
+      {
+        id: 'VIS.Nq.BPO-2108(h)',
+        operadora: 'Vista Energy',
+        area: 'Bajada del Palo Oeste (Neuquén)',
+        formacion: 'Vaca Muerta',
+        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
+        surface: [-38.240, -68.930],
+        bottom: [-38.212, -68.918],
+        tvd: '2.890 m',
+        lat: '3.100 m',
+        stages: '42 etapas',
+        sand: '10.950 tn',
+        water: '54.800 m³',
+        rate: '214 m³/d',
+        color: '#10b981',
+        history: [295, 270, 250, 236, 222, 214]
+      },
+      {
+        id: 'YPF.Md.CN7A-102(h)',
+        operadora: 'YPF S.A.',
+        area: 'CN VII A - Malargüe (Mendoza)',
+        formacion: 'Vaca Muerta Norte',
+        status: 'PILOTO NO CONVENCIONAL · EVALUACIÓN',
+        surface: [-36.985, -69.540],
+        bottom: [-36.962, -69.525],
+        tvd: '2.640 m',
+        lat: '2.510 m',
+        stages: '32 etapas',
+        sand: '8.200 tn',
+        water: '41.500 m³',
+        rate: '112 m³/d',
+        color: '#f59e0b',
+        history: [145, 138, 130, 124, 118, 112]
+      },
+      {
+        id: 'YPF.Md.Barr-812',
+        operadora: 'YPF S.A.',
+        area: 'Barrancas / Luján de Cuyo (Mendoza)',
+        formacion: 'Cuenca Cuyana',
+        status: 'EXTRACCIÓN SECUNDARIA · POLÍMEROS',
+        surface: [-33.125, -68.780],
+        bottom: [-33.125, -68.780],
+        tvd: '2.150 m',
+        lat: 'Vertical',
+        stages: 'N/A',
+        sand: 'N/A',
+        water: 'Polímeros',
+        rate: '34 m³/d',
+        color: '#10b981',
+        history: [31, 32, 33, 35, 34, 34]
+      }
+    ];
+
+    wellsData.forEach(w => {
+      if (w.lat !== 'Vertical') {
+        const line = L.polyline([w.surface, w.bottom], {
+          color: w.color,
+          weight: 4,
+          opacity: 0.9
+        }).addTo(layers.pozos);
+        line.on('click', () => selectWell(w, true));
+      }
+
+      const marker = L.circleMarker(w.surface, {
+        radius: 8,
+        fillColor: w.color,
+        color: '#ffffff',
+        weight: 2,
+        fillOpacity: 0.95
+      }).addTo(layers.pozos);
+
+      marker.on('click', () => selectWell(w, true));
+    });
+
+    // Concesiones
+    [
+      { name: 'Loma Campana', coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]], color: '#38bdf8' },
+      { name: 'Bajada del Palo Oeste', coords: [[-38.28, -69.00], [-38.18, -69.00], [-38.18, -68.88], [-38.28, -68.88]], color: '#0ea5e9' },
+      { name: 'CN VII A - Malargüe', coords: [[-37.06, -69.63], [-36.92, -69.63], [-36.92, -69.46], [-37.06, -69.46]], color: '#f59e0b' }
+    ].forEach(c => {
+      L.polygon(c.coords, {
+        color: c.color,
+        weight: 1.5,
+        fillColor: c.color,
+        fillOpacity: 0.12
+      }).bindPopup(`<b>Área:</b> ${c.name}`).addTo(layers.areas);
+    });
+
+    // Ductos
+    [
+      { name: 'Oleoducto VM Norte', coords: [[-38.31, -68.81], [-37.75, -69.15], [-37.02, -69.52], [-35.45, -69.30], [-33.08, -68.92]], color: '#a855f7' }
+    ].forEach(p => {
+      L.polyline(p.coords, {
+        color: p.color,
+        weight: 3,
+        dashArray: '8, 6'
+      }).bindPopup(`<b>Ducto:</b> ${p.name}`).addTo(layers.ductos);
+    });
+
+    // Focos VIIRS
+    [
+      { coords: [-38.308, -68.802], label: 'PTC Loma Campana · 18.4 MW' },
+      { coords: [-36.980, -69.532], label: 'Batería CN VII A · 6.8 MW' }
+    ].forEach(f => {
+      L.circleMarker(f.coords, {
+        radius: 9,
+        fillColor: '#f59e0b',
+        color: '#fef08a',
+        weight: 2,
+        fillOpacity: 0.8
+      }).bindPopup(`🔥 <b>VIIRS</b><br>${f.label}`).addTo(layers.viirs);
+    });
+
+    // Sismos
+    [
+      { coords: [-38.49, -69.05], label: 'Sismo 2.4 Ml · Prof 6 km' }
+    ].forEach(q => {
+      L.circle(q.coords, {
+        radius: 3000,
+        color: '#ef4444',
+        weight: 1.5,
+        fillColor: '#ef4444',
+        fillOpacity: 0.2
+      }).bindPopup(`⚠️ ${q.label}`).addTo(layers.sismos);
+    });
+
+    function selectWell(w, expandSheet = false) {
+      document.getElementById('peek-title').textContent = w.id;
+      document.getElementById('peek-sub').textContent = `${w.area} · Toca para ficha`;
+      document.getElementById('peek-rate').textContent = w.rate;
+
+      document.getElementById('well-status').textContent = w.status;
+      document.getElementById('well-area-line').textContent = `Área: ${w.area} · ${w.formacion}`;
+      document.getElementById('spec-tvd').textContent = w.tvd;
+      document.getElementById('spec-lat').textContent = w.lat;
+      document.getElementById('spec-stages').textContent = w.stages;
+      document.getElementById('spec-sand').textContent = w.sand;
+      document.getElementById('spec-water').textContent = w.water;
+      document.getElementById('spec-rate').textContent = w.rate;
+
+      renderChart(w.history);
+      switchTab('ficha');
+
+      if (expandSheet) {
+        document.getElementById('bottom-sheet').classList.add('expanded');
+      }
+    }
+
+    function renderChart(values) {
+      const container = document.getElementById('prod-chart');
+      container.innerHTML = '';
+      const months = ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov'];
+      const maxVal = Math.max(...values, 1);
+
+      values.forEach((v, i) => {
+        const h = Math.round((v / maxVal) * 70);
+        const col = document.createElement('div');
+        col.className = 'bar-col';
+        col.innerHTML = `
+          <span class="bar-lbl" style="color:#e2e8f0;">${v}</span>
+          <div class="bar-fill" style="height:${h}px;"></div>
+          <span class="bar-lbl">${months[i]}</span>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    function toggleSheet() {
+      document.getElementById('bottom-sheet').classList.toggle('expanded');
+    }
+
+    function switchTab(tabName) {
+      document.getElementById('tab-btn-ficha').classList.toggle('active', tabName === 'ficha');
+      document.getElementById('tab-btn-alertas').classList.toggle('active', tabName === 'alertas');
+      document.getElementById('pane-ficha').classList.toggle('active', tabName === 'ficha');
+      document.getElementById('pane-alertas').classList.toggle('active', tabName === 'alertas');
+      document.getElementById('bottom-sheet').classList.add('expanded');
+    }
+
+    function toggleLayersDrawer() {
+      const drawer = document.getElementById('layers-drawer');
+      const btn = document.getElementById('btn-layers');
+      drawer.classList.toggle('open');
+      btn.classList.toggle('active');
+    }
+
+    function toggleLayer(name, visible) {
+      if (visible) map.addLayer(layers[name]);
+      else map.removeLayer(layers[name]);
+    }
+
+    function flyToSector(sector, btn) {
+      currentSector = sector;
+      document.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (sector === 'vmSur') {
+        map.flyTo([-38.32, -68.85], 11);
+        document.getElementById('kpi-pozos').textContent = '142';
+        document.getElementById('kpi-prod').textContent = '14.820 m³/d';
+        selectWell(wellsData[0], false);
+      } else if (sector === 'vmNorte') {
+        map.flyTo([-37.02, -69.56], 11);
+        document.getElementById('kpi-pozos').textContent = '14';
+        document.getElementById('kpi-prod').textContent = '940 m³/d';
+        selectWell(wellsData[2], false);
+      } else if (sector === 'cuyana') {
+        map.flyTo([-33.12, -68.82], 11);
+        document.getElementById('kpi-pozos').textContent = '318';
+        document.getElementById('kpi-prod').textContent = '4.650 m³/d';
+        selectWell(wellsData[3], false);
+      }
+    }
+
+    function recenterCurrentSector() {
+      flyToSector(currentSector, null);
+    }
+
+    renderChart(wellsData[0].history);
+  </script>
+</body>
+</html>
