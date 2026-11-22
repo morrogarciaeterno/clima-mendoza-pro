@@ -184,7 +184,7 @@
       <div class="hero-tagline">Cuenca Neuquina &amp; Vaca Muerta</div>
       <div class="launcher-grid">
         <button class="launch-card" onclick="openPozosModal()"><div class="launch-top"><div class="l-ico">⌖</div><span class="launch-arrow">↗</span></div><div><b>POZOS</b><small>Padrón GIS Neuquén + Res. 319/93</small></div></button>
-        <button class="launch-card" onclick="openInfraModal('locaciones')"><div class="launch-top"><div class="l-ico">◈</div><span class="launch-arrow">↗</span></div><div><b>LOCACIONES</b><small>Pads y locaciones de superficie</small></div></button>
+        <button class="launch-card" onclick="openInfraModal('locaciones')"><div class="launch-top"><div class="l-ico">◈</div><span class="launch-arrow">↗</span></div><div><b>ACTIVOS</b><small>Infraestructura y activos de superficie</small></div></button>
         <button class="launch-card" onclick="openInfraModal('ductos')"><div class="launch-top"><div class="l-ico">⌇</div><span class="launch-arrow">↗</span></div><div><b>OLEODUCTOS</b><small>Ductos troncales y líneas de conducción</small></div></button>
         <button class="launch-card" onclick="openInfraModal('plantas')"><div class="launch-top"><div class="l-ico">⬡</div><span class="launch-arrow">↗</span></div><div><b>PLANTAS</b><small>Instalaciones de superficie y medición</small></div></button>
         <button class="launch-card" onclick="openInfraModal('areas')"><div class="launch-top"><div class="l-ico">▣</div><span class="launch-arrow">↗</span></div><div><b>ÁREAS</b><small>Concesiones, bloques y áreas vigentes</small></div></button>
@@ -201,7 +201,7 @@
       <div class="modal-title"><h3>PADRÓN DE POZOS · NEUQUÉN</h3><span>GIS OFICIAL + PRODUCCIÓN RES. 319/93</span></div>
       <div class="modal-actions">
         <button class="modal-switch active" onclick="openPozosModal()">POZOS</button>
-        <button class="modal-switch" onclick="openInfraModal('locaciones')">LOCACIONES</button>
+        <button class="modal-switch" onclick="openInfraModal('locaciones')">ACTIVOS</button>
         <button class="modal-switch" onclick="openInfraModal('ductos')">OLEODUCTOS</button>
         <button class="modal-switch" onclick="openInfraModal('plantas')">PLANTAS</button>
         <button class="modal-switch" onclick="openInfraModal('areas')">ÁREAS</button>
@@ -240,10 +240,10 @@
 <div class="modal-backdrop" id="infra-modal" onclick="if(event.target===this)closeAllModals()">
   <div class="modal-window">
     <div class="modal-head">
-      <div class="modal-title"><h3 id="infra-modal-title">LOCACIONES · NEUQUÉN</h3><span id="infra-modal-sub">PADS Y LOCACIONES DE SUPERFICIE</span></div>
+      <div class="modal-title"><h3 id="infra-modal-title">ACTIVOS · NEUQUÉN</h3><span id="infra-modal-sub">INFRAESTRUCTURA Y ACTIVOS DE SUPERFICIE</span></div>
       <div class="modal-actions">
         <button class="modal-switch" onclick="openPozosModal()">POZOS</button>
-        <button class="modal-switch" id="sw-locaciones" onclick="openInfraModal('locaciones')">LOCACIONES</button>
+        <button class="modal-switch" id="sw-locaciones" onclick="openInfraModal('locaciones')">ACTIVOS</button>
         <button class="modal-switch" id="sw-ductos" onclick="openInfraModal('ductos')">OLEODUCTOS</button>
         <button class="modal-switch" id="sw-plantas" onclick="openInfraModal('plantas')">PLANTAS</button>
         <button class="modal-switch" id="sw-areas" onclick="openInfraModal('areas')">ÁREAS</button>
@@ -374,7 +374,7 @@
     document.body.classList.remove('on-home');
     ['locaciones','ductos','plantas','areas'].forEach(k => { const btn = $('sw-' + k); if(btn) btn.classList.toggle('active', k === tipo); });
     const titles = {
-      locaciones:['LOCACIONES · NEUQUÉN','PADS Y LOCACIONES DE SUPERFICIE (LOC_NOMBRE / LOC_ID)'],
+      locaciones:['ACTIVOS · NEUQUÉN','INFRAESTRUCTURA Y ACTIVOS DE SUPERFICIE (LOC_NOMBRE / LOC_ID)'],
       ductos:['OLEODUCTOS Y LÍNEAS DE CONDUCCIÓN · NEUQUÉN','DUCTOS TRONCALES Y REDES DE TRANSPORTE'],
       plantas:['PLANTAS E INSTALACIONES · NEUQUÉN','INSTALACIONES DE SUPERFICIE Y PUNTOS DE MEDICIÓN'],
       areas:['ÁREAS Y CONCESIONES · NEUQUÉN','BLOQUES EXPLORATORIOS Y CONCESIONES VIGENTES']
