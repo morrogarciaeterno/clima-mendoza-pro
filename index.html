@@ -166,29 +166,92 @@
   ['search','operator','area','field','state'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',applyFilters));
 
   async function loadData(){
-    if(!state.api){$('config-dialog').showModal();return;}
-    setConnection('CONECTANDO…',false); $('footer-state').textContent='CONSULTANDO FUENTE OFICIAL';
+    if(!state.api) return;
+    setConnection('CONECTANDO…',false);
+    $('footer-state').textContent='CONSULTANDO FUENTE OFICIAL';
+    state.all=[];
+    markerLayer.clearLayers();
+    updateCounters();
+
+    let inicio=0;
+    const limite=100;
+    let pagina=0;
+    let cargaParcial=false;
+
     try{
-      const acumulados=[];
-      let inicio=0;
-      const limite=500;
-      let pagina=0;
       while(true){
         pagina++;
-        $('footer-state').textContent='CARGANDO POZOS · LOTE '+pagina;
-        const r=await fetch(state.api+'/api/pozos?inicio='+inicio+'&limite='+limite);
-        const j=await r.json();
-        if(!r.ok||!j.ok) throw new Error(j.error||'Respuesta inválida');
+        $('footer-state').textContent='CARGANDO POZOS · LOTE '+pagina+' · '+state.all.length+' CARGADOS';
+
+        let j=null;
+        let ultimoError=null;
+
+        for(let intento=1; intento<=2; intento++){
+          try{
+            const r=await fetch(state.api+'/api/pozos?inicio='+inicio+'&limite='+limite, {cache:'no-store'});
+            const data=await r.json();
+            if(!r.ok||!data.ok) throw new Error(data.error||'Respuesta inválida');
+            j=data;
+            break;
+          }catch(e){
+            ultimoError=e;
+            if(intento<2){
+              $('footer-state').textContent='REINTENTANDO LOTE '+pagina+' · '+state.all.length+' CARGADOS';
+              await new Promise(resolve=>setTimeout(resolve,1800));
+            }
+          }
+        }
+
+        if(!j){
+          cargaParcial=true;
+          toast('Carga parcial: '+state.all.length+' pozos conservados. '+(ultimoError?.message||'Fuente temporalmente sin respuesta'),true);
+          break;
+        }
+
         const lote=(j.registros||[]).map(x=>({id:x.id,...(x.datos||{}),_geometry:x.geometria}));
-        acumulados.push(...lote);
-        if(!j.hayMas || lote.length===0) break;
+        state.all.push(...lote);
+
+        // Mostrar inmediatamente lo recibido, sin esperar a terminar toda la base.
+        populateFilters();
+        applyFilters();
+        setConnection('API ONLINE',true);
+
+        if(!j.hayMas || lote.length<limite || lote.length===0) break;
         inicio=j.siguienteInicio ?? (inicio+lote.length);
-        if(pagina>=100) throw new Error('Se alcanzó el límite preventivo de 100 lotes');
+
+        // Pequeña pausa para no castigar al GeoServer oficial.
+        await new Promise(resolve=>setTimeout(resolve,450));
+
+        if(pagina>=250){
+          cargaParcial=true;
+          toast('Carga detenida por límite preventivo. Se mantienen '+state.all.length+' pozos.',true);
+          break;
+        }
       }
-      state.all=acumulados;
-      setConnection('API ONLINE',true); $('footer-state').textContent='ÚLTIMA ACTUALIZACIÓN '+new Date().toLocaleTimeString('es-AR');
-      populateFilters(); applyFilters(); toast(state.all.length+' pozos reales cargados');
-    }catch(e){setConnection('API SIN RESPUESTA',false);$('footer-state').textContent='ERROR DE CONEXIÓN';toast(e.message,true)}
+
+      if(state.all.length){
+        setConnection(cargaParcial?'API ONLINE · PARCIAL':'API ONLINE',true);
+        $('footer-state').textContent=(cargaParcial?'CARGA PARCIAL · ':'CARGA COMPLETA · ')+state.all.length+' POZOS';
+        populateFilters();
+        applyFilters();
+        if(!cargaParcial) toast(state.all.length+' pozos reales cargados');
+      }else{
+        setConnection('API SIN RESPUESTA',false);
+        $('footer-state').textContent='SIN DATOS CARGADOS';
+      }
+    }catch(e){
+      if(state.all.length){
+        setConnection('API ONLINE · PARCIAL',true);
+        $('footer-state').textContent='CARGA PARCIAL · '+state.all.length+' POZOS';
+        populateFilters();
+        applyFilters();
+        toast('Se conservaron '+state.all.length+' pozos cargados.',true);
+      }else{
+        setConnection('API SIN RESPUESTA',false);
+        $('footer-state').textContent='ERROR DE CONEXIÓN';
+        toast(e.message,true);
+      }
+    }
   }
   function setConnection(text,ok){$('api-status').textContent=text;document.querySelector('.dot').style.background=ok?'var(--green)':'var(--red)';}
   function options(id,values,label){const el=$(id),cur=el.value;el.innerHTML='<option value="">'+label+'</option>'+[...new Set(values.filter(Boolean))].sort().map(v=>'<option>'+escapeHtml(v)+'</option>').join('');el.value=cur;}
