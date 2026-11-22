@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Territoria Upstream | Inteligencia Geoespacial & Yacimientos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Territoria Upstream Mobile | Nova Territoria</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -12,9 +12,9 @@
 
   <style>
     :root {
-      --bg-dark: #0b0f17;
-      --panel-bg: rgba(15, 22, 34, 0.92);
-      --border-color: rgba(56, 189, 248, 0.22);
+      --bg-dark: #090d16;
+      --panel-bg: rgba(15, 23, 42, 0.95);
+      --border-color: rgba(56, 189, 248, 0.25);
       --accent-cyan: #38bdf8;
       --accent-amber: #f59e0b;
       --accent-emerald: #10b981;
@@ -28,192 +28,245 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    body {
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
       font-family: 'Inter', sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
     }
 
-    /* TOPBAR */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100%;
+      position: relative;
+    }
+
+    /* HEADER MÓVIL COMPACTO */
     header {
-      height: 58px;
-      background: #0d131f;
+      background: #0b111e;
       border-bottom: 1px solid var(--border-color);
+      padding: 8px 12px;
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+
+    .header-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 18px;
-      z-index: 1000;
+      margin-bottom: 8px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
 
     .brand-badge {
       background: linear-gradient(135deg, #0284c7, #0ea5e9);
       color: #fff;
       font-weight: 700;
-      font-size: 13px;
-      padding: 5px 9px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
+      font-size: 12px;
+      padding: 4px 7px;
+      border-radius: 5px;
     }
 
     .brand-title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
     }
 
     .brand-title span {
       color: var(--accent-amber);
+    }
+
+    .demo-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+
+    /* SELECTOR DE SECTORES SCROLLABLE */
+    .sector-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .sector-bar::-webkit-scrollbar { display: none; }
+
+    .sector-btn {
+      flex: 0 0 auto;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .sector-btn.active {
+      background: rgba(14, 165, 233, 0.22);
+      border-color: var(--accent-cyan);
+      color: #fff;
       font-weight: 600;
     }
 
-    .demo-pill {
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.45);
-      color: #fbbf24;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 3px 8px;
-      border-radius: 999px;
-    }
-
-    .sector-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    .sector-btn {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      color: var(--text-main);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .sector-btn:hover, .sector-btn.active {
-      background: rgba(14, 165, 233, 0.2);
-      border-color: var(--accent-cyan);
-      color: #fff;
-    }
-
-    /* MAIN LAYOUT */
-    .workspace {
-      flex: 1;
+    /* MAPA PRINCIPAL */
+    .map-stage {
       position: relative;
-      display: flex;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
     }
 
     #map {
-      flex: 1;
       height: 100%;
       width: 100%;
-      background: #090d16;
+      background: var(--bg-dark);
     }
 
-    /* KPI BAR OVERLAY */
-    .kpi-strip {
+    /* TIRA DE KPIs DESLIZABLE SOBRE EL MAPA */
+    .kpi-carousel {
       position: absolute;
-      top: 14px;
-      left: 56px;
-      right: 390px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
       z-index: 800;
-      pointer-events: none;
     }
+    .kpi-carousel::-webkit-scrollbar { display: none; }
 
     .kpi-card {
+      flex: 0 0 132px;
       background: var(--panel-bg);
       backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 10px 14px;
-      pointer-events: auto;
+      padding: 8px 10px;
     }
 
     .kpi-label {
-      font-size: 11px;
+      font-size: 9.5px;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      letter-spacing: 0.4px;
     }
 
     .kpi-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 14.5px;
+      font-weight: 700;
       color: #fff;
+      margin-top: 2px;
     }
 
     .kpi-sub {
-      font-size: 11px;
+      font-size: 10px;
       margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
-    /* LEFT LAYER CONTROL PANEL */
-    .layers-panel {
+    /* BOTONES FLOTANTES TÁCTILES (CAPAS / FICHA / ALERTAS) */
+    .fab-stack {
       position: absolute;
-      bottom: 24px;
-      left: 16px;
-      width: 265px;
+      right: 12px;
+      bottom: 84px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 850;
+    }
+
+    .fab-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+    }
+
+    .fab-btn.active {
+      border-color: var(--accent-cyan);
+      background: rgba(14, 165, 233, 0.3);
+    }
+
+    /* PANEL FLOTANTE DE CAPAS */
+    .layers-drawer {
+      position: absolute;
+      left: 12px;
+      bottom: 84px;
+      width: 235px;
       background: var(--panel-bg);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 14px;
-      z-index: 800;
+      padding: 12px;
+      z-index: 860;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
     }
 
-    .panel-heading {
-      font-size: 12px;
+    .layers-drawer.open {
+      display: block;
+    }
+
+    .drawer-title {
+      font-size: 11.5px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
       color: var(--accent-cyan);
-      margin-bottom: 10px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
     }
 
-    .layer-item {
+    .layer-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 0;
+      padding: 7px 0;
       font-size: 12.5px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
     }
+    .layer-row:last-child { border-bottom: none; }
 
-    .layer-item:last-child {
-      border-bottom: none;
-    }
-
-    .layer-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .layer-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-cyan);
     }
 
     .dot {
@@ -221,616 +274,72 @@
       height: 10px;
       border-radius: 50%;
       display: inline-block;
+      margin-right: 7px;
     }
 
-    /* RIGHT TECHNICAL INSPECTOR */
-    .inspector-panel {
-      width: 370px;
+    /* BOTTOM SHEET DESLIZABLE / PLEGABLE */
+    .bottom-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: var(--panel-bg);
-      backdrop-filter: blur(12px);
-      border-left: 1px solid var(--border-color);
-      padding: 16px;
-      overflow-y: auto;
-      z-index: 850;
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border-color);
+      border-radius: 16px 16px 0 0;
+      z-index: 900;
+      max-height: 76dvh;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      transform: translateY(calc(100% - 68px));
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.65);
     }
 
-    .well-header {
-      background: rgba(30, 41, 59, 0.65);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 8px;
-      padding: 12px;
+    .bottom-sheet.expanded {
+      transform: translateY(0);
     }
 
-    .well-tag {
-      display: inline-block;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 4px;
-      background: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      margin-bottom: 6px;
+    .sheet-handle-bar {
+      padding: 8px 14px 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      flex-shrink: 0;
     }
 
-    .well-name {
-      font-size: 16px;
+    .pill-grip {
+      width: 38px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.45);
+      margin-bottom: 8px;
+    }
+
+    .sheet-peek-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .peek-well-name {
+      font-size: 14px;
       font-weight: 700;
       color: #fff;
     }
 
-    .well-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
-
-    .spec-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .spec-box {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      border-radius: 6px;
-      padding: 8px 10px;
-    }
-
-    .spec-k {
-      font-size: 10.5px;
+    .peek-well-sub {
+      font-size: 11px;
       color: var(--text-muted);
     }
 
-    .spec-v {
+    .peek-rate {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13.5px;
-      font-weight: 600;
-      margin-top: 2px;
-      color: #f8fafc;
-    }
-
-    /* MINI BAR CHART */
-    .chart-box {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      border-radius: 8px;
-      padding: 12px;
-    }
-
-    .bars-container {
-      height: 110px;
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      padding-top: 16px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-    }
-
-    .bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .bar-fill {
-      width: 100%;
-      background: linear-gradient(180deg, #38bdf8, #0284c7);
-      border-radius: 3px 3px 0 0;
-      transition: height 0.35s ease;
-    }
-
-    .bar-lbl {
-      font-size: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-muted);
-    }
-
-    /* ALERTS FEED */
-    .alert-card {
-      background: rgba(239, 68, 68, 0.1);
-      border-left: 3px solid var(--accent-red);
-      border-radius: 6px;
-      padding: 9px 11px;
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-    .alert-card.amber {
-      background: rgba(245, 158, 11, 0.1);
-      border-left-color: var(--accent-amber);
-    }
-
-    .alert-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-bottom: 2px;
-    }
-
-    /* CUSTOM LEAFLET POPUP */
-    .leaflet-popup-content-wrapper {
-      background: #0f172a;
-      color: #f1f5f9;
-      border: 1px solid #38bdf8;
-      border-radius: 8px;
-    }
-    .leaflet-popup-tip {
-      background: #0f172a;
-    }
-
-    @media (max-width: 1050px) {
-      .kpi-strip { display: none; }
-      .inspector-panel { width: 310px; }
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <div class="brand">
-      <div class="brand-badge">NT</div>
-      <div class="brand-title">NOVA TERRITORIA <span>| UPSTREAM</span></div>
-      <span class="demo-pill">SIMULACIÓN DE INTERFAZ</span>
-    </div>
-
-    <div class="sector-controls">
-      <button class="sector-btn active" onclick="flyToSector('vmSur', this)">Vaca Muerta Sur (Añelo)</button>
-      <button class="sector-btn" onclick="flyToSector('vmNorte', this)">Vaca Muerta Norte (Malargüe)</button>
-      <button class="sector-btn" onclick="flyToSector('cuyana', this)">Cuenca Cuyana (Mendoza)</button>
-    </div>
-  </header>
-
-  <div class="workspace">
-    <!-- KPIs SUPERIORES -->
-    <div class="kpi-strip">
-      <div class="kpi-card">
-        <div class="kpi-label">Pozos Shale Activos</div>
-        <div class="kpi-value" id="kpi-pozos">142</div>
-        <div class="kpi-sub up">+6 en fractura activa</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Producción Bloque (Sim)</div>
-        <div class="kpi-value" id="kpi-prod">14.820 m³/d</div>
-        <div class="kpi-sub up">▲ 4.2% vs mes anterior</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Anomalías VIIRS (Flaring)</div>
-        <div class="kpi-value" id="kpi-viirs">3 Focos</div>
-        <div class="kpi-sub warn">FRP máx: 18.4 MW (PTC)</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Sismicidad & Rutas</div>
-        <div class="kpi-value" id="kpi-sismo">2.4 Ml</div>
-        <div class="kpi-sub warn">Viento Zonda RP 180 / RP 7</div>
-      </div>
-    </div>
-
-    <!-- MAPA LEAFLET -->
-    <div id="map"></div>
-
-    <!-- PANEL DE CAPAS -->
-    <div class="layers-panel">
-      <div class="panel-heading">
-        <span>Capas Geoespaciales</span>
-        <span style="font-size:10px; color:#94a3b8;">Cap. IV / Satélite</span>
-      </div>
-
-      <label class="layer-item">
-        <span class="layer-left"><span class="dot" style="background:#38bdf8;"></span> Áreas de Concesión</span>
-        <input type="checkbox" checked onchange="toggleLayer('areas', this.checked)">
-      </label>
-      <label class="layer-item">
-        <span class="layer-left"><span class="dot" style="background:#10b981;"></span> Pozos + Ramas Laterales</span>
-        <input type="checkbox" checked onchange="toggleLayer('pozos', this.checked)">
-      </label>
-      <label class="layer-item">
-        <span class="layer-left"><span class="dot" style="background:#a855f7;"></span> Oleoductos / Gasoductos</span>
-        <input type="checkbox" checked onchange="toggleLayer('ductos', this.checked)">
-      </label>
-      <label class="layer-item">
-        <span class="layer-left"><span class="dot" style="background:#f59e0b;"></span> Focos VIIRS / Antorchas</span>
-        <input type="checkbox" checked onchange="toggleLayer('viirs', this.checked)">
-      </label>
-      <label class="layer-item">
-        <span class="layer-left"><span class="dot" style="background:#ef4444;"></span> Sismos Inducidos (INPRES)</span>
-        <input type="checkbox" checked onchange="toggleLayer('sismos', this.checked)">
-      </label>
-    </div>
-
-    <!-- INSPECTOR TÉCNICO LATERAL -->
-    <aside class="inspector-panel">
-      <div class="panel-heading">
-        <span>Ficha Técnica de Activo</span>
-        <span style="font-size:10px; color:#38bdf8;">Adjunto IV</span>
-      </div>
-
-      <div class="well-header">
-        <span class="well-tag" id="well-status">EXTRACCIÓN EFECTIVA · SHALE OIL</span>
-        <div class="well-name" id="well-title">YPF.Nq.LCa-314(h)</div>
-        <div class="well-meta" id="well-sub">Área: Loma Campana · Formación: Vaca Muerta</div>
-      </div>
-
-      <div class="spec-grid">
-        <div class="spec-box">
-          <div class="spec-k">Prof. Vertical (TVD)</div>
-          <div class="spec-v" id="spec-tvd">2.980 m</div>
-        </div>
-        <div class="spec-box">
-          <div class="spec-k">Rama Horizontal</div>
-          <div class="spec-v" id="spec-lat">3.250 m</div>
-        </div>
-        <div class="spec-box">
-          <div class="spec-k">Etapas de Fractura</div>
-          <div class="spec-v" id="spec-stages">44 etapas</div>
-        </div>
-        <div class="spec-box">
-          <div class="spec-k">Arena Bombeada</div>
-          <div class="spec-v" id="spec-sand">11.400 tn</div>
-        </div>
-        <div class="spec-box">
-          <div class="spec-k">Agua Inyectada</div>
-          <div class="spec-v" id="spec-water">58.200 m³</div>
-        </div>
-        <div class="spec-box">
-          <div class="spec-k">Caudal Actual</div>
-          <div class="spec-v" id="spec-rate" style="color:#34d399;">186 m³/d</div>
-        </div>
-      </div>
-
-      <!-- CURVA DE DECLINACIÓN -->
-      <div class="chart-box">
-        <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-          <span style="font-weight:600;">Curva de Producción (m³/d)</span>
-          <span style="color:#94a3b8; font-family:'JetBrains Mono', monospace;">Últimos 6 meses</span>
-        </div>
-        <div class="bars-container" id="prod-chart"></div>
-      </div>
-
-      <!-- MONITOR DE ALERTAS OPERATIVAS -->
-      <div>
-        <div class="panel-heading" style="margin-bottom:8px;">
-          <span>Alertas Upstream (Workers)</span>
-          <span style="font-size:10px; color:#10b981;">● LIVE SIM</span>
-        </div>
-
-        <div class="alert-card">
-          <div class="alert-time">HACE 14 MIN · VIIRS NASA FIRMS</div>
-          <strong>Anomalía térmica en PTC Loma Campana:</strong> FRP 18.4 MW detectado dentro de radio de antorcha operativa. Sin propagación externa.
-        </div>
-
-        <div class="alert-card amber">
-          <div class="alert-time">HACE 42 MIN · CORREDOR PATA MORA / RP 180</div>
-          <strong>Ráfagas de Viento Zonda (65 km/h):</strong> Precaución para transporte de arena silícea y equipos de torre en bloque CN VII A (Malargüe).
-        </div>
-
-        <div class="alert-card amber">
-          <div class="alert-time">HACE 1 HORA · INPRES / USGS</div>
-          <strong>Sismo superficial 2.4 Ml (Prof: 6 km):</strong> Epicentro a 4.8 km al NO de Sauzal Bonito. Sin novedad en baterías.
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    // Inicializar mapa centrado en Vaca Muerta Sur (Añelo)
-    const map = L.map('map', {
-      zoomControl: true
-    }).setView([-38.32, -68.82], 11);
-
-    // Mapa base oscuro satelital/cartográfico (CartoDB Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO | Nova Territoria Upstream',
-      subdomains: 'abcd',
-      maxZoom: 18
-    }).addTo(map);
-
-    // Grupos de capas
-    const layers = {
-      areas: L.layerGroup().addTo(map),
-      pozos: L.layerGroup().addTo(map),
-      ductos: L.layerGroup().addTo(map),
-      viirs: L.layerGroup().addTo(map),
-      sismos: L.layerGroup().addTo(map)
-    };
-
-    // DATOS SIMULADOS DE POZOS (Neuquén + Mendoza Malargüe + Cuenca Cuyana)
-    const wellsData = [
-      {
-        id: 'YPF.Nq.LCa-314(h)',
-        operadora: 'YPF S.A.',
-        area: 'Loma Campana (Neuquén)',
-        formacion: 'Vaca Muerta',
-        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
-        surface: [-38.315, -68.810],
-        bottom: [-38.288, -68.795],
-        tvd: '2.980 m',
-        lat: '3.250 m',
-        stages: '44 etapas',
-        sand: '11.400 tn',
-        water: '58.200 m³',
-        rate: '186 m³/d',
-        color: '#10b981',
-        history: [260, 240, 215, 202, 194, 186]
-      },
-      {
-        id: 'VIS.Nq.BPO-2108(h)',
-        operadora: 'Vista Energy',
-        area: 'Bajada del Palo Oeste (Neuquén)',
-        formacion: 'Vaca Muerta',
-        status: 'EXTRACCIÓN EFECTIVA · SHALE OIL',
-        surface: [-38.240, -68.930],
-        bottom: [-38.212, -68.918],
-        tvd: '2.890 m',
-        lat: '3.100 m',
-        stages: '42 etapas',
-        sand: '10.950 tn',
-        water: '54.800 m³',
-        rate: '214 m³/d',
-        color: '#10b981',
-        history: [295, 270, 250, 236, 222, 214]
-      },
-      {
-        id: 'PAE.Nq.AG-412(h)',
-        operadora: 'Pan American Energy',
-        area: 'Aguada Pichana Oeste (Neuquén)',
-        formacion: 'Vaca Muerta',
-        status: 'EXTRACCIÓN EFECTIVA · SHALE GAS',
-        surface: [-38.450, -69.120],
-        bottom: [-38.425, -69.105],
-        tvd: '3.210 m',
-        lat: '2.950 m',
-        stages: '38 etapas',
-        sand: '9.800 tn',
-        water: '49.100 m³',
-        rate: '410 Mm³/d',
-        color: '#38bdf8',
-        history: [540, 505, 470, 445, 428, 410]
-      },
-      {
-        id: 'YPF.Md.CN7A-102(h)',
-        operadora: 'YPF S.A.',
-        area: 'CN VII A - Malargüe (Mendoza)',
-        formacion: 'Vaca Muerta Norte',
-        status: 'PILOTO NO CONVENCIONAL · EVALUACIÓN',
-        surface: [-36.985, -69.540],
-        bottom: [-36.962, -69.525],
-        tvd: '2.640 m',
-        lat: '2.510 m',
-        stages: '32 etapas',
-        sand: '8.200 tn',
-        water: '41.500 m³',
-        rate: '112 m³/d',
-        color: '#f59e0b',
-        history: [145, 138, 130, 124, 118, 112]
-      },
-      {
-        id: 'YPF.Md.PBN-105(h)',
-        operadora: 'YPF S.A.',
-        area: 'Paso Bardas Norte - Malargüe (Mendoza)',
-        formacion: 'Vaca Muerta Norte',
-        status: 'PERFORACIÓN / FRACTURA ACTIVA',
-        surface: [-37.140, -69.680],
-        bottom: [-37.118, -69.665],
-        tvd: '2.590 m',
-        lat: '2.480 m',
-        stages: '30 etapas',
-        sand: '7.900 tn',
-        water: '39.000 m³',
-        rate: 'En ensayo',
-        color: '#f59e0b',
-        history: [0, 0, 0, 45, 98, 105]
-      },
-      {
-        id: 'YPF.Md.Barr-812',
-        operadora: 'YPF S.A.',
-        area: 'Barrancas / Luján de Cuyo (Mendoza)',
-        formacion: 'Cuenca Cuyana (Convencional)',
-        status: 'EXTRACCIÓN SECUNDARIA · POLÍMEROS',
-        surface: [-33.125, -68.780],
-        bottom: [-33.125, -68.780],
-        tvd: '2.150 m',
-        lat: 'Vertical',
-        stages: 'N/A',
-        sand: 'N/A',
-        water: 'Iny. Polímeros',
-        rate: '34 m³/d',
-        color: '#10b981',
-        history: [31, 32, 33, 35, 34, 34]
-      }
-    ];
-
-    // Dibujar pozos y ramas horizontales
-    wellsData.forEach(w => {
-      // Rama horizontal (línea vectorial)
-      if (w.lat !== 'Vertical') {
-        const branch = L.polyline([w.surface, w.bottom], {
-          color: w.color,
-          weight: 3.5,
-          opacity: 0.85
-        }).addTo(layers.pozos);
-
-        branch.on('click', () => selectWell(w));
-      }
-
-      // Boca de pozo (Surface)
-      const marker = L.circleMarker(w.surface, {
-        radius: 7,
-        fillColor: w.color,
-        color: '#ffffff',
-        weight: 1.5,
-        fillOpacity: 0.95
-      }).addTo(layers.pozos);
-
-      marker.bindTooltip(`<b>${w.id}</b><br>${w.operadora} · ${w.rate}`, { direction: 'top' });
-      marker.on('click', () => selectWell(w));
-    });
-
-    // ÁREAS DE CONCESIÓN (Polígonos simulados)
-    const concessions = [
-      {
-        name: 'Loma Campana (YPF / Chevron)',
-        coords: [[-38.36, -68.89], [-38.26, -68.89], [-38.26, -68.74], [-38.36, -68.74]],
-        color: '#38bdf8'
-      },
-      {
-        name: 'Bajada del Palo Oeste (Vista)',
-        coords: [[-38.28, -69.00], [-38.18, -69.00], [-38.18, -68.88], [-38.28, -68.88]],
-        color: '#0ea5e9'
-      },
-      {
-        name: 'CN VII A - Lengua Vaca Muerta (Malargüe)',
-        coords: [[-37.06, -69.63], [-36.92, -69.63], [-36.92, -69.46], [-37.06, -69.46]],
-        color: '#f59e0b'
-      },
-      {
-        name: 'Paso Bardas Norte (Malargüe)',
-        coords: [[-37.21, -69.76], [-37.08, -69.76], [-37.08, -69.60], [-37.21, -69.60]],
-        color: '#f59e0b'
-      }
-    ];
-
-    concessions.forEach(c => {
-      L.polygon(c.coords, {
-        color: c.color,
-        weight: 1.5,
-        fillColor: c.color,
-        fillOpacity: 0.12
-      }).bindPopup(`<b>Concesión:</b> ${c.name}`).addTo(layers.areas);
-    });
-
-    // DUCTOS TRONCALES (Trazas simuladas)
-    const pipelines = [
-      {
-        name: 'Oleoducto Vaca Muerta Norte (Hacia Luján de Cuyo)',
-        coords: [[-38.31, -68.81], [-37.75, -69.15], [-37.02, -69.52], [-35.45, -69.30], [-33.08, -68.92]],
-        color: '#a855f7'
-      },
-      {
-        name: 'Gasoducto Perito Moreno (Tramo Tratayén)',
-        coords: [[-38.45, -69.12], [-38.35, -68.60], [-38.15, -67.90]],
-        color: '#c084fc'
-      }
-    ];
-
-    pipelines.forEach(p => {
-      L.polyline(p.coords, {
-        color: p.color,
-        weight: 3,
-        dashArray: '8, 6'
-      }).bindPopup(`<b>Ducto:</b> ${p.name}`).addTo(layers.ductos);
-    });
-
-    // FOCOS TÉRMICOS VIIRS (Antorchas / Flaring)
-    const viirsFlares = [
-      { coords: [-38.308, -68.802], label: 'PTC Loma Campana · Antorcha (18.4 MW)' },
-      { coords: [-38.235, -68.922], label: 'Batería BPO-1 · Antorcha (11.2 MW)' },
-      { coords: [-36.980, -69.532], label: 'Batería Piloto CN VII A · Venteo controlado (6.8 MW)' },
-      { coords: [-33.072, -68.928], label: 'Complejo Industrial Luján de Cuyo · Antorcha' }
-    ];
-
-    viirsFlares.forEach(f => {
-      L.circleMarker(f.coords, {
-        radius: 9,
-        fillColor: '#f59e0b',
-        color: '#fef08a',
-        weight: 2,
-        fillOpacity: 0.75
-      }).bindPopup(`🔥 <b>Sensor VIIRS (375m)</b><br>${f.label}`).addTo(layers.viirs);
-    });
-
-    // SISMOS SUPERFICIALES (INPRES / USGS)
-    const quakes = [
-      { coords: [-38.49, -69.05], mag: '2.4 Ml', depth: '6 km', place: '4.8 km NO de Sauzal Bonito' },
-      { coords: [-37.05, -69.58], mag: '2.1 Ml', depth: '8 km', place: 'Sector Sur Malargüe / Pata Mora' }
-    ];
-
-    quakes.forEach(q => {
-      L.circle(q.coords, {
-        radius: 3200,
-        color: '#ef4444',
-        weight: 1.5,
-        fillColor: '#ef4444',
-        fillOpacity: 0.18
-      }).bindPopup(`⚠️ <b>Sismo ${q.mag}</b><br>Profundidad: ${q.depth}<br>${q.place}`).addTo(layers.sismos);
-    });
-
-    // ACTUALIZAR FICHA TÉCNICA LATERAL
-    function selectWell(w) {
-      document.getElementById('well-status').textContent = w.status;
-      document.getElementById('well-title').textContent = w.id;
-      document.getElementById('well-sub').textContent = `Área: ${w.area} · ${w.formacion}`;
-      document.getElementById('spec-tvd').textContent = w.tvd;
-      document.getElementById('spec-lat').textContent = w.lat;
-      document.getElementById('spec-stages').textContent = w.stages;
-      document.getElementById('spec-sand').textContent = w.sand;
-      document.getElementById('spec-water').textContent = w.water;
-      document.getElementById('spec-rate').textContent = w.rate;
-
-      renderChart(w.history);
-    }
-
-    function renderChart(values) {
-      const container = document.getElementById('prod-chart');
-      container.innerHTML = '';
-      const months = ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov'];
-      const maxVal = Math.max(...values, 1);
-
-      values.forEach((v, idx) => {
-        const pct = Math.round((v / maxVal) * 85);
-        const col = document.createElement('div');
-        col.className = 'bar-col';
-        col.innerHTML = `
-          <span class="bar-lbl" style="color:#e2e8f0;">${v}</span>
-          <div class="bar-fill" style="height:${pct}px;"></div>
-          <span class="bar-lbl">${months[idx]}</span>
-        `;
-        container.appendChild(col);
-      });
-    }
-
-    // CONTROL DE CAPAS
-    function toggleLayer(name, visible) {
-      if (visible) {
-        map.addLayer(layers[name]);
-      } else {
-        map.removeLayer(layers[name]);
-      }
-    }
-
-    // NAVEGACIÓN POR SECTOR
-    function flyToSector(sector, btn) {
-      document.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      if (sector === 'vmSur') {
-        map.flyTo([-38.32, -68.85], 11);
-        document.getElementById('kpi-pozos').textContent = '142';
-        document.getElementById('kpi-prod').textContent = '14.820 m³/d';
-        selectWell(wellsData[0]);
-      } else if (sector === 'vmNorte') {
-        map.flyTo([-37.05, -69.58], 11);
-        document.getElementById('kpi-pozos').textContent = '14';
-        document.getElementById('kpi-prod').textContent = '940 m³/d';
-        selectWell(wellsData[3]);
-      } else if (sector === 'cuyana') {
-        map.flyTo([-33.12, -68.82], 11);
-        document.getElementById('kpi-pozos').textContent = '318';
-        document.getElementById('kpi-prod').textContent = '4.650 m³/d';
-        selectWell(wellsData[5]);
-      }
-    }
-
-    // Cargar gráfico inicial
-    renderChart(wellsData[0].history);
-  </script>
-</body>
-</html>
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      background: rgba(
