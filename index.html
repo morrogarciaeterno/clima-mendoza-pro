@@ -142,6 +142,7 @@
       filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
     }
 
+    /* POPUP COMPACTO EN EL MARCADOR DEL MAPA */
     .leaflet-popup-content-wrapper,
     .leaflet-popup-tip {
       background: rgba(15, 23, 42, 0.98);
@@ -201,17 +202,20 @@
       cursor: pointer;
     }
 
+    /* KPIs SUPERIORES (OCULTOS POR DEFECTO PARA ARRANCAR LIMPIO) */
     .kpi-carousel {
       position: absolute;
       top: 10px;
       left: 10px;
       right: 10px;
-      display: flex;
+      display: none;
       gap: 8px;
       overflow-x: auto;
       scrollbar-width: none;
       z-index: 800;
-      pointer-events: auto;
+    }
+    .kpi-carousel.open {
+      display: flex;
     }
     .kpi-carousel::-webkit-scrollbar { display: none; }
 
@@ -250,6 +254,7 @@
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
+    /* BOTONES FLOTANTES A LA IZQUIERDA */
     .fab-stack {
       position: absolute;
       left: 12px;
@@ -280,6 +285,7 @@
       background: rgba(14, 165, 233, 0.3);
     }
 
+    /* DRAWER DE CAPAS */
     .layers-drawer {
       position: absolute;
       left: 62px;
@@ -333,9 +339,10 @@
       margin-right: 7px;
     }
 
+    /* FICHA TÉCNICA POPUP LATERAL (OCULTA HASTA PRESIONAR UN POZO) */
     .side-popup-card {
       position: absolute;
-      top: 74px;
+      top: 12px;
       right: 12px;
       bottom: 24px;
       width: min(355px, calc(100vw - 24px));
@@ -350,7 +357,11 @@
       transform: translateX(calc(100% + 20px));
       opacity: 0;
       pointer-events: none;
-      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, top 0.2s ease;
+    }
+
+    .side-popup-card.with-kpis {
+      top: 74px;
     }
 
     .side-popup-card.open {
@@ -632,7 +643,8 @@
     </header>
 
     <div class="map-stage">
-      <div class="kpi-carousel">
+      <!-- KPIs SUPERIORES (OCULTOS AL ARRANCAR) -->
+      <div class="kpi-carousel" id="kpi-carousel">
         <div class="kpi-card">
           <div class="kpi-label">Pozos / Áreas (Ref)</div>
           <div class="kpi-value" id="kpi-pozos">6 Áreas</div>
@@ -657,13 +669,16 @@
 
       <div id="map"></div>
 
+      <!-- BOTONES FLOTANTES A LA IZQUIERDA -->
       <div class="fab-stack">
+        <button class="fab-btn" id="btn-kpi-toggle" title="Mostrar/Ocultar KPIs del bloque" onclick="toggleKpis()">📊</button>
         <button class="fab-btn" id="btn-ficha-toggle" title="Abrir/Cerrar Ficha Técnica" onclick="toggleSideCard()">📋</button>
         <button class="fab-btn" id="btn-layers" title="Capas" onclick="toggleLayersDrawer()">🗂️</button>
         <button class="fab-btn" id="btn-refresh" title="Actualizar telemetría" onclick="refreshTelemetry()">🔄</button>
         <button class="fab-btn" id="btn-center" title="Centrar sector" onclick="recenterCurrentSector()">🎯</button>
       </div>
 
+      <!-- PANEL DE CAPAS -->
       <div class="layers-drawer" id="layers-drawer">
         <div class="drawer-title">
           <span>Capas del Mapa</span>
@@ -687,6 +702,7 @@
         </label>
       </div>
 
+      <!-- FICHA TÉCNICA POPUP LATERAL (OCULTA HASTA PRESIONAR UN POZO) -->
       <aside class="side-popup-card" id="side-popup-card">
         <div class="card-header">
           <div>
@@ -784,6 +800,10 @@
       maxZoom: 18,
       className: 'dark-tiles'
     }).addTo(map);
+
+    map.on('click', () => {
+      closeSideCard();
+    });
 
     const layers = {
       areas: L.layerGroup().addTo(map),
@@ -1239,7 +1259,7 @@
           <div class="popup-rate">${w.rate}</div>
         </div>
         <div class="popup-sub">${w.operadora} · ${w.area}</div>
-        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Abrir ficha técnica</button>
+        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Ver ficha completa</button>
       `;
     }
 
@@ -1481,6 +1501,15 @@
       document.getElementById('live-status').textContent = 'USGS + OPEN-METEO LIVE';
     }
 
+    function toggleKpis() {
+      const kpis = document.getElementById('kpi-carousel');
+      const btn = document.getElementById('btn-kpi-toggle');
+      const card = document.getElementById('side-popup-card');
+      const isOpen = kpis.classList.toggle('open');
+      btn.classList.toggle('active', isOpen);
+      card.classList.toggle('with-kpis', isOpen);
+    }
+
     function openSideCard() {
       document.getElementById('side-popup-card').classList.add('open');
       document.getElementById('btn-ficha-toggle').classList.add('active');
@@ -1568,6 +1597,8 @@
         b.classList.toggle('active', b === btn || b.dataset.sector === sector);
       });
 
+      map.closePopup();
+      closeSideCard();
       map.flyTo([cfg.lat, cfg.lon], cfg.zoom);
       document.getElementById('kpi-pozos').textContent = cfg.pozos;
       document.getElementById('kpi-pozos-sub').textContent = cfg.pozosSub;
