@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Territoria Upstream Mobile | Nova Territoria</title>
+  <title>Territoria Upstream | Nova Territoria</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -142,6 +142,7 @@
       filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%) saturate(60%);
     }
 
+    /* POPUP COMPACTO EN EL MARCADOR DEL MAPA */
     .leaflet-popup-content-wrapper,
     .leaflet-popup-tip {
       background: rgba(15, 23, 42, 0.98);
@@ -151,30 +152,30 @@
     }
 
     .leaflet-popup-content {
-      margin: 10px 12px;
+      margin: 9px 11px;
       font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      line-height: 1.4;
-      min-width: 215px;
+      font-size: 11.5px;
+      line-height: 1.35;
+      min-width: 185px;
     }
 
     .popup-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
+      gap: 6px;
+      margin-bottom: 3px;
     }
 
     .popup-title {
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12.5px;
       color: #fff;
     }
 
     .popup-rate {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: #34d399;
       background: rgba(16, 185, 129, 0.16);
@@ -184,46 +185,24 @@
     }
 
     .popup-sub {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--text-muted);
       margin-bottom: 7px;
     }
 
-    .popup-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 5px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
-      margin-bottom: 8px;
-    }
-
-    .popup-cell {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      border-radius: 5px;
-      padding: 4px 6px;
-    }
-
-    .popup-cell span {
-      display: block;
-      font-family: 'Inter', sans-serif;
-      font-size: 9px;
-      color: var(--text-muted);
-    }
-
     .popup-btn {
       width: 100%;
-      padding: 6px 8px;
-      border-radius: 6px;
+      padding: 5px 8px;
+      border-radius: 5px;
       border: 1px solid var(--accent-cyan);
-      background: rgba(14, 165, 233, 0.24);
+      background: rgba(14, 165, 233, 0.22);
       color: #fff;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
     }
 
+    /* KPIs SUPERIORES */
     .kpi-carousel {
       position: absolute;
       top: 10px;
@@ -234,20 +213,21 @@
       overflow-x: auto;
       scrollbar-width: none;
       z-index: 800;
+      pointer-events: auto;
     }
     .kpi-carousel::-webkit-scrollbar { display: none; }
 
     .kpi-card {
-      flex: 0 0 136px;
+      flex: 0 0 134px;
       background: var(--panel-bg);
       backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 7px 9px;
     }
 
     .kpi-label {
-      font-size: 9.5px;
+      font-size: 9px;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.4px;
@@ -255,14 +235,14 @@
 
     .kpi-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #fff;
       margin-top: 2px;
     }
 
     .kpi-sub {
-      font-size: 10px;
+      font-size: 9.5px;
       margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
@@ -272,24 +252,25 @@
     .up { color: var(--accent-emerald); }
     .warn { color: var(--accent-amber); }
 
+    /* BOTONES FLOTANTES A LA IZQUIERDA PARA NO CHOCAR CON LA FICHA DERECHA */
     .fab-stack {
       position: absolute;
-      right: 12px;
-      bottom: 84px;
+      left: 12px;
+      bottom: 24px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
       z-index: 850;
     }
 
     .fab-btn {
-      width: 46px;
-      height: 46px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: var(--panel-bg);
       border: 1px solid var(--border-color);
       color: #fff;
-      font-size: 18px;
+      font-size: 17px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -302,19 +283,20 @@
       background: rgba(14, 165, 233, 0.3);
     }
 
+    /* DRAWER DE CAPAS */
     .layers-drawer {
       position: absolute;
-      left: 12px;
-      bottom: 84px;
-      width: 240px;
+      left: 62px;
+      bottom: 24px;
+      width: 225px;
       background: var(--panel-bg);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 12px;
+      padding: 11px 12px;
       z-index: 860;
       display: none;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
     }
 
     .layers-drawer.open {
@@ -322,11 +304,11 @@
     }
 
     .drawer-title {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--accent-cyan);
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
       display: flex;
       justify-content: space-between;
     }
@@ -335,108 +317,108 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 7px 0;
-      font-size: 12.5px;
+      padding: 6px 0;
+      font-size: 12px;
       border-bottom: 1px solid rgba(148, 163, 184, 0.12);
     }
     .layer-row:last-child { border-bottom: none; }
 
     .layer-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       accent-color: var(--accent-cyan);
     }
 
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       display: inline-block;
       margin-right: 7px;
     }
 
-    .bottom-sheet {
+    /* FICHA TÉCNICA POPUP LATERAL AL COSTADITO CON SCROLL PROLIJO */
+    .side-popup-card {
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 74px;
+      right: 12px;
+      bottom: 24px;
+      width: min(350px, calc(100vw - 24px));
       background: var(--panel-bg);
       backdrop-filter: blur(14px);
-      border-top: 1px solid var(--border-color);
-      border-radius: 16px 16px 0 0;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
       z-index: 900;
-      max-height: 75dvh;
       display: flex;
       flex-direction: column;
-      transform: translateY(calc(100% - 68px));
-      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-      box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.65);
+      box-shadow: -6px 10px 30px rgba(0, 0, 0, 0.72);
+      transform: translateX(calc(100% + 20px));
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
     }
 
-    .bottom-sheet.expanded {
-      transform: translateY(0);
+    .side-popup-card.open {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .sheet-handle-bar {
-      padding: 8px 14px 10px;
-      cursor: pointer;
+    .card-header {
+      padding: 11px 13px 9px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.16);
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
       flex-shrink: 0;
     }
 
-    .pill-grip {
-      width: 38px;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.45);
-      margin-bottom: 8px;
-    }
-
-    .sheet-peek-row {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .peek-well-name {
+    .card-well-id {
       font-size: 14px;
       font-weight: 700;
       color: #fff;
+      line-height: 1.25;
     }
 
-    .peek-well-sub {
+    .card-well-sub {
       font-size: 11px;
       color: var(--text-muted);
+      margin-top: 2px;
     }
 
-    .peek-rate {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent-emerald);
-      background: rgba(16, 185, 129, 0.14);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      padding: 4px 8px;
+    .card-close-btn {
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
-      white-space: nowrap;
-    }
-
-    .sheet-tabs {
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
       display: flex;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
 
-    .sheet-tab {
+    .card-close-btn:hover {
+      color: #fff;
+      border-color: var(--accent-cyan);
+    }
+
+    .card-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      flex-shrink: 0;
+      background: rgba(11, 17, 30, 0.6);
+    }
+
+    .card-tab {
       flex: 1;
-      padding: 10px 6px;
+      padding: 8px 6px;
       text-align: center;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       color: var(--text-muted);
       background: transparent;
@@ -445,23 +427,41 @@
       cursor: pointer;
     }
 
-    .sheet-tab.active {
+    .card-tab.active {
       color: var(--accent-cyan);
       border-bottom-color: var(--accent-cyan);
     }
 
-    .sheet-body {
-      padding: 14px;
+    /* SCROLL INTERNO PROLIJO */
+    .card-scroll-body {
+      padding: 12px 13px;
       overflow-y: auto;
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.4);
+    }
+
+    .card-scroll-body::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .card-scroll-body::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 999px;
+    }
+
+    .card-scroll-body::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.38);
+      border-radius: 999px;
     }
 
     .tab-pane {
       display: none;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
     }
     .tab-pane.active {
       display: flex;
@@ -469,7 +469,7 @@
 
     .well-pills {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       overflow-x: auto;
       scrollbar-width: none;
       padding-bottom: 2px;
@@ -479,12 +479,12 @@
     .well-chip {
       flex: 0 0 auto;
       background: rgba(30, 41, 59, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      border: 1px solid rgba(148, 163, 184, 0.22);
       color: var(--text-main);
-      padding: 5px 9px;
+      padding: 4px 8px;
       border-radius: 999px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
+      font-size: 10px;
       cursor: pointer;
     }
 
@@ -495,59 +495,76 @@
       font-weight: 600;
     }
 
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
     .status-badge {
       display: inline-block;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
+      font-size: 9.5px;
       padding: 3px 7px;
       border-radius: 4px;
-      background: rgba(16, 185, 129, 0.18);
+      background: rgba(16, 185, 129, 0.16);
       color: #34d399;
       border: 1px solid rgba(16, 185, 129, 0.35);
-      margin-bottom: 4px;
+    }
+
+    .ref-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(245, 158, 11, 0.14);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
     }
 
     .spec-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 7px;
     }
 
     .spec-box {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.14);
       border-radius: 7px;
-      padding: 8px 10px;
+      padding: 7px 9px;
     }
 
     .spec-k {
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--text-muted);
     }
 
     .spec-v {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       margin-top: 2px;
       color: #f8fafc;
     }
 
     .chart-box {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.14);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 9px 10px;
     }
 
     .bars-container {
-      height: 102px;
+      height: 92px;
       display: flex;
       align-items: flex-end;
-      gap: 7px;
-      padding-top: 14px;
+      gap: 6px;
+      padding-top: 12px;
       padding-bottom: 4px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
     }
 
     .bar-col {
@@ -555,7 +572,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
 
     .bar-fill {
@@ -565,7 +582,7 @@
     }
 
     .bar-lbl {
-      font-size: 9.5px;
+      font-size: 9px;
       font-family: 'JetBrains Mono', monospace;
       color: var(--text-muted);
     }
@@ -574,8 +591,8 @@
       background: rgba(239, 68, 68, 0.12);
       border-left: 3px solid var(--accent-red);
       border-radius: 6px;
-      padding: 9px 11px;
-      font-size: 12px;
+      padding: 8px 10px;
+      font-size: 11.5px;
       line-height: 1.35;
     }
 
@@ -591,7 +608,7 @@
 
     .alert-time {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9.5px;
+      font-size: 9px;
       color: var(--text-muted);
       margin-bottom: 3px;
     }
@@ -618,12 +635,12 @@
     <div class="map-stage">
       <div class="kpi-carousel">
         <div class="kpi-card">
-          <div class="kpi-label">Pozos Shale</div>
+          <div class="kpi-label">Pozos Shale (Ref)</div>
           <div class="kpi-value" id="kpi-pozos">142</div>
           <div class="kpi-sub up" id="kpi-pozos-sub">+6 en fractura</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Prod. Bloque</div>
+          <div class="kpi-label">Prod. Bloque (Ref)</div>
           <div class="kpi-value" id="kpi-prod">14.820 m³/d</div>
           <div class="kpi-sub up" id="kpi-prod-sub">▲ 4.2% mensual</div>
         </div>
@@ -641,12 +658,15 @@
 
       <div id="map"></div>
 
+      <!-- BOTONES FLOTANTES A LA IZQUIERDA -->
       <div class="fab-stack">
+        <button class="fab-btn active" id="btn-ficha-toggle" title="Abrir/Cerrar Ficha Técnica" onclick="toggleSideCard()">📋</button>
         <button class="fab-btn" id="btn-layers" title="Capas" onclick="toggleLayersDrawer()">🗂️</button>
         <button class="fab-btn" id="btn-refresh" title="Actualizar telemetría" onclick="refreshTelemetry()">🔄</button>
         <button class="fab-btn" id="btn-center" title="Centrar sector" onclick="recenterCurrentSector()">🎯</button>
       </div>
 
+      <!-- PANEL DE CAPAS -->
       <div class="layers-drawer" id="layers-drawer">
         <div class="drawer-title">
           <span>Capas del Mapa</span>
@@ -670,36 +690,38 @@
         </label>
       </div>
 
-      <div class="bottom-sheet" id="bottom-sheet">
-        <div class="sheet-handle-bar" onclick="toggleSheet()">
-          <div class="pill-grip"></div>
-          <div class="sheet-peek-row">
-            <div>
-              <div class="peek-well-name" id="peek-title">YPF.Nq.LCa-314(h)</div>
-              <div class="peek-well-sub" id="peek-sub">Loma Campana · Toca para ficha y pozos</div>
-            </div>
-            <div class="peek-rate" id="peek-rate">186 m³/d</div>
+      <!-- FICHA TÉCNICA POPUP LATERAL CON SCROLL -->
+      <aside class="side-popup-card open" id="side-popup-card">
+        <div class="card-header">
+          <div>
+            <div class="card-well-id" id="card-title">YPF.Nq.LCa-314(h)</div>
+            <div class="card-well-sub" id="card-sub">Loma Campana (Neuquén) · YPF S.A.</div>
           </div>
+          <button class="card-close-btn" title="Cerrar ficha" onclick="closeSideCard()">✕</button>
         </div>
 
-        <div class="sheet-tabs">
-          <button class="sheet-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Pozos Shale & Fractura</button>
-          <button class="sheet-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas</button>
+        <div class="card-tabs">
+          <button class="card-tab active" id="tab-btn-ficha" onclick="switchTab('ficha')">Ficha Técnica</button>
+          <button class="card-tab" id="tab-btn-alertas" onclick="switchTab('alertas')">Alertas en Vivo</button>
         </div>
 
-        <div class="sheet-body">
+        <div class="card-scroll-body">
           <div class="tab-pane active" id="pane-ficha">
             <div class="well-pills" id="well-pills"></div>
 
-            <div>
-              <span class="status-badge" id="well-status">SHALE OIL · HORIZONTAL</span>
-              <div style="font-size:12px; color:var(--text-muted);" id="well-area-line">Área: Loma Campana (Neuquén) · Vaca Muerta</div>
+            <div class="meta-row">
+              <span class="status-badge" id="well-status">EXTRACCIÓN EFECTIVA · SHALE OIL</span>
+              <span class="ref-tag">DATO REF.</span>
             </div>
 
             <div class="spec-grid">
               <div class="spec-box">
-                <div class="spec-k">Petróleo / Gas</div>
-                <div class="spec-v" id="spec-gas">186 m³/d · 94k m³/d</div>
+                <div class="spec-k">Petróleo Actual</div>
+                <div class="spec-v" id="spec-oil" style="color:#34d399;">186 m³/d</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Gas Asociado</div>
+                <div class="spec-v" id="spec-gas">94k m³/d</div>
               </div>
               <div class="spec-box">
                 <div class="spec-k">Agua / Presión Est.</div>
@@ -718,14 +740,18 @@
                 <div class="spec-v" id="spec-stages">44 etapas</div>
               </div>
               <div class="spec-box">
-                <div class="spec-k">Arena / Agua Iny.</div>
-                <div class="spec-v" id="spec-sand">11.4k tn · 58.2k m³</div>
+                <div class="spec-k">Arena Bombeada</div>
+                <div class="spec-v" id="spec-sand">11.400 tn</div>
+              </div>
+              <div class="spec-box">
+                <div class="spec-k">Agua Inyectada</div>
+                <div class="spec-v" id="spec-water">58.200 m³</div>
               </div>
             </div>
 
             <div class="chart-box">
-              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
-                <span style="font-weight:600;">Producción Mensual Petróleo (m³/d)</span>
+              <div style="display:flex; justify-content:space-between; font-size:10.5px; margin-bottom:2px;">
+                <span style="font-weight:600;">Curva Mensual Petróleo (m³/d)</span>
                 <span style="color:var(--text-muted); font-family:'JetBrains Mono', monospace;">Jun–Nov</span>
               </div>
               <div class="bars-container" id="prod-chart"></div>
@@ -741,7 +767,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </aside>
     </div>
   </div>
 
@@ -752,7 +778,7 @@
 
     const map = L.map('map', {
       zoomControl: false
-    }).setView([-38.30, -68.86], 11);
+    }).setView([-38.30, -68.82], 11);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap | Territoria',
@@ -771,7 +797,7 @@
       vmSur: {
         name: 'VM Sur · Añelo',
         lat: -38.30,
-        lon: -68.86,
+        lon: -68.82,
         zoom: 11,
         pozos: '142',
         pozosSub: '+6 en fractura',
@@ -816,7 +842,8 @@
         tvd: '2.980 m',
         lat: '3.250 m',
         stages: '44 etapas',
-        sand: '11.4k tn · 58.2k m³',
+        sand: '11.400 tn',
+        waterInj: '58.200 m³',
         gasRate: '94k m³/d',
         waterRate: '22 m³/d',
         pressure: '640 bar',
@@ -836,7 +863,8 @@
         tvd: '3.010 m',
         lat: '2.950 m',
         stages: '40 etapas',
-        sand: '10.2k tn · 51.4k m³',
+        sand: '10.200 tn',
+        waterInj: '51.400 m³',
         gasRate: '81k m³/d',
         waterRate: '18 m³/d',
         pressure: '615 bar',
@@ -856,7 +884,8 @@
         tvd: '2.890 m',
         lat: '3.100 m',
         stages: '42 etapas',
-        sand: '10.9k tn · 54.8k m³',
+        sand: '10.950 tn',
+        waterInj: '54.800 m³',
         gasRate: '108k m³/d',
         waterRate: '16 m³/d',
         pressure: '680 bar',
@@ -876,7 +905,8 @@
         tvd: '2.640 m',
         lat: '2.510 m',
         stages: '32 etapas',
-        sand: '8.2k tn · 41.5k m³',
+        sand: '8.200 tn',
+        waterInj: '41.500 m³',
         gasRate: '56k m³/d',
         waterRate: '14 m³/d',
         pressure: '590 bar',
@@ -897,6 +927,7 @@
         lat: 'Vertical',
         stages: 'N/A',
         sand: 'N/A',
+        waterInj: 'Polímeros',
         gasRate: '12k m³/d',
         waterRate: 'Polímeros',
         pressure: '210 bar',
@@ -913,13 +944,7 @@
           <div class="popup-rate">${w.rate}</div>
         </div>
         <div class="popup-sub">${w.operadora} · ${w.area}</div>
-        <div class="popup-grid">
-          <div class="popup-cell"><span>Gas</span>${w.gasRate}</div>
-          <div class="popup-cell"><span>Agua / Presión</span>${w.waterRate} · ${w.pressure}</div>
-          <div class="popup-cell"><span>TVD / Rama</span>${w.tvd} · ${w.lat}</div>
-          <div class="popup-cell"><span>Fractura</span>${w.stages}</div>
-        </div>
-        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Ver ficha y curva</button>
+        <button class="popup-btn" onclick="openWellDetailByIndex(${idx})">Abrir ficha técnica</button>
       `;
     }
 
@@ -930,12 +955,12 @@
       selectWell(w, true);
     }
 
-    function focusWellOnMap(idx, openPopup = true) {
+    function focusWellOnMap(idx) {
       const w = wellsData[idx];
       if (!w) return;
-      selectWell(w, false);
-      map.flyTo(w.surface, 13);
-      if (openPopup && wellMarkers[idx]) {
+      selectWell(w, true);
+      map.flyTo([w.surface[0], w.surface[1] + 0.035], 13);
+      if (wellMarkers[idx]) {
         setTimeout(() => wellMarkers[idx].openPopup(), 350);
       }
     }
@@ -951,7 +976,7 @@
         }).bindPopup(popupHtml).addTo(layers.pozos);
         line.on('click', (e) => {
           L.DomEvent.stopPropagation(e);
-          selectWell(w, false);
+          selectWell(w, true);
         });
       }
 
@@ -965,7 +990,7 @@
 
       marker.on('click', (e) => {
         L.DomEvent.stopPropagation(e);
-        selectWell(w, false);
+        selectWell(w, true);
       });
 
       wellMarkers[idx] = marker;
@@ -980,7 +1005,7 @@
         btn.textContent = `${w.shortLabel} · ${w.rate}`;
         btn.onclick = (e) => {
           e.stopPropagation();
-          focusWellOnMap(idx, true);
+          focusWellOnMap(idx);
         };
         container.appendChild(btn);
       });
@@ -1154,29 +1179,42 @@
       document.getElementById('live-status').textContent = 'USGS + OPEN-METEO LIVE';
     }
 
-    function selectWell(w, expandSheet = false) {
-      document.getElementById('peek-title').textContent = w.id;
-      document.getElementById('peek-sub').textContent = `${w.area} · ${w.operadora}`;
-      document.getElementById('peek-rate').textContent = w.rate;
+    function openSideCard() {
+      document.getElementById('side-popup-card').classList.add('open');
+      document.getElementById('btn-ficha-toggle').classList.add('active');
+    }
+
+    function closeSideCard() {
+      document.getElementById('side-popup-card').classList.remove('open');
+      document.getElementById('btn-ficha-toggle').classList.remove('active');
+    }
+
+    function toggleSideCard() {
+      const card = document.getElementById('side-popup-card');
+      const isOpen = card.classList.toggle('open');
+      document.getElementById('btn-ficha-toggle').classList.toggle('active', isOpen);
+    }
+
+    function selectWell(w, showCard = true) {
+      document.getElementById('card-title').textContent = w.id;
+      document.getElementById('card-sub').textContent = `${w.area} · ${w.operadora}`;
 
       document.getElementById('well-status').textContent = w.status;
-      document.getElementById('well-area-line').textContent = `Área: ${w.area} · ${w.formacion} (${w.operadora})`;
-      document.getElementById('spec-gas').textContent = `${w.rate} · ${w.gasRate}`;
+      document.getElementById('spec-oil').textContent = w.rate;
+      document.getElementById('spec-gas').textContent = w.gasRate;
       document.getElementById('spec-pres').textContent = `${w.waterRate} · ${w.pressure}`;
       document.getElementById('spec-tvd').textContent = w.tvd;
       document.getElementById('spec-lat').textContent = w.lat;
       document.getElementById('spec-stages').textContent = w.stages;
       document.getElementById('spec-sand').textContent = w.sand;
+      document.getElementById('spec-water').textContent = w.waterInj;
 
       renderWellPills(w.id);
       renderChart(w.history);
 
-      if (expandSheet) {
-        document.getElementById('tab-btn-ficha').classList.add('active');
-        document.getElementById('tab-btn-alertas').classList.remove('active');
-        document.getElementById('pane-ficha').classList.add('active');
-        document.getElementById('pane-alertas').classList.remove('active');
-        document.getElementById('bottom-sheet').classList.add('expanded');
+      if (showCard) {
+        switchTab('ficha');
+        openSideCard();
       }
     }
 
@@ -1187,7 +1225,7 @@
       const maxVal = Math.max(...values, 1);
 
       values.forEach((v, i) => {
-        const h = Math.max(12, Math.round((v / maxVal) * 62));
+        const h = Math.max(12, Math.round((v / maxVal) * 56));
         const col = document.createElement('div');
         col.className = 'bar-col';
         col.innerHTML = `
@@ -1199,16 +1237,12 @@
       });
     }
 
-    function toggleSheet() {
-      document.getElementById('bottom-sheet').classList.toggle('expanded');
-    }
-
     function switchTab(tabName) {
       document.getElementById('tab-btn-ficha').classList.toggle('active', tabName === 'ficha');
       document.getElementById('tab-btn-alertas').classList.toggle('active', tabName === 'alertas');
       document.getElementById('pane-ficha').classList.toggle('active', tabName === 'ficha');
       document.getElementById('pane-alertas').classList.toggle('active', tabName === 'alertas');
-      document.getElementById('bottom-sheet').classList.add('expanded');
+      openSideCard();
     }
 
     function toggleLayersDrawer() {
@@ -1238,7 +1272,7 @@
       document.getElementById('kpi-prod').textContent = cfg.prod;
       document.getElementById('kpi-prod-sub').textContent = cfg.prodSub;
 
-      selectWell(wellsData[cfg.wellIndex], false);
+      selectWell(wellsData[cfg.wellIndex], true);
       refreshTelemetry();
     }
 
@@ -1246,7 +1280,7 @@
       flyToSector(currentSector, null);
     }
 
-    selectWell(wellsData[0], false);
+    selectWell(wellsData[0], true);
     refreshTelemetry();
   </script>
 </body>
