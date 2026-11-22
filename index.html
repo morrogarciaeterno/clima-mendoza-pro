@@ -35,18 +35,17 @@
     .map-overlay{position:absolute;z-index:600;left:14px;top:14px;display:flex;gap:8px;pointer-events:none}.badge{background:rgba(8,18,27,.9);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:10px;color:var(--muted);backdrop-filter:blur(10px)}.badge b{color:var(--text);font-size:13px;margin-right:4px}
     .legend{position:absolute;z-index:600;left:14px;bottom:14px;background:rgba(8,18,27,.92);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:7px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
     .side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px;padding-right:3px}.side::-webkit-scrollbar{width:5px}.side::-webkit-scrollbar-thumb{background:#28485d;border-radius:9px}
-    .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);overflow:hidden}.card-head{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}.card-head h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#a8c0ce}.card-body{padding:14px}
+    .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);overflow:hidden}.card-head{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}.card-head h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#a8c0ce}.card-head span{font-size:10px;color:var(--muted)}.card-body{padding:14px}
     .asset-title{display:grid;grid-template-columns:52px 1fr auto;gap:13px;align-items:center}.asset-icon{width:52px;height:52px;border:1px solid #245266;background:#0e2937;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:25px}.asset-name h3{margin:0;font-size:21px;line-height:1.2}.asset-name p{margin:5px 0 0;color:var(--muted);font-family:"JetBrains Mono";font-size:11px}.state{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid}.state.active{color:#bffbd8;border-color:#2b8655;background:#103724}.state.inactive{color:#ffe3a7;border-color:#7d6330;background:#332711}.state.abandoned{color:#ffc2c6;border-color:#87414a;background:#381b20}.state.none{color:#aac0cc;border-color:#385163;background:#132431}
-    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{min-width:0;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.metric span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:7px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong.cyan{color:var(--cyan)}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{min-width:0;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.metric span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:7px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong.cyan{color:var(--cyan)}.metric small{display:block;margin-top:3px;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}.kv-row{padding:9px 0;border-bottom:1px solid rgba(47,75,91,.55);display:flex;align-items:center;justify-content:space-between;gap:12px}.kv-row span{font-size:10px;color:var(--muted)}.kv-row b{font-size:11px;text-align:right;max-width:66%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mono{font-family:"JetBrains Mono"}
-    .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.weather{padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.weather .ico{font-size:17px}.weather strong{display:block;font-size:17px;margin:7px 0 2px}.weather span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.weather small{color:#9fc2d2}
+    .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.weather{padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a1721}.weather strong{display:block;font-size:17px;margin:7px 0 2px}.weather span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.weather small{color:#9fc2d2}
     .risk{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #245b4a;background:linear-gradient(100deg,#10352b,#0a211e);border-radius:10px}.risk strong{font-size:12px;letter-spacing:.12em}.risk span{font-size:10px;color:#9adbb5}
     .empty{min-height:170px;display:grid;place-items:center;text-align:center;color:var(--muted)}.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:7px}.empty .circle{width:54px;height:54px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;font-size:22px;color:var(--cyan)}
     footer{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-top:1px solid var(--line);background:#070f16;color:#647f8f;font-size:9px;letter-spacing:.09em;text-transform:uppercase}
     .leaflet-container{font-family:Inter;background:#071018}.leaflet-control-zoom a{background:#0c1b26!important;color:#dff!important;border-color:#203a4a!important}.leaflet-control-attribution{background:rgba(8,18,27,.78)!important;color:#7f9aaa!important}.leaflet-control-attribution a{color:#64b8d0!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1f2b;color:var(--text);border:1px solid var(--line)}
     .marker{width:8px;height:8px;border-radius:50%;background:var(--cyan);border:3px solid #d7ffff;box-shadow:0 0 0 2px rgba(36,214,208,.18),0 0 9px rgba(36,214,208,.55)}.marker.ab{background:var(--red);border-color:#ffd4d7}.marker.in{background:var(--amber);border-color:#fff0c8}
     .toast{position:fixed;z-index:2000;right:18px;bottom:45px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#102330;color:var(--text);box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8b3d48}
-    dialog{border:1px solid var(--line);border-radius:14px;background:#0b1722;color:var(--text);padding:0;max-width:560px;width:calc(100% - 30px);box-shadow:0 30px 90px #000}dialog::backdrop{background:rgba(0,0,0,.68);backdrop-filter:blur(4px)}.modal-head{padding:16px 18px;border-bottom:1px solid var(--line)}.modal-head h3{margin:0}.modal-body{padding:18px}.modal-body p{font-size:12px;color:var(--muted);line-height:1.6}.modal-body input{width:100%;padding:13px;border-radius:9px;border:1px solid var(--line);background:#08131d;color:white}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}
     @media(max-width:1050px){html,body{overflow:auto}.app{height:auto;min-height:100%;grid-template-rows:auto auto auto 30px}.toolbar{grid-template-columns:repeat(3,1fr)}main{grid-template-columns:1fr}.map-shell{height:58vh}.side{overflow:visible}.top-status .source-pill{display:none}}
     @media(max-width:680px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.top-status .clock{display:none}.metrics{grid-template-columns:1fr 1fr}.weather-grid{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}main{padding:6px}.brand small{display:none}}
   </style>
@@ -60,9 +59,8 @@
     </div>
     <div class="top-status">
       <div class="source-pill">FUENTE · GIS OFICIAL NEUQUÉN</div>
-      <div class="status-pill"><i class="dot"></i><span id="api-status">API SIN CONFIGURAR</span></div>
+      <div class="status-pill"><i class="dot"></i><span id="api-status">INICIANDO…</span></div>
       <div class="clock" id="clock">--:--:--</div>
-      
     </div>
   </header>
 
@@ -90,7 +88,7 @@
       <section class="card">
         <div class="card-head"><h2>Activo seleccionado</h2><span class="mono" id="last-update">SIN SELECCIÓN</span></div>
         <div class="card-body" id="asset-card">
-          <div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica y ambiental aparecerá en este panel.</div></div>
+          <div class="empty"><div><div class="circle">⌖</div><b>Seleccioná un pozo en el mapa</b>La ficha técnica, productiva y ambiental aparecerá en este panel.</div></div>
         </div>
       </section>
 
@@ -102,6 +100,23 @@
           <div class="metric"><span>Reservorio</span><strong id="m-reservoir">—</strong></div>
           <div class="metric"><span>Año perforación</span><strong id="m-year">—</strong></div>
         </div></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Producción declarada</h2><span class="mono" id="prod-period">RES. 319/93</span></div>
+        <div class="card-body">
+          <div class="metrics">
+            <div class="metric"><span>Petróleo</span><strong class="cyan" id="p-oil">—</strong><small id="p-oil-sub">m³/mes</small></div>
+            <div class="metric"><span>Gas</span><strong id="p-gas">—</strong><small id="p-gas-sub">Mm³/mes</small></div>
+            <div class="metric"><span>Agua</span><strong id="p-water">—</strong><small id="p-water-sub">m³/mes</small></div>
+            <div class="metric"><span>TEF</span><strong id="p-tef">—</strong><small id="p-tef-sub">horas</small></div>
+          </div>
+          <div style="height:8px"></div>
+          <div class="kv-row" style="padding-bottom:0;border-bottom:none">
+            <span>Estado de consulta</span>
+            <b class="mono" id="p-status">Esperando selección</b>
+          </div>
+        </div>
       </section>
 
       <section class="card">
@@ -131,21 +146,20 @@
 
   <footer><span>TERRITORIA ENERGY · INTELIGENCIA TERRITORIAL Y AMBIENTAL</span><span>DATOS PÚBLICOS · SIN TELEMETRÍA PRIVADA</span><span id="footer-state">SISTEMA EN ESPERA</span></footer>
 </div>
-
-<dialog id="config-dialog">
-  <div class="modal-head"><h3>Conectar Territoria Energy API</h3></div>
-  <div class="modal-body">
-    <p>Pegá la dirección base completa de tu Worker, sin rutas al final. Ejemplo: <b>https://territoria-energy-api.tu-cuenta.workers.dev</b>. La dirección se guarda solamente en este navegador.</p>
-    <input id="api-url" placeholder="https://territoria-energy-api....workers.dev" autocomplete="off" />
-    <div class="modal-actions"><button class="btn" id="cancel-config">Cancelar</button><button class="btn primary" id="save-config">Guardar y conectar</button></div>
-  </div>
-</dialog>
 <div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
   const $ = id => document.getElementById(id);
-  const state = { all: [], filtered: [], markers: [], selected: null, api: 'https://territoria-energy-api.elexpreso17.workers.dev' };
+  const state = {
+    all: [],
+    filtered: [],
+    markers: [],
+    selected: null,
+    hasFittedOnce: false,
+    api: 'https://territoria-energy-api.elexpreso17.workers.dev'
+  };
+
   const map = L.map('map', { zoomControl:true, preferCanvas:true }).setView([-38.4,-69.1],7);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -153,17 +167,32 @@
   }).addTo(map);
   const markerLayer = L.layerGroup().addTo(map);
 
-  function tick(){ $('clock').textContent = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date()) + ' ART'; }
+  function tick(){
+    $('clock').textContent = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date()) + ' ART';
+  }
   tick(); setInterval(tick,1000);
-  function toast(msg,error=false){const t=$('toast');t.textContent=msg;t.className='toast show'+(error?' error':'');setTimeout(()=>t.className='toast',3800)}
-  function cleanBase(v){return v.trim().replace(/\/+$/,'')}
-  function safe(v,fallback='Sin dato'){return v===null||v===undefined||v===''?fallback:String(v)}
-  function fmtDate(v){if(!v)return 'Sin dato';const d=new Date(v);return isNaN(d)?String(v):new Intl.DateTimeFormat('es-AR').format(d)}
 
-  $('cancel-config').onclick=()=>$('config-dialog').close();
-  $('save-config').onclick=()=>{const value=cleanBase($('api-url').value);if(!/^https?:\/\//i.test(value)){toast('La URL debe comenzar con https://',true);return;}state.api=value;localStorage.setItem('territoriaEnergyApi',value);$('config-dialog').close();loadData();};
-  $('reload').onclick=loadData;
-  ['search','operator','area','field','state'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',applyFilters));
+  function toast(msg,error=false){
+    const t=$('toast'); t.textContent=msg;
+    t.className='toast show'+(error?' error':'');
+    setTimeout(()=>t.className='toast',3800);
+  }
+  function safe(v,fallback='Sin dato'){ return v===null||v===undefined||v===''?fallback:String(v); }
+  function fmtDate(v){ if(!v)return 'Sin dato'; const d=new Date(v); return isNaN(d)?String(v):new Intl.DateTimeFormat('es-AR').format(d); }
+  function getCoords(x){
+    const lat = Number(x.LATITUD ?? x._geometry?.coordinates?.[1]);
+    const lon = Number(x.LONGITUD ?? x._geometry?.coordinates?.[0]);
+    return (Number.isFinite(lat) && Number.isFinite(lon)) ? [lat, lon] : null;
+  }
+
+  $('reload').onclick = () => {
+    state.hasFittedOnce = false;
+    loadData();
+  };
+
+  ['search','operator','area','field','state'].forEach(id => {
+    $(id).addEventListener(id==='search'?'input':'change', () => applyFilters(true));
+  });
 
   async function loadData(){
     if(!state.api) return;
@@ -211,15 +240,13 @@
         const lote=(j.registros||[]).map(x=>({id:x.id,...(x.datos||{}),_geometry:x.geometria}));
         state.all.push(...lote);
 
-        // Mostrar inmediatamente lo recibido, sin esperar a terminar toda la base.
         populateFilters();
-        applyFilters();
+        applyFilters(false);
         setConnection('API ONLINE',true);
 
         if(!j.hayMas || lote.length<limite || lote.length===0) break;
         inicio=j.siguienteInicio ?? (inicio+lote.length);
 
-        // Pequeña pausa para no castigar al GeoServer oficial.
         await new Promise(resolve=>setTimeout(resolve,450));
 
         if(pagina>=250){
@@ -233,7 +260,7 @@
         setConnection(cargaParcial?'API ONLINE · PARCIAL':'API ONLINE',true);
         $('footer-state').textContent=(cargaParcial?'CARGA PARCIAL · ':'CARGA COMPLETA · ')+state.all.length+' POZOS';
         populateFilters();
-        applyFilters();
+        applyFilters(!state.hasFittedOnce);
         if(!cargaParcial) toast(state.all.length+' pozos reales cargados');
       }else{
         setConnection('API SIN RESPUESTA',false);
@@ -244,7 +271,7 @@
         setConnection('API ONLINE · PARCIAL',true);
         $('footer-state').textContent='CARGA PARCIAL · '+state.all.length+' POZOS';
         populateFilters();
-        applyFilters();
+        applyFilters(!state.hasFittedOnce);
         toast('Se conservaron '+state.all.length+' pozos cargados.',true);
       }else{
         setConnection('API SIN RESPUESTA',false);
@@ -253,44 +280,204 @@
       }
     }
   }
-  function setConnection(text,ok){$('api-status').textContent=text;document.querySelector('.dot').style.background=ok?'var(--green)':'var(--red)';}
-  function options(id,values,label){const el=$(id),cur=el.value;el.innerHTML='<option value="">'+label+'</option>'+[...new Set(values.filter(Boolean))].sort().map(v=>'<option>'+escapeHtml(v)+'</option>').join('');el.value=cur;}
-  function populateFilters(){options('operator',state.all.map(x=>x.OPERADOR),'Todas');options('area',state.all.map(x=>x.AREA_LEGAL),'Todas');options('field',state.all.map(x=>x.YACIMIENTO),'Todos');options('state',state.all.map(x=>x.ESTADO_GIS),'Todos');}
-  function applyFilters(){
-    const q=$('search').value.trim().toLowerCase(),op=$('operator').value,ar=$('area').value,fi=$('field').value,st=$('state').value;
-    state.filtered=state.all.filter(x=>(!q||[x.UWI_NQN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME].some(v=>String(v||'').toLowerCase().includes(q)))&&(!op||x.OPERADOR===op)&&(!ar||x.AREA_LEGAL===ar)&&(!fi||x.YACIMIENTO===fi)&&(!st||x.ESTADO_GIS===st));
-    renderMarkers(); updateCounters();
+
+  function setConnection(text,ok){
+    $('api-status').textContent=text;
+    document.querySelector('.dot').style.background=ok?'var(--green)':'var(--red)';
   }
-  function markerClass(x){const s=(x.ESTADO_GIS||'').toLowerCase();return s.includes('abandon')?'ab':s.includes('inactiv')?'in':''}
-  function renderMarkers(){
-    markerLayer.clearLayers();state.markers=[];
+
+  function options(id,values,label){
+    const el=$(id), cur=el.value;
+    const unique=[...new Set(values.filter(Boolean))].sort();
+    el.innerHTML='<option value="">'+label+'</option>'+unique.map(v=>'<option value="'+escapeHtml(v)+'">'+v.replace(/</g,'&lt;')+'</option>').join('');
+    if(unique.includes(cur)) el.value=cur;
+  }
+
+  function populateFilters(){
+    options('operator',state.all.map(x=>x.OPERADOR),'Todas');
+    options('area',state.all.map(x=>x.AREA_LEGAL),'Todas');
+    options('field',state.all.map(x=>x.YACIMIENTO),'Todos');
+    options('state',state.all.map(x=>x.ESTADO_GIS),'Todos');
+  }
+
+  function applyFilters(shouldFit=false){
+    const q=$('search').value.trim().toLowerCase(), op=$('operator').value, ar=$('area').value, fi=$('field').value, st=$('state').value;
+    state.filtered=state.all.filter(x =>
+      (!q || [x.UWI_NQN,x.WELL_NAME,x.FIELD_NAME,x.WELL_S_NAME].some(v => String(v||'').toLowerCase().includes(q))) &&
+      (!op || x.OPERADOR===op) &&
+      (!ar || x.AREA_LEGAL===ar) &&
+      (!fi || x.YACIMIENTO===fi) &&
+      (!st || x.ESTADO_GIS===st)
+    );
+    renderMarkers(shouldFit);
+    updateCounters();
+  }
+
+  function markerClass(x){
+    const s=(x.ESTADO_GIS||'').toLowerCase();
+    return s.includes('abandon')?'ab':s.includes('inactiv')?'in':'';
+  }
+
+  function renderMarkers(shouldFit=false){
+    markerLayer.clearLayers();
+    state.markers=[];
     const bounds=[];
-    state.filtered.forEach(x=>{const lat=Number(x.LATITUD??x._geometry?.coordinates?.[1]),lon=Number(x.LONGITUD??x._geometry?.coordinates?.[0]);if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
+    state.filtered.forEach(x => {
+      const coords = getCoords(x);
+      if(!coords) return;
+      const [lat, lon] = coords;
       const icon=L.divIcon({className:'',html:'<div class="marker '+markerClass(x)+'"></div>',iconSize:[8,8],iconAnchor:[4,4]});
-      const m=L.marker([lat,lon],{icon,title:safe(x.FIELD_NAME)}).on('click',()=>selectWell(x));m.addTo(markerLayer);state.markers.push(m);bounds.push([lat,lon]);
+      const m=L.marker([lat,lon],{icon,title:safe(x.FIELD_NAME)}).on('click',()=>selectWell(x));
+      m.addTo(markerLayer);
+      state.markers.push(m);
+      bounds.push([lat,lon]);
     });
-    if(bounds.length) map.fitBounds(bounds,{padding:[45,45],maxZoom:13});
+    if(bounds.length && (shouldFit || !state.hasFittedOnce)){
+      map.fitBounds(bounds,{padding:[45,45],maxZoom:13});
+      state.hasFittedOnce = true;
+    }
   }
-  function updateCounters(){$('visible-count').textContent=state.filtered.length;$('operator-count').textContent=new Set(state.filtered.map(x=>x.OPERADOR).filter(Boolean)).size;$('nc-count').textContent=state.filtered.filter(x=>x.RESERVORIO==='SH'||x.FORM_PROD==='VMUT').length;}
+
+  function updateCounters(){
+    $('visible-count').textContent=state.filtered.length;
+    $('operator-count').textContent=new Set(state.filtered.map(x=>x.OPERADOR).filter(Boolean)).size;
+    $('nc-count').textContent=state.filtered.filter(x=>x.RESERVORIO==='SH'||x.FORM_PROD==='VMUT').length;
+  }
+
+  function resetProduction(statusText='Consultando…', periodText='RES. 319/93'){
+    $('p-oil').textContent='—';
+    $('p-gas').textContent='—';
+    $('p-water').textContent='—';
+    $('p-tef').textContent='—';
+    $('p-oil-sub').textContent='m³/mes';
+    $('p-gas-sub').textContent='Mm³/mes';
+    $('p-water-sub').textContent='m³/mes';
+    $('p-tef-sub').textContent='horas';
+    $('prod-period').textContent=periodText;
+    $('p-status').textContent=statusText;
+  }
+
+  async function loadProduction(x){
+    const sigla = String(x.UWI_NQN || x.WELL_NAME || '').trim();
+    if(!sigla){
+      resetProduction('Sin UWI / sigla disponible');
+      return;
+    }
+    resetProduction('Consultando '+sigla+'…');
+    try{
+      const r = await fetch(state.api+'/api/produccion?sigla='+encodeURIComponent(sigla), {cache:'no-store'});
+      if(!r.ok) throw new Error('Endpoint /api/produccion no disponible ('+r.status+')');
+      const j = await r.json();
+      const rec = j.ultimo_mes || (Array.isArray(j.historial) ? j.historial[0] : null);
+      if(!rec){
+        resetProduction('Sin declaraciones registradas', j.recurso || 'RES. 319/93');
+        return;
+      }
+
+      const oil = Number(rec.prod_pet);
+      const gas = Number(rec.prod_gas);
+      const water = Number(rec.prod_agua);
+      const tef = Number(rec.tef);
+
+      $('p-oil').textContent = Number.isFinite(oil) ? oil.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—';
+      $('p-gas').textContent = Number.isFinite(gas) ? gas.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—';
+      $('p-water').textContent = Number.isFinite(water) ? water.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—';
+      $('p-tef').textContent = Number.isFinite(tef) ? tef.toLocaleString('es-AR',{maximumFractionDigits:1}) : '—';
+
+      const periodo = (rec.mes && rec.anio) ? String(rec.mes).padStart(2,'0')+'/'+rec.anio : 'RES. 319/93';
+      $('prod-period').textContent = periodo;
+      $('p-status').textContent = rec.fechaingreso ? 'Declarado · Ingreso '+fmtDate(rec.fechaingreso) : 'Período '+periodo;
+    }catch(e){
+      resetProduction('Sin datos de producción ('+e.message+')');
+    }
+  }
+
   async function selectWell(x){
-    state.selected=x;const statusClass=markerClass(x)==='ab'?'abandoned':markerClass(x)==='in'?'inactive':x.ESTADO_GIS?'active':'none';
+    state.selected=x;
+    const statusClass=markerClass(x)==='ab'?'abandoned':markerClass(x)==='in'?'inactive':x.ESTADO_GIS?'active':'none';
     $('asset-card').innerHTML=`<div class="asset-title"><div class="asset-icon">◩</div><div class="asset-name"><h3>${escapeHtml(safe(x.FIELD_NAME))}</h3><p>${escapeHtml(safe(x.WELL_NAME))} · ${escapeHtml(safe(x.UWI_NQN))}</p></div><div class="state ${statusClass}">${escapeHtml(safe(x.ESTADO_GIS).toUpperCase())}</div></div>`;
-    $('last-update').textContent='SELECCIONADO '+new Date().toLocaleTimeString('es-AR');$('m-class').textContent=safe(x.CLASS_NAME,'—');$('m-formation').textContent=safe(x.FORM_PROD,'—');$('m-reservoir').textContent=safe(x.RESERVORIO,'—');$('m-year').textContent=safe(x['AÑO_PERF'],'—');
-    const pairs=[['Operadora',x.OPERADOR],['Operadora original',x.OPERADOR_ORIGINAL],['Área legal',x.AREA_LEGAL],['Yacimiento',x.YACIMIENTO],['Fluido',x.FLUIDO],['Sistema de extracción',x.SIST_EXTRACCION],['Tipo',x.TYPE_NAME],['Elevación',x.ELEVACION!=null?x.ELEVACION+' m':null],['Profundidad medida',x.PROFUNDIDAD_MEDIDA!=null?x.PROFUNDIDAD_MEDIDA+' m':null],['Inicio perforación',fmtDate(x.INICIO_PERF)],['Fin perforación',fmtDate(x.FIN_PERF)],['Inicio terminación',fmtDate(x.INICIO_TERM)],['Fin terminación',fmtDate(x.FIN_TERM)],['Latitud',x.LATITUD],['Longitud',x.LONGITUD],['Legajo',x.LEGAJO],['Perfiles',x.PERFILES],['Observaciones',x.OBSERVACIONES?.trim()||null]];
+    $('last-update').textContent='SELECCIONADO '+new Date().toLocaleTimeString('es-AR');
+    $('m-class').textContent=safe(x.CLASS_NAME,'—');
+    $('m-formation').textContent=safe(x.FORM_PROD,'—');
+    $('m-reservoir').textContent=safe(x.RESERVORIO,'—');
+    $('m-year').textContent=safe(x['AÑO_PERF'],'—');
+
+    const coords = getCoords(x);
+    const pairs=[
+      ['Operadora',x.OPERADOR],
+      ['Operadora original',x.OPERADOR_ORIGINAL],
+      ['Área legal',x.AREA_LEGAL],
+      ['Yacimiento',x.YACIMIENTO],
+      ['Fluido',x.FLUIDO],
+      ['Sistema de extracción',x.SIST_EXTRACCION],
+      ['Tipo',x.TYPE_NAME],
+      ['Elevación',x.ELEVACION!=null?x.ELEVACION+' m':null],
+      ['Profundidad medida',x.PROFUNDIDAD_MEDIDA!=null?x.PROFUNDIDAD_MEDIDA+' m':null],
+      ['Inicio perforación',fmtDate(x.INICIO_PERF)],
+      ['Fin perforación',fmtDate(x.FIN_PERF)],
+      ['Inicio terminación',fmtDate(x.INICIO_TERM)],
+      ['Fin terminación',fmtDate(x.FIN_TERM)],
+      ['Latitud',coords?coords[0]:null],
+      ['Longitud',coords?coords[1]:null],
+      ['Legajo',x.LEGAJO],
+      ['Perfiles',x.PERFILES],
+      ['Observaciones',x.OBSERVACIONES?.trim()||null]
+    ];
     $('tech-kv').innerHTML=pairs.map(([k,v])=>`<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(safe(v))}">${escapeHtml(safe(v))}</b></div>`).join('');
-    const lat=Number(x.LATITUD),lon=Number(x.LONGITUD);if(Number.isFinite(lat)&&Number.isFinite(lon)){map.flyTo([lat,lon],13,{duration:.7});await loadWeather(lat,lon)}
+
+    if(coords){
+      const [lat, lon] = coords;
+      map.flyTo([lat,lon],13,{duration:.7});
+      await Promise.all([loadWeather(lat,lon), loadProduction(x)]);
+    }else{
+      await loadProduction(x);
+    }
   }
+
   async function loadWeather(lat,lon){
     resetWeather('CONSULTANDO…');
     const vars='temperature_2m,relative_humidity_2m,precipitation,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m';
-    try{const u=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=${vars}&timezone=America%2FArgentina%2FBuenos_Aires&wind_speed_unit=kmh&precipitation_unit=mm`;const r=await fetch(u);const j=await r.json();if(!r.ok||!j.current)throw new Error('Meteorología no disponible');const c=j.current;
-      $('w-temp').textContent=val(c.temperature_2m,'°C');$('w-wind').textContent=val(c.wind_speed_10m,'km/h');$('w-dir').textContent='Dirección '+cardinal(c.wind_direction_10m)+' · '+Math.round(c.wind_direction_10m||0)+'°';$('w-gust').textContent=val(c.wind_gusts_10m,'km/h');$('w-rain').textContent=val(c.precipitation,'mm');$('w-hum').textContent=val(c.relative_humidity_2m,'%');$('w-press').textContent=val(c.surface_pressure,'hPa');$('weather-time').textContent=safe(c.time).replace('T',' ');evaluateRisk(c);
-    }catch(e){resetWeather('SIN RESPUESTA');toast(e.message,true)}
+    try{
+      const u=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=${vars}&timezone=America%2FArgentina%2FBuenos_Aires&wind_speed_unit=kmh&precipitation_unit=mm`;
+      const r=await fetch(u); const j=await r.json();
+      if(!r.ok||!j.current)throw new Error('Meteorología no disponible');
+      const c=j.current;
+      $('w-temp').textContent=val(c.temperature_2m,'°C');
+      $('w-wind').textContent=val(c.wind_speed_10m,'km/h');
+      $('w-dir').textContent='Dirección '+cardinal(c.wind_direction_10m)+' · '+Math.round(c.wind_direction_10m||0)+'°';
+      $('w-gust').textContent=val(c.wind_gusts_10m,'km/h');
+      $('w-rain').textContent=val(c.precipitation,'mm');
+      $('w-hum').textContent=val(c.relative_humidity_2m,'%');
+      $('w-press').textContent=val(c.surface_pressure,'hPa');
+      $('weather-time').textContent=safe(c.time).replace('T',' ');
+      evaluateRisk(c);
+    }catch(e){
+      resetWeather('SIN RESPUESTA');
+      toast(e.message,true);
+    }
   }
-  function val(v,u){return v==null?'—':Math.round(v*10)/10+' '+u}function cardinal(d){if(d==null)return '—';return ['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8]}
-  function resetWeather(label){['w-temp','w-wind','w-gust','w-rain','w-hum','w-press'].forEach(id=>$(id).textContent='—');$('weather-time').textContent=label;$('risk-title').textContent='TERRITORIA · EVALUANDO';$('risk-text').textContent='Procesando condiciones ambientales del punto.';$('risk-icon').textContent='◌'}
-  function evaluateRisk(c){const gust=Number(c.wind_gusts_10m||0),rain=Number(c.precipitation||0),wind=Number(c.wind_speed_10m||0);let level='NORMAL',text='Sin umbrales ambientales relevantes en la lectura actual.',icon='●',color='#31d67b';if(gust>=70||rain>=15){level='ALERTA',text=gust>=70?'Ráfagas muy fuertes en el entorno del activo.':'Precipitación intensa en la lectura actual.';icon='▲';color='#ff5e68'}else if(gust>=45||wind>=35||rain>=5){level='ATENCIÓN',text=gust>=45?'Ráfagas elevadas en el entorno del activo.':rain>=5?'Precipitación relevante en el punto.':'Viento sostenido elevado.';icon='◆';color='#f4b544'}$('risk-title').textContent='TERRITORIA · '+level;$('risk-text').textContent=text;$('risk-icon').textContent=icon;$('risk-icon').style.color=color;}
+
+  function val(v,u){return v==null?'—':Math.round(v*10)/10+' '+u}
+  function cardinal(d){if(d==null)return '—';return ['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8]}
+  function resetWeather(label){
+    ['w-temp','w-wind','w-gust','w-rain','w-hum','w-press'].forEach(id=>$(id).textContent='—');
+    $('weather-time').textContent=label;
+    $('risk-title').textContent='TERRITORIA · EVALUANDO';
+    $('risk-text').textContent='Procesando condiciones ambientales del punto.';
+    $('risk-icon').textContent='◌';
+  }
+  function evaluateRisk(c){
+    const gust=Number(c.wind_gusts_10m||0),rain=Number(c.precipitation||0),wind=Number(c.wind_speed_10m||0);
+    let level='NORMAL',text='Sin umbrales ambientales relevantes en la lectura actual.',icon='●',color='#31d67b';
+    if(gust>=70||rain>=15){level='ALERTA',text=gust>=70?'Ráfagas muy fuertes en el entorno del activo.':'Precipitación intensa en la lectura actual.';icon='▲',color='#ff5e68'}
+    else if(gust>=45||wind>=35||rain>=5){level='ATENCIÓN',text=gust>=45?'Ráfagas elevadas en el entorno del activo.':rain>=5?'Precipitación relevante en el punto.':'Viento sostenido elevado.';icon='◆',color='#f4b544'}
+    $('risk-title').textContent='TERRITORIA · '+level;
+    $('risk-text').textContent=text;
+    $('risk-icon').textContent=icon;
+    $('risk-icon').style.color=color;
+  }
   function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}
+
   loadData();
 </script>
 </body>
