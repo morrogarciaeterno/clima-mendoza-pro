@@ -427,37 +427,46 @@
   }
 
   async function loadProduction(x){
-    const sigla = String(x.UWI_NQN || x.WELL_NAME || '').trim();
-    if(!sigla){
-      resetProduction('Sin UWI / sigla disponible');
+    const sigla = String(x.WELL_NAME || x.SIGLA_NACION || '').trim();
+    const idpozo = String(x.UWI_SEN || '').trim();
+    if(!sigla && !idpozo){
+      resetProduction('Sin sigla / UWI SEN disponible');
       return;
     }
-    resetProduction('Consultando '+sigla+'…');
+    resetProduction('Consultando '+(sigla || idpozo)+'…');
     try{
-      const r = await fetch(state.api+'/api/produccion?sigla='+encodeURIComponent(sigla), {cache:'no-store'});
-      if(!r.ok) throw new Error('Endpoint /api/produccion no disponible ('+r.status+')');
+      const qs = new URLSearchParams();
+      if(sigla) qs.set('sigla', sigla);
+      if(idpozo) qs.set('idpozo', idpozo);
+
+      const r = await fetch(state.api+'/api/produccion?'+qs.toString(), {cache:'no-store'});
       const j = await r.json();
+      if(!r.ok || j.ok === false) throw new Error(j.error || ('HTTP '+r.status));
+
       const rec = j.ultimo_mes || (Array.isArray(j.historial) ? j.historial[0] : null);
       if(!rec){
         resetProduction('Sin declaraciones registradas', j.recurso || 'RES. 319/93');
         return;
       }
 
-      const oil = Number(rec.prod_pet);
-      const gas = Number(rec.prod_gas);
-      const water = Number(rec.prod_agua);
-      const tef = Number(rec.tef);
+      const oil = Number(rec.prod_pet ?? rec.PROD_PET);
+      const gas = Number(rec.prod_gas ?? rec.PROD_GAS);
+      const water = Number(rec.prod_agua ?? rec.PROD_AGUA);
+      const tef = Number(rec.tef ?? rec.TEF);
 
       $('p-oil').textContent = Number.isFinite(oil) ? oil.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—';
       $('p-gas').textContent = Number.isFinite(gas) ? gas.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—';
       $('p-water').textContent = Number.isFinite(water) ? water.toLocaleString('es-AR',{maximumFractionDigits:2}) : '—';
       $('p-tef').textContent = Number.isFinite(tef) ? tef.toLocaleString('es-AR',{maximumFractionDigits:1}) : '—';
 
-      const periodo = (rec.mes && rec.anio) ? String(rec.mes).padStart(2,'0')+'/'+rec.anio : 'RES. 319/93';
+      const mes = rec.mes ?? rec.MES;
+      const anio = rec.anio ?? rec.ANIO;
+      const periodo = (mes && anio) ? String(mes).padStart(2,'0')+'/'+anio : 'RES. 319/93';
       $('prod-period').textContent = periodo;
-      $('p-status').textContent = rec.fechaingreso ? 'Declarado · Ingreso '+fmtDate(rec.fechaingreso) : 'Período '+periodo;
+      const fechaIng = rec.fechaingreso ?? rec.FECHAINGRESO;
+      $('p-status').textContent = fechaIng ? 'Declarado · Ingreso '+fmtDate(fechaIng) : 'Período '+periodo;
     }catch(e){
-      resetProduction('Sin datos de producción ('+e.message+')');
+      resetProduction(e.message || 'Sin datos de producción');
     }
   }
 
@@ -550,4 +559,4 @@
   loadData(false);
 </script>
 </body>
-</html> 
+</html>
