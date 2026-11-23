@@ -29,7 +29,62 @@ function initMap(){if(map)return;map=L.map('map',{preferCanvas:true}).setView([-
 async function openModule(type){statsSeq++;setStatsLayout(false);current=type;wellMode=type==='pozos';$('modal').classList.add('open');$('title').textContent=({pozos:'PADRÓN DE POZOS · NEUQUÉN',locaciones:'ACTIVOS · NEUQUÉN',ductos:'OLEODUCTOS Y LÍNEAS DE CONDUCCIÓN',plantas:'PLANTAS E INSTALACIONES',areas:'ÁREAS Y CONCESIONES · PRODUCCIÓN REAL'}[type]);initMap();setTimeout(()=>map.invalidateSize(),80);$('detail').innerHTML='<div class="loading">Consultando fuente oficial…</div>';try{const u=wellMode?API+'/api/pozos?inicio=0&limite=2000':API+'/api/infraestructura?tipo='+type;const r=await fetch(u,{cache:'no-store'}),j=await r.json();if(!r.ok||!j.ok)throw Error(j.error||'Sin respuesta');raw=wellMode?(j.registros||[]).map(x=>({type:'Feature',geometry:x.geometria,properties:{...(x.datos||{}),_id:x.id}})):(j.features||[]);$('layer').textContent=j.layer||type.toUpperCase();buildGroups();render(true);$('apiStatus').textContent='API ONLINE · NEUQUÉN'}catch(e){$('detail').innerHTML='<div class="loading err">'+esc(e.message)+'</div>'}}
 function props(f){return f.properties||{}}function titleOf(p){return p.WELL_NAME||p.SIGLA_NACION||p.NOMBRE||p.LOC_NOMBRE||p.YACIMIENTO||p.OPERADOR||p.CAPA||'Elemento GIS'}function operatorOf(p){return p.OPERADOR||p.OPERADORA||p.EMPRESA||p.TITULAR||''}function buildGroups(){let a=[...new Set(raw.map(f=>operatorOf(props(f))).filter(Boolean))].sort();$('group').innerHTML='<option value="">Todos</option>'+a.map(x=>'<option>'+esc(x)+'</option>').join('')}
 $('search').oninput=()=>['mendozaAreas','mendozaPozos','neuquenCuenca'].includes(current)?renderCuencaLayer(false):render(false);$('group').onchange=()=>['mendozaAreas','mendozaPozos','neuquenCuenca'].includes(current)?renderCuencaLayer(false):render(false);
-function render(fit){groupLayer.clearLayers();const q=$('search').value.toLowerCase(),g=$('group').value;let list=raw.filter(f=>{const p=props(f);return(!g||operatorOf(p)===g)&&(!q||Object.values(p).some(v=>String(v||'').toLowerCase().includes(q)))});$('count').textContent=list.length+' ELEMENTOS';const gj=L.geoJSON({type:'FeatureCollection',features:list},{style:f=>{const p=props(f),gas=/GAS/.test(String(p.FLUIDO||p.TIPO||'').toUpperCase());return{color:gas?'#f4b544':'#24d6d0',weight:current==='ductos'?3:2,fillColor:'#24d6d0',fillOpacity:.15}},pointToLayer:(f,ll)=>{const p=props(f),isMed=current==='plantas'&&String(p.CAPA||'').toLowerCase().includes('medicion');return L.circleMarker(ll,{radius:isMed?4.5:5.5,color:'#fff',weight:1,fillColor:isMed?'#f4b544':'#24d6d0',fillOpacity:.92})},onEachFeature:(f,l)=>{const p=props(f);if(current==='plantas')l.bindTooltip(esc(titleOf(p)));l.on('click',()=>show(f));}}).addTo(groupLayer);if(fit&&gj.getBounds().isValid())map.fitBounds(gj.getBounds(),{padding:[30,30],maxZoom:12});if(current==='plantas'){const nInst=list.filter(f=>!String((f.properties||{}).CAPA||'').toLowerCase().includes('medicion')).length;const nMed=list.length-nInst;$('detail').innerHTML=`<div class="legend-bar"><span><i class="dot-lg" style="background:#24d6d0"></i>Instalaciones (${nInst})</span><span><i class="dot-lg" style="background:#f4b544"></i>Puntos de medición (${nMed})</span></div><div class="loading">Seleccioná una planta, batería o punto de medición en el mapa.</div>`;return}$('detail').innerHTML='<div class="loading">Selecciona un elemento en el mapa.</div>'}
+function render(fit){
+  groupLayer.clearLayers();
+  const q=$('search').value.toLowerCase(),g=$('group').value;
+  const list=raw.filter(f=>{
+    const p=props(f);
+    return(!g||operatorOf(p)===g)&&(!q||Object.values(p).some(v=>String(v||'').toLowerCase().includes(q)));
+  });
+  $('count').textContent=list.length+' ELEMENTOS';
+
+  const isMedicion=p=>{
+    const cap=String(p.CAPA||'').toLowerCase();
+    const tipo=String(p.TIPO_INST||p.TIPO||'').toLowerCase();
+    return cap.includes('medicion')||cap.includes('punto')||tipo.includes('medic');
+  };
+
+  const instList=current==='plantas'?list.filter(f=>!isMedicion(props(f))):list;
+  const medList=current==='plantas'?list.filter(f=>isMedicion(props(f))):[];
+
+  const makeGeo=(items,forceMed=false)=>L.geoJSON({type:'FeatureCollection',features:items},{
+    style:f=>{
+      const p=props(f),gas=/GAS/.test(String(p.FLUIDO||p.TIPO||'').toUpperCase());
+      return{color:gas?'#f4b544':'#24d6d0',weight:current==='ductos'?3:2,fillColor:'#24d6d0',fillOpacity:.15};
+    },
+    pointToLayer:(f,ll)=>{
+      const med=current==='plantas'&&forceMed;
+      return L.circleMarker(ll,{
+        radius:med?5.5:4.8,
+        color:'#ffffff',
+        weight:med?1.4:1,
+        fillColor:med?'#ff9f1c':'#24d6d0',
+        fillOpacity:.95
+      });
+    },
+    onEachFeature:(f,l)=>{
+      const p=props(f);
+      if(current==='plantas')l.bindTooltip(esc(titleOf(p)));
+      l.on('click',()=>show(f));
+    }
+  });
+
+  const gjInst=makeGeo(instList,false).addTo(groupLayer);
+  const gjMed=medList.length?makeGeo(medList,true).addTo(groupLayer):null;
+
+  if(fit){
+    const b1=gjInst.getBounds().isValid()?gjInst.getBounds():null;
+    const b2=gjMed&&gjMed.getBounds().isValid()?gjMed.getBounds():null;
+    const bounds=b1&&b2?b1.extend(b2):(b1||b2);
+    if(bounds)map.fitBounds(bounds,{padding:[30,30],maxZoom:12});
+  }
+
+  if(current==='plantas'){
+    $('detail').innerHTML=`<div class="legend-bar"><span><i class="dot-lg" style="background:#24d6d0"></i>Instalaciones (${instList.length})</span><span><i class="dot-lg" style="background:#ff9f1c"></i>Puntos de medición (${medList.length})</span></div><div class="loading">Seleccioná una planta, batería o punto de medición en el mapa.</div>`;
+    return;
+  }
+  $('detail').innerHTML='<div class="loading">Selecciona un elemento en el mapa.</div>';
+}
 function row(k,v){if(v===null||v===undefined||String(v).trim()===''||String(v).trim()==='0')return'';return`<div class="row"><span>${esc(k)}</span><b title="${esc(v)}">${esc(v)}</b></div>`}function formatNum(v){return Number(v).toLocaleString('es-AR',{maximumFractionDigits:2})}function stamp(v){if(!v)return'Sin dato';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleString('es-AR')}
 function copyCoords(lat,lon,btn){if(!navigator.clipboard)return;navigator.clipboard.writeText(`${lat}, ${lon}`).then(()=>{const old=btn.textContent;btn.textContent='✓ COORDENADAS COPIADAS';setTimeout(()=>btn.textContent=old,1600)})}
 async function show(f){const p={...props(f)},t=titleOf(p),sub=[p.ID_NQN,p.ID_DUCTO,p.LOC_ID,p.CAPA].filter(Boolean).join(' · ');if(current==='areas'){const keys=[['ID Neuquén',p.ID_NQN],['Nombre',p.NOMBRE],['Bloque',p.BLOQUE],['Tipo de área',p.TIPO_AREA||p.TIPO],['Titular',p.TITULAR],['Operador',p.OPERADOR],['Superficie legal',p.SUP_LEGAL||p.SUPERFICIE],['Participación',p.PARTICIPACION],['Tipo de contrato',p.TIPO_CONTRATO],['Norma legal',p.NORMA_LEGAL],['Inicio contrato',p.INICIO_CONTRATO],['Fin contrato',p.FIN_CONTRATO],['Mensura',p.MENSURA],['Observaciones',p.OBSERVACIONES]];$('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc(sub||'ÁREA GIS · NEUQUÉN')}</small></div><div class="kv">${keys.map(x=>row(...x)).join('')}</div><div id="areaProd" class="prod"><div class="loading">Consultando producción real del área…</div></div>`;await loadArea(p.NOMBRE||p.AREA||p.BLOQUE||t);return}if(current==='plantas'){const tipo=p.TIPO_INST||p.TIPO||p.CAPA||'Instalación';const oper=operatorOf(p)||'Sin dato';const areaName=p.AREA||p.CONCESION||p.YACIMIENTO||'';const lat=p.LATITUD??(f.geometry?.coordinates?.[1]);const lon=p.LONGITUD??(f.geometry?.coordinates?.[0]);const hasCoords=lat!==undefined&&lon!==undefined&&lat!==''&&lon!=='';const entries=Object.entries(p).filter(([,v])=>v!==null&&v!==''&&String(v).trim()!=='').slice(0,26);$('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc(sub||'PLANTA / INSTALACIÓN · NEUQUÉN')}</small></div><div class="metrics" style="margin-bottom:10px"><div class="metric"><span>TIPO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div><div class="metric"><span>OPERADOR</span><strong title="${esc(oper)}">${esc(oper)}</strong></div><div class="metric"><span>ÁREA</span><strong class="a" title="${esc(areaName||'Sin dato')}">${esc(areaName||'Sin dato')}</strong></div></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>${hasCoords?`<button type="button" class="gps-btn" onclick="copyCoords('${esc(lat)}','${esc(lon)}',this)">COPIAR COORDENADAS GPS (${esc(Number(lat).toFixed(5))}, ${esc(Number(lon).toFixed(5))})</button>`:''}${areaName?`<div id="areaProd" class="prod"><div class="loading">Consultando producción real del área ${esc(areaName)}…</div></div>`:''}`;if(areaName)await loadArea(areaName);return}if(current==='ductos'){const keys=[['ID ducto',p.ID_DUCTO],['Operador',operatorOf(p)],['Concesión',p.CONCESION],['Otorgado',p.OTORGADO],['Desde',p.DESDE||p.ORIGEN],['Hasta',p.HASTA||p.DESTINO],['Recibe de',p.RECIBE_DE||p.RECIBE],['Entrega a',p.ENTREGA_A||p.ENTREGA],['Fluido',p.FLUIDO],['Tipo',p.TIPO],['Tramo',p.TRAMO],['Diámetro',p.DIAMETRO],['Espesor',p.ESPESOR],['Material',p.MATERIAL],['Tendido',p.TENDIDO],['Profundidad',p.PROFUNDIDAD||p.PROF],['Revestimiento exterior',p.REVESTIMIENTO_EXTERIOR||p.REV_EXT],['Revestimiento interior',p.REVESTIMIENTO_INTERIOR||p.REV_INT]];$('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc(sub||'DUCTO · GIS')}</small></div><div class="metrics"><div class="metric"><span>OPERADOR</span><strong>${esc(operatorOf(p)||'Sin dato')}</strong></div><div class="metric"><span>FLUIDO</span><strong class="c">${esc(p.FLUIDO||'Sin dato')}</strong></div><div class="metric"><span>TIPO</span><strong>${esc(p.TIPO||'Sin dato')}</strong></div></div><div class="duct-grid">${keys.map(x=>row(...x)).join('')}</div>`;return}if(wellMode){showWell(p);return}let entries=Object.entries(p).filter(([,v])=>v!==null&&v!==''&&String(v).trim()!=='').slice(0,28);$('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc(sub||'GIS · NEUQUÉN')}</small></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`}
