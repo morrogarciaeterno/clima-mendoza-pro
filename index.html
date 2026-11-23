@@ -64,7 +64,7 @@
     .modal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.modal-switch{border:1px solid var(--line);background:var(--panel2);color:var(--muted);padding:6px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-size:10px;letter-spacing:.05em}.modal-switch:hover,.modal-switch.active{border-color:var(--cyan);color:var(--cyan);background:#122a3a}
     .modal-close{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:11px}.modal-close:hover{border-color:var(--red);color:#ffc2c6}
     .pozos-body{min-height:0;display:grid;grid-template-columns:minmax(0,57%) minmax(400px,43%);gap:10px;padding:10px;background:var(--bg)}.modal-body{min-height:0;display:grid;grid-template-columns:1fr 380px;gap:10px;padding:10px;background:var(--bg)}
-    .modal-map-wrap{position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#09141d}#infra-map{width:100%;height:100%}.modal-side{min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;gap:10px}
+    .modal-map-wrap{position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#09141d}#infra-map{width:100%;height:100%}.modal-side{min-height:0;overflow:hidden;display:grid;grid-auto-rows:max-content;gap:10px}.modal-side .card{overflow:visible}.modal-side #infra-detail{overflow:visible}.duct-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.duct-grid .kv-row{min-width:0}.duct-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px}.duct-summary .metric{padding:8px}.duct-summary .metric strong{font-size:12px}
     .infra-banner{padding:10px 12px;border:1px solid #295368;background:#0b1e2b;border-radius:10px;margin-bottom:10px}
     .infra-banner b{display:block;font-size:15px;color:#fff;font-family:"JetBrains Mono",monospace}
     .infra-banner small{display:block;margin-top:3px;font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.08em}
@@ -469,15 +469,29 @@
         p.YACIMIENTO_ENTORNO = refMeta.yacimiento;
       }
 
-      const title = p.LOC_NOMBRE || p.NOMBRE || p.OPERADOR || p.OPERADORA_ESTIMADA || p.CAPA || 'Elemento GIS';
-      const sub = [p.LOC_TIPO, p.LOC_ID ? 'ID ' + p.LOC_ID : '', p.CAPA].filter(Boolean).join(' · ');
-      const rows = Object.entries(p).filter(([,v]) => v !== null && v !== '' && String(v).trim() !== '').slice(0, 22);
-      setHtml('infra-detail',
-        `<div class="infra-banner"><b>${escapeHtml(String(title))}</b><small>${escapeHtml(String(sub || 'Neuquén · GIS'))}</small></div>` +
-        '<div class="kv" style="grid-template-columns:1fr">' +
-        rows.map(([k,v]) => `<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(String(v))}">${escapeHtml(String(v))}</b></div>`).join('') +
-        '</div>'
-      );
+      const title = p.LOC_NOMBRE || p.NOMBRE || p.NOMBRE_DUCTO || p.OPERADOR || p.OPERADORA_ESTIMADA || p.CAPA || 'Elemento GIS';
+      const sub = [p.LOC_TIPO, p.LOC_ID ? 'ID ' + p.LOC_ID : '', p.ID_DUCTO ? 'ID ' + p.ID_DUCTO : '', p.CAPA].filter(Boolean).join(' · ');
+      const has = v => v !== null && v !== undefined && String(v).trim() !== '';
+      if(infraCurrentType === 'ductos'){
+        const pick = (...keys) => { for(const k of keys){ if(has(p[k])) return p[k]; } return null; };
+        const op = pick('OPERADOR','OPERADORA','EMPRESA','operador','operadora','empresa');
+        const fluid = pick('FLUIDO','PRODUCTO');
+        const type = pick('TIPO','TIPO_DUCTO');
+        const rows = [
+          ['ID ducto',pick('ID_DUCTO','IDDUCTO','DUCTO_ID')],['Operador',op],['Concesión',pick('CONCESION','CONCESIÓN')],['Otorgado',pick('OTORGADO')],
+          ['Desde',pick('DESDE','ORIGEN')],['Hasta',pick('HASTA','DESTINO')],['Recibe de',pick('RECIBE_DE','RECIBEDE','RECIBE')],['Entrega a',pick('ENTREGA_A','ENTREGAA','ENTREGA')],
+          ['Fluido',fluid],['Tipo',type],['Tramo',pick('TRAMO')],['Diámetro',pick('DIAMETRO','DIÁMETRO')],['Espesor',pick('ESPESOR')],['Material',pick('MATERIAL')],
+          ['Tendido',pick('TENDIDO')],['Profundidad',pick('PROFUNDIDAD','PROF')],['Revestimiento exterior',pick('REVESTIMIENTO_EXTERIOR','REV_EXT','REVEST_EXT')],['Revestimiento interior',pick('REVESTIMIENTO_INTERIOR','REV_INT','REVEST_INT')]
+        ].filter(([,v])=>has(v) && String(v).trim() !== '0');
+        setHtml('infra-detail',
+          `<div class="infra-banner"><b>${escapeHtml(String(title))}</b><small>${escapeHtml(String(sub || 'Neuquén · GIS'))}</small></div>` +
+          `<div class="duct-summary"><div class="metric"><span>OPERADOR</span><strong>${escapeHtml(safe(op,'Sin dato'))}</strong></div><div class="metric"><span>FLUIDO</span><strong class="cyan">${escapeHtml(safe(fluid,'Sin dato'))}</strong></div><div class="metric"><span>TIPO</span><strong>${escapeHtml(safe(type,'Sin dato'))}</strong></div></div>` +
+          '<div class="duct-grid">' + rows.map(([k,v])=>`<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(String(v))}">${escapeHtml(String(v))}</b></div>`).join('') + '</div>'
+        );
+      }else{
+        const rows = Object.entries(p).filter(([,v]) => v !== null && v !== '' && String(v).trim() !== '').slice(0, 22);
+        setHtml('infra-detail', `<div class="infra-banner"><b>${escapeHtml(String(title))}</b><small>${escapeHtml(String(sub || 'Neuquén · GIS'))}</small></div>` + '<div class="kv" style="grid-template-columns:1fr">' + rows.map(([k,v]) => `<div class="kv-row"><span>${escapeHtml(k)}</span><b title="${escapeHtml(String(v))}">${escapeHtml(String(v))}</b></div>`).join('') + '</div>');
+      }
     };
 
     const isLoc = infraCurrentType === 'locaciones';
