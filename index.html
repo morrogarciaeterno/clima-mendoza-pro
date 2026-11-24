@@ -314,10 +314,26 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
   </div>
 </div>
 
+<div class="modal" id="popupCompare" style="z-index:2500">
+  <div class="window">
+    <div class="head">
+      <h2 id="popTitle">COMPARADOR DE POZOS, OPERADORAS, ÁREAS &amp; SERIE ANUAL OIL/GAS</h2>
+      <div class="nav">
+        <button class="close" onclick="$('popupCompare').classList.remove('open')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>CERRAR POPUP</button>
+      </div>
+    </div>
+    <div class="body stats-mode" style="overflow-y:auto">
+      <div id="popupBody" class="cb"></div>
+    </div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
 let map,groupLayer,rnAreasGroup,rnPozosGroup,current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,statsCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
+let statsCompareMode=false,cmpA='NEUQUINA',cmpB='CUYANA',cmpScaleMode='dual',cmpWindow=12;
+let popEntityType='empresas',popFluid='gas',popItemA='',popItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
 function showHome(){
@@ -339,7 +355,7 @@ function setStatsLayout(isStats){
   $('detailTitle').textContent=isStats?'TABLERO ESTADÍSTICO · 12 MESES & COMPARATIVA MENSUAL':'DETALLE DEL ELEMENTO';
   if(!isStats&&map)setTimeout(()=>map.invalidateSize(),80);
 }
-function closeModal(){rnReqSeq++;statsSeq++;setStatsLayout(false);$('modal').classList.remove('open')}
+function closeModal(){rnReqSeq++;statsSeq++;statsCompareMode=false;setStatsLayout(false);$('modal').classList.remove('open')}
 function initMap(){
   if(map)return;
   map=L.map('map',{preferCanvas:true}).setView([-38.4,-69.1],7);
@@ -350,7 +366,7 @@ function initMap(){
 }
 
 async function openModule(type){
-  rnReqSeq++;statsSeq++;setStatsLayout(false);current=type;wellMode=type==='pozos';plantasFilter='all';
+  rnReqSeq++;statsSeq++;statsCompareMode=false;setStatsLayout(false);current=type;wellMode=type==='pozos';plantasFilter='all';
   $('modal').classList.add('open');
   $('title').textContent=({
     pozos:'CUENCA NEUQUINA · PADRÓN DE POZOS',
@@ -372,7 +388,7 @@ async function openModule(type){
 }
 
 async function openCuyanaModule(sub){
-  rnReqSeq++;statsSeq++;setStatsLayout(false);wellMode=false;mzaPlantasFilter='all';
+  rnReqSeq++;statsSeq++;statsCompareMode=false;setStatsLayout(false);wellMode=false;mzaPlantasFilter='all';
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='areas'){await loadMendozaProductionAreas();return}
@@ -391,7 +407,7 @@ function rnSubtabs(active){
 }
 
 async function openRioNegroModule(sub){
-  statsSeq++;setStatsLayout(false);wellMode=false;
+  statsSeq++;statsCompareMode=false;setStatsLayout(false);wellMode=false;
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='ambos'){await loadRioNegroAmbos();return}
@@ -402,7 +418,7 @@ async function openRioNegroModule(sub){
 
 async function loadRioNegroAmbos(){
   const seq=++rnReqSeq;
-  statsSeq++;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
+  statsSeq++;statsCompareMode=false;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
   $('modal').classList.add('open');
   $('title').textContent='RÍO NEGRO · ÁREAS + POZOS EN MAPA (CAP. IV)';
   $('layer').textContent='ÁREAS + POZOS · RN';
@@ -459,6 +475,7 @@ function renderRioNegroCombined(fit){
 
   const areasGeo=showAreas?areasFiltered.filter(f=>f.geometry&&f.geometry.type):[];
   const pozosGeo=showPozos?pozosFiltered.filter(f=>f.geometry&&f.geometry.type):[];
+  const sinGeoTotal=Math.max(0,(showAreas?areasFiltered.length-areasGeo.length:0)+(showPozos?pozosFiltered.length-pozosGeo.length:0));
 
   const gjAreas=areasGeo.length?L.geoJSON({type:'FeatureCollection',features:areasGeo},{
     pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:8,color:'#071018',weight:1.5,fillColor:'#f4b544',fillOpacity:.8}),
@@ -501,15 +518,16 @@ function renderRioNegroCombined(fit){
       <button type="button" onclick="setRnOverlayMode('both')" style="color:${rnOverlayMode==='both'?'#fff':'var(--mut)'}">Áreas + Pozos</button>
       <button type="button" onclick="setRnOverlayMode('areas')" style="color:${rnOverlayMode==='areas'?'#f4b544':'var(--mut)'}"><i class="dot-lg" style="background:#f4b544"></i>Áreas (${areasFiltered.length} · ${areasGeo.length} en mapa)</button>
       <button type="button" onclick="setRnOverlayMode('pozos')" style="color:${rnOverlayMode==='pozos'?'#24d6d0':'var(--mut)'}"><i class="dot-lg" style="background:#24d6d0"></i>Pozos (${pozosFiltered.length} · ${pozosGeo.length} en mapa)</button>
+      <span><i class="dot-lg" style="background:var(--mut)"></i>Sin ubicación en mapa (${sinGeoTotal})</span>
     </div>
-    <div class="banner"><b>RÍO NEGRO · ÁREAS Y POZOS EN MAPA</b><small>ÁMBAR = ÁREAS · CIAN = POZOS ACTIVOS / OTROS</small></div>
+    <div class="banner"><b>RÍO NEGRO · ÁREAS Y POZOS EN MAPA</b><small>${areasGeo.length+pozosGeo.length} CON UBICACIÓN EN MAPA · ${sinGeoTotal} SIN UBICACIÓN EN MAPA</small></div>
     <div class="loading">Tocá un marcador de área o de pozo en el mapa para ver su ficha detallada.</div>
   `;
 }
 
 async function openRioNegroDuctos(){
   const seq=++rnReqSeq;
-  statsSeq++;setStatsLayout(false);wellMode=false;current='rnDuctos';
+  statsSeq++;statsCompareMode=false;setStatsLayout(false);wellMode=false;current='rnDuctos';
   $('modal').classList.add('open');
   $('title').textContent='RÍO NEGRO · DUCTOS RES. 319/93';
   $('layer').textContent='DUCTOS RÍO NEGRO';
@@ -532,7 +550,7 @@ async function openRioNegroDuctos(){
 
 async function loadRioNegroAreas(){
   const seq=++rnReqSeq;
-  setStatsLayout(false);current='rnAreas';
+  statsCompareMode=false;setStatsLayout(false);current='rnAreas';
   $('title').textContent='RÍO NEGRO · ÁREAS PRODUCTIVAS (CAP. IV)';
   $('layer').textContent='ÁREAS RÍO NEGRO';
   map.setView([-39.2,-67.8],8);
@@ -552,7 +570,7 @@ async function loadRioNegroAreas(){
 
 async function loadRioNegroPozos(){
   const seq=++rnReqSeq;
-  setStatsLayout(false);current='rnPozos';
+  statsCompareMode=false;setStatsLayout(false);current='rnPozos';
   $('title').textContent='RÍO NEGRO · POZOS DECLARADOS (CAP. IV)';
   $('layer').textContent='POZOS RÍO NEGRO';
   map.setView([-39.2,-67.8],8);
@@ -772,11 +790,323 @@ function renderBarsHtml(items,labelKey,valKey,unitSuffix,fillClass,limit=12,subF
 }
 
 function statsScopeKey(){return `${statsCuenca}|${statsProvincia||'ALL'}`}
-function setStatsFluid(mode){statsFluid=mode==='gas'?'gas':'oil';paintEstadisticas()}
-function setStatsScope(c,prov){statsCuenca=c;statsProvincia=prov||'';loadEstadisticasData()}
-function onStatsMonthChange(val){statsMonth=String(val||'').trim();loadEstadisticasData()}
+function setStatsFluid(mode){statsFluid=mode==='gas'?'gas':'oil';if(statsCompareMode)renderInteractiveCompare();else paintEstadisticas()}
+function setStatsScope(c,prov){statsCompareMode=false;statsCuenca=c;statsProvincia=prov||'';loadEstadisticasData()}
+function onStatsMonthChange(val){statsMonth=String(val||'').trim();if(statsCompareMode)renderInteractiveCompare();else loadEstadisticasData()}
+
+function scopeParams(code){
+  if(code==='RIONEGRO')return{cuenca:'TODAS',provincia:'RIO NEGRO',label:'Río Negro'};
+  if(code==='CUYANA')return{cuenca:'CUYANA',provincia:'',label:'Cuenca Cuyana'};
+  if(code==='NEUQUINA')return{cuenca:'NEUQUINA',provincia:'',label:'Cuenca Neuquina'};
+  return{cuenca:'TODAS',provincia:'',label:'Argentina (Todas)'};
+}
+
+async function fetchScopeStats(code){
+  const q=new URLSearchParams({top:'15'});
+  const sp=scopeParams(code);
+  if(sp.cuenca!=='TODAS')q.set('cuenca',sp.cuenca);
+  if(sp.provincia)q.set('provincia',sp.provincia);
+  if(statsMonth&&/^\d{4}-\d{2}$/.test(statsMonth)){
+    const [y,m]=statsMonth.split('-');
+    q.set('anio',String(Number(y)));
+    q.set('mes',String(Number(m)));
+  }
+  const cacheKey=`${code}|${statsMonth||'latest'}`;
+  if(statsCache[cacheKey])return statsCache[cacheKey];
+  const r=await fetch(`${API}/api/estadisticas?${q.toString()}`,{cache:'no-store'});
+  const j=await r.json();
+  if(!r.ok||!j.ok)throw Error(j.error||`Error consultando ${sp.label}`);
+  statsCache[cacheKey]=j;
+  return j;
+}
+
+async function renderInteractiveCompare(){
+  statsCompareMode=true;
+  const seq=++statsSeq;
+  const isGas=statsFluid==='gas';
+  const unit=isGas?'Mm³':'Mbbl/d';
+  const spA=scopeParams(cmpA);
+  const spB=scopeParams(cmpB);
+
+  const controlsHtml=`
+    <div class="stats-toolbar">
+      <div class="stats-cuencas">
+        <button type="button" onclick="statsCompareMode=false;paintEstadisticas()">← VISTA SIMPLE</button>
+        <div class="month-picker"><label for="cmpSelA">SERIE A</label><select id="cmpSelA" onchange="cmpA=this.value;renderInteractiveCompare()">
+          <option value="NEUQUINA"${cmpA==='NEUQUINA'?' selected':''}>Cuenca Neuquina</option>
+          <option value="CUYANA"${cmpA==='CUYANA'?' selected':''}>Cuenca Cuyana</option>
+          <option value="RIONEGRO"${cmpA==='RIONEGRO'?' selected':''}>Río Negro</option>
+          <option value="TODAS"${cmpA==='TODAS'?' selected':''}>Argentina (Todas)</option>
+        </select></div>
+        <div class="month-picker"><label for="cmpSelB">SERIE B</label><select id="cmpSelB" onchange="cmpB=this.value;renderInteractiveCompare()">
+          <option value="CUYANA"${cmpB==='CUYANA'?' selected':''}>Cuenca Cuyana</option>
+          <option value="NEUQUINA"${cmpB==='NEUQUINA'?' selected':''}>Cuenca Neuquina</option>
+          <option value="RIONEGRO"${cmpB==='RIONEGRO'?' selected':''}>Río Negro</option>
+          <option value="TODAS"${cmpB==='TODAS'?' selected':''}>Argentina (Todas)</option>
+        </select></div>
+        <div class="month-picker"><label for="cmpWinSel">VENTANA</label><select id="cmpWinSel" onchange="cmpWindow=Number(this.value)||12;renderInteractiveCompare()">
+          <option value="6"${cmpWindow===6?' selected':''}>Últimos 6M</option>
+          <option value="12"${cmpWindow===12?' selected':''}>Últimos 12M</option>
+        </select></div>
+        <button type="button" class="${cmpScaleMode==='dual'?'active':''}" onclick="cmpScaleMode='dual';renderInteractiveCompare()">EJE REAL</button>
+        <button type="button" class="${cmpScaleMode==='index'?'active':''}" onclick="cmpScaleMode='index';renderInteractiveCompare()">BASE 100 (%)</button>
+        <button type="button" onclick="openComparePopup('empresas', statsFluid)">POPUP &amp; ANUAL</button>
+      </div>
+      <div class="fluid-switch" style="margin:0;min-width:180px">
+        <button type="button" class="${!isGas?'active':''}" onclick="statsFluid='oil';renderInteractiveCompare()">OIL</button>
+        <button type="button" class="${isGas?'active':''}" onclick="statsFluid='gas';renderInteractiveCompare()">GAS</button>
+      </div>
+    </div>
+  `;
+
+  $('detail').innerHTML=controlsHtml+'<div class="loading">Calculando comparación interactiva…</div>';
+
+  try{
+    const [jA,jB]=await Promise.all([fetchScopeStats(cmpA),fetchScopeStats(cmpB)]);
+    if(seq!==statsSeq||current!=='estadisticas'||!statsCompareMode)return;
+
+    const sA=(jA.serie_12m||[]).slice(-cmpWindow);
+    const sB=jB.serie_12m||[];
+    const mapB=new Map(sB.map(x=>[x.periodo,x]));
+
+    const rawRows=sA.map(a=>{
+      const b=mapB.get(a.periodo);
+      return{
+        periodo:a.periodo,
+        vA:Number(isGas?a.gas_miles_m3:a.petroleo_mbbl_d)||0,
+        vB:Number(isGas?(b?.gas_miles_m3):(b?.petroleo_mbbl_d))||0
+      };
+    });
+
+    const firstA=rawRows.find(r=>r.vA>0)?.vA||1;
+    const firstB=rawRows.find(r=>r.vB>0)?.vB||1;
+
+    const rows=rawRows.map(r=>({
+      ...r,
+      pA:cmpScaleMode==='index'?(r.vA/firstA)*100:r.vA,
+      pB:cmpScaleMode==='index'?(r.vB/firstB)*100:r.vB
+    }));
+
+    const w=920,h=180,padL=58,padR=cmpScaleMode==='dual'?58:28,padT=18,padB=26;
+    const plotW=w-padL-padR,plotH=h-padT-padB;
+
+    const allP=rows.flatMap(r=>[r.pA,r.pB]);
+    const sharedMin=Math.min(...allP,0);
+    const sharedMax=Math.max(...allP,1);
+    const sharedSpan=Math.max((sharedMax-sharedMin)*1.15,1);
+    const sharedBase=Math.max(0,sharedMin-(sharedMax-sharedMin)*0.1);
+
+    const maxA=Math.max(...rows.map(r=>r.pA),1),minA=Math.min(...rows.map(r=>r.pA),0);
+    const spanA=Math.max((maxA-minA)*1.15,1),baseA=Math.max(0,minA-(maxA-minA)*0.1);
+
+    const maxB=Math.max(...rows.map(r=>r.pB),1),minB=Math.min(...rows.map(r=>r.pB),0);
+    const spanB=Math.max((maxB-minB)*1.15,1),baseB=Math.max(0,minB-(maxB-minB)*0.1);
+
+    const pts=rows.map((r,i)=>{
+      const x=padL+(rows.length===1?plotW/2:(i/(rows.length-1))*plotW);
+      const yA=cmpScaleMode==='index'
+        ?padT+plotH-(((r.pA-sharedBase)/sharedSpan)*plotH)
+        :padT+plotH-(((r.pA-baseA)/spanA)*plotH);
+      const yB=cmpScaleMode==='index'
+        ?padT+plotH-(((r.pB-sharedBase)/sharedSpan)*plotH)
+        :padT+plotH-(((r.pB-baseB)/spanB)*plotH);
+      return{...r,x,yA,yB};
+    });
+
+    const polyA=pts.map(p=>`${p.x.toFixed(1)},${p.yA.toFixed(1)}`).join(' ');
+    const polyB=pts.map(p=>`${p.x.toFixed(1)},${p.yB.toFixed(1)}`).join(' ');
+
+    const grid=[0,0.5,1].map(t=>{
+      const gy=padT+plotH*(1-t);
+      const leftVal=cmpScaleMode==='index'?(sharedBase+sharedSpan*t):(baseA+spanA*t);
+      const rightVal=baseB+spanB*t;
+      const suffix=cmpScaleMode==='index'?' idx':'';
+      return`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${w-padR}" y2="${gy.toFixed(1)}" stroke="#1f3545" stroke-dasharray="3 3" stroke-width="1"/>
+        <text x="${padL-8}" y="${(gy+3).toFixed(1)}" fill="#24d6d0" font-size="9" text-anchor="end">${formatNum(leftVal)}${suffix}</text>
+        ${cmpScaleMode==='dual'?`<text x="${w-padR+8}" y="${(gy+3).toFixed(1)}" fill="#f4b544" font-size="9" text-anchor="start">${formatNum(rightVal)}</text>`:''}`;
+    }).join('');
+
+    const dots=pts.map(p=>{
+      const diff=p.vA-p.vB;
+      const ratio=p.vB?`${formatNum(p.vA/p.vB)}x`:'—';
+      return`<g>
+        <title>${esc(p.periodo)} · ${esc(spA.label)}: ${formatNum(p.vA)} ${unit} | ${esc(spB.label)}: ${formatNum(p.vB)} ${unit} | Dif: ${diff>0?'+':''}${formatNum(diff)} ${unit} (${ratio})</title>
+        <circle cx="${p.x.toFixed(1)}" cy="${p.yA.toFixed(1)}" r="4.2" fill="#24d6d0" stroke="#071018" stroke-width="1.2"/>
+        <circle cx="${p.x.toFixed(1)}" cy="${p.yB.toFixed(1)}" r="4.2" fill="#f4b544" stroke="#071018" stroke-width="1.2"/>
+        <text x="${p.x.toFixed(1)}" y="${h-6}" fill="#7f9aaa" font-size="9" text-anchor="middle">${esc(p.periodo)}</text>
+      </g>`;
+    }).join('');
+
+    const last=pts[pts.length-1]||{periodo:'—',vA:0,vB:0};
+    const mA=jA.resumen_mes||{},mB=jB.resumen_mes||{};
+    const valCurA=Number(isGas?mA.gas_miles_m3:mA.petroleo_mbbl_d)||0;
+    const valCurB=Number(isGas?mB.gas_miles_m3:mB.petroleo_mbbl_d)||0;
+
+    $('detail').innerHTML=controlsHtml+`
+      <div class="banner">
+        <b>${esc(spA.label)} VS. ${esc(spB.label)} · ${isGas?'GAS':'OIL'} (${esc(jA.periodo?.label||last.periodo)})</b>
+        <small>CIAN = ${esc(spA.label.toUpperCase())} · ÁMBAR = ${esc(spB.label.toUpperCase())} · MODO ${cmpScaleMode==='index'?'BASE 100':'EJE DUAL REAL'}</small>
+      </div>
+      <div class="metrics">
+        <div class="metric"><span>${esc(spA.label.toUpperCase())}</span><strong class="c">${formatNum(valCurA)}</strong><small>${esc(unit)}</small></div>
+        <div class="metric"><span>${esc(spB.label.toUpperCase())}</span><strong class="a">${formatNum(valCurB)}</strong><small>${esc(unit)}</small></div>
+        <div class="metric"><span>RATIO (A / B)</span><strong>${valCurB?formatNum(valCurA/valCurB)+'x':'—'}</strong><small>Dif: ${valCurA-valCurB>0?'+':''}${formatNum(valCurA-valCurB)} ${esc(unit)}</small></div>
+      </div>
+      <div class="chart-card">
+        <div class="stat-title"><b>COMPARATIVA INTERACTIVA (${rows.length} MESES)</b><span>PASÁ EL CURSOR SOBRE CADA MES</span></div>
+        <div class="chart-wrap">
+          <svg class="chart-svg" style="height:180px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Comparativa interactiva">
+            ${grid}
+            <polyline fill="none" stroke="#24d6d0" stroke-width="2.4" points="${polyA}"/>
+            <polyline fill="none" stroke="#f4b544" stroke-width="2.4" points="${polyB}"/>
+            ${dots}
+          </svg>
+        </div>
+        <div class="prod-foot">Cada punto mensual muestra en el tooltip el valor de Serie A, Serie B, diferencia y proporción A/B.</div>
+      </div>
+    `;
+  }catch(e){
+    if(seq!==statsSeq||current!=='estadisticas'||!statsCompareMode)return;
+    $('detail').innerHTML=controlsHtml+`<div class="loading err">${esc(e.message)}</div>`;
+  }
+}
+
+function getRankingListForPopup(data, type, fluid){
+  if(!data)return[];
+  const isGas=fluid==='gas';
+  if(type==='pozos'){
+    const arr=isGas?(data.ranking_pozos_gas||[]):(data.ranking_pozos_oil||[]);
+    return arr.map(x=>({key:x.sigla,label:x.sigla,val:Number(isGas?x.gas_miles_m3:x.petroleo_bbl_d)||0,unit:isGas?'Mm³':'bbl/d',sub:`${x.empresa} · ${x.area}`}));
+  }
+  if(type==='areas'){
+    const arr=isGas?(data.ranking_areas_gas||[]):(data.ranking_areas_oil||[]);
+    return arr.map(x=>({key:x.area,label:x.area,val:Number(isGas?x.gas_miles_m3:x.petroleo_mbbl_d)||0,unit:isGas?'Mm³':'Mbbl/d',sub:`${x.pozos_activos||0} pozos activos`}));
+  }
+  const arr=isGas?(data.ranking_empresas_gas||[]):(data.ranking_empresas_oil||[]);
+  return arr.map(x=>({key:x.empresa,label:x.empresa,val:Number(isGas?x.gas_miles_m3:x.petroleo_mbbl_d)||0,unit:isGas?'Mm³':'Mbbl/d',sub:`${x.pozos_activos||0} pozos activos`}));
+}
+
+function renderAnnualChartSvg(serie, fluid){
+  if(!serie||!serie.length)return'<div class="loading">Sin serie anual disponible para el filtro seleccionado.</div>';
+  const isGas=fluid==='gas';
+  const vals=serie.map(y=>Number(isGas?y.gas_miles_m3:y.petroleo_mbbl)||0);
+  const unit=isGas?'Mm³ / año':'Mbbl acum. / año';
+  const w=920,h=175,padL=62,padR=24,padT=18,padB=26;
+  const plotW=w-padL-padR,plotH=h-padT-padB;
+  const maxV=Math.max(...vals,1);
+  const barW=Math.min(64,Math.max(22,(plotW/serie.length)*0.52));
+
+  const grid=[0,0.5,1].map(t=>{
+    const gy=padT+plotH*(1-t);
+    const gv=maxV*t;
+    return`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${w-padR}" y2="${gy.toFixed(1)}" stroke="#1f3545" stroke-dasharray="3 3" stroke-width="1"/>
+      <text x="${padL-8}" y="${(gy+3).toFixed(1)}" fill="#7f9aaa" font-size="9" text-anchor="end">${formatNum(gv)}</text>`;
+  }).join('');
+
+  const bars=serie.map((y,i)=>{
+    const v=vals[i];
+    const bh=Math.max(3,(v/maxV)*plotH);
+    const cx=padL+(serie.length===1?plotW/2:((i+0.5)/serie.length)*plotW);
+    const bx=cx-barW/2;
+    const by=padT+plotH-bh;
+    const yoy=isGas?y.yoy_gas_pct:y.yoy_pet_pct;
+    const col=isGas?'#31d67b':'#24d6d0';
+    const yoyTxt=yoy!==null&&yoy!==undefined?` (${yoy>0?'+':''}${yoy}% YoY)`:'';
+    return`<g>
+      <title>Año ${y.anio}: ${formatNum(v)} ${unit}${yoyTxt} | Oil: ${formatNum(y.petroleo_mbbl)} Mbbl · Gas: ${formatNum(y.gas_miles_m3)} Mm³</title>
+      <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="4" fill="${col}" opacity=".88"/>
+      <text x="${cx.toFixed(1)}" y="${(by-5).toFixed(1)}" fill="#eaf4f8" font-size="8.5" text-anchor="middle">${formatNum(v)}</text>
+      <text x="${cx.toFixed(1)}" y="${(h-6).toFixed(1)}" fill="#7f9aaa" font-size="9.5" text-anchor="middle">${y.anio}</text>
+    </g>`;
+  }).join('');
+
+  return`<div class="chart-wrap"><svg class="chart-svg" style="height:175px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Producción anual vs años anteriores">${grid}${bars}</svg></div>`;
+}
+
+function openComparePopup(defaultType='empresas', defaultFluid='gas'){
+  popEntityType=defaultType;
+  popFluid=defaultFluid;
+  $('popupCompare').classList.add('open');
+  renderPopupCompare();
+}
+
+async function renderPopupCompare(){
+  const scope=statsScopeKey();
+  const baseObj=statsCache[`${scope}|${statsMonth||'latest'}`]||statsCache[`${scope}|latest`];
+  const list=getRankingListForPopup(baseObj,popEntityType,popFluid);
+  if(!popItemA&&list[0])popItemA=list[0].key;
+  if(!popItemB&&list[1])popItemB=list[1].key;
+  if(list.length&&!list.some(x=>x.key===popItemA))popItemA=list[0].key;
+  if(list.length>1&&!list.some(x=>x.key===popItemB))popItemB=list[1].key;
+
+  const optsHtml=list.map(x=>`<option value="${esc(x.key)}">${esc(x.label)} (${formatNum(x.val)} ${esc(x.unit)})</option>`).join('');
+  const itemAObj=list.find(x=>x.key===popItemA)||list[0]||{key:'',label:'—',val:0,unit:'',sub:''};
+  const itemBObj=list.find(x=>x.key===popItemB)||list[1]||{key:'',label:'—',val:0,unit:'',sub:''};
+
+  $('popupBody').innerHTML=`
+    <div class="stats-toolbar">
+      <div class="stats-cuencas">
+        <button type="button" class="${popEntityType==='pozos'?'active':''}" onclick="popEntityType='pozos';popItemA='';popItemB='';renderPopupCompare()">POZOS</button>
+        <button type="button" class="${popEntityType==='empresas'?'active':''}" onclick="popEntityType='empresas';popItemA='';popItemB='';renderPopupCompare()">OPERADORAS</button>
+        <button type="button" class="${popEntityType==='areas'?'active':''}" onclick="popEntityType='areas';popItemA='';popItemB='';renderPopupCompare()">ÁREAS</button>
+        <div class="month-picker"><label for="popSelA">ELEMENTO A</label><select id="popSelA" onchange="popItemA=this.value;renderPopupCompare()">${optsHtml}</select></div>
+        <div class="month-picker"><label for="popSelB">ELEMENTO B</label><select id="popSelB" onchange="popItemB=this.value;renderPopupCompare()">${optsHtml}</select></div>
+      </div>
+      <div class="fluid-switch" style="margin:0;min-width:180px">
+        <button type="button" class="${popFluid==='oil'?'active':''}" onclick="popFluid='oil';renderPopupCompare()">OIL</button>
+        <button type="button" class="${popFluid==='gas'?'active':''}" onclick="popFluid='gas';renderPopupCompare()">GAS</button>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><span>A · ${esc(itemAObj.label)}</span><strong class="c">${formatNum(itemAObj.val)}</strong><small>${esc(itemAObj.unit)} · ${esc(itemAObj.sub)}</small></div>
+      <div class="metric"><span>B · ${esc(itemBObj.label)}</span><strong class="a">${formatNum(itemBObj.val)}</strong><small>${esc(itemBObj.unit)} · ${esc(itemBObj.sub)}</small></div>
+      <div class="metric"><span>DIFERENCIA (A - B)</span><strong>${itemAObj.val-itemBObj.val>0?'+':''}${formatNum(itemAObj.val-itemBObj.val)}</strong><small>${esc(itemAObj.unit)} · Ratio: ${itemBObj.val?formatNum(itemAObj.val/itemBObj.val)+'x':'—'}</small></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="stat-title"><b>PRODUCCIÓN ANUAL VS. AÑOS ANTERIORES (${popFluid.toUpperCase()}) · ${esc(itemAObj.label||statsCuenca)}</b><span>SERIE HISTÓRICA ANUAL (CAPÍTULO IV)</span></div>
+      <div id="annualChartBox"><div class="loading">Cargando serie anual de Oil y Gas…</div></div>
+    </div>
+  `;
+
+  if($('popSelA')&&itemAObj.key)$('popSelA').value=itemAObj.key;
+  if($('popSelB')&&itemBObj.key)$('popSelB').value=itemBObj.key;
+
+  try{
+    const q=new URLSearchParams();
+    if(statsCuenca!=='TODAS')q.set('cuenca',statsCuenca);
+    if(statsProvincia)q.set('provincia',statsProvincia);
+    if(popEntityType==='empresas'&&itemAObj.key)q.set('empresa',itemAObj.key);
+    if(popEntityType==='areas'&&itemAObj.key)q.set('area',itemAObj.key);
+    if(popEntityType==='pozos'&&itemAObj.key)q.set('sigla',itemAObj.key);
+
+    const r=await fetch(`${API}/api/anual?${q.toString()}`,{cache:'no-store'});
+    const j=await r.json();
+    if(!$('annualChartBox'))return;
+    if(!r.ok||!j.ok)throw Error(j.error||'Error cargando serie anual');
+
+    const serie=j.serie_anual||[];
+    const resumenAnualHtml=serie.length
+      ?`<div class="metrics" style="margin-top:10px">`+serie.slice(-4).map(y=>{
+          const yoy=popFluid==='gas'?y.yoy_gas_pct:y.yoy_pet_pct;
+          return`<div class="metric">
+            <span>AÑO ${y.anio}</span>
+            <strong class="${popFluid==='gas'?'c':'a'}">${formatNum(popFluid==='gas'?y.gas_miles_m3:y.petroleo_mbbl)}</strong>
+            <small>${popFluid==='gas'?'Mm³ gas':'Mbbl oil'}</small>
+            <small class="${yoy>0?'delta-up':(yoy<0?'delta-down':'delta-flat')}">YoY: ${yoy??'—'}%</small>
+          </div>`;
+        }).join('')+`</div>`
+      :'';
+
+    $('annualChartBox').innerHTML=renderAnnualChartSvg(serie,popFluid)+resumenAnualHtml;
+  }catch(e){
+    if($('annualChartBox'))$('annualChartBox').innerHTML=`<div class="loading err">${esc(e.message)}</div>`;
+  }
+}
 
 function paintEstadisticas(){
+  if(statsCompareMode){renderInteractiveCompare();return}
   if(current!=='estadisticas')return;
   const scope=statsScopeKey();
   const cacheKey=`${scope}|${statsMonth||'latest'}`;
@@ -792,7 +1122,7 @@ function paintEstadisticas(){
   }).join('');
   const fallbackOpt=curMonthVal?`<option value="${esc(curMonthVal)}" selected>${esc(curMonthVal.split('-').reverse().join('/'))}</option>`:'<option value="">Último mes</option>';
   const monthControl=`<div class="month-picker"><label for="statsMonthSelect">MES/AÑO</label><select id="statsMonthSelect" onchange="onStatsMonthChange(this.value)">${mesesOpts||fallbackOpt}</select></div>`;
-  const toolbar=`<div class="stats-toolbar"><div class="stats-cuencas"><button type="button" class="${statsCuenca==='NEUQUINA'&&!statsProvincia?'active':''}" onclick="setStatsScope('NEUQUINA','')">CUENCA NEUQUINA</button><button type="button" class="${statsCuenca==='CUYANA'&&!statsProvincia?'active':''}" onclick="setStatsScope('CUYANA','')">CUENCA CUYANA</button><button type="button" class="${statsProvincia==='RIO NEGRO'?'active':''}" onclick="setStatsScope('TODAS','RIO NEGRO')">RÍO NEGRO</button><button type="button" class="${statsCuenca==='TODAS'&&!statsProvincia?'active':''}" onclick="setStatsScope('TODAS','')">ARGENTINA (TODAS)</button>${monthControl}</div><div class="fluid-switch" style="margin:0;min-width:200px"><button type="button" class="${statsFluid==='oil'?'active':''}" onclick="setStatsFluid('oil')">OIL</button><button type="button" class="${statsFluid==='gas'?'active':''}" onclick="setStatsFluid('gas')">GAS</button></div></div>`;
+  const toolbar=`<div class="stats-toolbar"><div class="stats-cuencas"><button type="button" class="${statsCuenca==='NEUQUINA'&&!statsProvincia?'active':''}" onclick="setStatsScope('NEUQUINA','')">CUENCA NEUQUINA</button><button type="button" class="${statsCuenca==='CUYANA'&&!statsProvincia?'active':''}" onclick="setStatsScope('CUYANA','')">CUENCA CUYANA</button><button type="button" class="${statsProvincia==='RIO NEGRO'?'active':''}" onclick="setStatsScope('TODAS','RIO NEGRO')">RÍO NEGRO</button><button type="button" class="${statsCuenca==='TODAS'&&!statsProvincia?'active':''}" onclick="setStatsScope('TODAS','')">ARGENTINA (TODAS)</button><button type="button" onclick="renderInteractiveCompare()">COMPARADOR LIBRE</button><button type="button" onclick="openComparePopup('empresas', statsFluid)">POPUP &amp; ANUAL</button>${monthControl}</div><div class="fluid-switch" style="margin:0;min-width:200px"><button type="button" class="${statsFluid==='oil'?'active':''}" onclick="setStatsFluid('oil')">OIL</button><button type="button" class="${statsFluid==='gas'?'active':''}" onclick="setStatsFluid('gas')">GAS</button></div></div>`;
   const activeData=statsCache[cacheKey];
   if(!activeData){$('detail').innerHTML=toolbar+'<div class="loading">Calculando serie histórica, comparativa mensual y rankings…</div>';return}
   if(!activeData.periodo){$('detail').innerHTML=toolbar+'<div class="loading err">Sin datos disponibles para el mes o jurisdicción seleccionada.</div>';return}
@@ -852,6 +1182,7 @@ async function loadEstadisticasData(){
 }
 
 async function openEstadisticas(cuencaInit, provInit=''){
+  statsCompareMode=false;
   if(cuencaInit)statsCuenca=cuencaInit;
   statsProvincia=provInit||'';
   current='estadisticas';wellMode=false;$('modal').classList.add('open');
@@ -974,6 +1305,8 @@ function renderCuencaLayer(fit){
   $('count').textContent=list.length+(['mendozaPozos','rnPozos'].includes(current)?' POZOS':['mendozaDuctos','rnDuctos'].includes(current)?' DUCTOS':current==='mendozaPlantas'?' INSTALACIONES':' ÁREAS');
 
   const geoItems=list.filter(f=>f.geometry&&f.geometry.type);
+  const sinGeo=Math.max(0,list.length-geoItems.length);
+
   const gj=geoItems.length?L.geoJSON({type:'FeatureCollection',features:geoItems},{
     style:f=>{
       const p=f.properties||{};
@@ -1011,7 +1344,7 @@ function renderCuencaLayer(fit){
   if(current==='rnDuctos'){
     const nGas=list.filter(f=>/GAS/.test(String(((f.properties||{}).FLUIDO||(f.properties||{}).fluido||(f.properties||{}).TIPO||(f.properties||{}).tipo||'')).toUpperCase())).length;
     const nOther=list.length-nGas;
-    $('detail').innerHTML=rnSubtabs('ductos')+`<div class="legend-bar"><span><i class="dot-lg" style="background:#f4b544"></i>Gas (${nGas})</span><span><i class="dot-lg" style="background:#24d6d0"></i>Oil / Otros (${nOther})</span><span>Total: ${list.length}</span></div><div class="banner"><b>DUCTOS RES. 319 · RÍO NEGRO</b><small>${list.length} ELEMENTOS · ${geoItems.length} EN MAPA</small></div><div class="loading">${geoItems.length?'Seleccioná un ducto en el mapa para ver sus atributos.':'La fuente actual de ductos no devolvió geometrías para Río Negro.'}</div>`;
+    $('detail').innerHTML=rnSubtabs('ductos')+`<div class="legend-bar"><span><i class="dot-lg" style="background:#f4b544"></i>Gas (${nGas})</span><span><i class="dot-lg" style="background:#24d6d0"></i>Oil / Otros (${nOther})</span><span><i class="dot-lg" style="background:var(--mut)"></i>Sin ubicación en mapa (${sinGeo})</span></div><div class="banner"><b>DUCTOS RES. 319 · RÍO NEGRO</b><small>${list.length} ELEMENTOS · ${geoItems.length} CON UBICACIÓN EN MAPA · ${sinGeo} SIN UBICACIÓN EN MAPA</small></div><div class="loading">${geoItems.length?'Seleccioná un ducto en el mapa para ver sus atributos.':'Sin capa / sin ubicación en mapa para ductos de Río Negro.'}</div>`;
     return;
   }
 
@@ -1021,7 +1354,7 @@ function renderCuencaLayer(fit){
       const idxRaw=raw.indexOf(f);
       return`<div class="row" style="cursor:pointer" onclick="showMendozaProductionArea(raw[${idxRaw}].properties||{})"><span>${i+1}. ${esc(p.nombre_area||'Área')}</span><b>${formatNum(p.total_pet_m3)} m³ oil · ${formatNum(p.total_gas_m3)} Mm³ gas</b></div>`;
     }).join('');
-    $('detail').innerHTML=rnSubtabs('areas')+`<div class="banner"><b>ÁREAS DE RÍO NEGRO (CAP. IV)</b><small>${list.length} ÁREAS · ${geoItems.length} EN MAPA</small></div><div class="kv">${topRows||'<div class="loading">Sin áreas para el filtro actual.</div>'}</div>`;
+    $('detail').innerHTML=rnSubtabs('areas')+`<div class="legend-bar"><span><i class="dot-lg" style="background:#f4b544"></i>Con ubicación (${geoItems.length})</span><span><i class="dot-lg" style="background:var(--mut)"></i>Sin ubicación en mapa (${sinGeo})</span></div><div class="banner"><b>ÁREAS DE RÍO NEGRO (CAP. IV)</b><small>${list.length} ÁREAS · ${geoItems.length} CON UBICACIÓN EN MAPA · ${sinGeo} SIN UBICACIÓN EN MAPA</small></div><div class="kv">${topRows||'<div class="loading">Sin áreas para el filtro actual.</div>'}</div>`;
     return;
   }
 
@@ -1031,7 +1364,7 @@ function renderCuencaLayer(fit){
       const idxRaw=raw.indexOf(f);
       return`<div class="row" style="cursor:pointer" onclick="showMendozaWell(raw[${idxRaw}].properties||{})"><span>${i+1}. ${esc(p.sigla||'Pozo')}</span><b>${esc(p.area||'')} · ${formatNum(p.prod_pet)} m³</b></div>`;
     }).join('');
-    $('detail').innerHTML=rnSubtabs('pozos')+`<div class="banner"><b>POZOS DE RÍO NEGRO (CAP. IV)</b><small>${list.length} POZOS · ${geoItems.length} GEORREFERENCIADOS EN MAPA</small></div><div class="kv">${topWells||'<div class="loading">Sin pozos para el filtro actual.</div>'}</div>`;
+    $('detail').innerHTML=rnSubtabs('pozos')+`<div class="legend-bar"><span><i class="dot-lg" style="background:#24d6d0"></i>Con ubicación (${geoItems.length})</span><span><i class="dot-lg" style="background:var(--mut)"></i>Sin ubicación en mapa (${sinGeo})</span></div><div class="banner"><b>POZOS DE RÍO NEGRO (CAP. IV)</b><small>${list.length} POZOS · ${geoItems.length} CON UBICACIÓN EN MAPA · ${sinGeo} SIN UBICACIÓN EN MAPA</small></div><div class="kv">${topWells||'<div class="loading">Sin pozos para el filtro actual.</div>'}</div>`;
     return;
   }
 
