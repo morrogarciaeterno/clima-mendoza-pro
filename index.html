@@ -1068,9 +1068,9 @@ async function fetchAnnualForEntity(type,key){
   }
 }
 
-function renderAnnualDiffChartSvg(serieA,serieB,labelA,labelB,fluid){
+function renderAnnualBarsSvg(serieA,serieB,labelA,labelB,fluid,unitOverride){
   const isGas=fluid==='gas';
-  const unit=isGas?'Mm³':'Mbbl';
+  const unit=unitOverride||(isGas?'Mm³':'Mbbl');
   const mapA=new Map((serieA||[]).map(y=>[y.anio,y]));
   const mapB=new Map((serieB||[]).map(y=>[y.anio,y]));
   const years=[...new Set([...mapA.keys(),...mapB.keys()])].sort((a,b)=>a-b);
@@ -1081,43 +1081,43 @@ function renderAnnualDiffChartSvg(serieA,serieB,labelA,labelB,fluid){
     const b=mapB.get(anio);
     const vA=Number(isGas?a?.gas_miles_m3:a?.petroleo_mbbl)||0;
     const vB=Number(isGas?b?.gas_miles_m3:b?.petroleo_mbbl)||0;
-    const diff=vA-vB;
-    return{anio,vA,vB,diff};
+    return{anio,vA,vB};
   });
 
-  const w=920,h=190,padL=66,padR=24,padT=20,padB=28;
+  const w=920,h=195,padL=62,padR=24,padT=22,padB=30;
   const plotW=w-padL-padR,plotH=h-padT-padB;
-  const maxAbsDiff=Math.max(...rows.map(r=>Math.abs(r.diff)),1);
-  const zeroY=padT+plotH/2;
-  const halfH=(plotH/2)-6;
-  const barW=Math.min(54,Math.max(18,(plotW/rows.length)*0.48));
+  const maxVal=Math.max(...rows.flatMap(r=>[r.vA,r.vB]),1);
+  const baseY=padT+plotH;
+  const groupW=plotW/rows.length;
+  const barW=Math.min(34,Math.max(10,groupW*0.34));
+  const gap=Math.max(4,barW*0.22);
 
-  const grid=`
-    <line x1="${padL}" y1="${padT}" x2="${w-padR}" y2="${padT}" stroke="#1f3545" stroke-dasharray="3 3" stroke-width="1"/>
-    <line x1="${padL}" y1="${zeroY.toFixed(1)}" x2="${w-padR}" y2="${zeroY.toFixed(1)}" stroke="#3f6278" stroke-width="1.2"/>
-    <line x1="${padL}" y1="${(padT+plotH).toFixed(1)}" x2="${w-padR}" y2="${(padT+plotH).toFixed(1)}" stroke="#1f3545" stroke-dasharray="3 3" stroke-width="1"/>
-    <text x="${padL-8}" y="${(padT+4).toFixed(1)}" fill="#24d6d0" font-size="9" text-anchor="end">+${formatNum(maxAbsDiff)}</text>
-    <text x="${padL-8}" y="${(zeroY+3).toFixed(1)}" fill="#eaf4f8" font-size="9" text-anchor="end">0</text>
-    <text x="${padL-8}" y="${(padT+plotH+3).toFixed(1)}" fill="#f4b544" font-size="9" text-anchor="end">-${formatNum(maxAbsDiff)}</text>
-  `;
+  const grid=[0,0.5,1].map(t=>{
+    const gy=padT+plotH*(1-t);
+    const gv=maxVal*t;
+    return`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${w-padR}" y2="${gy.toFixed(1)}" stroke="#1f3545" stroke-dasharray="3 3" stroke-width="1"/>
+      <text x="${padL-8}" y="${(gy+3).toFixed(1)}" fill="#7f9aaa" font-size="9" text-anchor="end">${formatNum(gv)}</text>`;
+  }).join('');
 
   const bars=rows.map((r,i)=>{
-    const cx=padL+(rows.length===1?plotW/2:((i+0.5)/rows.length)*plotW);
-    const bx=cx-barW/2;
-    const bh=Math.max(2,(Math.abs(r.diff)/maxAbsDiff)*halfH);
-    const isPos=r.diff>=0;
-    const by=isPos?(zeroY-bh):zeroY;
-    const col=isPos?'#24d6d0':'#f4b544';
-    const leader=r.vA===r.vB?'Empate':(r.vA>r.vB?`Lidera A (${labelA})`:`Lidera B (${labelB})`);
+    const cx=padL+((i+0.5)*groupW);
+    const hA=Math.max(2,(r.vA/maxVal)*plotH);
+    const hB=Math.max(2,(r.vB/maxVal)*plotH);
+    const xA=cx-gap/2-barW;
+    const xB=cx+gap/2;
+    const yA=baseY-hA;
+    const yB=baseY-hB;
     return`<g>
-      <title>${esc(r.anio)} · ${leader} | A (${labelA}): ${formatNum(r.vA)} ${unit} | B (${labelB}): ${formatNum(r.vB)} ${unit} | Dif (A-B): ${r.diff>0?'+':''}${formatNum(r.diff)} ${unit}</title>
-      <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity=".9"/>
-      <text x="${cx.toFixed(1)}" y="${(isPos?by-4:by+bh+10).toFixed(1)}" fill="#eaf4f8" font-size="8.5" text-anchor="middle">${r.diff>0?'+':''}${formatNum(r.diff)}</text>
-      <text x="${cx.toFixed(1)}" y="${(h-6).toFixed(1)}" fill="#7f9aaa" font-size="9.5" text-anchor="middle">${esc(r.anio)}</text>
+      <title>${esc(r.anio)} · A (${esc(labelA)}): ${formatNum(r.vA)} ${unit} | B (${esc(labelB)}): ${formatNum(r.vB)} ${unit}</title>
+      <rect x="${xA.toFixed(1)}" y="${yA.toFixed(1)}" width="${barW.toFixed(1)}" height="${hA.toFixed(1)}" rx="3" fill="#24d6d0" opacity=".92"/>
+      <text x="${(xA+barW/2).toFixed(1)}" y="${(yA-4).toFixed(1)}" fill="#24d6d0" font-size="8" text-anchor="middle">${formatNum(r.vA)}</text>
+      <rect x="${xB.toFixed(1)}" y="${yB.toFixed(1)}" width="${barW.toFixed(1)}" height="${hB.toFixed(1)}" rx="3" fill="#f4b544" opacity=".92"/>
+      <text x="${(xB+barW/2).toFixed(1)}" y="${(yB-4).toFixed(1)}" fill="#f4b544" font-size="8" text-anchor="middle">${formatNum(r.vB)}</text>
+      <text x="${cx.toFixed(1)}" y="${(h-7).toFixed(1)}" fill="#7f9aaa" font-size="9.5" text-anchor="middle">${esc(r.anio)}</text>
     </g>`;
   }).join('');
 
-  return`<div class="chart-wrap"><svg class="chart-svg" style="height:190px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Diferencia A menos B">${grid}${bars}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px"><span>Arriba de 0 (cian): <b>${esc(labelA)}</b> supera a <b>${esc(labelB)}</b></span><span>Abajo de 0 (ámbar): <b>${esc(labelB)}</b> supera a <b>${esc(labelA)}</b></span></div>`;
+  return`<div class="chart-wrap"><svg class="chart-svg" style="height:195px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Comparación directa A vs B">${grid}${bars}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px"><span><i class="dot-lg" style="background:#24d6d0"></i> <b>${esc(labelA)}</b> (Elemento A · ${esc(unit)})</span><span><i class="dot-lg" style="background:#f4b544"></i> <b>${esc(labelB)}</b> (Elemento B · ${esc(unit)})</span></div>`;
 }
 
 async function renderPopupCompare(forceReload=false){
@@ -1162,7 +1162,7 @@ async function renderPopupCompare(forceReload=false){
     const objA=items.find(x=>x.key===popItemA)||items[0];
     const objB=items.find(x=>x.key===popItemB)||(items[1]||items[0]);
 
-    const diffMes=objA.val-objB.val;
+    const diffMes=Math.abs(objA.val-objB.val);
     const ratioMes=objB.val?`${formatNum(objA.val/objB.val)}x`:'—';
     const leaderMes=objA.val===objB.val?'Empate':(objA.val>objB.val?objA.label:objB.label);
 
@@ -1179,14 +1179,14 @@ async function renderPopupCompare(forceReload=false){
           <small>${esc(objB.unit)} · ${esc(objB.sub)}</small>
         </div>
         <div class="metric">
-          <span>DIFERENCIA MENSUAL (A - B)</span>
-          <strong>${diffMes>0?'+':''}${formatNum(diffMes)}</strong>
-          <small>${esc(objA.unit)} · Ratio: ${ratioMes} · Lidera: ${esc(leaderMes)}</small>
+          <span>BRECHA MENSUAL (|A - B|)</span>
+          <strong>${formatNum(diffMes)}</strong>
+          <small>${esc(objA.unit)} · Ratio A/B: ${ratioMes} · Lidera: ${esc(leaderMes)}</small>
         </div>
       </div>
 
       <div class="chart-card" id="annualDiffBox">
-        <div class="stat-title"><b>DIFERENCIA (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>CALCULANDO…</span></div>
+        <div class="stat-title"><b>COMPARATIVA DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)} VS. ${esc(objB.label)}</b><span>CALCULANDO…</span></div>
         <div class="loading">Calculando comparativa…</div>
       </div>
     `;
@@ -1208,14 +1208,13 @@ async function renderPopupCompare(forceReload=false){
       const leaderOil=sumA_oil===sumB_oil?'Empate en OIL':(sumA_oil>sumB_oil?`Más OIL: ${objA.label}`:`Más OIL: ${objB.label}`);
       const leaderGas=sumA_gas===sumB_gas?'Empate en GAS':(sumA_gas>sumB_gas?`Más GAS: ${objA.label}`:`Más GAS: ${objB.label}`);
       box.innerHTML=`
-        <div class="stat-title"><b>DIFERENCIA ANUAL (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>${esc(leaderOil)} · ${esc(leaderGas)}</span></div>
-        ${renderAnnualDiffChartSvg(serieA,serieB,objA.label,objB.label,popFluid)}
+        <div class="stat-title"><b>COMPARATIVA ANUAL DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)} VS. ${esc(objB.label)}</b><span>${esc(leaderOil)} · ${esc(leaderGas)}</span></div>
+        ${renderAnnualBarsSvg(serieA,serieB,objA.label,objB.label,popFluid,popFluid==='gas'?'Mm³ / año':'Mbbl / año')}
       `;
       return;
     }
 
     const serie12=cat.serie_12m||[];
-    const totMes=popFluid==='gas'?(cat.resumen_mes?.gas_miles_m3||1):(cat.resumen_mes?.petroleo_mbbl_d||1);
     const fbA=serie12.map(m=>({
       anio:m.periodo,
       petroleo_mbbl:Number((((Number(m.petroleo_mbbl_d)||0)*objA.oilVal)/Math.max(cat.resumen_mes?.petroleo_mbbl_d||1,1)).toFixed(2)),
@@ -1227,8 +1226,8 @@ async function renderPopupCompare(forceReload=false){
       gas_miles_m3:Number((((Number(m.gas_miles_m3)||0)*objB.gasVal)/Math.max(cat.resumen_mes?.gas_miles_m3||1,1)).toFixed(2))
     }));
     box.innerHTML=`
-      <div class="stat-title"><b>DIFERENCIA COMPARATIVA (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>SERIE MENSUAL ESTIMADA</span></div>
-      ${renderAnnualDiffChartSvg(fbA,fbB,objA.label,objB.label,popFluid)}
+      <div class="stat-title"><b>COMPARATIVA DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)} VS. ${esc(objB.label)}</b><span>SERIE MENSUAL ESTIMADA</span></div>
+      ${renderAnnualBarsSvg(fbA,fbB,objA.label,objB.label,popFluid,objA.unit)}
     `;
   }catch(e){
     if(seq!==statsSeq||!$('popupCompareContent'))return;
