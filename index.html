@@ -45,7 +45,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 
 .launch{width:100%;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:stretch;gap:12px}
 .launch.cuyana-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
-.launch.rn-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.launch.rn-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
 .launch button{display:flex;flex-direction:column;justify-content:flex-start;height:100%;min-height:118px;min-width:0;padding:18px 14px;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--p);color:var(--txt);cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
 .launch button:hover{border-color:var(--c);background:#112a39;transform:translateY(-1px)}
 .btn-top{display:flex;align-items:center;gap:8px;min-width:0}
@@ -199,9 +199,9 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
                 <span class="b-tag" style="color:#58e6e0">PATAGONIA · VACA MUERTA</span>
               </div>
               <b>RÍO NEGRO</b>
-              <small>Pozos, áreas, ductos Res. 319 y estadísticas mensuales de Capítulo IV en Río Negro.</small>
+              <small>Áreas + Pozos juntos en el mapa, ductos Res. 319 y estadísticas mensuales de Capítulo IV.</small>
             </div>
-            <div class="b-foot"><span style="color:#58e6e0">4 MÓDULOS OPERATIVOS</span><span style="color:#58e6e0">INGRESAR →</span></div>
+            <div class="b-foot"><span style="color:#58e6e0">5 MÓDULOS OPERATIVOS</span><span style="color:#58e6e0">INGRESAR →</span></div>
           </button>
 
           <button class="basin-card" onclick="openEstadisticas('TODAS','')">
@@ -277,10 +277,11 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
           </div>
         </div>
         <div class="launch rn-grid">
-          <button onclick="openRioNegroModule('pozos')"><div class="btn-top"><span class="btn-ico" style="color:#24d6d0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 20l4-9 4 9"/><path d="M7.5 15h5"/><path d="M5 10l12-5"/><circle cx="17.5" cy="4.8" r="1.8"/><path d="M18.5 6.5v6"/><path d="M17 12.5h3"/></svg></span><b>POZOS</b></div><small>Padrón y producción Cap. IV Río Negro</small></button>
+          <button onclick="openRioNegroModule('ambos')"><div class="btn-top"><span class="btn-ico" style="color:#24d6d0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="4"/><circle cx="16" cy="9" r="3"/><path d="M3 19h18"/></svg></span><b>ÁREAS + POZOS</b></div><small>Áreas y pozos juntos en el mapa RN</small></button>
+          <button onclick="openRioNegroModule('pozos')"><div class="btn-top"><span class="btn-ico" style="color:#24d6d0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 20l4-9 4 9"/><path d="M7.5 15h5"/><path d="M5 10l12-5"/><circle cx="17.5" cy="4.8" r="1.8"/><path d="M18.5 6.5v6"/><path d="M17 12.5h3"/></svg></span><b>POZOS</b></div><small>Padrón y producción Cap. IV RN</small></button>
           <button onclick="openRioNegroModule('areas')"><div class="btn-top"><span class="btn-ico" style="color:#f4b544"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l6-2 4 2 6-2v14l-6 2-4-2-6 2V6z"/><path d="M10 4v14m4-12v14"/></svg></span><b>ÁREAS + PROD.</b></div><small>Concesiones y volúmenes acumulados</small></button>
           <button onclick="openRioNegroModule('ductos')"><div class="btn-top"><span class="btn-ico" style="color:#58e6e0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h6a2 2 0 0 0 2-2V5h4v4a4 4 0 0 1-4 4H8v5H4V9z"/><path d="M16 14h4v5h-4z"/></svg></span><b>DUCTOS RES. 319</b></div><small>Trazas oficiales en Río Negro</small></button>
-          <button onclick="openEstadisticas('TODAS','RIO NEGRO')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span><b>ESTADÍSTICAS</b></div><small>12 meses, MoM y rankings Río Negro</small></button>
+          <button onclick="openEstadisticas('TODAS','RIO NEGRO')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span><b>ESTADÍSTICAS</b></div><small>12 meses, MoM y rankings RN</small></button>
         </div>
       </div>
     </div>
@@ -316,7 +317,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
-let map,groupLayer,current='areas',raw=[],wellMode=false,statsSeq=0,statsCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
+let map,groupLayer,rnAreasGroup,rnPozosGroup,current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,statsSeq=0,statsCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
 function showHome(){
@@ -344,6 +345,8 @@ function initMap(){
   map=L.map('map',{preferCanvas:true}).setView([-38.4,-69.1],7);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);
   groupLayer=L.layerGroup().addTo(map);
+  rnAreasGroup=L.layerGroup().addTo(groupLayer);
+  rnPozosGroup=L.layerGroup().addTo(groupLayer);
 }
 
 async function openModule(type){
@@ -380,9 +383,9 @@ async function openCuyanaModule(sub){
 
 function rnSubtabs(active){
   return `<div class="subtabs">
-    <button ${active==='areas'?'class="active"':''} onclick="loadRioNegroAreas()">ÁREAS + PROD.</button>
-    <button ${active==='pozos'?'class="active"':''} onclick="loadRioNegroPozos()">POZOS</button>
-    <button ${active==='ductos'?'class="active"':''} onclick="openRioNegroDuctos()">DUCTOS RES. 319</button>
+    <button ${active==='ambos'?'class="active"':''} onclick="loadRioNegroAmbos()">ÁREAS + POZOS</button>
+    <button ${active==='areas'?'class="active"':''} onclick="loadRioNegroAreas()">SOLO ÁREAS</button>
+    <button ${active==='pozos'?'class="active"':''} onclick="loadRioNegroPozos()">SOLO POZOS</button>
     <button onclick="openEstadisticas('TODAS','RIO NEGRO')">ESTADÍSTICAS</button>
   </div>`;
 }
@@ -391,9 +394,112 @@ async function openRioNegroModule(sub){
   statsSeq++;setStatsLayout(false);wellMode=false;
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
+  if(sub==='ambos'){await loadRioNegroAmbos();return}
   if(sub==='areas'){await loadRioNegroAreas();return}
   if(sub==='pozos'){await loadRioNegroPozos();return}
   await openRioNegroDuctos();
+}
+
+async function loadRioNegroAmbos(){
+  statsSeq++;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
+  $('modal').classList.add('open');
+  $('title').textContent='RÍO NEGRO · ÁREAS + POZOS EN MAPA (CAP. IV)';
+  $('layer').textContent='ÁREAS + POZOS · RN';
+  initMap();setTimeout(()=>map.invalidateSize(),80);
+  map.setView([-39.2,-67.8],8);
+  $('detail').innerHTML=rnSubtabs('ambos')+'<div class="loading">Cargando áreas y pozos de Río Negro…</div>';
+  try{
+    const [rA,rP]=await Promise.all([
+      fetch(API+'/api/rionegro/areas',{cache:'no-store'}),
+      fetch(API+'/api/rionegro/pozos?limite=2000',{cache:'no-store'})
+    ]);
+    const [jA,jP]=await Promise.all([rA.json(),rP.json()]);
+    if(!rA.ok||!jA.ok)throw Error(jA.error||'Error cargando áreas de Río Negro');
+    if(!rP.ok||!jP.ok)throw Error(jP.error||'Error cargando pozos de Río Negro');
+    rnAreasData=jA.features||[];
+    rnPozosData=jP.features||[];
+    raw=[...rnAreasData,...rnPozosData];
+    buildCuencaFilters();
+    renderRioNegroCombined(true);
+  }catch(e){
+    $('detail').innerHTML=rnSubtabs('ambos')+'<div class="loading err">'+esc(e.message)+'</div>';
+  }
+}
+
+function setRnOverlayMode(mode){
+  rnOverlayMode=mode;
+  renderRioNegroCombined(false);
+}
+
+function renderRioNegroCombined(fit){
+  initMap();
+  groupLayer.clearLayers();
+  rnAreasGroup.clearLayers();
+  rnPozosGroup.clearLayers();
+  rnAreasGroup.addTo(groupLayer);
+  rnPozosGroup.addTo(groupLayer);
+
+  const q=$('search').value.trim().toLowerCase(),op=$('group').value;
+  const matchFilter=f=>{
+    const p=f.properties||{};
+    const operKey=normOp(mzaOperatorOf(p));
+    const vals=[p.sigla,p.nombre_area,p.area,p.empresa,p.operador,p.yacimiento,p.formacion].filter(Boolean);
+    return(!op||operKey===op)&&(!q||vals.some(v=>String(v).toLowerCase().includes(q)));
+  };
+
+  const areasFiltered=rnAreasData.filter(matchFilter);
+  const pozosFiltered=rnPozosData.filter(matchFilter);
+
+  const showAreas=rnOverlayMode==='both'||rnOverlayMode==='areas';
+  const showPozos=rnOverlayMode==='both'||rnOverlayMode==='pozos';
+
+  const areasGeo=showAreas?areasFiltered.filter(f=>f.geometry&&f.geometry.type):[];
+  const pozosGeo=showPozos?pozosFiltered.filter(f=>f.geometry&&f.geometry.type):[];
+
+  const gjAreas=areasGeo.length?L.geoJSON({type:'FeatureCollection',features:areasGeo},{
+    pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:8,color:'#071018',weight:1.5,fillColor:'#f4b544',fillOpacity:.8}),
+    onEachFeature:(f,l)=>{
+      const p=f.properties||{};
+      l.bindTooltip('Área: '+esc(p.nombre_area||'Área'));
+      l.on('click',()=>showMendozaProductionArea(p));
+    }
+  }).addTo(rnAreasGroup):null;
+
+  const gjPozos=pozosGeo.length?L.geoJSON({type:'FeatureCollection',features:pozosGeo},{
+    pointToLayer:(f,ll)=>{
+      const p=f.properties||{};
+      const st=String(p.tipoestado||'').toLowerCase();
+      const fill=st.includes('aband')?'#ff5e68':st.includes('reserva')?'#31d67b':'#24d6d0';
+      return L.circleMarker(ll,{radius:4.5,color:'#ffffff',weight:1,fillColor:fill,fillOpacity:.95});
+    },
+    onEachFeature:(f,l)=>{
+      const p=f.properties||{};
+      l.bindTooltip('Pozo: '+esc(p.sigla||'Pozo'));
+      l.on('click',()=>showMendozaWell(p));
+    }
+  }).addTo(rnPozosGroup):null;
+
+  if(gjPozos)gjPozos.bringToFront();
+
+  const totalVisible=(showAreas?areasFiltered.length:0)+(showPozos?pozosFiltered.length:0);
+  $('count').textContent=`${areasFiltered.length} ÁREAS · ${pozosFiltered.length} POZOS (${totalVisible} VISIBLES)`;
+
+  if(fit){
+    const bA=gjAreas&&gjAreas.getBounds().isValid()?gjAreas.getBounds():null;
+    const bP=gjPozos&&gjPozos.getBounds().isValid()?gjPozos.getBounds():null;
+    const bounds=bA&&bP?bA.extend(bP):(bA||bP);
+    if(bounds)map.fitBounds(bounds,{padding:[25,25],maxZoom:10});
+  }
+
+  $('detail').innerHTML=rnSubtabs('ambos')+`
+    <div class="legend-bar">
+      <button type="button" onclick="setRnOverlayMode('both')" style="color:${rnOverlayMode==='both'?'#fff':'var(--mut)'}">Áreas + Pozos</button>
+      <button type="button" onclick="setRnOverlayMode('areas')" style="color:${rnOverlayMode==='areas'?'#f4b544':'var(--mut)'}"><i class="dot-lg" style="background:#f4b544"></i>Áreas (${areasFiltered.length} · ${areasGeo.length} en mapa)</button>
+      <button type="button" onclick="setRnOverlayMode('pozos')" style="color:${rnOverlayMode==='pozos'?'#24d6d0':'var(--mut)'}"><i class="dot-lg" style="background:#24d6d0"></i>Pozos (${pozosFiltered.length} · ${pozosGeo.length} en mapa)</button>
+    </div>
+    <div class="banner"><b>RÍO NEGRO · ÁREAS Y POZOS EN MAPA</b><small>ÁMBAR = ÁREAS · CIAN = POZOS ACTIVOS / OTROS</small></div>
+    <div class="loading">Tocá un marcador de área o de pozo en el mapa para ver su ficha detallada.</div>
+  `;
 }
 
 async function openRioNegroDuctos(){
@@ -425,7 +531,7 @@ async function loadRioNegroAreas(){
     if(!r.ok||!j.ok)throw Error(j.error||'Sin respuesta');
     raw=j.features||[];
     $('layer').textContent=j.layer||'CAPÍTULO IV · RN';
-    buildCuencaFilters();renderCuencaLayer(false);
+    buildCuencaFilters();renderCuencaLayer(true);
   }catch(e){$('detail').innerHTML=rnSubtabs('areas')+'<div class="loading err">'+esc(e.message)+'</div>'}
 }
 
@@ -466,8 +572,14 @@ function buildGroups(){
   $('search').value='';
 }
 
-$('search').oninput=()=>['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos','rnAreas','rnPozos'].includes(current)?renderCuencaLayer(false):render(false);
-$('group').onchange=()=>['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos','rnAreas','rnPozos'].includes(current)?renderCuencaLayer(false):render(false);
+$('search').oninput=()=>{
+  if(current==='rnAmbos'){renderRioNegroCombined(false);return}
+  ['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos','rnAreas','rnPozos'].includes(current)?renderCuencaLayer(false):render(false);
+};
+$('group').onchange=()=>{
+  if(current==='rnAmbos'){renderRioNegroCombined(false);return}
+  ['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos','rnAreas','rnPozos'].includes(current)?renderCuencaLayer(false):render(false);
+};
 function setPlantasFilter(f){plantasFilter=f;render(false)}
 function setMzaPlantasFilter(f){mzaPlantasFilter=f;renderCuencaLayer(false)}
 
@@ -820,6 +932,7 @@ function mzaPlantCatColor(cat){
 }
 
 function renderCuencaLayer(fit){
+  initMap();
   groupLayer.clearLayers();
   const q=$('search').value.trim().toLowerCase(),op=$('group').value;
   const baseList=raw.filter(f=>{
@@ -877,7 +990,8 @@ function renderCuencaLayer(fit){
   if(current==='rnAreas'){
     const topRows=list.slice(0,15).map((f,i)=>{
       const p=f.properties||{};
-      return`<div class="row" style="cursor:pointer" onclick="showMendozaProductionArea(raw[${raw.indexOf(f)}].properties||{})"><span>${i+1}. ${esc(p.nombre_area||'Área')}</span><b>${formatNum(p.total_pet_m3)} m³ oil · ${formatNum(p.total_gas_m3)} Mm³ gas</b></div>`;
+      const idxRaw=raw.indexOf(f);
+      return`<div class="row" style="cursor:pointer" onclick="showMendozaProductionArea(raw[${idxRaw}].properties||{})"><span>${i+1}. ${esc(p.nombre_area||'Área')}</span><b>${formatNum(p.total_pet_m3)} m³ oil · ${formatNum(p.total_gas_m3)} Mm³ gas</b></div>`;
     }).join('');
     $('detail').innerHTML=rnSubtabs('areas')+`<div class="banner"><b>ÁREAS DE RÍO NEGRO (CAP. IV)</b><small>${list.length} ÁREAS CON DECLARACIONES</small></div><div class="kv">${topRows||'<div class="loading">Sin áreas para el filtro actual.</div>'}</div>`;
     return;
@@ -886,7 +1000,8 @@ function renderCuencaLayer(fit){
   if(current==='rnPozos'){
     const topWells=list.slice(0,20).map((f,i)=>{
       const p=f.properties||{};
-      return`<div class="row" style="cursor:pointer" onclick="showMendozaWell(raw[${raw.indexOf(f)}].properties||{})"><span>${i+1}. ${esc(p.sigla||'Pozo')}</span><b>${esc(p.area||'')} · ${formatNum(p.prod_pet)} m³</b></div>`;
+      const idxRaw=raw.indexOf(f);
+      return`<div class="row" style="cursor:pointer" onclick="showMendozaWell(raw[${idxRaw}].properties||{})"><span>${i+1}. ${esc(p.sigla||'Pozo')}</span><b>${esc(p.area||'')} · ${formatNum(p.prod_pet)} m³</b></div>`;
     }).join('');
     $('detail').innerHTML=rnSubtabs('pozos')+`<div class="banner"><b>POZOS DE RÍO NEGRO (CAP. IV)</b><small>${list.length} POZOS · ${geoItems.length} GEORREFERENCIADOS EN MAPA</small></div><div class="kv">${topWells||'<div class="loading">Sin pozos para el filtro actual.</div>'}</div>`;
     return;
@@ -992,14 +1107,14 @@ async function showCuencaFeature(f){
 }
 
 function showMendozaProductionArea(p){
-  const isRn=current==='rnAreas'||String(p.provincia||'').toUpperCase().includes('RIO NEGRO');
-  const tabs=isRn?rnSubtabs('areas'):mzaSubtabs('areas');
+  const isRn=current==='rnAreas'||current==='rnAmbos'||String(p.provincia||'').toUpperCase().includes('RIO NEGRO');
+  const tabs=isRn?rnSubtabs(current==='rnAmbos'?'ambos':'areas'):mzaSubtabs('areas');
   $('detail').innerHTML=tabs+`<div class="banner"><b>${esc(p.nombre_area||'Área')}</b><small>${esc(p.id_area||p.provincia||'')} · PRODUCCIÓN POR ÁREA</small></div><div class="metrics"><div class="metric"><span>PETRÓLEO</span><strong class="c">${formatNum(p.total_pet_m3)}</strong><small>m³</small></div><div class="metric"><span>GAS</span><strong>${formatNum(p.total_gas_m3)}</strong><small>miles m³</small></div><div class="metric"><span>POZOS ACTIVOS</span><strong>${formatNum(p.pozos_activos)}</strong><small>unidades</small></div></div><div class="prod"><div class="kv">${row('Operador',p.operador)}${row('Provincia',p.provincia)}${row('ID área',p.id_area)}${row('Fuente',p.CAPA||'Capítulo IV')}</div></div>`;
 }
 
 function showMendozaWell(p){
-  const isRn=current==='rnPozos'||String(p.provincia||'').toUpperCase().includes('RIO NEGRO');
-  const tabs=isRn?rnSubtabs('pozos'):mzaSubtabs('pozos');
+  const isRn=current==='rnPozos'||current==='rnAmbos'||String(p.provincia||'').toUpperCase().includes('RIO NEGRO');
+  const tabs=isRn?rnSubtabs(current==='rnAmbos'?'ambos':'pozos'):mzaSubtabs('pozos');
   $('detail').innerHTML=tabs+`<div class="banner"><b>${esc(p.sigla||'Pozo')}</b><small>${esc(p.area||'')} · ${esc(p.cuenca||'')}</small></div><div class="kv">${row('Empresa',p.empresa)}${row('Área',p.area)}${row('Código área',p.cod_area)}${row('Yacimiento',p.yacimiento)}${row('Código yacimiento',p.cod_yacimiento)}${row('Formación',p.formacion)}${row('Últ. período',p.periodo)}${row('Prod. petróleo (m³)',p.prod_pet)}${row('Prod. gas (Mm³)',p.prod_gas)}${row('Prod. agua (m³)',p.prod_agua)}${row('Profundidad',p.profundidad!=null?formatNum(p.profundidad)+' m':null)}${row('Cota',p.cota!=null?formatNum(p.cota)+' m':null)}${row('Clasificación',p.clasificacion)}${row('Subclasificación',p.subclasificacion)}${row('Recurso',p.tipo_recurso)}${row('Tipo pozo',p.tipopozo)}${row('Extracción',p.tipoextraccion)}${row('Estado',p.tipoestado)}</div>`;
 }
 
