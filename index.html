@@ -97,6 +97,8 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .prod-head b{font-size:10px;color:var(--c);letter-spacing:.1em}
 .prod-head span{font-size:10px;color:var(--a)}
 .prod-foot{font-size:9px;color:var(--mut);line-height:1.5;margin-top:8px}
+.native-cta{width:100%;margin-top:9px;height:34px;border:1px solid var(--c);border-radius:8px;background:#0b2433;color:var(--c);font-size:10px;font-weight:800;letter-spacing:.08em;cursor:pointer}
+.native-cta:hover{background:#12364a;color:#fff}
 .loading{padding:25px;text-align:center;color:var(--mut)}
 .err{color:#ffc2c6}
 .duct-grid{margin-top:6px}
@@ -339,9 +341,13 @@ async function openCuyanaModule(sub){
 }
 
 function props(f){return f.properties||{}}
-function titleOf(p){return p.WELL_NAME||p.SIGLA_NACION||p.NOMBRE||p.nombre||p.LOC_NOMBRE||p.YACIMIENTO||p.OPERADOR||p.CAPA||'Elemento GIS'}
+function titleOf(p){return p.WELL_NAME||p.SIGLA_NACION||p.NOMBRE||p.nombre||p.nombre_tramo||p.ducto||p.LOC_NOMBRE||p.YACIMIENTO||p.OPERADOR||p.CAPA||'Elemento GIS'}
 function normOp(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase().replace(/\s+/g,' ')}
-function operatorOf(p){if(!p||typeof p!=='object')return'';const rawOp=p.OPERADOR??p.operador??p.OPERADORA??p.operadora??p.EMPRESA??p.empresa??p.TITULAR??p.titular??'';return String(rawOp).trim().replace(/\s+/g,' ')}
+function operatorOf(p){
+  if(!p||typeof p!=='object')return'';
+  const rawOp=p.OPERADOR??p.operador??p.OPERADORA??p.operadora??p.empresa_informante??p.EMPRESA_INFORMANTE??p.EMPRESA??p.empresa??p.TITULAR??p.titular??p.Operador25??'';
+  return String(rawOp).trim().replace(/\s+/g,' ');
+}
 function locGroupOf(p){return String(p.LOC_TIPO||p.LOC_AGRUPA||p.CAPA||'').trim().replace(/\s+/g,' ')}
 
 function buildGroups(){
@@ -617,9 +623,20 @@ function mzaSubtabs(active){
     <button ${active==='plantas'?'class="active"':''} onclick="loadMendozaPlantas()">PLANTAS / INST.</button>
   </div>`;
 }
-function buildCuencaFilters(kind){
-  const ops=[...new Set(raw.map(f=>{const p=f.properties||{};return String(kind==='mzaP'?p.empresa:(p.operador||p.Operador25||p.OPERADOR||p.EMPRESA||p.TITULAR||'')).trim()}).filter(Boolean))].sort();
-  $('group').innerHTML='<option value="">Todos los operadores</option>'+ops.map(o=>'<option value="'+esc(o)+'">'+esc(o)+'</option>').join('');
+
+function mzaOperatorOf(p){
+  return String(p.empresa||p.operador||p.empresa_informante||p.EMPRESA_INFORMANTE||p.Operador25||p.OPERADOR||p.EMPRESA||p.TITULAR||'').trim();
+}
+
+function buildCuencaFilters(){
+  const mapOps=new Map();
+  for(const f of raw){
+    const label=mzaOperatorOf(f.properties||{});
+    const key=normOp(label);
+    if(key&&!mapOps.has(key))mapOps.set(key,label);
+  }
+  const sorted=[...mapOps.entries()].sort((a,b)=>a[1].localeCompare(b[1],'es'));
+  $('group').innerHTML='<option value="">Todos los operadores</option>'+sorted.map(([key,label])=>'<option value="'+esc(key)+'">'+esc(label)+'</option>').join('');
   $('search').value='';
 }
 
@@ -630,7 +647,7 @@ async function loadMendozaProductionAreas(){
     const r=await fetch(API+'/api/mendoza/produccion-areas?limite=5000',{cache:'no-store'}),j=await r.json();
     if(!r.ok||!j.ok)throw Error(j.error||'Sin respuesta');
     raw=j.features||[];$('layer').textContent=j.layer||'PRODUCCIÓN ÁREAS MENDOZA';
-    buildCuencaFilters('mza');renderCuencaLayer(true);
+    buildCuencaFilters();renderCuencaLayer(true);
   }catch(e){$('detail').innerHTML=mzaSubtabs('areas')+'<div class="loading err">'+esc(e.message)+'</div>';}
 }
 
@@ -646,7 +663,7 @@ async function loadMendozaPozos(){
     const seen=new Set();
     raw=merged.filter(f=>{const k=f.id||((f.properties||{}).sigla+'|'+JSON.stringify(f.geometry||{}));if(seen.has(k))return false;seen.add(k);return true});
     $('layer').textContent='POZOS MENDOZA · CUYANA + NEUQUINA';
-    buildCuencaFilters('mzaP');renderCuencaLayer(true);
+    buildCuencaFilters();renderCuencaLayer(true);
   }catch(e){$('detail').innerHTML=mzaSubtabs('pozos')+'<div class="loading err">'+esc(e.message)+'</div>';}
 }
 
@@ -654,15 +671,15 @@ async function loadMendozaDuctos(){
   setStatsLayout(false);current='mendozaDuctos';$('title').textContent='CUENCA CUYANA · OLEODUCTOS Y DUCTOS';$('layer').textContent='DUCTOS CUYANA';
   $('detail').innerHTML=mzaSubtabs('ductos')+'<div class="loading">Consultando red de ductos de Mendoza…</div>';
   try{
-    const r=await fetch(API+'/api/mendoza/ductos',{cache:'no-store'}),j=await r.json();
+    const r=await fetch(API+'/api/mendoza/ductos?limite=10000',{cache:'no-store'}),j=await r.json();
     if(!r.ok||!j.ok){
       const msg=(j.error==='Ruta no encontrada')
-        ?'Falta agregar y desplegar la ruta /api/mendoza/ductos en el Worker (territoria-energy-api.elexpreso17.workers.dev).'
+        ?'Falta desplegar la ruta /api/mendoza/ductos en el Worker.'
         :(j.error||'Error consultando ductos de Mendoza');
       throw Error(msg);
     }
     raw=j.features||[];$('layer').textContent=j.layer||'DUCTOS MENDOZA';
-    buildCuencaFilters('mzaD');renderCuencaLayer(true);
+    buildCuencaFilters();renderCuencaLayer(true);
   }catch(e){$('detail').innerHTML=mzaSubtabs('ductos')+'<div class="loading err">'+esc(e.message)+'</div>';}
 }
 
@@ -671,15 +688,15 @@ async function loadMendozaPlantas(){
   $('title').textContent='CUENCA CUYANA · PLANTAS E INSTALACIONES';$('layer').textContent='INSTALACIONES CUYANA';
   $('detail').innerHTML=mzaSubtabs('plantas')+'<div class="loading">Consultando upstream, medición, plantas y nodos de Mendoza…</div>';
   try{
-    const r=await fetch(API+'/api/mendoza/plantas',{cache:'no-store'}),j=await r.json();
+    const r=await fetch(API+'/api/mendoza/plantas?limite=10000',{cache:'no-store'}),j=await r.json();
     if(!r.ok||!j.ok){
       const msg=(j.error==='Ruta no encontrada')
-        ?'Falta agregar y desplegar la ruta /api/mendoza/plantas en el Worker (territoria-energy-api.elexpreso17.workers.dev).'
+        ?'Falta desplegar la ruta /api/mendoza/plantas en el Worker.'
         :(j.error||'Error consultando plantas e instalaciones de Mendoza');
       throw Error(msg);
     }
     raw=j.features||[];$('layer').textContent=j.layer||'INSTALACIONES MENDOZA';
-    buildCuencaFilters('mzaPl');renderCuencaLayer(true);
+    buildCuencaFilters();renderCuencaLayer(true);
   }catch(e){$('detail').innerHTML=mzaSubtabs('plantas')+'<div class="loading err">'+esc(e.message)+'</div>';}
 }
 
@@ -695,9 +712,9 @@ function renderCuencaLayer(fit){
   const q=$('search').value.trim().toLowerCase(),op=$('group').value;
   const baseList=raw.filter(f=>{
     const p=f.properties||{};
-    let oper=current==='mendozaPozos'?p.empresa:(p.operador||p.Operador25||p.OPERADOR||p.EMPRESA||p.TITULAR||'');
-    let vals=current==='mendozaPozos'?[p.sigla,p.area,p.cod_area,p.empresa,p.yacimiento,p.formacion,p.tipoestado]:current==='mendozaAreas'?[p.nombre_area,p.id_area,p.operador]:Object.values(p);
-    return(!op||String(oper)===op)&&(!q||vals.some(v=>String(v||'').toLowerCase().includes(q)));
+    const operKey=normOp(mzaOperatorOf(p));
+    const vals=current==='mendozaPozos'?[p.sigla,p.area,p.cod_area,p.empresa,p.yacimiento,p.formacion,p.tipoestado]:current==='mendozaAreas'?[p.nombre_area,p.id_area,p.operador]:Object.values(p);
+    return(!op||operKey===op)&&(!q||vals.some(v=>String(v||'').toLowerCase().includes(q)));
   });
 
   const list=(current==='mendozaPlantas'&&mzaPlantasFilter!=='all')
@@ -710,7 +727,7 @@ function renderCuencaLayer(fit){
     style:f=>{
       const p=f.properties||{};
       if(current==='mendozaDuctos'){
-        const gas=/GAS/.test(String(p.FLUIDO||p.fluido||p.TIPO||p.tipo||'').toUpperCase());
+        const gas=/GAS/.test(String(p.FLUIDO||p.fluido||p.TIPO||p.tipo||p.CAPA||'').toUpperCase());
         return{color:gas?'#f4b544':'#24d6d0',weight:3};
       }
       if(current==='mendozaPlantas'){
@@ -730,7 +747,7 @@ function renderCuencaLayer(fit){
     },
     onEachFeature:(f,l)=>{
       const p=f.properties||{};
-      l.bindTooltip(esc(p.nombre_area||p.area||p.sigla||p.NOMBRE||p.nombre||p.CAPA||'Elemento'));
+      l.bindTooltip(esc(p.nombre_area||p.area||p.sigla||p.nombre_tramo||p.ducto||p.NOMBRE||p.nombre||p.CAPA||'Elemento'));
       l.on('click',()=>showCuencaFeature(f));
     }
   }).addTo(groupLayer);
@@ -740,9 +757,9 @@ function renderCuencaLayer(fit){
   const head=mzaSubtabs(current==='mendozaPozos'?'pozos':current==='mendozaDuctos'?'ductos':current==='mendozaPlantas'?'plantas':'areas');
 
   if(current==='mendozaDuctos'){
-    const nGas=list.filter(f=>/GAS/.test(String(((f.properties||{}).FLUIDO||(f.properties||{}).fluido||(f.properties||{}).TIPO||(f.properties||{}).tipo||'')).toUpperCase())).length;
+    const nGas=list.filter(f=>/GAS/.test(String(((f.properties||{}).FLUIDO||(f.properties||{}).fluido||(f.properties||{}).TIPO||(f.properties||{}).tipo||(f.properties||{}).CAPA||'')).toUpperCase())).length;
     const nOther=list.length-nGas;
-    $('detail').innerHTML=head+`<div class="legend-bar"><span><i class="dot-lg" style="background:#f4b544"></i>Gas (${nGas})</span><span><i class="dot-lg" style="background:#24d6d0"></i>Oil / Otros (${nOther})</span><span>Total: ${list.length}</span></div><div class="banner"><b>DUCTOS DE MENDOZA</b><small>${list.length} ELEMENTOS VISIBLES</small></div><div class="loading">Buscá y seleccioná un ducto en el mapa para ver sus datos.</div>`;
+    $('detail').innerHTML=head+`<div class="legend-bar"><span><i class="dot-lg" style="background:#f4b544"></i>Gas (${nGas})</span><span><i class="dot-lg" style="background:#24d6d0"></i>Oil / Otros (${nOther})</span><span>Total: ${list.length}</span></div><div class="banner"><b>DUCTOS DE MENDOZA</b><small>${list.length} ELEMENTOS VISIBLES</small></div><div class="loading">Buscá y seleccioná un ducto en el mapa para ver sus datos y la producción de la cuenca.</div>`;
     return;
   }
 
@@ -767,21 +784,67 @@ function renderCuencaLayer(fit){
   $('detail').innerHTML=head+extraLeg+'<div class="banner"><b>'+(current==='mendozaPozos'?'POZOS DE MENDOZA':'ÁREAS PRODUCTIVAS DE MENDOZA')+'</b><small>'+list.length+' ELEMENTOS VISIBLES</small></div><div class="loading">Busca y selecciona un elemento en el mapa.</div>';
 }
 
-function showCuencaFeature(f){
+async function loadCuyanaNativeContext(){
+  const box=$('cuyanaBasinProd');
+  if(!box)return;
+  const cacheKey='CUYANA|latest';
+  try{
+    let j=statsCache[cacheKey];
+    if(!j){
+      const r=await fetch(API+'/api/estadisticas?cuenca=CUYANA&top=5',{cache:'no-store'});
+      j=await r.json();
+      if(!r.ok||!j.ok)throw Error(j.error||'Sin datos');
+      statsCache[cacheKey]=j;
+    }
+    const m=j.resumen_mes||{},cmp=j.comparacion_mes_anterior||{};
+    if(!j.periodo){box.innerHTML='<div class="loading">Sin declaraciones mensuales para Cuenca Cuyana.</div>';return}
+    const petDiffStr=`${cmp.diferencia_mbbl_d>0?'+':''}${formatNum(cmp.diferencia_mbbl_d||0)} Mbbl/d`;
+    const gasDiffStr=`${cmp.diferencia_gas_miles_m3>0?'+':''}${formatNum(cmp.diferencia_gas_miles_m3||0)} Mm³`;
+    box.innerHTML=`
+      <div class="prod-head"><b>PRODUCCIÓN CUENCA CUYANA (NATIVO)</b><span>${esc(j.periodo.label)}</span></div>
+      <div class="metrics">
+        <div class="metric"><span>PETRÓLEO</span><strong class="c">${formatNum(m.petroleo_mbbl_d)}</strong><small>Mbbl/d</small>${fmtDelta(cmp.pct_mbbl_d??cmp.pct_pet,petDiffStr,cmp.periodo_anterior)}</div>
+        <div class="metric"><span>GAS</span><strong>${formatNum(m.gas_miles_m3)}</strong><small>Mm³/mes</small>${fmtDelta(cmp.pct_gas,gasDiffStr,cmp.periodo_anterior)}</div>
+        <div class="metric"><span>POZOS ACTIVOS</span><strong>${formatNum(m.pozos_con_petroleo)}</strong><small>en producción</small></div>
+      </div>
+      <div class="prod-foot">Nota: El WFS oficial informa la traza y especificaciones físicas del ducto; los caudales declarados corresponden al balance mensual de Cuenca Cuyana (Capítulo IV · SE).</div>
+      <button type="button" class="native-cta" onclick="openEstadisticas('CUYANA')">VER TABLERO ESTADÍSTICO CUYANA →</button>
+    `;
+  }catch(e){
+    if(box)box.innerHTML='<div class="prod-foot">No se pudo cargar el resumen productivo de Cuenca Cuyana.</div>';
+  }
+}
+
+async function showCuencaFeature(f){
   const p=f.properties||{};
   if(current==='mendozaAreas'){showMendozaProductionArea(p);return}
   if(current==='mendozaPozos'){showMendozaWell(p);return}
   if(current==='mendozaPlantas'){
-    const t=p.NOMBRE||p.nombre||p.DENOMINACION||p.SIGLA||p.CAPA||'Instalación Mendoza';
+    const t=p.NOMBRE||p.nombre||p.DENOMINACION||p.denominacion||p.SIGLA||p.sigla||p.CAPA||'Instalación Mendoza';
     const cat=p._CATEGORIA_MZA||'instalacion';
     const entries=Object.entries(p).filter(([k,v])=>!k.startsWith('_')&&v!==null&&v!==''&&String(v).trim()!=='');
     $('detail').innerHTML=mzaSubtabs('plantas')+`<div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'MENDOZA')+' · '+cat.toUpperCase())}</small></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`;
     return;
   }
-  const t=p.NOMBRE||p.nombre||p.ID_DUCTO||'Ducto Mendoza';
+  const t=p.nombre_tramo||p.ducto||p.NOMBRE||p.nombre||p.ID_DUCTO||'Ducto Mendoza';
+  const op=mzaOperatorOf(p)||'Sin dato';
+  const tipo=p.tipo||p.TIPO||p.FLUIDO||p.fluido||'Ducto';
+  const diam=p.diametro||p.DIAMETRO||'—';
+  const tramoTipo=p.tipo_tramo||p.TENDIDO||'';
   const entries=Object.entries(p).filter(([k,v])=>!k.startsWith('_')&&v!==null&&v!==''&&String(v).trim()!=='');
-  $('detail').innerHTML=mzaSubtabs('ductos')+`<div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'DUCTOS')+' · CUENCA CUYANA')}</small></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`;
+  $('detail').innerHTML=mzaSubtabs('ductos')+`
+    <div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'DUCTOS')+' · CUENCA CUYANA')}</small></div>
+    <div class="metrics" style="margin-bottom:10px">
+      <div class="metric"><span>INFORMANTE</span><strong title="${esc(op)}">${esc(op)}</strong></div>
+      <div class="metric"><span>TIPO / FLUIDO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div>
+      <div class="metric"><span>DIÁMETRO</span><strong class="a">${esc(diam)}</strong><small>${esc(tramoTipo||'Sin tipo tramo')}</small></div>
+    </div>
+    <div id="cuyanaBasinProd" class="prod"><div class="loading">Cargando contexto productivo nativo de Cuenca Cuyana…</div></div>
+    <div class="prod" style="margin-top:10px"><div class="prod-head"><b>ATRIBUTOS OFICIALES (${entries.length})</b><span>GIS MENDOZA</span></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div></div>
+  `;
+  await loadCuyanaNativeContext();
 }
+
 function showMendozaProductionArea(p){
   $('detail').innerHTML=mzaSubtabs('areas')+`<div class="banner"><b>${esc(p.nombre_area||'Área Mendoza')}</b><small>${esc(p.id_area||'')} · PRODUCCIÓN POR ÁREA</small></div><div class="metrics"><div class="metric"><span>PETRÓLEO</span><strong class="c">${formatNum(p.total_pet_m3)}</strong><small>m³</small></div><div class="metric"><span>GAS</span><strong>${formatNum(p.total_gas_m3)}</strong><small>m³</small></div><div class="metric"><span>POZOS ACTIVOS</span><strong>${formatNum(p.pozos_activos)}</strong><small>unidades</small></div></div><div class="prod"><div class="kv">${row('Operador',p.operador)}${row('ID área',p.id_area)}${row('Fuente','vista_produccion_areas_final')}</div></div>`;
 }
