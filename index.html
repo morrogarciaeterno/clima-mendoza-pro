@@ -975,12 +975,15 @@ function openComparePopup(defaultType='empresas',defaultFluid='oil'){
   popEntityType=defaultType;
   popFluid=defaultFluid;
   $('popupCompare').classList.add('open');
-  renderPopupCompare();
+  renderPopupCompare(false);
 }
 
-async function fetchArgentinaCatalog(){
-  if(popCatalogCache)return popCatalogCache;
-  const r=await fetch(`${API}/api/estadisticas?cuenca=TODAS&top=500`,{cache:'no-store'});
+async function fetchArgentinaCatalog(forceReload=false){
+  if(!forceReload && popCatalogCache){
+    const hasData=(popCatalogCache.ranking_empresas_oil?.length||0)+(popCatalogCache.ranking_empresas_gas?.length||0)+(popCatalogCache.ranking_pozos_oil?.length||0)+(popCatalogCache.ranking_pozos_gas?.length||0);
+    if(hasData>0)return popCatalogCache;
+  }
+  const r=await fetch(`${API}/api/estadisticas?cuenca=TODAS&top=30`,{cache:'no-store'});
   const j=await r.json();
   if(!r.ok||!j.ok)throw Error(j.error||'Error cargando catálogo de Argentina');
   popCatalogCache=j;
@@ -1084,7 +1087,7 @@ function renderAnnualDiffChartSvg(serieA,serieB,labelA,labelB,fluid){
   return`<div class="chart-wrap"><svg class="chart-svg" style="height:190px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Diferencia anual A menos B">${grid}${bars}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px"><span>Arriba de 0 (cian): <b>${esc(labelA)}</b> supera a <b>${esc(labelB)}</b></span><span>Abajo de 0 (ámbar): <b>${esc(labelB)}</b> supera a <b>${esc(labelA)}</b></span></div>`;
 }
 
-async function renderPopupCompare(){
+async function renderPopupCompare(forceReload=false){
   const seq=++statsSeq;
   $('popupBody').innerHTML=`
     <div class="stats-toolbar">
@@ -1094,6 +1097,7 @@ async function renderPopupCompare(){
         <button type="button" class="${popEntityType==='areas'?'active':''}" onclick="popEntityType='areas';popItemA='';popItemB='';renderPopupCompare()">ÁREAS</button>
         <div class="month-picker" style="flex:1;min-width:240px"><label for="popSelA">ELEMENTO A</label><select id="popSelA" style="width:100%" onchange="popItemA=this.value;renderPopupCompare()"><option value="">Cargando…</option></select></div>
         <div class="month-picker" style="flex:1;min-width:240px"><label for="popSelB">ELEMENTO B</label><select id="popSelB" style="width:100%" onchange="popItemB=this.value;renderPopupCompare()"><option value="">Cargando…</option></select></div>
+        <button type="button" onclick="renderPopupCompare(true)">RECARGAR</button>
       </div>
       <div class="fluid-switch" style="margin:0;min-width:180px">
         <button type="button" class="${popFluid==='oil'?'active':''}" onclick="popFluid='oil';renderPopupCompare()">OIL</button>
@@ -1104,24 +1108,26 @@ async function renderPopupCompare(){
   `;
 
   try{
-    const cat=await fetchArgentinaCatalog();
+    const cat=await fetchArgentinaCatalog(forceReload);
     if(seq!==statsSeq||!$('popupCompare').classList.contains('open'))return;
 
     const items=getAllArgentinaItems(cat,popEntityType,popFluid);
-    if(!popItemA&&items[0])popItemA=items[0].key;
-    if(!popItemB&&items[1])popItemB=items[1].key;
-    if(items.length&&!items.some(x=>x.key===popItemA))popItemA=items[0].key;
-    if(items.length>1&&!items.some(x=>x.key===popItemB))popItemB=items[1].key;
+    if(!items.length){
+      if($('popSelA'))$('popSelA').innerHTML='<option value="">Sin elementos disponibles</option>';
+      if($('popSelB'))$('popSelB').innerHTML='<option value="">Sin elementos disponibles</option>';
+      $('popupCompareContent').innerHTML='<div class="loading err">No se recibieron elementos en el ranking nacional. Tocá RECARGAR para reintentar.</div>';
+      return;
+    }
 
-    const optsHtml=items.length
-      ?items.map(x=>`<option value="${esc(x.key)}">${esc(x.label)} (${formatNum(x.val)} ${esc(x.unit)})</option>`).join('')
-      :'<option value="">Sin elementos disponibles</option>';
+    if(!popItemA||!items.some(x=>x.key===popItemA))popItemA=items[0].key;
+    if(!popItemB||!items.some(x=>x.key===popItemB))popItemB=(items[1]||items[0]).key;
 
-    if($('popSelA')){$('popSelA').innerHTML=optsHtml;if(popItemA)$('popSelA').value=popItemA;}
-    if($('popSelB')){$('popSelB').innerHTML=optsHtml;if(popItemB)$('popSelB').value=popItemB;}
+    const optsHtml=items.map(x=>`<option value="${esc(x.key)}">${esc(x.label)} (${formatNum(x.val)} ${esc(x.unit)})</option>`).join('');
+    if($('popSelA')){$('popSelA').innerHTML=optsHtml;$('popSelA').value=popItemA;}
+    if($('popSelB')){$('popSelB').innerHTML=optsHtml;$('popSelB').value=popItemB;}
 
-    const objA=items.find(x=>x.key===popItemA)||items[0]||{key:'',label:'—',val:0,unit:'',sub:''};
-    const objB=items.find(x=>x.key===popItemB)||items[1]||items[0]||{key:'',label:'—',val:0,unit:'',sub:''};
+    const objA=items.find(x=>x.key===popItemA)||items[0];
+    const objB=items.find(x=>x.key===popItemB)||(items[1]||items[0]);
 
     const [serieA,serieB]=await Promise.all([
       fetchAnnualForEntity(popEntityType,objA.key),
