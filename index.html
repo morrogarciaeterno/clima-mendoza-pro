@@ -742,13 +742,12 @@ function renderSerie12mSvg(serie, isGas){
   if(!serie||!serie.length)return'<div class="loading">Sin serie mensual disponible.</div>';
   const vals=serie.map(x=>Number(isGas?x.gas_miles_m3:x.petroleo_mbbl_d)||0);
   const unit=isGas?'Mm³':'Mbbl/d';
-  const w=900,h=150,padL=54,padR=34,padT=16,padB=24;
+  const w=900,h=150,padL=58,padR=24,padT=16,padB=24;
   const plotW=w-padL-padR, plotH=h-padT-padB;
-  const dataMax=Math.max(...vals), dataMin=Math.min(...vals);
-  const rawSpan=Math.max(dataMax-dataMin, Math.abs(dataMax)*0.02, 1);
-  const minV=dataMin - rawSpan*0.25;
-  const maxV=dataMax + rawSpan*0.20;
-  const span=Math.max(maxV-minV, 1);
+  const dataMax=Math.max(...vals,1);
+  const minV=0;
+  const maxV=dataMax*1.12;
+  const span=Math.max(maxV-minV,1);
   const pts=serie.map((m,i)=>{
     const x=padL+(serie.length===1?plotW/2:(i/(serie.length-1))*plotW);
     const v=vals[i];
@@ -775,7 +774,7 @@ function renderSerie12mSvg(serie, isGas){
   const lastPct=isGas?last.m.variacion_gas_pct:last.m.variacion_pet_pct;
   const lastCls=lastPct>0?'delta-up':(lastPct<0?'delta-down':'delta-flat');
   const lastTxt=lastPct===null||lastPct===undefined?'Sin mes previo':`${lastPct>0?'▲ +':'▼ '}${formatNum(lastPct)}% vs mes ant.`;
-  return`<div class="chart-wrap"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Gráfica últimos meses">${gridLines}<path d="${areaD}" fill="${fillColor}"/><polyline fill="none" stroke="${strokeColor}" stroke-width="2.4" points="${poly}"/>${circles}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px;margin-top:4px"><span>Último punto (${esc(last.m.periodo)}): <b>${formatNum(last.v)} ${esc(unit)}</b> · <span class="${lastCls}">${lastTxt}</span></span><span>Pasá el cursor o tocá un punto para ver el detalle</span></div>`;
+  return`<div class="chart-wrap"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Gráfica últimos meses">${gridLines}<path d="${areaD}" fill="${fillColor}"/><polyline fill="none" stroke="${strokeColor}" stroke-width="2.4" points="${poly}"/>${circles}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px;margin-top:4px"><span>Último punto (${esc(last.m.periodo)}): <b>${formatNum(last.v)} ${esc(unit)}</b> · <span class="${lastCls}">${lastTxt}</span></span><span>Eje desde 0 · Pasá el cursor sobre un punto para ver el detalle</span></div>`;
 }
 
 function renderBarsHtml(items,labelKey,valKey,unitSuffix,fillClass,limit=12,subFn=null){
@@ -887,29 +886,18 @@ async function renderInteractiveCompare(){
       pB:cmpScaleMode==='index'?(r.vB/firstB)*100:r.vB
     }));
 
-    const w=920,h=180,padL=58,padR=cmpScaleMode==='dual'?58:28,padT=18,padB=26;
+    const w=920,h=180,padL=62,padR=28,padT=18,padB=26;
     const plotW=w-padL-padR,plotH=h-padT-padB;
 
     const allP=rows.flatMap(r=>[r.pA,r.pB]);
-    const sharedMin=Math.min(...allP,0);
     const sharedMax=Math.max(...allP,1);
-    const sharedSpan=Math.max((sharedMax-sharedMin)*1.15,1);
-    const sharedBase=Math.max(0,sharedMin-(sharedMax-sharedMin)*0.1);
-
-    const maxA=Math.max(...rows.map(r=>r.pA),1),minA=Math.min(...rows.map(r=>r.pA),0);
-    const spanA=Math.max((maxA-minA)*1.15,1),baseA=Math.max(0,minA-(maxA-minA)*0.1);
-
-    const maxB=Math.max(...rows.map(r=>r.pB),1),minB=Math.min(...rows.map(r=>r.pB),0);
-    const spanB=Math.max((maxB-minB)*1.15,1),baseB=Math.max(0,minB-(maxB-minB)*0.1);
+    const sharedBase=0;
+    const sharedSpan=Math.max(sharedMax*1.12,1);
 
     const pts=rows.map((r,i)=>{
       const x=padL+(rows.length===1?plotW/2:(i/(rows.length-1))*plotW);
-      const yA=cmpScaleMode==='index'
-        ?padT+plotH-(((r.pA-sharedBase)/sharedSpan)*plotH)
-        :padT+plotH-(((r.pA-baseA)/spanA)*plotH);
-      const yB=cmpScaleMode==='index'
-        ?padT+plotH-(((r.pB-sharedBase)/sharedSpan)*plotH)
-        :padT+plotH-(((r.pB-baseB)/spanB)*plotH);
+      const yA=padT+plotH-(((r.pA-sharedBase)/sharedSpan)*plotH);
+      const yB=padT+plotH-(((r.pB-sharedBase)/sharedSpan)*plotH);
       return{...r,x,yA,yB};
     });
 
@@ -918,12 +906,10 @@ async function renderInteractiveCompare(){
 
     const grid=[0,0.5,1].map(t=>{
       const gy=padT+plotH*(1-t);
-      const leftVal=cmpScaleMode==='index'?(sharedBase+sharedSpan*t):(baseA+spanA*t);
-      const rightVal=baseB+spanB*t;
+      const val=sharedBase+sharedSpan*t;
       const suffix=cmpScaleMode==='index'?' idx':'';
       return`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${w-padR}" y2="${gy.toFixed(1)}" stroke="#1f3545" stroke-dasharray="3 3" stroke-width="1"/>
-        <text x="${padL-8}" y="${(gy+3).toFixed(1)}" fill="#24d6d0" font-size="9" text-anchor="end">${formatNum(leftVal)}${suffix}</text>
-        ${cmpScaleMode==='dual'?`<text x="${w-padR+8}" y="${(gy+3).toFixed(1)}" fill="#f4b544" font-size="9" text-anchor="start">${formatNum(rightVal)}</text>`:''}`;
+        <text x="${padL-8}" y="${(gy+3).toFixed(1)}" fill="#eaf4f8" font-size="9" text-anchor="end">${formatNum(val)}${suffix}</text>`;
     }).join('');
 
     const dots=pts.map(p=>{
@@ -945,7 +931,7 @@ async function renderInteractiveCompare(){
     $('detail').innerHTML=controlsHtml+`
       <div class="banner">
         <b>${esc(spA.label)} VS. ${esc(spB.label)} · ${isGas?'GAS':'OIL'} (${esc(jA.periodo?.label||last.periodo)})</b>
-        <small>CIAN = ${esc(spA.label.toUpperCase())} · ÁMBAR = ${esc(spB.label.toUpperCase())} · MODO ${cmpScaleMode==='index'?'BASE 100':'EJE DUAL REAL'}</small>
+        <small>CIAN = ${esc(spA.label.toUpperCase())} · ÁMBAR = ${esc(spB.label.toUpperCase())} · MODO ${cmpScaleMode==='index'?'BASE 100':'EJE ÚNICO REAL'}</small>
       </div>
       <div class="metrics">
         <div class="metric"><span>${esc(spA.label.toUpperCase())}</span><strong class="c">${formatNum(valCurA)}</strong><small>${esc(unit)}</small></div>
@@ -953,7 +939,7 @@ async function renderInteractiveCompare(){
         <div class="metric"><span>RATIO (A / B)</span><strong>${valCurB?formatNum(valCurA/valCurB)+'x':'—'}</strong><small>Dif: ${valCurA-valCurB>0?'+':''}${formatNum(valCurA-valCurB)} ${esc(unit)}</small></div>
       </div>
       <div class="chart-card">
-        <div class="stat-title"><b>COMPARATIVA INTERACTIVA (${rows.length} MESES)</b><span>PASÁ EL CURSOR SOBRE CADA MES</span></div>
+        <div class="stat-title"><b>COMPARATIVA INTERACTIVA (${rows.length} MESES)</b><span>EJE COMPARTIDO DESDE 0</span></div>
         <div class="chart-wrap">
           <svg class="chart-svg" style="height:180px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Comparativa interactiva">
             ${grid}
@@ -962,7 +948,7 @@ async function renderInteractiveCompare(){
             ${dots}
           </svg>
         </div>
-        <div class="prod-foot">Cada punto mensual muestra en el tooltip el valor de Serie A, Serie B, diferencia y proporción A/B.</div>
+        <div class="prod-foot">Ambas líneas comparten la misma escala vertical para reflejar la diferencia real entre ${esc(spA.label)} y ${esc(spB.label)}.</div>
       </div>
     `;
   }catch(e){
@@ -1086,7 +1072,7 @@ function renderAnnualBarsSvg(serieA,serieB,labelA,labelB,fluid,unitOverride){
 
   const w=920,h=195,padL=62,padR=24,padT=22,padB=30;
   const plotW=w-padL-padR,plotH=h-padT-padB;
-  const maxVal=Math.max(...rows.flatMap(r=>[r.vA,r.vB]),1);
+  const maxVal=Math.max(...rows.flatMap(r=>[r.vA,r.vB]),1)*1.12;
   const baseY=padT+plotH;
   const groupW=plotW/rows.length;
   const barW=Math.min(34,Math.max(10,groupW*0.34));
