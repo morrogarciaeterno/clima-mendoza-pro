@@ -89,7 +89,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .metric strong{display:block;margin-top:6px;color:var(--txt);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .metric strong.c{color:var(--c)}
 .metric strong.a{color:var(--a)}
-.metric small{display:block;color:var(--mut);font-size:8px;margin-top:3px}
+.metric small{display:block;color:var(--mut);font-size:8.5px;margin-top:3px;line-height:1.35}
 .delta-up{color:var(--g)!important}
 .delta-down{color:var(--r)!important}
 .delta-flat{color:var(--mut)!important}
@@ -97,7 +97,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .prod-head{display:flex;justify-content:space-between;margin-bottom:9px}
 .prod-head b{font-size:10px;color:var(--c);letter-spacing:.1em}
 .prod-head span{font-size:10px;color:var(--a)}
-.prod-foot{font-size:9px;color:var(--mut);line-height:1.5;margin-top:8px}
+.prod-foot{font-size:9.5px;color:var(--mut);line-height:1.5;margin-top:8px}
 .native-cta{width:100%;margin-top:9px;height:34px;border:1px solid var(--c);border-radius:8px;background:#0b2433;color:var(--c);font-size:10px;font-weight:800;letter-spacing:.08em;cursor:pointer}
 .native-cta:hover{background:#12364a;color:#fff}
 .loading{padding:25px;text-align:center;color:var(--mut)}
@@ -114,7 +114,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .subtabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0 0 10px}
 .subtabs button{min-height:38px;height:auto;border:1px solid var(--line);border-radius:8px;background:#091823;color:var(--mut);cursor:pointer;font-weight:800;font-size:9.5px;padding:6px 8px;line-height:1.15;white-space:normal;display:flex;align-items:center;justify-content:center;text-align:center}
 .subtabs button.active,.subtabs button:hover{color:var(--c);border-color:var(--c)}
-.stat-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.stat-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
 .stat-title b{font-size:10px;color:var(--c);letter-spacing:.1em}
 .stat-title span{font-size:9px;color:var(--a)}
 .fluid-switch{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
@@ -130,6 +130,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .chart-card{margin-top:10px;padding:10px 12px;border:1px solid #27566b;border-radius:10px;background:#071923}
 .chart-wrap{width:100%;overflow:hidden}
 .chart-svg{width:100%;min-width:0;height:150px;display:block}
+.cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:10px;align-items:start}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
 .stats-panel{padding:11px;border:1px solid #27566b;border-radius:10px;background:#071923}
 .bar-item{margin-bottom:8px}
@@ -137,8 +138,8 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .bar-top{display:flex;justify-content:space-between;gap:8px;font-size:10px;margin-bottom:3px}
 .bar-top b{color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-top span{color:var(--c);white-space:nowrap}
-.bar-sub{font-size:8px;color:var(--mut);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-track{height:6px;border-radius:999px;background:#0c2230;overflow:hidden}
+.bar-sub{font-size:9px;color:var(--mut);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:7px;border-radius:999px;background:#0c2230;overflow:hidden}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--c),var(--g));border-radius:999px}
 .bar-fill.a{background:linear-gradient(90deg,var(--a),#e87d3e)}
 .bar-fill.g{background:linear-gradient(90deg,#31d67b,#24d6d0)}
@@ -146,7 +147,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .leaflet-control-attribution{background:#071018cc!important;color:#789!important}
 .leaflet-control-attribution a{color:var(--c)!important}
 @media(max-width:1180px){.basin-selector{grid-template-columns:repeat(2,minmax(0,1fr))}.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
+@media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid,.cmp-grid{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
 </style>
 </head>
 <body>
@@ -318,6 +319,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
 let map,groupLayer,rnAreasGroup,rnPozosGroup,current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,statsCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
+let statsCompareAB=false,abType='empresas',abItemA='',abItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
 function showHome(){
@@ -726,13 +728,12 @@ function renderSerie12mSvg(serie, isGas){
   if(!serie||!serie.length)return'<div class="loading">Sin serie mensual disponible.</div>';
   const vals=serie.map(x=>Number(isGas?x.gas_miles_m3:x.petroleo_mbbl_d)||0);
   const unit=isGas?'Mm³':'Mbbl/d';
-  const w=900,h=150,padL=54,padR=34,padT=16,padB=24;
+  const w=900,h=150,padL=58,padR=24,padT=16,padB=24;
   const plotW=w-padL-padR, plotH=h-padT-padB;
-  const dataMax=Math.max(...vals), dataMin=Math.min(...vals);
-  const rawSpan=Math.max(dataMax-dataMin, Math.abs(dataMax)*0.02, 1);
-  const minV=dataMin - rawSpan*0.25;
-  const maxV=dataMax + rawSpan*0.20;
-  const span=Math.max(maxV-minV, 1);
+  const dataMax=Math.max(...vals,1);
+  const minV=0;
+  const maxV=dataMax*1.12;
+  const span=Math.max(maxV-minV,1);
   const pts=serie.map((m,i)=>{
     const x=padL+(serie.length===1?plotW/2:(i/(serie.length-1))*plotW);
     const v=vals[i];
@@ -759,11 +760,198 @@ function renderSerie12mSvg(serie, isGas){
   const lastPct=isGas?last.m.variacion_gas_pct:last.m.variacion_pet_pct;
   const lastCls=lastPct>0?'delta-up':(lastPct<0?'delta-down':'delta-flat');
   const lastTxt=lastPct===null||lastPct===undefined?'Sin mes previo':`${lastPct>0?'▲ +':'▼ '}${formatNum(lastPct)}% vs mes ant.`;
-  return`<div class="chart-wrap"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Gráfica últimos meses">${gridLines}<path d="${areaD}" fill="${fillColor}"/><polyline fill="none" stroke="${strokeColor}" stroke-width="2.4" points="${poly}"/>${circles}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px;margin-top:4px"><span>Último punto (${esc(last.m.periodo)}): <b>${formatNum(last.v)} ${esc(unit)}</b> · <span class="${lastCls}">${lastTxt}</span></span><span>Pasá el cursor o tocá un punto para ver el detalle</span></div>`;
+  return`<div class="chart-wrap"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Gráfica últimos meses">${gridLines}<path d="${areaD}" fill="${fillColor}"/><polyline fill="none" stroke="${strokeColor}" stroke-width="2.4" points="${poly}"/>${circles}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px;margin-top:4px"><span>Último punto (${esc(last.m.periodo)}): <b>${formatNum(last.v)} ${esc(unit)}</b> · <span class="${lastCls}">${lastTxt}</span></span><span>Eje real desde 0 · Pasá el cursor sobre un punto para ver el detalle</span></div>`;
 }
 
 function sortRankingDesc(items, valKey){
   return (items||[]).slice().sort((a,b)=>(Number(b?.[valKey])||0)-(Number(a?.[valKey])||0));
+}
+
+function inferBasinFromSigla(sigla,data){
+  if(data?.filtros?.provincia)return data.filtros.provincia;
+  if(data?.filtros?.cuenca)return `Cuenca ${data.filtros.cuenca}`;
+  const s=String(sigla||'').toUpperCase();
+  if(s.includes('.NQ.')||s.includes('NEUQU'))return 'Cuenca Neuquina';
+  if(s.includes('.MD.')||s.includes('.MZ.')||s.includes('CUYAN'))return 'Cuenca Cuyana';
+  if(s.includes('.RN.')||s.includes('RIO NEGRO'))return 'Río Negro';
+  if(s.includes('.MA.')||s.includes('AUSTRAL'))return 'Cuenca Austral';
+  if(s.includes('.CH.')||s.includes('SAN JORGE'))return 'Golfo San Jorge';
+  return 'Argentina (Cap. IV)';
+}
+
+function getComparePool(data,type,isGas){
+  if(!data)return[];
+  const scopeLabel=data?.filtros?.provincia||(data?.filtros?.cuenca?`Cuenca ${data.filtros.cuenca}`:'Argentina (Todas)');
+  if(type==='areas'){
+    const key=isGas?'gas_miles_m3':'petroleo_mbbl_d';
+    const unit=isGas?'Mm³':'Mbbl/d';
+    const list=isGas?(data.ranking_areas_gas||data.ranking_areas||[]):(data.ranking_areas_oil||data.ranking_areas||[]);
+    return sortRankingDesc(list,key).map(x=>({
+      name:x.area,
+      val:Number(x[key])||0,
+      unit,
+      cuenca:scopeLabel,
+      empresa:'',
+      area:x.area,
+      extra:`${scopeLabel} · ${x.pozos_activos||0} pozos activos`
+    }));
+  }
+  if(type==='pozos'){
+    const key=isGas?'gas_miles_m3':'petroleo_bbl_d';
+    const unit=isGas?'Mm³':'bbl/d';
+    const list=isGas?(data.ranking_pozos_gas||[]):(data.ranking_pozos_oil||[]);
+    return sortRankingDesc(list,key).map(x=>{
+      const cu=inferBasinFromSigla(x.sigla,data);
+      const op=x.empresa||'Operadora s/d';
+      const ar=x.area||'Área s/d';
+      return{
+        name:x.sigla,
+        val:Number(x[key])||0,
+        unit,
+        cuenca:cu,
+        empresa:op,
+        area:ar,
+        extra:`Op: ${op} · ${ar} (${cu})`
+      };
+    });
+  }
+  const key=isGas?'gas_miles_m3':'petroleo_mbbl_d';
+  const unit=isGas?'Mm³':'Mbbl/d';
+  const list=isGas?(data.ranking_empresas_gas||data.ranking_empresas||[]):(data.ranking_empresas_oil||data.ranking_empresas||[]);
+  return sortRankingDesc(list,key).map(x=>({
+    name:x.empresa,
+    val:Number(x[key])||0,
+    unit,
+    cuenca:scopeLabel,
+    empresa:x.empresa,
+    area:'',
+    extra:`${scopeLabel} · ${x.pozos_activos||0} pozos activos`
+  }));
+}
+
+function renderCompareBarsSvg(serie12,totSerie,a,b,isGas){
+  if(!serie12||!serie12.length)return'';
+  const rows=serie12.map(m=>{
+    const baseTot=Number(isGas?m.gas_miles_m3:m.petroleo_mbbl_d)||0;
+    const ratioScale=totSerie>0?(baseTot/totSerie):1;
+    return{
+      periodo:m.periodo,
+      vA:Number((a.val*ratioScale).toFixed(2)),
+      vB:Number((b.val*ratioScale).toFixed(2))
+    };
+  });
+
+  const w=900,h=185,padL=60,padR=20,padT=20,padB=28;
+  const plotW=w-padL-padR,plotH=h-padT-padB;
+  const maxVal=Math.max(...rows.flatMap(r=>[r.vA,r.vB]),1)*1.14;
+  const baseY=padT+plotH;
+  const groupW=plotW/rows.length;
+  const barW=Math.min(28,Math.max(9,groupW*0.34));
+  const gap=Math.max(3,barW*0.2);
+
+  const grid=[0,0.5,1].map(t=>{
+    const gy=padT+plotH*(1-t);
+    const gv=maxVal*t;
+    return`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${w-padR}" y2="${gy.toFixed(1)}" stroke="#1f3545" stroke-dasharray="3 3" stroke-width="1"/>
+      <text x="${padL-8}" y="${(gy+3).toFixed(1)}" fill="#7f9aaa" font-size="9" text-anchor="end">${formatNum(gv)}</text>`;
+  }).join('');
+
+  const bars=rows.map((r,i)=>{
+    const cx=padL+((i+0.5)*groupW);
+    const hA=Math.max(2,(r.vA/maxVal)*plotH);
+    const hB=Math.max(2,(r.vB/maxVal)*plotH);
+    const xA=cx-gap/2-barW;
+    const xB=cx+gap/2;
+    const yA=baseY-hA;
+    const yB=baseY-hB;
+    return`<g>
+      <title>${esc(r.periodo)} · A (${esc(a.name)}): ${formatNum(r.vA)} ${esc(a.unit)} | B (${esc(b.name)}): ${formatNum(r.vB)} ${esc(b.unit)}</title>
+      <rect x="${xA.toFixed(1)}" y="${yA.toFixed(1)}" width="${barW.toFixed(1)}" height="${hA.toFixed(1)}" rx="3" fill="#24d6d0" opacity=".94"/>
+      <text x="${(xA+barW/2).toFixed(1)}" y="${(yA-4).toFixed(1)}" fill="#24d6d0" font-size="7.8" text-anchor="middle">${formatNum(r.vA)}</text>
+      <rect x="${xB.toFixed(1)}" y="${yB.toFixed(1)}" width="${barW.toFixed(1)}" height="${hB.toFixed(1)}" rx="3" fill="#f4b544" opacity=".94"/>
+      <text x="${(xB+barW/2).toFixed(1)}" y="${(yB-4).toFixed(1)}" fill="#f4b544" font-size="7.8" text-anchor="middle">${formatNum(r.vB)}</text>
+      <text x="${cx.toFixed(1)}" y="${(h-6).toFixed(1)}" fill="#7f9aaa" font-size="8.8" text-anchor="middle">${esc(r.periodo)}</text>
+    </g>`;
+  }).join('');
+
+  return`<div class="chart-wrap" style="margin-top:10px"><svg class="chart-svg" style="height:185px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Comparación de barras lado a lado">${grid}${bars}</svg></div>
+  <div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px">
+    <span><i class="dot-lg" style="background:#24d6d0"></i> <b>${esc(a.name)}</b> (${esc(a.unit)})</span>
+    <span><i class="dot-lg" style="background:#f4b544"></i> <b>${esc(b.name)}</b> (${esc(b.unit)})</span>
+  </div>`;
+}
+
+function renderCompareABHtml(data,isGas){
+  if(!statsCompareAB)return'';
+  const pool=getComparePool(data,abType,isGas);
+  const typeLabel=abType==='areas'?'ÁREAS':(abType==='pozos'?'POZOS':'OPERADORAS');
+  if(!pool.length){
+    return`<div class="chart-card"><div class="loading">Sin datos de ${typeLabel.toLowerCase()} para comparar en este filtro.</div></div>`;
+  }
+  if(!abItemA||!pool.some(x=>x.name===abItemA))abItemA=pool[0].name;
+  if(!abItemB||!pool.some(x=>x.name===abItemB))abItemB=(pool[1]||pool[0]).name;
+
+  const a=pool.find(x=>x.name===abItemA)||pool[0];
+  const b=pool.find(x=>x.name===abItemB)||(pool[1]||pool[0]);
+  const maxAB=Math.max(a.val,b.val,1);
+  const pctA=Math.max(2,(a.val/maxAB)*100);
+  const pctB=Math.max(2,(b.val/maxAB)*100);
+  const diffAbs=Math.abs(a.val-b.val);
+  const ratio=b.val>0?`${formatNum(a.val/b.val)}x`:'—';
+  const leader=a.val===b.val?'Empate':(a.val>b.val?a.name:b.name);
+  const optsA=pool.map(x=>`<option value="${esc(x.name)}"${x.name===a.name?' selected':''}>${esc(x.name)} (${formatNum(x.val)} ${esc(x.unit)})</option>`).join('');
+  const optsB=pool.map(x=>`<option value="${esc(x.name)}"${x.name===b.name?' selected':''}>${esc(x.name)} (${formatNum(x.val)} ${esc(x.unit)})</option>`).join('');
+  const totSerie=isGas?(data.resumen_mes?.gas_miles_m3||1):(data.resumen_mes?.petroleo_mbbl_d||1);
+
+  return`
+    <div class="chart-card">
+      <div class="stat-title">
+        <b>COMPARATIVA DIRECTA · ${typeLabel} (${isGas?'GAS':'OIL'}) · ESCALA REAL UNIFICADA</b>
+        <span>PERÍODO ${esc(data.periodo?.label||'')}</span>
+      </div>
+      <div class="filters" style="grid-template-columns:150px 1fr 1fr;margin-bottom:10px">
+        <select onchange="abType=this.value;abItemA='';abItemB='';paintEstadisticas()">
+          <option value="empresas"${abType==='empresas'?' selected':''}>Operadoras</option>
+          <option value="areas"${abType==='areas'?' selected':''}>Áreas</option>
+          <option value="pozos"${abType==='pozos'?' selected':''}>Pozos (Top)</option>
+        </select>
+        <select onchange="abItemA=this.value;paintEstadisticas()">${optsA}</select>
+        <select onchange="abItemB=this.value;paintEstadisticas()">${optsB}</select>
+      </div>
+      <div class="cmp-grid">
+        <div>
+          <div class="metrics" style="margin-bottom:10px">
+            <div class="metric"><span>A · ${esc(a.name)}</span><strong class="c">${formatNum(a.val)}</strong><small>${esc(a.unit)} · ${esc(a.extra)}</small></div>
+            <div class="metric"><span>B · ${esc(b.name)}</span><strong class="a">${formatNum(b.val)}</strong><small>${esc(b.unit)} · ${esc(b.extra)}</small></div>
+            <div class="metric"><span>BRECHA REAL (|A - B|)</span><strong>${formatNum(diffAbs)}</strong><small>${esc(a.unit)} · Ratio A/B: ${ratio} · Lidera: ${esc(leader)}</small></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-top"><b>A: ${esc(a.name)}</b><span>${formatNum(a.val)} ${esc(a.unit)}</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pctA.toFixed(1)}%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-top"><b>B: ${esc(b.name)}</b><span>${formatNum(b.val)} ${esc(b.unit)}</span></div>
+            <div class="bar-track"><div class="bar-fill a" style="width:${pctB.toFixed(1)}%"></div></div>
+          </div>
+          ${renderCompareBarsSvg(data.serie_12m||[],totSerie,a,b,isGas)}
+        </div>
+        <div class="stats-panel">
+          <div class="stat-title"><b>ZONA &amp; METADATOS</b><span>CAP. IV</span></div>
+          <div class="kv">
+            <div class="row"><span>Cuenca / Zona A</span><b>${esc(a.cuenca||'—')}${a.area?' · '+esc(a.area):''}</b></div>
+            <div class="row"><span>Cuenca / Zona B</span><b>${esc(b.cuenca||'—')}${b.area?' · '+esc(b.area):''}</b></div>
+            ${a.empresa?`<div class="row"><span>Operadora A</span><b>${esc(a.empresa)}</b></div>`:''}
+            ${b.empresa?`<div class="row"><span>Operadora B</span><b>${esc(b.empresa)}</b></div>`:''}
+          </div>
+          <div class="prod-foot" style="margin-top:8px">
+            <b>Lectura de escala real:</b><br>
+            Ambas barras comparten el mismo eje desde <b>0</b> para reflejar la diferencia real de volumen entre <b>${esc(a.name)}</b> y <b>${esc(b.name)}</b>.<br><br>
+            En <b>Pozos</b> se listan los líderes del ranking nacional/regional de Capítulo IV para mantener respuesta inmediata.
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderBarsHtml(items,labelKey,valKey,unitSuffix,fillClass,limit=12,subFn=null){
@@ -799,7 +987,7 @@ function paintEstadisticas(){
   }).join('');
   const fallbackOpt=curMonthVal?`<option value="${esc(curMonthVal)}" selected>${esc(curMonthVal.split('-').reverse().join('/'))}</option>`:'<option value="">Último mes</option>';
   const monthControl=`<div class="month-picker"><label for="statsMonthSelect">MES/AÑO</label><select id="statsMonthSelect" onchange="onStatsMonthChange(this.value)">${mesesOpts||fallbackOpt}</select></div>`;
-  const toolbar=`<div class="stats-toolbar"><div class="stats-cuencas"><button type="button" class="${statsCuenca==='NEUQUINA'&&!statsProvincia?'active':''}" onclick="setStatsScope('NEUQUINA','')">CUENCA NEUQUINA</button><button type="button" class="${statsCuenca==='CUYANA'&&!statsProvincia?'active':''}" onclick="setStatsScope('CUYANA','')">CUENCA CUYANA</button><button type="button" class="${statsProvincia==='RIO NEGRO'?'active':''}" onclick="setStatsScope('TODAS','RIO NEGRO')">RÍO NEGRO</button><button type="button" class="${statsCuenca==='TODAS'&&!statsProvincia?'active':''}" onclick="setStatsScope('TODAS','')">ARGENTINA (TODAS)</button>${monthControl}</div><div class="fluid-switch" style="margin:0;min-width:200px"><button type="button" class="${statsFluid==='oil'?'active':''}" onclick="setStatsFluid('oil')">OIL</button><button type="button" class="${statsFluid==='gas'?'active':''}" onclick="setStatsFluid('gas')">GAS</button></div></div>`;
+  const toolbar=`<div class="stats-toolbar"><div class="stats-cuencas"><button type="button" class="${statsCuenca==='NEUQUINA'&&!statsProvincia?'active':''}" onclick="setStatsScope('NEUQUINA','')">CUENCA NEUQUINA</button><button type="button" class="${statsCuenca==='CUYANA'&&!statsProvincia?'active':''}" onclick="setStatsScope('CUYANA','')">CUENCA CUYANA</button><button type="button" class="${statsProvincia==='RIO NEGRO'?'active':''}" onclick="setStatsScope('TODAS','RIO NEGRO')">RÍO NEGRO</button><button type="button" class="${statsCuenca==='TODAS'&&!statsProvincia?'active':''}" onclick="setStatsScope('TODAS','')">ARGENTINA (TODAS)</button><button type="button" class="${statsCompareAB?'active':''}" onclick="statsCompareAB=!statsCompareAB;paintEstadisticas()">COMPARAR A vs B</button>${monthControl}</div><div class="fluid-switch" style="margin:0;min-width:200px"><button type="button" class="${statsFluid==='oil'?'active':''}" onclick="setStatsFluid('oil')">OIL</button><button type="button" class="${statsFluid==='gas'?'active':''}" onclick="setStatsFluid('gas')">GAS</button></div></div>`;
   const activeData=statsCache[cacheKey];
   if(!activeData){$('detail').innerHTML=toolbar+'<div class="loading">Calculando serie histórica, comparativa mensual y rankings…</div>';return}
   if(!activeData.periodo){$('detail').innerHTML=toolbar+'<div class="loading err">Sin datos disponibles para el mes o jurisdicción seleccionada.</div>';return}
@@ -819,6 +1007,7 @@ function paintEstadisticas(){
       <div class="metric"><span>GAS (${esc(activeData.periodo.label)})</span><strong>${formatNum(m.gas_miles_m3)}</strong><small>miles m³/mes (Mm³)</small>${fmtDelta(cmp.pct_gas,gasDiffStr,cmp.periodo_anterior)}</div>
       <div class="metric"><span>POZOS ACTIVOS</span><strong>${formatNum(isGas?(m.pozos_con_gas??m.pozos_con_petroleo):m.pozos_con_petroleo)}</strong><small>con prod. ${isGas?'gas':'oil'} &gt; 0</small><small class="delta-flat">Días del mes: ${esc(activeData.periodo.dias)}</small></div>
     </div>
+    ${renderCompareABHtml(activeData,isGas)}
     <div class="chart-card">
       <div class="stat-title"><b>EVOLUCIÓN ÚLTIMOS ${(activeData.serie_12m||[]).length} MESES · ${isGas?'GAS (Mm³)':'PETRÓLEO (Mbbl/d)'}</b><span>VERDE = SUBIÓ · ROJO = BAJÓ</span></div>
       ${renderSerie12mSvg(activeData.serie_12m||[],isGas)}
