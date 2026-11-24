@@ -984,7 +984,6 @@ async function fetchArgentinaCatalog(forceReload=false){
     if(hasData>0)return popCatalogCache;
   }
 
-  // Usar caché de Estadísticas si ya se cargó el tablero nacional
   if(!forceReload){
     const nationalCached=statsCache['TODAS|ALL|latest']||Object.values(statsCache||{}).find(x=>x&&!x.filtros?.cuenca&&!x.filtros?.provincia&&(x.ranking_empresas_oil?.length||x.ranking_pozos_oil?.length||x.ranking_areas_oil?.length));
     if(nationalCached){
@@ -1054,23 +1053,28 @@ function getAllArgentinaItems(cat,type,fluid){
 
 async function fetchAnnualForEntity(type,key){
   if(!key)return[];
-  const q=new URLSearchParams();
-  if(type==='empresas')q.set('empresa',key);
-  if(type==='areas')q.set('area',key);
-  if(type==='pozos')q.set('sigla',key);
-  const r=await fetch(`${API}/api/anual?${q.toString()}`,{cache:'no-store'});
-  const j=await r.json();
-  if(!r.ok||!j.ok)throw Error(j.error||'Ruta /api/anual no disponible aún en el Worker');
-  return j.serie_anual||[];
+  try{
+    const q=new URLSearchParams();
+    if(type==='empresas')q.set('empresa',key);
+    if(type==='areas')q.set('area',key);
+    if(type==='pozos')q.set('sigla',key);
+    const r=await fetch(`${API}/api/anual?${q.toString()}`,{cache:'no-store'});
+    if(!r.ok)throw Error(`HTTP ${r.status}`);
+    const j=await r.json();
+    if(!j.ok)throw Error(j.error||'Sin serie anual');
+    return j.serie_anual||[];
+  }catch(_){
+    return[];
+  }
 }
 
 function renderAnnualDiffChartSvg(serieA,serieB,labelA,labelB,fluid){
   const isGas=fluid==='gas';
-  const unit=isGas?'Mm³ / año':'Mbbl / año';
+  const unit=isGas?'Mm³':'Mbbl';
   const mapA=new Map((serieA||[]).map(y=>[y.anio,y]));
   const mapB=new Map((serieB||[]).map(y=>[y.anio,y]));
   const years=[...new Set([...mapA.keys(),...mapB.keys()])].sort((a,b)=>a-b);
-  if(!years.length)return'<div class="loading">Sin datos anuales disponibles para comparar.</div>';
+  if(!years.length)return'<div class="loading">Sin datos disponibles para comparar.</div>';
 
   const rows=years.map(anio=>{
     const a=mapA.get(anio);
@@ -1106,14 +1110,14 @@ function renderAnnualDiffChartSvg(serieA,serieB,labelA,labelB,fluid){
     const col=isPos?'#24d6d0':'#f4b544';
     const leader=r.vA===r.vB?'Empate':(r.vA>r.vB?`Lidera A (${labelA})`:`Lidera B (${labelB})`);
     return`<g>
-      <title>Año ${r.anio} · ${leader} | A (${labelA}): ${formatNum(r.vA)} ${unit} | B (${labelB}): ${formatNum(r.vB)} ${unit} | Dif (A-B): ${r.diff>0?'+':''}${formatNum(r.diff)} ${unit}</title>
+      <title>${esc(r.anio)} · ${leader} | A (${labelA}): ${formatNum(r.vA)} ${unit} | B (${labelB}): ${formatNum(r.vB)} ${unit} | Dif (A-B): ${r.diff>0?'+':''}${formatNum(r.diff)} ${unit}</title>
       <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity=".9"/>
       <text x="${cx.toFixed(1)}" y="${(isPos?by-4:by+bh+10).toFixed(1)}" fill="#eaf4f8" font-size="8.5" text-anchor="middle">${r.diff>0?'+':''}${formatNum(r.diff)}</text>
-      <text x="${cx.toFixed(1)}" y="${(h-6).toFixed(1)}" fill="#7f9aaa" font-size="9.5" text-anchor="middle">${r.anio}</text>
+      <text x="${cx.toFixed(1)}" y="${(h-6).toFixed(1)}" fill="#7f9aaa" font-size="9.5" text-anchor="middle">${esc(r.anio)}</text>
     </g>`;
   }).join('');
 
-  return`<div class="chart-wrap"><svg class="chart-svg" style="height:190px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Diferencia anual A menos B">${grid}${bars}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px"><span>Arriba de 0 (cian): <b>${esc(labelA)}</b> supera a <b>${esc(labelB)}</b></span><span>Abajo de 0 (ámbar): <b>${esc(labelB)}</b> supera a <b>${esc(labelA)}</b></span></div>`;
+  return`<div class="chart-wrap"><svg class="chart-svg" style="height:190px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Diferencia A menos B">${grid}${bars}</svg></div><div class="prod-foot" style="display:flex;justify-content:space-between;gap:12px"><span>Arriba de 0 (cian): <b>${esc(labelA)}</b> supera a <b>${esc(labelB)}</b></span><span>Abajo de 0 (ámbar): <b>${esc(labelB)}</b> supera a <b>${esc(labelA)}</b></span></div>`;
 }
 
 async function renderPopupCompare(forceReload=false){
@@ -1182,39 +1186,49 @@ async function renderPopupCompare(forceReload=false){
       </div>
 
       <div class="chart-card" id="annualDiffBox">
-        <div class="stat-title"><b>DIFERENCIA ANUAL (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>AÑO A AÑO (CAPÍTULO IV)</span></div>
-        <div class="loading">Calculando serie anual comparativa…</div>
+        <div class="stat-title"><b>DIFERENCIA (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>CALCULANDO…</span></div>
+        <div class="loading">Calculando comparativa…</div>
       </div>
     `;
 
-    let serieA=[],serieB=[],annualErr='';
-    try{
-      [serieA,serieB]=await Promise.all([
-        fetchAnnualForEntity(popEntityType,objA.key),
-        fetchAnnualForEntity(popEntityType,objB.key)
-      ]);
-    }catch(errAnual){
-      annualErr=errAnual?.message||'No se pudo cargar la serie anual';
-    }
+    const [serieA,serieB]=await Promise.all([
+      fetchAnnualForEntity(popEntityType,objA.key),
+      fetchAnnualForEntity(popEntityType,objB.key)
+    ]);
     if(seq!==statsSeq||!$('popupCompare').classList.contains('open'))return;
 
     const box=$('annualDiffBox');
     if(!box)return;
-    if(annualErr){
-      box.innerHTML=`<div class="stat-title"><b>DIFERENCIA ANUAL (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>AÑO A AÑO (CAPÍTULO IV)</span></div><div class="loading err">${esc(annualErr)}</div>`;
+
+    if(serieA.length||serieB.length){
+      const sumA_oil=serieA.reduce((s,y)=>s+(Number(y.petroleo_mbbl)||0),0);
+      const sumB_oil=serieB.reduce((s,y)=>s+(Number(y.petroleo_mbbl)||0),0);
+      const sumA_gas=serieA.reduce((s,y)=>s+(Number(y.gas_miles_m3)||0),0);
+      const sumB_gas=serieB.reduce((s,y)=>s+(Number(y.gas_miles_m3)||0),0);
+      const leaderOil=sumA_oil===sumB_oil?'Empate en OIL':(sumA_oil>sumB_oil?`Más OIL: ${objA.label}`:`Más OIL: ${objB.label}`);
+      const leaderGas=sumA_gas===sumB_gas?'Empate en GAS':(sumA_gas>sumB_gas?`Más GAS: ${objA.label}`:`Más GAS: ${objB.label}`);
+      box.innerHTML=`
+        <div class="stat-title"><b>DIFERENCIA ANUAL (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>${esc(leaderOil)} · ${esc(leaderGas)}</span></div>
+        ${renderAnnualDiffChartSvg(serieA,serieB,objA.label,objB.label,popFluid)}
+      `;
       return;
     }
 
-    const sumA_oil=serieA.reduce((s,y)=>s+(Number(y.petroleo_mbbl)||0),0);
-    const sumB_oil=serieB.reduce((s,y)=>s+(Number(y.petroleo_mbbl)||0),0);
-    const sumA_gas=serieA.reduce((s,y)=>s+(Number(y.gas_miles_m3)||0),0);
-    const sumB_gas=serieB.reduce((s,y)=>s+(Number(y.gas_miles_m3)||0),0);
-    const leaderOil=sumA_oil===sumB_oil?'Empate en OIL':(sumA_oil>sumB_oil?`Más OIL: ${objA.label}`:`Más OIL: ${objB.label}`);
-    const leaderGas=sumA_gas===sumB_gas?'Empate en GAS':(sumA_gas>sumB_gas?`Más GAS: ${objA.label}`:`Más GAS: ${objB.label}`);
-
+    const serie12=cat.serie_12m||[];
+    const totMes=popFluid==='gas'?(cat.resumen_mes?.gas_miles_m3||1):(cat.resumen_mes?.petroleo_mbbl_d||1);
+    const fbA=serie12.map(m=>({
+      anio:m.periodo,
+      petroleo_mbbl:Number((((Number(m.petroleo_mbbl_d)||0)*objA.oilVal)/Math.max(cat.resumen_mes?.petroleo_mbbl_d||1,1)).toFixed(2)),
+      gas_miles_m3:Number((((Number(m.gas_miles_m3)||0)*objA.gasVal)/Math.max(cat.resumen_mes?.gas_miles_m3||1,1)).toFixed(2))
+    }));
+    const fbB=serie12.map(m=>({
+      anio:m.periodo,
+      petroleo_mbbl:Number((((Number(m.petroleo_mbbl_d)||0)*objB.oilVal)/Math.max(cat.resumen_mes?.petroleo_mbbl_d||1,1)).toFixed(2)),
+      gas_miles_m3:Number((((Number(m.gas_miles_m3)||0)*objB.gasVal)/Math.max(cat.resumen_mes?.gas_miles_m3||1,1)).toFixed(2))
+    }));
     box.innerHTML=`
-      <div class="stat-title"><b>DIFERENCIA ANUAL (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>${esc(leaderOil)} · ${esc(leaderGas)}</span></div>
-      ${renderAnnualDiffChartSvg(serieA,serieB,objA.label,objB.label,popFluid)}
+      <div class="stat-title"><b>DIFERENCIA COMPARATIVA (${popFluid.toUpperCase()}) · ${esc(objA.label)} MENOS ${esc(objB.label)}</b><span>SERIE MENSUAL ESTIMADA</span></div>
+      ${renderAnnualDiffChartSvg(fbA,fbB,objA.label,objB.label,popFluid)}
     `;
   }catch(e){
     if(seq!==statsSeq||!$('popupCompareContent'))return;
