@@ -130,6 +130,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .chart-card{margin-top:10px;padding:10px 12px;border:1px solid #27566b;border-radius:10px;background:#071923}
 .chart-wrap{width:100%;overflow:hidden}
 .chart-svg{width:100%;min-width:0;height:150px;display:block}
+.pop-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:10px;align-items:start}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
 .stats-panel{padding:11px;border:1px solid #27566b;border-radius:10px;background:#071923}
 .bar-item{margin-bottom:8px}
@@ -146,7 +147,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .leaflet-control-attribution{background:#071018cc!important;color:#789!important}
 .leaflet-control-attribution a{color:var(--c)!important}
 @media(max-width:1180px){.basin-selector{grid-template-columns:repeat(2,minmax(0,1fr))}.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
+@media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid,.pop-layout{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
 </style>
 </head>
 <body>
@@ -998,43 +999,75 @@ async function fetchArgentinaCatalog(forceReload=false){
   throw Error(j?.error||'No se recibieron elementos en el ranking nacional.');
 }
 
+function inferBasinFromSigla(sigla,cat){
+  if(cat?.filtros?.provincia)return cat.filtros.provincia;
+  if(cat?.filtros?.cuenca)return `Cuenca ${cat.filtros.cuenca}`;
+  const s=String(sigla||'').toUpperCase();
+  if(s.includes('.NQ.')||s.includes('NEUQU'))return 'Cuenca Neuquina';
+  if(s.includes('.MD.')||s.includes('.MZ.')||s.includes('CUYAN'))return 'Cuenca Cuyana';
+  if(s.includes('.RN.')||s.includes('RIO NEGRO'))return 'Río Negro';
+  if(s.includes('.MA.')||s.includes('AUSTRAL'))return 'Cuenca Austral';
+  if(s.includes('.CH.')||s.includes('SAN JORGE'))return 'Golfo San Jorge';
+  return 'Argentina (Cap. IV)';
+}
+
 function getAllArgentinaItems(cat,type,fluid){
   if(!cat)return[];
   const isGas=fluid==='gas';
   if(type==='pozos'){
     const arr=isGas?(cat.ranking_pozos_gas||[]):(cat.ranking_pozos_oil||[]);
-    return arr.map(x=>({
-      key:x.sigla,
-      label:x.sigla,
-      val:Number(isGas?x.gas_miles_m3:x.petroleo_bbl_d)||0,
-      oilVal:Number(x.petroleo_bbl_d)||0,
-      gasVal:Number(x.gas_miles_m3)||0,
-      unit:isGas?'Mm³':'bbl/d',
-      sub:`${x.empresa||''} · ${x.area||''}`.replace(/^\s*·\s*|\s*·\s*$/g,'')
-    }));
+    return arr.map(x=>{
+      const op=x.empresa||'Operadora s/d';
+      const ar=x.area||'Área s/d';
+      const cu=inferBasinFromSigla(x.sigla,cat);
+      return{
+        key:x.sigla,
+        label:x.sigla,
+        empresa:op,
+        area:ar,
+        cuenca:cu,
+        val:Number(isGas?x.gas_miles_m3:x.petroleo_bbl_d)||0,
+        oilVal:Number(x.petroleo_bbl_d)||0,
+        gasVal:Number(x.gas_miles_m3)||0,
+        unit:isGas?'Mm³':'bbl/d',
+        sub:`Op: ${op} · ${ar} (${cu})`
+      };
+    });
   }
   if(type==='areas'){
     const arr=isGas?(cat.ranking_areas_gas||[]):(cat.ranking_areas_oil||[]);
-    return arr.map(x=>({
-      key:x.area,
-      label:x.area,
+    return arr.map(x=>{
+      const cu=cat?.filtros?.provincia||(cat?.filtros?.cuenca?`Cuenca ${cat.filtros.cuenca}`:'Argentina');
+      return{
+        key:x.area,
+        label:x.area,
+        empresa:'',
+        area:x.area,
+        cuenca:cu,
+        val:Number(isGas?x.gas_miles_m3:x.petroleo_mbbl_d)||0,
+        oilVal:Number(x.petroleo_mbbl_d)||0,
+        gasVal:Number(x.gas_miles_m3)||0,
+        unit:isGas?'Mm³':'Mbbl/d',
+        sub:`${cu} · ${x.pozos_activos||0} pozos activos`
+      };
+    });
+  }
+  const arr=isGas?(cat.ranking_empresas_gas||[]):(cat.ranking_empresas_oil||[]);
+  return arr.map(x=>{
+    const cu=cat?.filtros?.provincia||(cat?.filtros?.cuenca?`Cuenca ${cat.filtros.cuenca}`:'Argentina');
+    return{
+      key:x.empresa,
+      label:x.empresa,
+      empresa:x.empresa,
+      area:'',
+      cuenca:cu,
       val:Number(isGas?x.gas_miles_m3:x.petroleo_mbbl_d)||0,
       oilVal:Number(x.petroleo_mbbl_d)||0,
       gasVal:Number(x.gas_miles_m3)||0,
       unit:isGas?'Mm³':'Mbbl/d',
-      sub:`${x.pozos_activos||0} pozos activos`
-    }));
-  }
-  const arr=isGas?(cat.ranking_empresas_gas||[]):(cat.ranking_empresas_oil||[]);
-  return arr.map(x=>({
-    key:x.empresa,
-    label:x.empresa,
-    val:Number(isGas?x.gas_miles_m3:x.petroleo_mbbl_d)||0,
-    oilVal:Number(x.petroleo_mbbl_d)||0,
-    gasVal:Number(x.gas_miles_m3)||0,
-    unit:isGas?'Mm³':'Mbbl/d',
-    sub:`${x.pozos_activos||0} pozos activos`
-  }));
+      sub:`${cu} · ${x.pozos_activos||0} pozos activos`
+    };
+  });
 }
 
 async function fetchAnnualForEntity(type,key){
@@ -1152,28 +1185,49 @@ async function renderPopupCompare(forceReload=false){
     const ratioMes=objB.val?`${formatNum(objA.val/objB.val)}x`:'—';
     const leaderMes=objA.val===objB.val?'Empate':(objA.val>objB.val?objA.label:objB.label);
 
-    $('popupCompareContent').innerHTML=`
-      <div class="metrics" style="margin-top:8px">
-        <div class="metric">
-          <span>A · ${esc(objA.label)} (${esc(cat.periodo?.label||'MES')})</span>
-          <strong class="c">${formatNum(objA.val)}</strong>
-          <small>${esc(objA.unit)} · ${esc(objA.sub)}</small>
+    const sideNoteHtml=`
+      <div class="chart-card" style="margin-top:8px">
+        <div class="stat-title"><b>ZONA &amp; ALCANCE DEL LISTADO</b><span>NOTA</span></div>
+        <div class="kv">
+          <div class="row"><span>Cuenca / Zona A</span><b>${esc(objA.cuenca||'—')}${objA.area?' · '+esc(objA.area):''}</b></div>
+          <div class="row"><span>Cuenca / Zona B</span><b>${esc(objB.cuenca||'—')}${objB.area?' · '+esc(objB.area):''}</b></div>
+          ${objA.empresa?`<div class="row"><span>Operadora A</span><b>${esc(objA.empresa)}</b></div>`:''}
+          ${objB.empresa?`<div class="row"><span>Operadora B</span><b>${esc(objB.empresa)}</b></div>`:''}
         </div>
-        <div class="metric">
-          <span>B · ${esc(objB.label)} (${esc(cat.periodo?.label||'MES')})</span>
-          <strong class="a">${formatNum(objB.val)}</strong>
-          <small>${esc(objB.unit)} · ${esc(objB.sub)}</small>
-        </div>
-        <div class="metric">
-          <span>BRECHA MENSUAL (|A - B|)</span>
-          <strong>${formatNum(diffMes)}</strong>
-          <small>${esc(objA.unit)} · Ratio A/B: ${ratioMes} · Lidera: ${esc(leaderMes)}</small>
+        <div class="prod-foot" style="margin-top:8px">
+          <b>¿Por qué no aparecen todos los pozos?</b><br>
+          Este selector muestra el <b>top de pozos más productivos</b> del ranking (no los decenas de miles del padrón completo) para responder rápido sin demoras ni cortes.
         </div>
       </div>
+    `;
 
-      <div class="chart-card" id="annualDiffBox">
-        <div class="stat-title"><b>COMPARATIVA DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)} VS. ${esc(objB.label)}</b><span>CALCULANDO…</span></div>
-        <div class="loading">Calculando comparativa…</div>
+    $('popupCompareContent').innerHTML=`
+      <div class="pop-layout">
+        <div>
+          <div class="metrics" style="margin-top:8px">
+            <div class="metric">
+              <span>A · ${esc(objA.label)} (${esc(objA.cuenca)} · ${esc(cat.periodo?.label||'MES')})</span>
+              <strong class="c">${formatNum(objA.val)}</strong>
+              <small>${esc(objA.unit)} · ${esc(objA.sub)}</small>
+            </div>
+            <div class="metric">
+              <span>B · ${esc(objB.label)} (${esc(objB.cuenca)} · ${esc(cat.periodo?.label||'MES')})</span>
+              <strong class="a">${formatNum(objB.val)}</strong>
+              <small>${esc(objB.unit)} · ${esc(objB.sub)}</small>
+            </div>
+            <div class="metric">
+              <span>BRECHA MENSUAL (|A - B|)</span>
+              <strong>${formatNum(diffMes)}</strong>
+              <small>${esc(objA.unit)} · Ratio A/B: ${ratioMes} · Lidera: ${esc(leaderMes)}</small>
+            </div>
+          </div>
+
+          <div class="chart-card" id="annualDiffBox">
+            <div class="stat-title"><b>COMPARATIVA DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)}${objA.empresa?` [${esc(objA.empresa)}]`:''} VS. ${esc(objB.label)}${objB.empresa?` [${esc(objB.empresa)}]`:''}</b><span>${esc(objA.cuenca)} / ${esc(objB.cuenca)}</span></div>
+            <div class="loading">Calculando comparativa…</div>
+          </div>
+        </div>
+        ${sideNoteHtml}
       </div>
     `;
 
@@ -1194,7 +1248,7 @@ async function renderPopupCompare(forceReload=false){
       const leaderOil=sumA_oil===sumB_oil?'Empate en OIL':(sumA_oil>sumB_oil?`Más OIL: ${objA.label}`:`Más OIL: ${objB.label}`);
       const leaderGas=sumA_gas===sumB_gas?'Empate en GAS':(sumA_gas>sumB_gas?`Más GAS: ${objA.label}`:`Más GAS: ${objB.label}`);
       box.innerHTML=`
-        <div class="stat-title"><b>COMPARATIVA ANUAL DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)} VS. ${esc(objB.label)}</b><span>${esc(leaderOil)} · ${esc(leaderGas)}</span></div>
+        <div class="stat-title"><b>COMPARATIVA ANUAL DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)}${objA.empresa?` [${esc(objA.empresa)}]`:''} VS. ${esc(objB.label)}${objB.empresa?` [${esc(objB.empresa)}]`:''}</b><span>${esc(leaderOil)} · ${esc(leaderGas)}</span></div>
         ${renderAnnualBarsSvg(serieA,serieB,objA.label,objB.label,popFluid,popFluid==='gas'?'Mm³ / año':'Mbbl / año')}
       `;
       return;
@@ -1212,7 +1266,7 @@ async function renderPopupCompare(forceReload=false){
       gas_miles_m3:Number((((Number(m.gas_miles_m3)||0)*objB.gasVal)/Math.max(cat.resumen_mes?.gas_miles_m3||1,1)).toFixed(2))
     }));
     box.innerHTML=`
-      <div class="stat-title"><b>COMPARATIVA DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)} VS. ${esc(objB.label)}</b><span>SERIE MENSUAL ESTIMADA</span></div>
+      <div class="stat-title"><b>COMPARATIVA DIRECTA (${popFluid.toUpperCase()}) · ${esc(objA.label)}${objA.empresa?` [${esc(objA.empresa)}]`:''} VS. ${esc(objB.label)}${objB.empresa?` [${esc(objB.empresa)}]`:''}</b><span>SERIE MENSUAL ESTIMADA · ${esc(objA.cuenca)}</span></div>
       ${renderAnnualBarsSvg(fbA,fbB,objA.label,objB.label,popFluid,objA.unit)}
     `;
   }catch(e){
