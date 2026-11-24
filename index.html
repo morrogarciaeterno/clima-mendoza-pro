@@ -616,7 +616,7 @@ function buildCuencaFilters(kind){
 }
 
 async function loadMendozaProductionAreas(){
-  setStatsLayout(false);current='mendozaAreas';$('title').textContent='CUENCA CUYANA · ÁREAS PRODUCTIVAS';
+  setStatsLayout(false);current='mendozaAreas';$('title').textContent='CUENCA CUYANA · ÁREAS PRODUCTIVAS';$('layer').textContent='ÁREAS MENDOZA';
   $('detail').innerHTML=mzaSubtabs('areas')+'<div class="loading">Cargando áreas productivas oficiales…</div>';
   try{
     const r=await fetch(API+'/api/mendoza/produccion-areas?limite=5000',{cache:'no-store'}),j=await r.json();
@@ -627,7 +627,7 @@ async function loadMendozaProductionAreas(){
 }
 
 async function loadMendozaPozos(){
-  setStatsLayout(false);current='mendozaPozos';$('title').textContent='CUENCA CUYANA · POZOS DE MENDOZA';
+  setStatsLayout(false);current='mendozaPozos';$('title').textContent='CUENCA CUYANA · POZOS DE MENDOZA';$('layer').textContent='POZOS MENDOZA';
   $('detail').innerHTML=mzaSubtabs('pozos')+'<div class="loading">Cargando pozos oficiales…</div>';
   try{
     const [rC,rN]=await Promise.all([fetch(API+'/api/mendoza/pozos?limite=15000&cuenca=CUYANA',{cache:'no-store'}),fetch(API+'/api/mendoza/pozos?limite=15000&cuenca=NEUQUINA',{cache:'no-store'})]);
@@ -643,11 +643,16 @@ async function loadMendozaPozos(){
 }
 
 async function loadMendozaDuctos(){
-  setStatsLayout(false);current='mendozaDuctos';$('title').textContent='CUENCA CUYANA · OLEODUCTOS Y DUCTOS';
+  setStatsLayout(false);current='mendozaDuctos';$('title').textContent='CUENCA CUYANA · OLEODUCTOS Y DUCTOS';$('layer').textContent='DUCTOS CUYANA';
   $('detail').innerHTML=mzaSubtabs('ductos')+'<div class="loading">Consultando red de ductos de Mendoza…</div>';
   try{
     const r=await fetch(API+'/api/mendoza/ductos',{cache:'no-store'}),j=await r.json();
-    if(!r.ok||!j.ok)throw Error(j.error||'Endpoint /api/mendoza/ductos pendiente en el Worker');
+    if(!r.ok||!j.ok){
+      const msg=(j.error==='Ruta no encontrada')
+        ?'Falta agregar y desplegar la ruta /api/mendoza/ductos en el Worker (territoria-energy-api.elexpreso17.workers.dev).'
+        :(j.error||'Error consultando ductos de Mendoza');
+      throw Error(msg);
+    }
     raw=j.features||[];$('layer').textContent=j.layer||'DUCTOS MENDOZA';
     buildCuencaFilters('mzaD');renderCuencaLayer(true);
   }catch(e){$('detail').innerHTML=mzaSubtabs('ductos')+'<div class="loading err">'+esc(e.message)+'</div>';}
