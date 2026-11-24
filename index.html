@@ -14,23 +14,23 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .brand{font-weight:900;letter-spacing:.12em;display:flex;align-items:center;gap:10px}
 .brand-logo{width:44px;height:44px;flex:0 0 44px}
 .brand-logo svg{width:100%;height:100%;display:block}
-.hero-logo{width:200px;height:200px;margin:0 auto 10px}
+.hero-logo{width:180px;height:180px;margin:0 auto 10px}
 .hero-logo svg{width:100%;height:100%;display:block;filter:drop-shadow(0 12px 24px rgba(0,0,0,.55))}
 .brand b{color:var(--c)}
 .status{font-size:11px;color:#bffbd8;border:1px solid var(--line);padding:8px 12px;border-radius:8px}
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--g);margin-right:7px}
 .home{display:grid;place-items:stretch;padding:12px;background:radial-gradient(circle at 50% 25%,rgba(36,214,208,.12),transparent 40%),var(--bg)}
-.hub{width:100%;height:100%;padding:28px 36px;border:1px solid #24465a;border-radius:20px;background:linear-gradient(160deg,#0e1c28,#08121b);box-shadow:0 25px 70px #0008;text-align:center;display:flex;flex-direction:column;justify-content:center}
-.hub h1{font-size:46px;letter-spacing:.12em;margin:0}
+.hub{width:100%;height:100%;padding:24px 32px;border:1px solid #24465a;border-radius:20px;background:linear-gradient(160deg,#0e1c28,#08121b);box-shadow:0 25px 70px #0008;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.hub h1{font-size:42px;letter-spacing:.12em;margin:0}
 .hub h1 b{color:var(--c)}
 .hub p{color:var(--mut);letter-spacing:.16em;font-size:12px}
 
-.basin-selector{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:1120px;width:100%;margin:28px auto 0}
-.basin-card{display:flex;flex-direction:column;justify-content:space-between;padding:22px 20px;text-align:left;border:1px solid #25485c;border-radius:16px;background:linear-gradient(160deg,#0f2230,#091520);color:var(--txt);cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.basin-selector{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;max-width:1280px;width:100%;margin:24px auto 0}
+.basin-card{display:flex;flex-direction:column;justify-content:space-between;padding:20px 18px;text-align:left;border:1px solid #25485c;border-radius:16px;background:linear-gradient(160deg,#0f2230,#091520);color:var(--txt);cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
 .basin-card:hover{border-color:var(--c);background:#122c3c;transform:translateY(-2px)}
-.basin-card .b-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.basin-card .b-tag{font-size:9px;font-weight:800;letter-spacing:.12em;padding:4px 8px;border-radius:6px;background:#081822;border:1px solid #234659;color:var(--c)}
-.basin-card b{display:block;font-size:18px;letter-spacing:.06em;margin-top:14px;color:#fff}
+.basin-card .b-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.basin-card .b-tag{font-size:8.5px;font-weight:800;letter-spacing:.1em;padding:4px 7px;border-radius:6px;background:#081822;border:1px solid #234659;color:var(--c);white-space:nowrap}
+.basin-card b{display:block;font-size:17px;letter-spacing:.06em;margin-top:14px;color:#fff}
 .basin-card small{display:block;color:var(--mut);font-size:11px;margin-top:6px;line-height:1.45}
 .basin-card .b-foot{margin-top:16px;padding-top:10px;border-top:1px solid #1f3545;font-size:10px;font-weight:700;color:var(--c);display:flex;justify-content:space-between;align-items:center}
 
@@ -45,6 +45,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 
 .launch{width:100%;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:stretch;gap:12px}
 .launch.cuyana-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.launch.rn-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:720px}
 .launch button{display:flex;flex-direction:column;justify-content:flex-start;height:100%;min-height:118px;min-width:0;padding:18px 14px;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--p);color:var(--txt);cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
 .launch button:hover{border-color:var(--c);background:#112a39;transform:translateY(-1px)}
 .btn-top{display:flex;align-items:center;gap:8px;min-width:0}
@@ -144,8 +145,8 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .leaflet-container{background:#071018}
 .leaflet-control-attribution{background:#071018cc!important;color:#789!important}
 .leaflet-control-attribution a{color:var(--c)!important}
-@media(max-width:1100px){.launch,.launch.cuyana-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.basin-selector{grid-template-columns:1fr}}
-@media(max-width:1000px){.launch,.launch.cuyana-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
+@media(max-width:1180px){.basin-selector{grid-template-columns:repeat(2,minmax(0,1fr))}.launch,.launch.cuyana-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
 </style>
 </head>
 <body>
@@ -164,7 +165,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
         <div class="hero-logo"><svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Territoria Energy"><defs><clipPath id="badgeClip2"><circle cx="110" cy="112" r="82"/></clipPath><linearGradient id="skyBand2" x1="28" y1="30" x2="192" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#194256"/><stop offset="100%" stop-color="#2a687c"/></linearGradient><linearGradient id="sunGlow2" x1="110" y1="45" x2="165" y2="125" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f6c667"/><stop offset="100%" stop-color="#d4933b"/></linearGradient><linearGradient id="riverGrad2" x1="90" y1="125" x2="125" y2="195" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#33c2cf"/><stop offset="100%" stop-color="#105e78"/></linearGradient><linearGradient id="ringMetal2" x1="25" y1="25" x2="195" y2="195" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#58e6e0"/><stop offset="50%" stop-color="#1c4a63"/><stop offset="100%" stop-color="#24d6d0"/></linearGradient></defs><g clip-path="url(#badgeClip2)"><rect x="24" y="26" width="172" height="172" fill="#0d2332"/><circle cx="110" cy="112" r="82" fill="url(#skyBand2)"/><circle cx="118" cy="108" r="64" fill="#23576b"/><circle cx="126" cy="104" r="48" fill="url(#sunGlow2)" opacity=".88"/><circle cx="130" cy="102" r="31" fill="#fbe1a1" opacity=".72"/><path d="M52 84H98C103 84 106 80.5 106 76C106 71.8 102.8 68.5 98.6 68.2C97.2 61.5 91.2 56.5 84 56.5C77.5 56.5 72 60.5 69.8 66.2C68.6 65.8 67.3 65.5 66 65.5C59.4 65.5 54 70.9 54 77.5C54 79.8 54.7 82 55.8 83.8" fill="#d9eef5" stroke="#0b2230" stroke-width="2.2"/><path d="M122 128L150 76L176 112L194 94V146H122V128Z" fill="#6f6556" stroke="#0b2230" stroke-width="2.2"/><path d="M110 56C125.5 56 138 68.5 138 84C138 103.5 110 131 110 131C110 131 82 103.5 82 84C82 68.5 94.5 56 110 56Z" fill="#0b2434" stroke="#64efe9" stroke-width="2.4"/><circle cx="110" cy="84" r="11.5" fill="#eaf6fa"/><path d="M26 134C54 128 84 134 106 144L92 196H26V134Z" fill="#3b5e47" stroke="#0b2230" stroke-width="2.2"/><path d="M194 116C168 118 144 130 130 148C118 164 114 180 112 196H194V116Z" fill="#4f7755" stroke="#0b2230" stroke-width="2.2"/><path d="M104 136C116 144 96 158 104 172C110 182 102 190 94 196H122C130 186 132 174 124 162C116 150 128 140 120 134H104Z" fill="url(#riverGrad2)" stroke="#0b2230" stroke-width="2"/><path d="M34 148L74 134L104 146V162L66 176L34 162V148Z" fill="#233746" stroke="#0b2230" stroke-width="2.2"/><path d="M58 152L69 114L79 150M62 136H75" stroke="#d8e8f0" stroke-width="2.5"/><path d="M46 122L89 102" stroke="#f0c265" stroke-width="3.6"/><path d="M87 96C94 97.5 98 103 96.5 111L88.5 108Z" fill="#f0c265" stroke="#0b2230" stroke-width="1.8"/></g><circle cx="110" cy="112" r="82" stroke="url(#ringMetal2)" stroke-width="5"/><circle cx="110" cy="112" r="86" stroke="#24d6d0" stroke-width="1" stroke-opacity=".35"/><g transform="translate(166,44) rotate(36)"><rect x="-34" y="-8" width="22" height="16" rx="2" fill="#2c7da0" stroke="#0b2230" stroke-width="2"/><rect x="12" y="-8" width="22" height="16" rx="2" fill="#2c7da0" stroke="#0b2230" stroke-width="2"/><rect x="-9" y="-10" width="18" height="20" rx="3" fill="#dcebf2" stroke="#0b2230" stroke-width="2"/></g></svg></div>
         <h1>TERRITORIA <b>ENERGY</b></h1>
         <p>SHALE &amp; CONVENTIONAL OIL &amp; GAS INTELLIGENCE PLATFORM</p>
-        <p style="margin-top:-2px;color:#c5dce6">SELECCIONÁ UNA CUENCA PARA EXPLORAR INFRAESTRUCTURA Y PRODUCCIÓN</p>
+        <p style="margin-top:-2px;color:#c5dce6">SELECCIONÁ UNA CUENCA O JURISDICCIÓN PARA EXPLORAR INFRAESTRUCTURA Y PRODUCCIÓN</p>
 
         <div class="basin-selector">
           <button class="basin-card" onclick="selectBasin('NEUQUINA')">
@@ -174,7 +175,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
                 <span class="b-tag">VACA MUERTA · NEUQUÉN</span>
               </div>
               <b>CUENCA NEUQUINA</b>
-              <small>Padrón de pozos, locaciones de superficie, oleoductos, gasoductos, plantas, puntos de medición y concesiones.</small>
+              <small>Padrón de pozos, locaciones de superficie, oleoductos, gasoductos, plantas, medición y concesiones.</small>
             </div>
             <div class="b-foot"><span>6 MÓDULOS OPERATIVOS</span><span>INGRESAR →</span></div>
           </button>
@@ -186,19 +187,31 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
                 <span class="b-tag" style="color:#f4b544">MENDOZA · CUYO</span>
               </div>
               <b>CUENCA CUYANA</b>
-              <small>Pozos, áreas productivas, oleoductos/gasoductos, baterías/upstream, medición, plantas y estadísticas de Mendoza.</small>
+              <small>Pozos, áreas productivas, ductos Res. 319/gas, baterías/upstream, medición, plantas y estadísticas.</small>
             </div>
             <div class="b-foot"><span style="color:#f4b544">5 MÓDULOS OPERATIVOS</span><span style="color:#f4b544">INGRESAR →</span></div>
           </button>
 
-          <button class="basin-card" onclick="openEstadisticas('TODAS')">
+          <button class="basin-card" onclick="selectBasin('RIONEGRO')">
+            <div>
+              <div class="b-head">
+                <span class="btn-ico" style="color:#58e6e0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17c4-4 7-4 10 0s6 4 8 0"/><path d="M3 12c4-4 7-4 10 0s6 4 8 0"/><path d="M12 3v5"/></svg></span>
+                <span class="b-tag" style="color:#58e6e0">PATAGONIA · VACA MUERTA</span>
+              </div>
+              <b>RÍO NEGRO</b>
+              <small>Producción mensual Capítulo IV, rankings de áreas/operadoras/pozos y ductos Res. 319 en Río Negro.</small>
+            </div>
+            <div class="b-foot"><span style="color:#58e6e0">2 MÓDULOS OPERATIVOS</span><span style="color:#58e6e0">INGRESAR →</span></div>
+          </button>
+
+          <button class="basin-card" onclick="openEstadisticas('TODAS','')">
             <div>
               <div class="b-head">
                 <span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span>
                 <span class="b-tag" style="color:#31d67b">CAPÍTULO IV · SE</span>
               </div>
               <b>ESTADÍSTICAS NACIONALES</b>
-              <small>Serie histórica de 12 meses en Mbbl/d y Mm³, variación intermensual (MoM) y rankings de áreas, operadoras y pozos.</small>
+              <small>Serie histórica de 12 meses en Mbbl/d y Mm³, variación intermensual (MoM) y rankings nacionales.</small>
             </div>
             <div class="b-foot"><span style="color:#31d67b">TABLERO COMPARATIVO</span><span style="color:#31d67b">ABRIR →</span></div>
           </button>
@@ -212,8 +225,9 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
             <span class="btn-ico" style="color:#24d6d0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="11" r="7"/><circle cx="12" cy="11" r="2.5"/></svg></span>
             <div><b>CUENCA NEUQUINA</b><small>GIS NEUQUÉN · RES. 319/93 · CAPÍTULO IV</small></div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="back-btn" onclick="selectBasin('CUYANA')">CAMBIAR A CUYANA</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="back-btn" onclick="selectBasin('CUYANA')">CUYANA</button>
+            <button class="back-btn" onclick="selectBasin('RIONEGRO')">RÍO NEGRO</button>
             <button class="back-btn" onclick="showHome()">← INICIO</button>
           </div>
         </div>
@@ -223,7 +237,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
           <button onclick="openModule('ductos')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h6a2 2 0 0 0 2-2V5h4v4a4 4 0 0 1-4 4H8v5H4V9z"/><path d="M16 14h4v5h-4z"/></svg></span><b>OLEODUCTOS</b></div><small>Ductos y líneas de conducción</small></button>
           <button onclick="openModule('plantas')"><div class="btn-top"><span class="btn-ico" style="color:#58e6e0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10l6 3V8l6 3V5h6v15H3z"/><path d="M7 16h2m4 0h2m4 0h1"/></svg></span><b>PLANTAS</b></div><small>Instalaciones y medición</small></button>
           <button onclick="openModule('areas')"><div class="btn-top"><span class="btn-ico" style="color:#f4b544"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l6-2 4 2 6-2v14l-6 2-4-2-6 2V6z"/><path d="M10 4v14m4-12v14"/></svg></span><b>ÁREAS</b></div><small>Concesiones y producción real</small></button>
-          <button onclick="openEstadisticas('NEUQUINA')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span><b>ESTADÍSTICAS</b></div><small>12 meses, MoM y rankings Neuquina</small></button>
+          <button onclick="openEstadisticas('NEUQUINA','')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span><b>ESTADÍSTICAS</b></div><small>12 meses, MoM y rankings Neuquina</small></button>
         </div>
       </div>
 
@@ -234,8 +248,9 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
             <span class="btn-ico" style="color:#f4b544"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l6-2 4 2 6-2v14l-6 2-4-2-6 2V6z"/></svg></span>
             <div><b style="color:#f4b544">CUENCA CUYANA · MENDOZA</b><small>INFRAESTRUCTURA PROVINCIAL · CAPÍTULO IV</small></div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="back-btn" onclick="selectBasin('NEUQUINA')">CAMBIAR A NEUQUINA</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="back-btn" onclick="selectBasin('NEUQUINA')">NEUQUINA</button>
+            <button class="back-btn" onclick="selectBasin('RIONEGRO')">RÍO NEGRO</button>
             <button class="back-btn" onclick="showHome()">← INICIO</button>
           </div>
         </div>
@@ -244,13 +259,32 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
           <button onclick="openCuyanaModule('areas')"><div class="btn-top"><span class="btn-ico" style="color:#f4b544"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l6-2 4 2 6-2v14l-6 2-4-2-6 2V6z"/><path d="M10 4v14m4-12v14"/></svg></span><b>ÁREAS + PROD.</b></div><small>Concesiones y volúmenes acumulados</small></button>
           <button onclick="openCuyanaModule('ductos')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h6a2 2 0 0 0 2-2V5h4v4a4 4 0 0 1-4 4H8v5H4V9z"/><path d="M16 14h4v5h-4z"/></svg></span><b>OLEODUCTOS</b></div><small>Ductos Res. 319 y transporte gas</small></button>
           <button onclick="openCuyanaModule('plantas')"><div class="btn-top"><span class="btn-ico" style="color:#58e6e0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10l6 3V8l6 3V5h6v15H3z"/><path d="M7 16h2m4 0h2m4 0h1"/></svg></span><b>PLANTAS / INST.</b></div><small>Upstream, medición, plantas y nodos</small></button>
-          <button onclick="openEstadisticas('CUYANA')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span><b>ESTADÍSTICAS</b></div><small>12 meses, MoM y rankings Cuyana</small></button>
+          <button onclick="openEstadisticas('CUYANA','')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span><b>ESTADÍSTICAS</b></div><small>12 meses, MoM y rankings Cuyana</small></button>
+        </div>
+      </div>
+
+      <!-- VISTA RÍO NEGRO -->
+      <div id="viewRioNegro" class="basin-view">
+        <div class="basin-topbar">
+          <div class="basin-topbar-left">
+            <span class="btn-ico" style="color:#58e6e0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17c4-4 7-4 10 0s6 4 8 0"/><path d="M3 12c4-4 7-4 10 0s6 4 8 0"/></svg></span>
+            <div><b style="color:#58e6e0">RÍO NEGRO · PATAGONIA / VACA MUERTA</b><small>CAPÍTULO IV · RES. 319/93</small></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="back-btn" onclick="selectBasin('NEUQUINA')">NEUQUINA</button>
+            <button class="back-btn" onclick="selectBasin('CUYANA')">CUYANA</button>
+            <button class="back-btn" onclick="showHome()">← INICIO</button>
+          </div>
+        </div>
+        <div class="launch rn-grid">
+          <button onclick="openEstadisticas('TODAS','RIO NEGRO')"><div class="btn-top"><span class="btn-ico" style="color:#31d67b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="11" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></span><b>ESTADÍSTICAS RÍO NEGRO</b></div><small>12 meses, MoM y top áreas/operadoras/pozos</small></button>
+          <button onclick="openRioNegroDuctos()"><div class="btn-top"><span class="btn-ico" style="color:#58e6e0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h6a2 2 0 0 0 2-2V5h4v4a4 4 0 0 1-4 4H8v5H4V9z"/><path d="M16 14h4v5h-4z"/></svg></span><b>DUCTOS RES. 319</b></div><small>Trazas oficiales en Río Negro</small></button>
         </div>
       </div>
     </div>
   </main>
 
-  <footer><span>TERRITORIA ENERGY</span><span>GIS NEUQUÉN · MENDOZA · RES. 319/93</span><span id="foot">SISTEMA LISTO</span></footer>
+  <footer><span>TERRITORIA ENERGY</span><span>GIS NEUQUÉN · MENDOZA · RÍO NEGRO · RES. 319/93</span><span id="foot">SISTEMA LISTO</span></footer>
 </div>
 
 <div class="modal" id="modal">
@@ -280,18 +314,20 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
-let map,groupLayer,current='areas',raw=[],wellMode=false,statsSeq=0,statsCache={},statsCuenca='NEUQUINA',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
+let map,groupLayer,current='areas',raw=[],wellMode=false,statsSeq=0,statsCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
 function showHome(){
   $('homeSelector').style.display='';
   $('viewNeuquina').classList.remove('active');
   $('viewCuyana').classList.remove('active');
+  $('viewRioNegro').classList.remove('active');
 }
 function selectBasin(b){
   $('homeSelector').style.display='none';
   $('viewNeuquina').classList.toggle('active',b==='NEUQUINA');
   $('viewCuyana').classList.toggle('active',b==='CUYANA');
+  $('viewRioNegro').classList.toggle('active',b==='RIONEGRO');
 }
 
 function setStatsLayout(isStats){
@@ -340,6 +376,23 @@ async function openCuyanaModule(sub){
   if(sub==='plantas'){await loadMendozaPlantas();return}
 }
 
+async function openRioNegroDuctos(){
+  statsSeq++;setStatsLayout(false);wellMode=false;current='rnDuctos';
+  $('modal').classList.add('open');
+  $('title').textContent='RÍO NEGRO · DUCTOS RES. 319/93';
+  $('layer').textContent='DUCTOS RÍO NEGRO';
+  initMap();setTimeout(()=>map.invalidateSize(),80);
+  $('detail').innerHTML='<div class="loading">Consultando ductos oficiales en Río Negro…</div>';
+  try{
+    const r=await fetch(API+'/api/mendoza/ductos?provincia='+encodeURIComponent('RIO NEGRO')+'&limite=10000',{cache:'no-store'});
+    const j=await r.json();
+    if(!r.ok||!j.ok)throw Error(j.error||'Sin respuesta');
+    raw=j.features||[];
+    $('layer').textContent=j.layer||'DUCTOS RES. 319';
+    buildCuencaFilters();renderCuencaLayer(true);
+  }catch(e){$('detail').innerHTML='<div class="loading err">'+esc(e.message)+'</div>'}
+}
+
 function props(f){return f.properties||{}}
 function titleOf(p){return p.WELL_NAME||p.SIGLA_NACION||p.NOMBRE||p.nombre||p.nombre_tramo||p.ducto||p.LOC_NOMBRE||p.YACIMIENTO||p.OPERADOR||p.CAPA||'Elemento GIS'}
 function normOp(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase().replace(/\s+/g,' ')}
@@ -362,8 +415,8 @@ function buildGroups(){
   $('search').value='';
 }
 
-$('search').oninput=()=>['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas'].includes(current)?renderCuencaLayer(false):render(false);
-$('group').onchange=()=>['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas'].includes(current)?renderCuencaLayer(false):render(false);
+$('search').oninput=()=>['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos'].includes(current)?renderCuencaLayer(false):render(false);
+$('group').onchange=()=>['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos'].includes(current)?renderCuencaLayer(false):render(false);
 function setPlantasFilter(f){plantasFilter=f;render(false)}
 function setMzaPlantasFilter(f){mzaPlantasFilter=f;renderCuencaLayer(false)}
 
@@ -532,16 +585,18 @@ function renderBarsHtml(items,labelKey,valKey,unitSuffix,fillClass,limit=12,subF
   }).join('');
 }
 
+function statsScopeKey(){return `${statsCuenca}|${statsProvincia||'ALL'}`}
 function setStatsFluid(mode){statsFluid=mode==='gas'?'gas':'oil';paintEstadisticas()}
-function setStatsCuenca(c){statsCuenca=c;loadEstadisticasData()}
+function setStatsScope(c,prov){statsCuenca=c;statsProvincia=prov||'';loadEstadisticasData()}
 function onStatsMonthChange(val){statsMonth=String(val||'').trim();loadEstadisticasData()}
 
 function paintEstadisticas(){
   if(current!=='estadisticas')return;
-  const cacheKey=`${statsCuenca}|${statsMonth||'latest'}`;
-  const j=statsCache[cacheKey]||statsCache[`${statsCuenca}|latest`];
+  const scope=statsScopeKey();
+  const cacheKey=`${scope}|${statsMonth||'latest'}`;
+  const j=statsCache[cacheKey]||statsCache[`${scope}|latest`];
   const curMonthVal=statsMonth||(j?.periodo?.anio&&j?.periodo?.mes?`${j.periodo.anio}-${String(j.periodo.mes).padStart(2,'0')}`:'');
-  const rawPeriodos=(statsCache[`${statsCuenca}|latest`]?.periodos_disponibles)||(j?.periodos_disponibles)||(j?.serie_12m||[]).map(m=>({
+  const rawPeriodos=(statsCache[`${scope}|latest`]?.periodos_disponibles)||(j?.periodos_disponibles)||(j?.serie_12m||[]).map(m=>({
     value:`${m.anio}-${String(m.mes).padStart(2,'0')}`,
     label:m.periodo
   }));
@@ -551,10 +606,10 @@ function paintEstadisticas(){
   }).join('');
   const fallbackOpt=curMonthVal?`<option value="${esc(curMonthVal)}" selected>${esc(curMonthVal.split('-').reverse().join('/'))}</option>`:'<option value="">Último mes</option>';
   const monthControl=`<div class="month-picker"><label for="statsMonthSelect">MES/AÑO</label><select id="statsMonthSelect" onchange="onStatsMonthChange(this.value)">${mesesOpts||fallbackOpt}</select></div>`;
-  const toolbar=`<div class="stats-toolbar"><div class="stats-cuencas"><button type="button" class="${statsCuenca==='NEUQUINA'?'active':''}" onclick="setStatsCuenca('NEUQUINA')">CUENCA NEUQUINA</button><button type="button" class="${statsCuenca==='CUYANA'?'active':''}" onclick="setStatsCuenca('CUYANA')">CUENCA CUYANA</button><button type="button" class="${statsCuenca==='TODAS'?'active':''}" onclick="setStatsCuenca('TODAS')">ARGENTINA (TODAS)</button>${monthControl}</div><div class="fluid-switch" style="margin:0;min-width:200px"><button type="button" class="${statsFluid==='oil'?'active':''}" onclick="setStatsFluid('oil')">OIL</button><button type="button" class="${statsFluid==='gas'?'active':''}" onclick="setStatsFluid('gas')">GAS</button></div></div>`;
+  const toolbar=`<div class="stats-toolbar"><div class="stats-cuencas"><button type="button" class="${statsCuenca==='NEUQUINA'&&!statsProvincia?'active':''}" onclick="setStatsScope('NEUQUINA','')">CUENCA NEUQUINA</button><button type="button" class="${statsCuenca==='CUYANA'&&!statsProvincia?'active':''}" onclick="setStatsScope('CUYANA','')">CUENCA CUYANA</button><button type="button" class="${statsProvincia==='RIO NEGRO'?'active':''}" onclick="setStatsScope('TODAS','RIO NEGRO')">RÍO NEGRO</button><button type="button" class="${statsCuenca==='TODAS'&&!statsProvincia?'active':''}" onclick="setStatsScope('TODAS','')">ARGENTINA (TODAS)</button>${monthControl}</div><div class="fluid-switch" style="margin:0;min-width:200px"><button type="button" class="${statsFluid==='oil'?'active':''}" onclick="setStatsFluid('oil')">OIL</button><button type="button" class="${statsFluid==='gas'?'active':''}" onclick="setStatsFluid('gas')">GAS</button></div></div>`;
   const activeData=statsCache[cacheKey];
   if(!activeData){$('detail').innerHTML=toolbar+'<div class="loading">Calculando serie histórica, comparativa mensual y rankings…</div>';return}
-  if(!activeData.periodo){$('detail').innerHTML=toolbar+'<div class="loading err">Sin datos disponibles para el mes o cuenca seleccionado.</div>';return}
+  if(!activeData.periodo){$('detail').innerHTML=toolbar+'<div class="loading err">Sin datos disponibles para el mes o jurisdicción seleccionada.</div>';return}
   const m=activeData.resumen_mes||{},cmp=activeData.comparacion_mes_anterior||{},isGas=statsFluid==='gas';
   const areas=isGas?(activeData.ranking_areas_gas||activeData.ranking_areas||[]):(activeData.ranking_areas_oil||activeData.ranking_areas||[]);
   const emps=isGas?(activeData.ranking_empresas_gas||activeData.ranking_empresas||[]):(activeData.ranking_empresas_oil||activeData.ranking_empresas||[]);
@@ -563,8 +618,9 @@ function paintEstadisticas(){
   const pozoValKey=isGas?'gas_miles_m3':'petroleo_bbl_d',pozoUnit=isGas?'Mm³':'bbl/d';
   const petDiffStr=`${cmp.diferencia_mbbl_d>0?'+':''}${formatNum(cmp.diferencia_mbbl_d||0)} Mbbl/d`;
   const gasDiffStr=`${cmp.diferencia_gas_miles_m3>0?'+':''}${formatNum(cmp.diferencia_gas_miles_m3||0)} Mm³`;
+  const tituloScope=statsProvincia==='RIO NEGRO'?'PROVINCIA DE RÍO NEGRO':(statsCuenca==='TODAS'?'ARGENTINA · TODAS LAS CUENCAS':'CUENCA '+statsCuenca);
   $('detail').innerHTML=toolbar+`
-    <div class="banner"><b>${esc(statsCuenca==='TODAS'?'ARGENTINA · TODAS LAS CUENCAS':'CUENCA '+statsCuenca)} · PERÍODO ${esc(activeData.periodo.label)} (${isGas?'GAS':'OIL'})</b><small>SERIE DE ${(activeData.serie_12m||[]).length} MESES HASTA ${esc(activeData.periodo.label)} · COMPARATIVA VS MES ANTERIOR</small></div>
+    <div class="banner"><b>${esc(tituloScope)} · PERÍODO ${esc(activeData.periodo.label)} (${isGas?'GAS':'OIL'})</b><small>SERIE DE ${(activeData.serie_12m||[]).length} MESES HASTA ${esc(activeData.periodo.label)} · COMPARATIVA VS MES ANTERIOR</small></div>
     <div class="metrics">
       <div class="metric"><span>PETRÓLEO (${esc(activeData.periodo.label)})</span><strong class="c">${formatNum(m.petroleo_mbbl_d)}</strong><small>Mbbl/d (${formatNum(m.petroleo_m3)} m³)</small>${fmtDelta(cmp.pct_mbbl_d??cmp.pct_pet,petDiffStr,cmp.periodo_anterior)}</div>
       <div class="metric"><span>GAS (${esc(activeData.periodo.label)})</span><strong>${formatNum(m.gas_miles_m3)}</strong><small>miles m³/mes (Mm³)</small>${fmtDelta(cmp.pct_gas,gasDiffStr,cmp.periodo_anterior)}</div>
@@ -585,12 +641,14 @@ function paintEstadisticas(){
 
 async function loadEstadisticasData(){
   const seq=++statsSeq;
-  const cacheKey=`${statsCuenca}|${statsMonth||'latest'}`;
+  const scope=statsScopeKey();
+  const cacheKey=`${scope}|${statsMonth||'latest'}`;
   if(statsCache[cacheKey]){paintEstadisticas();return}
   paintEstadisticas();
   try{
     const params=new URLSearchParams({top:'15'});
     if(statsCuenca!=='TODAS')params.set('cuenca',statsCuenca);
+    if(statsProvincia)params.set('provincia',statsProvincia);
     if(statsMonth&&/^\d{4}-\d{2}$/.test(statsMonth)){
       const [y,m]=statsMonth.split('-');
       params.set('anio',String(Number(y)));
@@ -607,10 +665,13 @@ async function loadEstadisticasData(){
   }
 }
 
-async function openEstadisticas(cuencaInit){
+async function openEstadisticas(cuencaInit, provInit=''){
   if(cuencaInit)statsCuenca=cuencaInit;
+  statsProvincia=provInit||'';
   current='estadisticas';wellMode=false;$('modal').classList.add('open');
-  $('title').textContent='ESTADÍSTICAS · 12 MESES & COMPARATIVA MENSUAL';
+  $('title').textContent=statsProvincia==='RIO NEGRO'
+    ?'ESTADÍSTICAS · RÍO NEGRO (12 MESES & MoM)'
+    :'ESTADÍSTICAS · 12 MESES & COMPARATIVA MENSUAL';
   setStatsLayout(true);$('layer').textContent='CAPÍTULO IV · SE';
   await loadEstadisticasData();
 }
@@ -721,12 +782,12 @@ function renderCuencaLayer(fit){
     ?baseList.filter(f=>((f.properties||{})._CATEGORIA_MZA||'upstream')===mzaPlantasFilter)
     :baseList;
 
-  $('count').textContent=list.length+(current==='mendozaPozos'?' POZOS':current==='mendozaDuctos'?' DUCTOS':current==='mendozaPlantas'?' INSTALACIONES':' ÁREAS');
+  $('count').textContent=list.length+(current==='mendozaPozos'?' POZOS':(current==='mendozaDuctos'||current==='rnDuctos')?' DUCTOS':current==='mendozaPlantas'?' INSTALACIONES':' ÁREAS');
 
   const gj=L.geoJSON({type:'FeatureCollection',features:list},{
     style:f=>{
       const p=f.properties||{};
-      if(current==='mendozaDuctos'){
+      if(current==='mendozaDuctos'||current==='rnDuctos'){
         const gas=/GAS/.test(String(p.FLUIDO||p.fluido||p.TIPO||p.tipo||p.CAPA||'').toUpperCase());
         return{color:gas?'#f4b544':'#24d6d0',weight:3};
       }
@@ -753,6 +814,13 @@ function renderCuencaLayer(fit){
   }).addTo(groupLayer);
 
   if(fit&&gj.getBounds().isValid())map.fitBounds(gj.getBounds(),{padding:[25,25],maxZoom:current==='mendozaPozos'?12:10});
+
+  if(current==='rnDuctos'){
+    const nGas=list.filter(f=>/GAS/.test(String(((f.properties||{}).FLUIDO||(f.properties||{}).fluido||(f.properties||{}).TIPO||(f.properties||{}).tipo||'')).toUpperCase())).length;
+    const nOther=list.length-nGas;
+    $('detail').innerHTML=`<div class="legend-bar"><span><i class="dot-lg" style="background:#f4b544"></i>Gas (${nGas})</span><span><i class="dot-lg" style="background:#24d6d0"></i>Oil / Otros (${nOther})</span><span>Total: ${list.length}</span></div><div class="banner"><b>DUCTOS RES. 319 · RÍO NEGRO</b><small>${list.length} ELEMENTOS VISIBLES</small></div><div class="loading">Seleccioná un ducto en el mapa para ver sus atributos.</div>`;
+    return;
+  }
 
   const head=mzaSubtabs(current==='mendozaPozos'?'pozos':current==='mendozaDuctos'?'ductos':current==='mendozaPlantas'?'plantas':'areas');
 
@@ -787,7 +855,7 @@ function renderCuencaLayer(fit){
 async function loadCuyanaNativeContext(){
   const box=$('cuyanaBasinProd');
   if(!box)return;
-  const cacheKey='CUYANA|latest';
+  const cacheKey='CUYANA|ALL|latest';
   try{
     let j=statsCache[cacheKey];
     if(!j){
@@ -808,7 +876,7 @@ async function loadCuyanaNativeContext(){
         <div class="metric"><span>POZOS ACTIVOS</span><strong>${formatNum(m.pozos_con_petroleo)}</strong><small>en producción</small></div>
       </div>
       <div class="prod-foot">Nota: El WFS oficial informa la traza y especificaciones físicas del ducto; los caudales declarados corresponden al balance mensual de Cuenca Cuyana (Capítulo IV · SE).</div>
-      <button type="button" class="native-cta" onclick="openEstadisticas('CUYANA')">VER TABLERO ESTADÍSTICO CUYANA →</button>
+      <button type="button" class="native-cta" onclick="openEstadisticas('CUYANA','')">VER TABLERO ESTADÍSTICO CUYANA →</button>
     `;
   }catch(e){
     if(box)box.innerHTML='<div class="prod-foot">No se pudo cargar el resumen productivo de Cuenca Cuyana.</div>';
@@ -819,6 +887,14 @@ async function showCuencaFeature(f){
   const p=f.properties||{};
   if(current==='mendozaAreas'){showMendozaProductionArea(p);return}
   if(current==='mendozaPozos'){showMendozaWell(p);return}
+  if(current==='rnDuctos'){
+    const t=p.nombre_tramo||p.ducto||p.NOMBRE||p.nombre||'Ducto Río Negro';
+    const op=mzaOperatorOf(p)||'Sin dato';
+    const tipo=p.tipo||p.TIPO||p.FLUIDO||p.fluido||'Ducto Res. 319';
+    const entries=Object.entries(p).filter(([k,v])=>!k.startsWith('_')&&v!==null&&v!==''&&String(v).trim()!=='');
+    $('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'DUCTOS_RES319')+' · RÍO NEGRO')}</small></div><div class="metrics" style="margin-bottom:10px"><div class="metric"><span>INFORMANTE</span><strong title="${esc(op)}">${esc(op)}</strong></div><div class="metric"><span>TIPO / FLUIDO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div><div class="metric"><span>PROVINCIA</span><strong class="a">${esc(p.provincia||p.PROVINCIA||'RÍO NEGRO')}</strong></div></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`;
+    return;
+  }
   if(current==='mendozaPlantas'){
     const t=p.NOMBRE||p.nombre||p.DENOMINACION||p.denominacion||p.SIGLA||p.sigla||p.CAPA||'Instalación Mendoza';
     const cat=p._CATEGORIA_MZA||'instalacion';
@@ -852,7 +928,7 @@ function showMendozaWell(p){
   $('detail').innerHTML=mzaSubtabs('pozos')+`<div class="banner"><b>${esc(p.sigla||'Pozo Mendoza')}</b><small>${esc(p.area||'')} · ${esc(p.cuenca||'CUYANA')}</small></div><div class="kv">${row('Empresa',p.empresa)}${row('Área',p.area)}${row('Código área',p.cod_area)}${row('Yacimiento',p.yacimiento)}${row('Código yacimiento',p.cod_yacimiento)}${row('Formación',p.formacion)}${row('Profundidad',p.profundidad!=null?formatNum(p.profundidad)+' m':null)}${row('Cota',p.cota!=null?formatNum(p.cota)+' m':null)}${row('Clasificación',p.clasificacion)}${row('Subclasificación',p.subclasificacion)}${row('Recurso',p.tipo_recurso)}${row('Tipo pozo',p.tipopozo)}${row('Extracción',p.tipoextraccion)}${row('Estado',p.tipoestado)}</div>`;
 }
 
-fetch(API+'/health').then(r=>r.json()).then(j=>{$('apiStatus').textContent=j.ok?'API ONLINE · NEUQUÉN & MENDOZA':'API SIN RESPUESTA'}).catch(()=>{$('apiStatus').textContent='API SIN RESPUESTA';document.querySelector('.dot').style.background='var(--r)'});
+fetch(API+'/health').then(r=>r.json()).then(j=>{$('apiStatus').textContent=j.ok?'API ONLINE · NQN · MZA · RN':'API SIN RESPUESTA'}).catch(()=>{$('apiStatus').textContent='API SIN RESPUESTA';document.querySelector('.dot').style.background='var(--r)'});
 </script>
 </body>
 </html>
