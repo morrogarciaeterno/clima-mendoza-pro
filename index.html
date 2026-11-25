@@ -363,7 +363,15 @@ function setStatsLayout(isStats){
   $('detailTitle').textContent=isStats?'TABLERO ESTADÍSTICO · 12 MESES & COMPARATIVA MENSUAL':'DETALLE DEL ELEMENTO';
   if(!isStats&&map)setTimeout(()=>map.invalidateSize(),80);
 }
-function closeSatPopup(){$('satPopup').classList.remove('open')}
+function closeSatPopup(){
+  if(satMiniMap){
+    satMiniMap.remove();
+    satMiniMap=null;
+    satBaseLayer=null;
+    satOverlayGroup=null;
+  }
+  $('satPopup').classList.remove('open');
+}
 function closeModal(){rnReqSeq++;statsSeq++;satSeq++;closeSatPopup();setStatsLayout(false);$('modal').classList.remove('open')}
 
 function initMap(){
@@ -388,6 +396,13 @@ function setSatBaseTile(mode){
 }
 
 function openSatInternalPopup(lat, lon, label='Instalación'){
+  if(satMiniMap){
+    satMiniMap.remove();
+    satMiniMap=null;
+    satBaseLayer=null;
+    satOverlayGroup=null;
+  }
+
   const key=`${Number(lat).toFixed(4)},${Number(lon).toFixed(4)}`;
   const cached=satCache[key];
   const s2=cached?.optico_s2?.ultima||null;
@@ -414,19 +429,14 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
   `;
   $('satPopup').classList.add('open');
 
-  setTimeout(()=>{
-    if(!satMiniMap){
-      satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],15);
-      satOverlayGroup=L.layerGroup().addTo(satMiniMap);
-    }else{
-      satMiniMap.invalidateSize();
-      satMiniMap.setView([lat,lon],15);
-    }
+  requestAnimationFrame(()=>{
+    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],15);
+    satOverlayGroup=L.layerGroup().addTo(satMiniMap);
     setSatBaseTile('sat');
-    satOverlayGroup.clearLayers();
     L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.5,fillColor:'#24d6d0',fillOpacity:.08}).addTo(satOverlayGroup);
     L.circleMarker([lat,lon],{radius:6,color:'#071018',weight:1.5,fillColor:'#f4b544',fillOpacity:1}).bindTooltip(esc(label)).addTo(satOverlayGroup);
-  },80);
+    setTimeout(()=>satMiniMap&&satMiniMap.invalidateSize(),60);
+  });
 }
 
 function extractLatLon(geom, propsObj){
