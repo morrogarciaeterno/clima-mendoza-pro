@@ -57,6 +57,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 footer{display:flex;justify-content:space-between;align-items:center;padding:0 14px;border-top:1px solid var(--line);font-size:9px;color:var(--mut)}
 .modal{position:fixed;inset:0;background:#03090edd;backdrop-filter:blur(6px);display:none;padding:14px;z-index:2000}
 .modal.open{display:grid}
+#satPopup{z-index:2500;place-items:center}
+.sat-dialog{width:min(980px,100%);max-height:92vh;display:grid;grid-template-rows:50px 1fr;border:1px solid var(--c);border-radius:14px;overflow:hidden;background:var(--p);box-shadow:0 24px 70px #000c}
+.sat-body{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+#satMap{width:100%;height:360px;border:1px solid var(--line);border-radius:10px;background:#08141f}
+.sat-switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.sat-switch button{height:30px;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:#091823;color:var(--mut);font-size:10px;font-weight:700;cursor:pointer}
+.sat-switch button.active,.sat-switch button:hover{color:var(--c);border-color:var(--c)}
+
 .window{width:100%;height:100%;display:grid;grid-template-rows:52px 1fr;border:1px solid #284b60;border-radius:14px;overflow:hidden;background:var(--p)}
 .head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;border-bottom:1px solid var(--line);background:#08141f}
 .head h2{font-size:13px;color:var(--c);letter-spacing:.1em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -98,9 +106,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .prod-head b{font-size:10px;color:var(--c);letter-spacing:.1em}
 .prod-head span{font-size:10px;color:var(--a)}
 .prod-foot{font-size:9.5px;color:var(--mut);line-height:1.5;margin-top:8px}
-.sat-link{display:inline-block;margin-top:8px;color:var(--c);font-size:10px;font-weight:700;text-decoration:none}
-.sat-link:hover{text-decoration:underline}
-.sat-thumb{width:100%;max-height:125px;object-fit:cover;border-radius:6px;border:1px solid #295368;margin-top:8px;display:block}
+.sat-thumb{width:100%;max-height:150px;object-fit:cover;border-radius:6px;border:1px solid #295368;margin-top:8px;display:block}
 .native-cta{width:100%;margin-top:9px;height:34px;border:1px solid var(--c);border-radius:8px;background:#0b2433;color:var(--c);font-size:10px;font-weight:800;letter-spacing:.08em;cursor:pointer}
 .native-cta:hover{background:#12364a;color:#fff}
 .loading{padding:25px;text-align:center;color:var(--mut)}
@@ -318,10 +324,23 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
   </div>
 </div>
 
+<!-- POPUP INTERNO DE INSPECCIÓN SATELITAL / TERRENO -->
+<div class="modal" id="satPopup">
+  <div class="sat-dialog">
+    <div class="head">
+      <h2 id="satPopupTitle">INSPECTOR SATELITAL INTERNO</h2>
+      <div class="nav">
+        <button class="close" onclick="closeSatPopup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>CERRAR POPUP</button>
+      </div>
+    </div>
+    <div class="sat-body" id="satPopupBody"></div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
-let map,groupLayer,rnAreasGroup,rnPozosGroup,current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,statsCache={},satCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
+let map,groupLayer,rnAreasGroup,rnPozosGroup,satMiniMap,satBaseLayer,satOverlayGroup,current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,statsCache={},satCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
 let statsCompareAB=false,abType='empresas',abItemA='',abItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
@@ -344,7 +363,9 @@ function setStatsLayout(isStats){
   $('detailTitle').textContent=isStats?'TABLERO ESTADÍSTICO · 12 MESES & COMPARATIVA MENSUAL':'DETALLE DEL ELEMENTO';
   if(!isStats&&map)setTimeout(()=>map.invalidateSize(),80);
 }
-function closeModal(){rnReqSeq++;statsSeq++;satSeq++;setStatsLayout(false);$('modal').classList.remove('open')}
+function closeSatPopup(){$('satPopup').classList.remove('open')}
+function closeModal(){rnReqSeq++;statsSeq++;satSeq++;closeSatPopup();setStatsLayout(false);$('modal').classList.remove('open')}
+
 function initMap(){
   if(map)return;
   map=L.map('map',{preferCanvas:true}).setView([-38.4,-69.1],7);
@@ -352,6 +373,60 @@ function initMap(){
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
+}
+
+function setSatBaseTile(mode){
+  if(!satMiniMap)return;
+  if(satBaseLayer)satMiniMap.removeLayer(satBaseLayer);
+  satBaseLayer=mode==='osm'
+    ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'})
+    :L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Esri World Imagery'});
+  satBaseLayer.addTo(satMiniMap);
+  const bSat=$('btnSatImagery'),bOsm=$('btnSatOsm');
+  if(bSat)bSat.classList.toggle('active',mode!=='osm');
+  if(bOsm)bOsm.classList.toggle('active',mode==='osm');
+}
+
+function openSatInternalPopup(lat, lon, label='Instalación'){
+  const key=`${Number(lat).toFixed(4)},${Number(lon).toFixed(4)}`;
+  const cached=satCache[key];
+  const s2=cached?.optico_s2?.ultima||null;
+  const s1=cached?.radar_s1?.ultima||null;
+  const fmt=iso=>{
+    if(!iso)return'Sin pasada reciente';
+    const d=new Date(iso);
+    return isNaN(d)?String(iso):d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  };
+
+  $('satPopupTitle').textContent=`ZOOM SATELITAL · ${String(label).toUpperCase()}`;
+  $('satPopupBody').innerHTML=`
+    <div class="sat-switch">
+      <button type="button" id="btnSatImagery" class="active" onclick="setSatBaseTile('sat')">SATÉLITE (ZOOM DETALLE)</button>
+      <button type="button" id="btnSatOsm" onclick="setSatBaseTile('osm')">MAPA / CALLES (OSM)</button>
+      <button type="button" onclick="if(satMiniMap)satMiniMap.setView([${lat},${lon}],16)">CENTRAR 16X</button>
+    </div>
+    <div id="satMap"></div>
+    <div class="metrics">
+      <div class="metric"><span>ÓPTICO (${esc(s2?.satelite||'SENTINEL-2')})</span><strong class="c">${esc(s2?s2.nubosidad_pct+'% nubes':'Sin dato')}</strong><small>${esc(fmt(s2?.fecha))}</small></div>
+      <div class="metric"><span>RADAR SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><strong>${esc(s1?.orbita||'SAR')}</strong><small>${esc(fmt(s1?.fecha))}</small></div>
+      <div class="metric"><span>COORDENADA EXACTA</span><strong class="a">${Number(lat).toFixed(5)}, ${Number(lon).toFixed(5)}</strong><small>Círculo: 500 m · Pasadas limpias (45d): ${esc(cached?.optico_s2?.total_limpias??'—')}</small></div>
+    </div>
+  `;
+  $('satPopup').classList.add('open');
+
+  setTimeout(()=>{
+    if(!satMiniMap){
+      satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],15);
+      satOverlayGroup=L.layerGroup().addTo(satMiniMap);
+    }else{
+      satMiniMap.invalidateSize();
+      satMiniMap.setView([lat,lon],15);
+    }
+    setSatBaseTile('sat');
+    satOverlayGroup.clearLayers();
+    L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.5,fillColor:'#24d6d0',fillOpacity:.08}).addTo(satOverlayGroup);
+    L.circleMarker([lat,lon],{radius:6,color:'#071018',weight:1.5,fillColor:'#f4b544',fillOpacity:1}).bindTooltip(esc(label)).addTo(satOverlayGroup);
+  },80);
 }
 
 function extractLatLon(geom, propsObj){
@@ -371,14 +446,16 @@ function extractLatLon(geom, propsObj){
   return null;
 }
 
-function satBlockHtml(coords){
+function satBlockHtml(coords, label='Elemento'){
   if(!coords)return'';
-  return`<div id="satBox" class="prod"><div class="loading">Consultando pasadas Sentinel-2 y Sentinel-1…</div></div>`;
+  return`<div id="satBox" class="prod" data-sat-label="${esc(label)}"><div class="loading">Consultando pasadas Sentinel-2 y Sentinel-1…</div></div>`;
 }
 
 async function loadSatelitePanel(coords){
   const box=$('satBox');
   if(!box||!coords)return;
+  const label=box.getAttribute('data-sat-label')||'Elemento';
+  const safeLabel=esc(label).replace(/'/g,"\\'");
   const seq=++satSeq;
   const key=`${coords.lat.toFixed(4)},${coords.lon.toFixed(4)}`;
   try{
@@ -407,13 +484,13 @@ async function loadSatelitePanel(coords){
         <div class="row"><span>Radar SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><b>${esc(fmt(s1?.fecha))}${s1?.orbita?` · ${esc(s1.orbita)}`:''}</b></div>
         <div class="row"><span>Pasadas limpias (45d)</span><b>${esc(j.optico_s2?.total_limpias ?? 0)} ópticas · ${esc(j.radar_s1?.total_pasadas ?? 0)} SAR</b></div>
       </div>
-      ${s2?.thumbnail?`<img class="sat-thumb" src="${esc(s2.thumbnail)}" alt="Vista previa satelital" loading="lazy" onerror="this.style.display='none'">`:''}
-      ${s2?.eo_browser_url?`<a class="sat-link" href="${esc(s2.eo_browser_url)}" target="_blank" rel="noopener">Abrir en EO Browser (Zoom 15x) ↗</a>`:''}
-      <div class="prod-foot">Coordenada: ${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)} · Fuente: Copernicus Data Space (STAC)</div>
+      ${s2?.thumbnail?`<img class="sat-thumb" style="cursor:pointer" title="Tocá para ampliar en mapa con zoom" src="${esc(s2.thumbnail)}" alt="Vista previa satelital" loading="lazy" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')" onerror="this.style.display='none'">`:''}
+      <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM)</button>
+      <div class="prod-foot">Coordenada: ${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)} · Tocá la imagen o el botón para acercar</div>
     `;
   }catch(e){
     if(seq!==satSeq||!$('satBox'))return;
-    $('satBox').innerHTML=`<div class="prod-head"><b>TELEMETRÍA SATELITAL (1 KM)</b><span>COPERNICUS</span></div><div class="prod-foot err">${esc(e.message)}</div>`;
+    $('satBox').innerHTML=`<div class="prod-head"><b>TELEMETRÍA SATELITAL (1 KM)</b><span>COPERNICUS</span></div><button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM)</button><div class="prod-foot err">${esc(e.message)}</div>`;
   }
 }
 
@@ -757,7 +834,7 @@ function stamp(v){if(!v)return'Sin dato';const d=new Date(v);return isNaN(d)?Str
 async function show(f){
   const p={...props(f)},t=titleOf(p),sub=[p.ID_NQN,p.ID_DUCTO,p.LOC_ID,p.CAPA].filter(Boolean).join(' · ');
   const coords=extractLatLon(f.geometry,p);
-  const satHtml=satBlockHtml(coords);
+  const satHtml=satBlockHtml(coords,t);
 
   if(current==='areas'){
     const keys=[['ID Neuquén',p.ID_NQN],['Nombre',p.NOMBRE],['Bloque',p.BLOQUE],['Tipo de área',p.TIPO_AREA||p.TIPO],['Titular',p.TITULAR],['Operador',p.OPERADOR],['Superficie legal',p.SUP_LEGAL||p.SUPERFICIE],['Participación',p.PARTICIPACION],['Tipo de contrato',p.TIPO_CONTRATO],['Norma legal',p.NORMA_LEGAL],['Inicio contrato',p.INICIO_CONTRATO],['Fin contrato',p.FIN_CONTRATO],['Mensura',p.MENSURA],['Observaciones',p.OBSERVACIONES]];
@@ -792,7 +869,7 @@ async function loadArea(name){const box=$('areaProd');if(!box)return;try{const r
 
 async function showWell(p,coords=null){
   const name=p.WELL_NAME||p.UWI_NQN||'Pozo seleccionado';
-  $('detail').innerHTML=`<div class="banner"><b class="well-name">${esc(name)}</b><small>${esc(p.YACIMIENTO||p.FIELD_NAME||'GIS NEUQUÉN')} · ${esc(operatorOf(p)||'Sin operadora')}</small></div><div id="wellProd" class="prod"><div class="loading">Consultando producción declarada…</div></div>${satBlockHtml(coords)}<div class="kv">${[['UWI Neuquén',p.UWI_NQN],['UWI Nación',p.UWI_SEN],['Estado',p.ESTADO_GIS],['Operadora',p.OPERADOR],['Área',p.AREA_LEGAL],['Yacimiento',p.YACIMIENTO],['Formación',p.FORM_PROD],['Reservorio',p.RESERVORIO],['Profundidad',p.PROFUNDIDAD_MEDIDA],['Sistema extracción',p.SIST_EXTRACCION]].map(x=>row(...x)).join('')}</div>`;
+  $('detail').innerHTML=`<div class="banner"><b class="well-name">${esc(name)}</b><small>${esc(p.YACIMIENTO||p.FIELD_NAME||'GIS NEUQUÉN')} · ${esc(operatorOf(p)||'Sin operadora')}</small></div><div id="wellProd" class="prod"><div class="loading">Consultando producción declarada…</div></div>${satBlockHtml(coords,name)}<div class="kv">${[['UWI Neuquén',p.UWI_NQN],['UWI Nación',p.UWI_SEN],['Estado',p.ESTADO_GIS],['Operadora',p.OPERADOR],['Área',p.AREA_LEGAL],['Yacimiento',p.YACIMIENTO],['Formación',p.FORM_PROD],['Reservorio',p.RESERVORIO],['Profundidad',p.PROFUNDIDAD_MEDIDA],['Sistema extracción',p.SIST_EXTRACCION]].map(x=>row(...x)).join('')}</div>`;
   loadSatelitePanel(coords);
   const sigla=p.WELL_NAME||p.SIGLA_NACION||'',id=p.UWI_SEN||'';
   try{
@@ -1394,7 +1471,7 @@ async function showCuencaFeature(f){
     const op=mzaOperatorOf(p)||'Sin dato';
     const tipo=p.tipo||p.TIPO||p.FLUIDO||p.fluido||'Ducto Res. 319';
     const entries=Object.entries(p).filter(([k,v])=>!k.startsWith('_')&&v!==null&&v!==''&&String(v).trim()!=='');
-    $('detail').innerHTML=rnSubtabs('ductos')+`<div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'DUCTOS_RES319')+' · RÍO NEGRO')}</small></div><div class="metrics" style="margin-bottom:10px"><div class="metric"><span>INFORMANTE</span><strong title="${esc(op)}">${esc(op)}</strong></div><div class="metric"><span>TIPO / FLUIDO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div><div class="metric"><span>PROVINCIA</span><strong class="a">${esc(p.provincia||p.PROVINCIA||'RÍO NEGRO')}</strong></div></div>${satBlockHtml(coords)}<div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`;
+    $('detail').innerHTML=rnSubtabs('ductos')+`<div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'DUCTOS_RES319')+' · RÍO NEGRO')}</small></div><div class="metrics" style="margin-bottom:10px"><div class="metric"><span>INFORMANTE</span><strong title="${esc(op)}">${esc(op)}</strong></div><div class="metric"><span>TIPO / FLUIDO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div><div class="metric"><span>PROVINCIA</span><strong class="a">${esc(p.provincia||p.PROVINCIA||'RÍO NEGRO')}</strong></div></div>${satBlockHtml(coords,t)}<div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`;
     await loadSatelitePanel(coords);
     return;
   }
@@ -1402,7 +1479,7 @@ async function showCuencaFeature(f){
     const t=p.NOMBRE||p.nombre||p.DENOMINACION||p.denominacion||p.SIGLA||p.sigla||p.CAPA||'Instalación Mendoza';
     const cat=p._CATEGORIA_MZA||'instalacion';
     const entries=Object.entries(p).filter(([k,v])=>!k.startsWith('_')&&v!==null&&v!==''&&String(v).trim()!=='');
-    $('detail').innerHTML=mzaSubtabs('plantas')+`<div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'MENDOZA')+' · '+cat.toUpperCase())}</small></div>${satBlockHtml(coords)}<div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`;
+    $('detail').innerHTML=mzaSubtabs('plantas')+`<div class="banner"><b>${esc(t)}</b><small>${esc((p.CAPA||'MENDOZA')+' · '+cat.toUpperCase())}</small></div>${satBlockHtml(coords,t)}<div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>`;
     await loadSatelitePanel(coords);
     return;
   }
@@ -1419,7 +1496,7 @@ async function showCuencaFeature(f){
       <div class="metric"><span>TIPO / FLUIDO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div>
       <div class="metric"><span>DIÁMETRO</span><strong class="a">${esc(diam)}</strong><small>${esc(tramoTipo||'Sin tipo tramo')}</small></div>
     </div>
-    ${satBlockHtml(coords)}
+    ${satBlockHtml(coords,t)}
     <div id="cuyanaBasinProd" class="prod"><div class="loading">Cargando contexto productivo nativo de Cuenca Cuyana…</div></div>
     <div class="prod" style="margin-top:10px"><div class="prod-head"><b>ATRIBUTOS OFICIALES (${entries.length})</b><span>GIS MENDOZA</span></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div></div>
   `;
@@ -1429,14 +1506,16 @@ async function showCuencaFeature(f){
 function showMendozaProductionArea(p,coords=null){
   const isRn=current==='rnAreas'||current==='rnAmbos'||String(p.provincia||'').toUpperCase().includes('RIO NEGRO');
   const tabs=isRn?rnSubtabs(current==='rnAmbos'?'ambos':'areas'):mzaSubtabs('areas');
-  $('detail').innerHTML=tabs+`<div class="banner"><b>${esc(p.nombre_area||'Área')}</b><small>${esc(p.id_area||p.provincia||'')} · PRODUCCIÓN POR ÁREA</small></div><div class="metrics"><div class="metric"><span>PETRÓLEO</span><strong class="c">${formatNum(p.total_pet_m3)}</strong><small>m³</small></div><div class="metric"><span>GAS</span><strong>${formatNum(p.total_gas_m3)}</strong><small>miles m³</small></div><div class="metric"><span>POZOS ACTIVOS</span><strong>${formatNum(p.pozos_activos)}</strong><small>unidades</small></div></div>${satBlockHtml(coords)}<div class="prod"><div class="kv">${row('Operador',p.operador)}${row('Provincia',p.provincia)}${row('ID área',p.id_area)}${row('Fuente',p.CAPA||'Capítulo IV')}</div></div>`;
+  const areaTitle=p.nombre_area||'Área';
+  $('detail').innerHTML=tabs+`<div class="banner"><b>${esc(areaTitle)}</b><small>${esc(p.id_area||p.provincia||'')} · PRODUCCIÓN POR ÁREA</small></div><div class="metrics"><div class="metric"><span>PETRÓLEO</span><strong class="c">${formatNum(p.total_pet_m3)}</strong><small>m³</small></div><div class="metric"><span>GAS</span><strong>${formatNum(p.total_gas_m3)}</strong><small>miles m³</small></div><div class="metric"><span>POZOS ACTIVOS</span><strong>${formatNum(p.pozos_activos)}</strong><small>unidades</small></div></div>${satBlockHtml(coords,areaTitle)}<div class="prod"><div class="kv">${row('Operador',p.operador)}${row('Provincia',p.provincia)}${row('ID área',p.id_area)}${row('Fuente',p.CAPA||'Capítulo IV')}</div></div>`;
   loadSatelitePanel(coords);
 }
 
 function showMendozaWell(p,coords=null){
   const isRn=current==='rnPozos'||current==='rnAmbos'||String(p.provincia||'').toUpperCase().includes('RIO NEGRO');
   const tabs=isRn?rnSubtabs(current==='rnAmbos'?'ambos':'pozos'):mzaSubtabs('pozos');
-  $('detail').innerHTML=tabs+`<div class="banner"><b>${esc(p.sigla||'Pozo')}</b><small>${esc(p.area||'')} · ${esc(p.cuenca||'')}</small></div>${satBlockHtml(coords)}<div class="kv">${row('Empresa',p.empresa)}${row('Área',p.area)}${row('Código área',p.cod_area)}${row('Yacimiento',p.yacimiento)}${row('Código yacimiento',p.cod_yacimiento)}${row('Formación',p.formacion)}${row('Últ. período',p.periodo)}${row('Prod. petróleo (m³)',p.prod_pet)}${row('Prod. gas (Mm³)',p.prod_gas)}${row('Prod. agua (m³)',p.prod_agua)}${row('Profundidad',p.profundidad!=null?formatNum(p.profundidad)+' m':null)}${row('Cota',p.cota!=null?formatNum(p.cota)+' m':null)}${row('Clasificación',p.clasificacion)}${row('Subclasificación',p.subclasificacion)}${row('Recurso',p.tipo_recurso)}${row('Tipo pozo',p.tipopozo)}${row('Extracción',p.tipoextraccion)}${row('Estado',p.tipoestado)}</div>`;
+  const wellTitle=p.sigla||'Pozo';
+  $('detail').innerHTML=tabs+`<div class="banner"><b>${esc(wellTitle)}</b><small>${esc(p.area||'')} · ${esc(p.cuenca||'')}</small></div>${satBlockHtml(coords,wellTitle)}<div class="kv">${row('Empresa',p.empresa)}${row('Área',p.area)}${row('Código área',p.cod_area)}${row('Yacimiento',p.yacimiento)}${row('Código yacimiento',p.cod_yacimiento)}${row('Formación',p.formacion)}${row('Últ. período',p.periodo)}${row('Prod. petróleo (m³)',p.prod_pet)}${row('Prod. gas (Mm³)',p.prod_gas)}${row('Prod. agua (m³)',p.prod_agua)}${row('Profundidad',p.profundidad!=null?formatNum(p.profundidad)+' m':null)}${row('Cota',p.cota!=null?formatNum(p.cota)+' m':null)}${row('Clasificación',p.clasificacion)}${row('Subclasificación',p.subclasificacion)}${row('Recurso',p.tipo_recurso)}${row('Tipo pozo',p.tipopozo)}${row('Extracción',p.tipoextraccion)}${row('Estado',p.tipoestado)}</div>`;
   loadSatelitePanel(coords);
 }
 
