@@ -393,43 +393,38 @@ function heatColorByFrp(frp){
   return'#ffd029';
 }
 
-function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación', paneName=null){
+function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación'){
   if(!targetGroup)return;
   targetGroup.clearLayers();
   if(!showHeatLayer||!heatData)return;
 
-  const circleOpts=(r,col,op)=>({
-    radius:r,
-    color:col,
-    weight:1.4,
-    fillColor:col,
-    fillOpacity:op,
-    ...(paneName?{pane:paneName}:{})
-  });
-
   L.circle([lat,lon],{
     radius:(heatData.radio_km||15)*1000,
     color:'#ff9f1c',
-    weight:1.4,
-    dashArray:'5 5',
+    weight:1.5,
+    dashArray:'6 6',
     fillColor:'#ff9f1c',
-    fillOpacity:.04,
-    ...(paneName?{pane:paneName}:{})
+    fillOpacity:.05
   }).addTo(targetGroup);
 
   for(const f of (heatData.focos||[])){
     const col=heatColorByFrp(f.frp_mw);
-    const radHalo=Math.min(1100,Math.max(320,260+(Number(f.frp_mw)||0)*18));
+    const radHalo=Math.min(1400,Math.max(450,380+(Number(f.frp_mw)||0)*20));
 
-    L.circle([f.lat,f.lon],circleOpts(radHalo,col,.26)).addTo(targetGroup);
+    L.circle([f.lat,f.lon],{
+      radius:radHalo,
+      color:col,
+      weight:1.5,
+      fillColor:col,
+      fillOpacity:.32
+    }).addTo(targetGroup);
 
     L.circleMarker([f.lat,f.lon],{
-      radius:7,
-      color:'#ffffff',
-      weight:1.8,
+      radius:8,
+      color:'#071018',
+      weight:2,
       fillColor:col,
-      fillOpacity:1,
-      ...(paneName?{pane:paneName}:{})
+      fillOpacity:1
     }).bindTooltip(`🔥 ${esc(f.satelite||'FIRMS')} · FRP ${esc(f.frp_mw)} MW · ${esc(f.distancia_km)} km de ${esc(label)} · ${esc(f.fecha)} ${esc(f.hora_utc||'')} UTC`).addTo(targetGroup);
   }
 }
@@ -473,8 +468,8 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     <div class="sat-switch">
       <button type="button" id="btnSatImagery" class="active" onclick="setSatBaseTile('sat')">SATÉLITE (ZOOM DETALLE)</button>
       <button type="button" id="btnSatOsm" onclick="setSatBaseTile('osm')">MAPA / CALLES (OSM)</button>
-      <button type="button" onclick="if(satMiniMap)satMiniMap.setView([${lat},${lon}],15)">CENTRAR 15X</button>
-      <button type="button" onclick="if(satMiniMap)satMiniMap.setView([${lat},${lon}],10)">VER RADIO 15 KM (CALOR)</button>
+      <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],15);satMiniMap.invalidateSize();}">CENTRAR 15X</button>
+      <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],11);satMiniMap.invalidateSize();}">VER RADIO 15 KM (CALOR)</button>
     </div>
     <div id="satMap"></div>
     <div class="metrics" id="satPopupMetrics">
@@ -485,22 +480,16 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
   `;
   $('satPopup').classList.add('open');
 
-  requestAnimationFrame(()=>{
-    satMiniMap=L.map('satMap',{preferCanvas:false,maxZoom:18}).setView([lat,lon],14);
-    satMiniMap.createPane('satHeatPane');
-    satMiniMap.getPane('satHeatPane').style.zIndex=420;
-    satMiniMap.createPane('satInstPane');
-    satMiniMap.getPane('satInstPane').style.zIndex=450;
-
+  setTimeout(()=>{
+    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],14);
     satHeatGroup=L.layerGroup().addTo(satMiniMap);
     satOverlayGroup=L.layerGroup().addTo(satMiniMap);
     setSatBaseTile('sat');
-    paintHeatOnGroup(satHeatGroup,hCached,lat,lon,label,'satHeatPane');
-
-    L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.5,fillColor:'#24d6d0',fillOpacity:.08,pane:'satInstPane'}).addTo(satOverlayGroup);
-    L.circleMarker([lat,lon],{radius:7,color:'#071018',weight:2,fillColor:'#24d6d0',fillOpacity:1,pane:'satInstPane'}).bindTooltip('Instalación: '+esc(label)).addTo(satOverlayGroup);
-    setTimeout(()=>satMiniMap&&satMiniMap.invalidateSize(),60);
-  });
+    paintHeatOnGroup(satHeatGroup,hCached,lat,lon,label);
+    L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.8,fillColor:'#24d6d0',fillOpacity:.1}).addTo(satOverlayGroup);
+    L.circleMarker([lat,lon],{radius:8,color:'#ffffff',weight:2,fillColor:'#24d6d0',fillOpacity:1}).bindTooltip('Instalación: '+esc(label)).addTo(satOverlayGroup);
+    satMiniMap.invalidateSize();
+  },100);
 }
 
 function extractLatLon(geom, propsObj){
@@ -556,7 +545,7 @@ async function loadSatelitePanel(coords){
     if(h&&hSeq===heatSeq){
       if(mainHeatGroup)paintHeatOnGroup(mainHeatGroup,h,coords.lat,coords.lon,label);
       if(satMiniMap&&satHeatGroup&&$('satPopup')?.classList.contains('open')){
-        paintHeatOnGroup(satHeatGroup,h,coords.lat,coords.lon,label,'satHeatPane');
+        paintHeatOnGroup(satHeatGroup,h,coords.lat,coords.lon,label);
         if(satOverlayGroup)satOverlayGroup.bringToFront();
         const mEl=$('satPopupMetrics');
         if(mEl&&mEl.children[2]){
