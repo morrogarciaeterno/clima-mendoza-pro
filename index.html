@@ -402,10 +402,29 @@ function heatColorByFrp(frp){
   return'#ffd029';
 }
 
+function isFocoInWindow(f, mode='7d'){
+  if(mode==='24h'){
+    if(typeof f.ultimas_24h==='boolean')return f.ultimas_24h;
+    if(f.fecha&&f.hora_utc){
+      const ts=Date.parse(`${f.fecha}T${f.hora_utc}:00Z`);
+      if(Number.isFinite(ts))return ts>=(Date.now()-24*60*60*1000);
+    }
+    return false;
+  }
+  if(mode==='3d'){
+    if(typeof f.ultimos_3d==='boolean')return f.ultimos_3d;
+    if(f.fecha&&f.hora_utc){
+      const ts=Date.parse(`${f.fecha}T${f.hora_utc}:00Z`);
+      if(Number.isFinite(ts))return ts>=(Date.now()-3*24*60*60*1000);
+    }
+    return Boolean(f.ultimas_24h);
+  }
+  return true;
+}
+
 function getFilteredFocos(heatData, mode='7d'){
   const list=heatData?.focos||[];
-  if(mode==='24h')return list.filter(x=>Boolean(x.ultimas_24h));
-  return list;
+  return list.filter(x=>isFocoInWindow(x,mode));
 }
 
 function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación', mode='7d'){
@@ -456,7 +475,7 @@ function paintFirmsSummaryCard(heatData, mode='7d'){
   if(!el)return;
   if(!heatData){
     el.innerHTML=`
-      <div class="wx-box"><span>FOCOS TÉRMICOS (7D / 24H)</span><strong>Consultando…</strong><small>VIIRS SNPP · NOAA-20 · MODIS C6.1</small></div>
+      <div class="wx-box"><span>FOCOS TÉRMICOS (7D / 3D / 24H)</span><strong>Consultando…</strong><small>VIIRS SNPP · NOAA-20 · MODIS C6.1</small></div>
       <div class="wx-box"><span>NOCHE VS DÍA (VENTEO)</span><strong>—</strong><small>Detección nocturna vs diurna</small></div>
       <div class="wx-box"><span>FRP MÁXIMO</span><strong>—</strong><small>Potencia radiativa MW</small></div>
       <div class="wx-box"><span>FOCO MÁS CERCANO</span><strong>—</strong><small>Distancia y satélite</small></div>
@@ -468,14 +487,17 @@ function paintFirmsSummaryCard(heatData, mode='7d'){
   const diur=activeFocos.length-noct;
   const maxFrp=activeFocos.reduce((m,x)=>Math.max(m,Number(x.frp_mw)||0),0);
   const near=activeFocos[0]||null;
-  const count24h=heatData.focos_24h ?? (heatData.focos||[]).filter(x=>x.ultimas_24h).length;
+  const count24h=getFilteredFocos(heatData,'24h').length;
+  const count3d=getFilteredFocos(heatData,'3d').length;
   const count7d=heatData.total_focos ?? (heatData.focos||[]).length;
+  const labelWin=mode==='24h'?'ÚLTIMAS 24H':(mode==='3d'?'ÚLTIMOS 3 DÍAS':'ÚLTIMOS 7 DÍAS');
+  const activeCount=mode==='24h'?count24h:(mode==='3d'?count3d:count7d);
 
   el.innerHTML=`
     <div class="wx-box">
-      <span>FOCOS ${mode==='24h'?'ÚLTIMAS 24H':'ÚLTIMOS 7 DÍAS'}</span>
-      <strong class="a">${mode==='24h'?count24h+' focos (24h)':count7d+' focos (7d)'}</strong>
-      <small>24h: ${count24h} · 7d: ${count7d} · Radio ${esc(heatData.radio_km||15)} km</small>
+      <span>FOCOS ${labelWin}</span>
+      <strong class="a">${activeCount} focos (${mode})</strong>
+      <small>24h: ${count24h} · 3d: ${count3d} · 7d: ${count7d}</small>
     </div>
     <div class="wx-box">
       <span>NOCHE VS DÍA (VENTEO)</span>
@@ -485,7 +507,7 @@ function paintFirmsSummaryCard(heatData, mode='7d'){
     <div class="wx-box">
       <span>FRP MÁXIMO</span>
       <strong>${formatNum(maxFrp)} MW</strong>
-      <small>Potencia radiativa máxima en filtro</small>
+      <small>Potencia radiativa máxima en ${mode}</small>
     </div>
     <div class="wx-box">
       <span>FOCO MÁS CERCANO</span>
@@ -496,9 +518,10 @@ function paintFirmsSummaryCard(heatData, mode='7d'){
 }
 
 function setSatHeatMode(mode){
-  satHeatMode=mode==='24h'?'24h':'7d';
-  const b7=$('btnHeat7d'),b24=$('btnHeat24h');
+  satHeatMode=mode==='24h'?'24h':(mode==='3d'?'3d':'7d');
+  const b7=$('btnHeat7d'),b3=$('btnHeat3d'),b24=$('btnHeat24h');
   if(b7)b7.classList.toggle('active',satHeatMode==='7d');
+  if(b3)b3.classList.toggle('active',satHeatMode==='3d');
   if(b24)b24.classList.toggle('active',satHeatMode==='24h');
   if(lastSatCoords){
     const key=`${Number(lastSatCoords.lat).toFixed(4)},${Number(lastSatCoords.lon).toFixed(4)}`;
@@ -644,6 +667,7 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
       <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],16);satMiniMap.invalidateSize();}">VER PLANTA (ZOOM 16X)</button>
       <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],11);satMiniMap.invalidateSize();}">VER RADIO 15 KM (CALOR)</button>
       <button type="button" id="btnHeat7d" class="active" onclick="setSatHeatMode('7d')">HISTÓRICO 7D</button>
+      <button type="button" id="btnHeat3d" onclick="setSatHeatMode('3d')">ÚLTIMOS 3D</button>
       <button type="button" id="btnHeat24h" onclick="setSatHeatMode('24h')">ÚLTIMAS 24H</button>
     </div>
     <div id="satMap"></div>
@@ -742,7 +766,8 @@ async function loadSatelitePanel(coords){
     const s1=j.radar_s1?.ultima||null;
     const near=h?.foco_mas_cercano||null;
     const noctCount=h?(h.nocturnos ?? (h.focos||[]).filter(x=>x.es_nocturno).length):0;
-    const count24h=h?(h.focos_24h ?? (h.focos||[]).filter(x=>x.ultimas_24h).length):0;
+    const count3d=h?getFilteredFocos(h,'3d').length:0;
+    const count24h=h?getFilteredFocos(h,'24h').length:0;
     const fmt=iso=>{
       if(!iso)return'Sin pasada reciente';
       const d=new Date(iso);
@@ -754,7 +779,7 @@ async function loadSatelitePanel(coords){
       <div class="kv">
         <div class="row"><span>Óptico (${esc(s2?.satelite||'SENTINEL-2')})</span><b>${esc(fmt(s2?.fecha))}${s2?` · ${esc(s2.nubosidad_pct)}% nubes`:''}</b></div>
         <div class="row"><span>Radar SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><b>${esc(fmt(s1?.fecha))}${s1?.orbita?` · ${esc(s1.orbita)}`:''}</b></div>
-        <div class="row"><span>Focos térmicos (7d / 24h)</span><b>${h?`${esc(h.total_focos)} (7d) · ${esc(count24h)} (24h)`:'No disponible'}</b></div>
+        <div class="row"><span>Focos (7d / 3d / 24h)</span><b>${h?`${esc(h.total_focos)} (7d) · ${esc(count3d)} (3d) · ${esc(count24h)} (24h)`:'No disponible'}</b></div>
         <div class="row"><span>Nocturnos / FRP máx.</span><b>${h?`${esc(noctCount)} noche · máx. ${formatNum(h.frp_max_mw||0)} MW`:'—'}</b></div>
         ${near?`<div class="row"><span>Foco más cercano</span><b>${esc(near.distancia_km)} km · ${esc(near.satelite||'FIRMS')} (${esc(near.frp_mw)} MW)</b></div>`:''}
       </div>
