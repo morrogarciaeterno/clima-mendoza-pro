@@ -340,7 +340,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
-let map,groupLayer,rnAreasGroup,rnPozosGroup,mainHeatGroup,satMiniMap,satBaseLayer,satOverlayGroup,satHeatGroup,showHeatLayer=true;
+let map,groupLayer,rnAreasGroup,rnPozosGroup,mainHeatGroup,satMiniMap,satBaseLayer,satOverlayGroup,satHeatGroup,showHeatLayer=true,lastSatCoords=null,lastSatLabel='Instalación';
 let current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,heatSeq=0,statsCache={},satCache={},heatCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
 let statsCompareAB=false,abType='empresas',abItemA='',abItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
@@ -398,30 +398,33 @@ function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación')
   targetGroup.clearLayers();
   if(!showHeatLayer||!heatData)return;
 
+  const radioKm=Number(heatData.radio_km)||15;
   L.circle([lat,lon],{
-    radius:(heatData.radio_km||15)*1000,
+    radius:radioKm*1000,
     color:'#ff9f1c',
-    weight:1.5,
+    weight:1.8,
     dashArray:'6 6',
     fillColor:'#ff9f1c',
-    fillOpacity:.05
+    fillOpacity:.06
   }).addTo(targetGroup);
 
   for(const f of (heatData.focos||[])){
+    const fLat=Number(f.lat), fLon=Number(f.lon);
+    if(!Number.isFinite(fLat)||!Number.isFinite(fLon))continue;
     const col=heatColorByFrp(f.frp_mw);
-    const radHalo=Math.min(1400,Math.max(450,380+(Number(f.frp_mw)||0)*20));
+    const radHalo=Math.min(1600,Math.max(550,450+(Number(f.frp_mw)||0)*22));
 
-    L.circle([f.lat,f.lon],{
+    L.circle([fLat,fLon],{
       radius:radHalo,
       color:col,
-      weight:1.5,
+      weight:1.8,
       fillColor:col,
-      fillOpacity:.32
+      fillOpacity:.35
     }).addTo(targetGroup);
 
-    L.circleMarker([f.lat,f.lon],{
-      radius:8,
-      color:'#071018',
+    L.circleMarker([fLat,fLon],{
+      radius:9,
+      color:'#ffffff',
       weight:2,
       fillColor:col,
       fillOpacity:1
@@ -436,14 +439,19 @@ function setSatBaseTile(mode){
     ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'})
     :L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Esri World Imagery'});
   satBaseLayer.addTo(satMiniMap);
-  if(satHeatGroup)satHeatGroup.bringToFront();
-  if(satOverlayGroup)satOverlayGroup.bringToFront();
+  if(lastSatCoords){
+    const key=`${Number(lastSatCoords.lat).toFixed(4)},${Number(lastSatCoords.lon).toFixed(4)}`;
+    paintHeatOnGroup(satHeatGroup,heatCache[key],lastSatCoords.lat,lastSatCoords.lon,lastSatLabel);
+  }
   const bSat=$('btnSatImagery'),bOsm=$('btnSatOsm');
   if(bSat)bSat.classList.toggle('active',mode!=='osm');
   if(bOsm)bOsm.classList.toggle('active',mode==='osm');
 }
 
 function openSatInternalPopup(lat, lon, label='Instalación'){
+  lastSatCoords={lat:Number(lat),lon:Number(lon)};
+  lastSatLabel=label;
+
   if(satMiniMap){
     satMiniMap.remove();
     satMiniMap=null;
@@ -486,10 +494,10 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     satOverlayGroup=L.layerGroup().addTo(satMiniMap);
     setSatBaseTile('sat');
     paintHeatOnGroup(satHeatGroup,hCached,lat,lon,label);
-    L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.8,fillColor:'#24d6d0',fillOpacity:.1}).addTo(satOverlayGroup);
+    L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.8,fillColor:'#24d6d0',fillOpacity:.12}).addTo(satOverlayGroup);
     L.circleMarker([lat,lon],{radius:8,color:'#ffffff',weight:2,fillColor:'#24d6d0',fillOpacity:1}).bindTooltip('Instalación: '+esc(label)).addTo(satOverlayGroup);
     satMiniMap.invalidateSize();
-  },100);
+  },120);
 }
 
 function extractLatLon(geom, propsObj){
@@ -546,7 +554,7 @@ async function loadSatelitePanel(coords){
       if(mainHeatGroup)paintHeatOnGroup(mainHeatGroup,h,coords.lat,coords.lon,label);
       if(satMiniMap&&satHeatGroup&&$('satPopup')?.classList.contains('open')){
         paintHeatOnGroup(satHeatGroup,h,coords.lat,coords.lon,label);
-        if(satOverlayGroup)satOverlayGroup.bringToFront();
+        satMiniMap.invalidateSize();
         const mEl=$('satPopupMetrics');
         if(mEl&&mEl.children[2]){
           mEl.children[2].innerHTML=`<span>MAPA DE CALOR (15 KM · 7D)</span><strong class="a">${esc(h.total_focos)} focos</strong><small>${esc(h.foco_mas_cercano?`Más cercano: ${h.foco_mas_cercano.distancia_km} km (${h.foco_mas_cercano.frp_mw} MW)`:'Sin focos en radio')}</small>`;
