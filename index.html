@@ -428,11 +428,6 @@ function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación')
   }
 }
 
-function toggleHeatVisibility(){
-  showHeatLayer=!showHeatLayer;
-  if(!showHeatLayer&&mainHeatGroup)mainHeatGroup.clearLayers();
-}
-
 function setSatBaseTile(mode){
   if(!satMiniMap)return;
   if(satBaseLayer)satMiniMap.removeLayer(satBaseLayer);
@@ -473,6 +468,7 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
       <button type="button" id="btnSatImagery" class="active" onclick="setSatBaseTile('sat')">SATÉLITE (ZOOM DETALLE)</button>
       <button type="button" id="btnSatOsm" onclick="setSatBaseTile('osm')">MAPA / CALLES (OSM)</button>
       <button type="button" onclick="if(satMiniMap)satMiniMap.setView([${lat},${lon}],15)">CENTRAR 15X</button>
+      <button type="button" onclick="if(satMiniMap)satMiniMap.setView([${lat},${lon}],10)">VER RADIO 15 KM (CALOR)</button>
     </div>
     <div id="satMap"></div>
     <div class="metrics">
