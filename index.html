@@ -58,12 +58,21 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .modal{position:fixed;inset:0;background:#03090edd;backdrop-filter:blur(6px);display:none;padding:14px;z-index:2000}
 .modal.open{display:grid}
 #satPopup{z-index:2500;place-items:center}
-.sat-dialog{width:min(980px,100%);max-height:92vh;display:grid;grid-template-rows:50px 1fr;border:1px solid var(--c);border-radius:14px;overflow:hidden;background:var(--p);box-shadow:0 24px 70px #000c}
+.sat-dialog{width:min(1120px,100%);max-height:94vh;display:grid;grid-template-rows:50px 1fr;border:1px solid var(--c);border-radius:14px;overflow:hidden;background:var(--p);box-shadow:0 24px 70px #000c}
 .sat-body{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
-#satMap{width:100%;height:360px;border:1px solid var(--line);border-radius:10px;background:#08141f}
+#satMap{width:100%;height:430px;border:1px solid var(--line);border-radius:10px;background:#08141f}
 .sat-switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .sat-switch button{height:30px;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:#091823;color:var(--mut);font-size:10px;font-weight:700;cursor:pointer}
 .sat-switch button.active,.sat-switch button:hover{color:var(--c);border-color:var(--c)}
+.wx-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wx-box{padding:10px 12px;border:1px solid #27566b;border-radius:10px;background:#071923;min-width:0}
+.wx-box span{display:block;color:var(--mut);font-size:8.5px;letter-spacing:.08em}
+.wx-box strong{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:13px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wx-box strong.c{color:var(--c)}
+.wx-box strong.a{color:var(--a)}
+.wx-box strong.g{color:var(--g)}
+.wx-box small{display:block;margin-top:4px;font-size:9px;color:var(--mut);line-height:1.35}
+.wind-arrow{display:inline-block;font-size:14px;line-height:1;color:var(--c);transition:transform .2s}
 
 .window{width:100%;height:100%;display:grid;grid-template-rows:52px 1fr;border:1px solid #284b60;border-radius:14px;overflow:hidden;background:var(--p)}
 .head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;border-bottom:1px solid var(--line);background:#08141f}
@@ -156,7 +165,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .leaflet-control-attribution{background:#071018cc!important;color:#789!important}
 .leaflet-control-attribution a{color:var(--c)!important}
 @media(max-width:1180px){.basin-selector{grid-template-columns:repeat(2,minmax(0,1fr))}.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid,.cmp-grid{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
+@media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid,.cmp-grid,.wx-strip{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
 </style>
 </head>
 <body>
@@ -324,7 +333,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
   </div>
 </div>
 
-<!-- POPUP INTERNO DE INSPECCIÓN SATELITAL / MAPA DE CALOR -->
+<!-- POPUP INTERNO DE INSPECCIÓN SATELITAL / MAPA DE CALOR / CLIMA -->
 <div class="modal" id="satPopup">
   <div class="sat-dialog">
     <div class="head">
@@ -341,7 +350,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
 let map,groupLayer,rnAreasGroup,rnPozosGroup,mainHeatGroup,satMiniMap,satBaseLayer,satOverlayGroup,satHeatGroup,showHeatLayer=true,lastSatCoords=null,lastSatLabel='Instalación';
-let current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,heatSeq=0,statsCache={},satCache={},heatCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
+let current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,heatSeq=0,wxSeq=0,statsCache={},satCache={},heatCache={},wxCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
 let statsCompareAB=false,abType='empresas',abItemA='',abItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
@@ -374,7 +383,7 @@ function closeSatPopup(){
   }
   $('satPopup').classList.remove('open');
 }
-function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;closeSatPopup();if(mainHeatGroup)mainHeatGroup.clearLayers();setStatsLayout(false);$('modal').classList.remove('open')}
+function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatPopup();if(mainHeatGroup)mainHeatGroup.clearLayers();setStatsLayout(false);$('modal').classList.remove('open')}
 
 function initMap(){
   if(map)return;
@@ -432,6 +441,93 @@ function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación')
   }
 }
 
+function degToCardinal(deg){
+  if(!Number.isFinite(Number(deg)))return'—';
+  const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+  const idx=Math.round((((Number(deg)%360)+360)%360)/22.5)%16;
+  return dirs[idx];
+}
+
+function wmoToCondition(code, cloudPct, rainMm){
+  const c=Number(code), cl=Number(cloudPct)||0, r=Number(rainMm)||0;
+  if(r>0.1||[51,53,55,56,57,61,63,65,66,67,80,81,82].includes(c))return{estado:'Lluvia / Precipitación',cls:'a'};
+  if([95,96,99].includes(c))return{estado:'Tormenta eléctrica',cls:'a'};
+  if([71,73,75,77,85,86].includes(c))return{estado:'Nieve',cls:'c'};
+  if([45,48].includes(c))return{estado:'Niebla / Bruma',cls:''};
+  if(cl>=75||[2,3].includes(c))return{estado:'Nublado',cls:''};
+  if(cl>=30||c===1)return{estado:'Parcialmente nublado',cls:'c'};
+  return{estado:'Despejado',cls:'g'};
+}
+
+function paintWeatherStrip(wx){
+  const el=$('satPopupWeather');
+  if(!el)return;
+  if(!wx){
+    el.innerHTML=`
+      <div class="wx-box"><span>VIENTO (ORIGEN)</span><strong>—</strong><small>Sin dato meteorológico</small></div>
+      <div class="wx-box"><span>SENTIDO HACIA DONDE CORRE</span><strong>—</strong><small>Rumbo de desplazamiento</small></div>
+      <div class="wx-box"><span>CIELO Y NUBOSIDAD</span><strong>—</strong><small>Cobertura de nubes</small></div>
+      <div class="wx-box"><span>LLUVIA / TEMPERATURA</span><strong>—</strong><small>Precipitación y temp.</small></div>
+    `;
+    return;
+  }
+  const fromDeg=Number(wx.winddirection_10m);
+  const toDeg=Number.isFinite(fromDeg)?((fromDeg+180)%360):null;
+  const fromCard=degToCardinal(fromDeg);
+  const toCard=degToCardinal(toDeg);
+  const cond=wmoToCondition(wx.weathercode,wx.cloudcover,wx.precipitation);
+  const windSpd=Number(wx.windspeed_10m)||0;
+  const gustSpd=Number(wx.windgusts_10m);
+  const rainVal=Number(wx.precipitation)||0;
+  const tempVal=Number(wx.temperature_2m);
+  const arrowRot=Number.isFinite(toDeg)?(toDeg-90):0;
+
+  el.innerHTML=`
+    <div class="wx-box">
+      <span>VIENTO (DESDE)</span>
+      <strong class="c">${formatNum(windSpd)} km/h · ${esc(fromCard)}</strong>
+      <small>${Number.isFinite(fromDeg)?Math.round(fromDeg)+'° origen':''}${Number.isFinite(gustSpd)?' · Ráfagas '+formatNum(gustSpd)+' km/h':''}</small>
+    </div>
+    <div class="wx-box">
+      <span>SENTIDO (CORRE HACIA)</span>
+      <strong class="g"><i class="wind-arrow" style="transform:rotate(${arrowRot}deg)">➤</i> ${esc(toCard)} (${Number.isFinite(toDeg)?Math.round(toDeg)+'°':'—'})</strong>
+      <small>Desplazamiento del aire desde ${esc(fromCard)} hacia ${esc(toCard)}</small>
+    </div>
+    <div class="wx-box">
+      <span>ESTADO DEL CIELO</span>
+      <strong class="${cond.cls}">${esc(cond.estado)}</strong>
+      <small>Nubes: ${Number.isFinite(Number(wx.cloudcover))?Math.round(Number(wx.cloudcover))+'%':'—'}</small>
+    </div>
+    <div class="wx-box">
+      <span>LLUVIA / TEMP.</span>
+      <strong class="${rainVal>0?'a':''}">${rainVal>0?formatNum(rainVal)+' mm':'Sin lluvia (0 mm)'}</strong>
+      <small>${Number.isFinite(tempVal)?'Temp: '+formatNum(tempVal)+' °C':''}${Number.isFinite(Number(wx.relativehumidity_2m))?' · HR '+Math.round(Number(wx.relativehumidity_2m))+'%':''}</small>
+    </div>
+  `;
+}
+
+async function loadPopupWeather(lat, lon){
+  const seq=++wxSeq;
+  const key=`${Number(lat).toFixed(4)},${Number(lon).toFixed(4)}`;
+  if(wxCache[key]){
+    paintWeatherStrip(wxCache[key]);
+    return;
+  }
+  try{
+    const u=`https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,relativehumidity_2m,precipitation,weathercode,cloudcover,windspeed_10m,winddirection_10m,windgusts_10m&timezone=auto`;
+    const r=await fetch(u,{cache:'no-store'});
+    const j=await r.json();
+    if(seq!==wxSeq)return;
+    const cur=j?.current||null;
+    if(cur){
+      wxCache[key]=cur;
+      paintWeatherStrip(cur);
+    }
+  }catch(_){
+    if(seq===wxSeq)paintWeatherStrip(null);
+  }
+}
+
 function setSatBaseTile(mode){
   if(!satMiniMap)return;
   if(satBaseLayer)satMiniMap.removeLayer(satBaseLayer);
@@ -463,6 +559,7 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
   const key=`${Number(lat).toFixed(4)},${Number(lon).toFixed(4)}`;
   const cached=satCache[key];
   const hCached=heatCache[key];
+  const wCached=wxCache[key];
   const s2=cached?.optico_s2?.ultima||null;
   const s1=cached?.radar_s1?.ultima||null;
   const fmt=iso=>{
@@ -471,7 +568,7 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     return isNaN(d)?String(iso):d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   };
 
-  $('satPopupTitle').textContent=`ZOOM SATELITAL & CALOR · ${String(label).toUpperCase()}`;
+  $('satPopupTitle').textContent=`ZOOM SATELITAL, CLIMA & CALOR · ${String(label).toUpperCase()}`;
   $('satPopupBody').innerHTML=`
     <div class="sat-switch">
       <button type="button" id="btnSatImagery" class="active" onclick="setSatBaseTile('sat')">SATÉLITE (ZOOM DETALLE)</button>
@@ -480,6 +577,12 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
       <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],11);satMiniMap.invalidateSize();}">VER RADIO 15 KM (CALOR)</button>
     </div>
     <div id="satMap"></div>
+    <div class="wx-strip" id="satPopupWeather">
+      <div class="wx-box"><span>VIENTO &amp; CLIMA</span><strong>Consultando…</strong><small>Obteniendo viento, sentido, nubes y lluvia…</small></div>
+      <div class="wx-box"><span>SENTIDO HACIA DONDE CORRE</span><strong>—</strong><small>Rumbo de desplazamiento</small></div>
+      <div class="wx-box"><span>CIELO Y NUBOSIDAD</span><strong>—</strong><small>Cobertura de nubes</small></div>
+      <div class="wx-box"><span>LLUVIA / TEMPERATURA</span><strong>—</strong><small>Precipitación y temp.</small></div>
+    </div>
     <div class="metrics" id="satPopupMetrics">
       <div class="metric"><span>ÓPTICO (${esc(s2?.satelite||'SENTINEL-2')})</span><strong class="c">${esc(s2?s2.nubosidad_pct+'% nubes':'Sin dato')}</strong><small>${esc(fmt(s2?.fecha))}</small></div>
       <div class="metric"><span>RADAR SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><strong>${esc(s1?.orbita||'SAR')}</strong><small>${esc(fmt(s1?.fecha))}</small></div>
@@ -487,6 +590,8 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     </div>
   `;
   $('satPopup').classList.add('open');
+  if(wCached)paintWeatherStrip(wCached);
+  loadPopupWeather(lat,lon);
 
   setTimeout(()=>{
     satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],14);
@@ -582,17 +687,17 @@ async function loadSatelitePanel(coords){
         ${near?`<div class="row"><span>Foco más cercano</span><b>${esc(near.distancia_km)} km · ${esc(near.frp_mw)} MW (${esc(near.periodo)})</b></div>`:''}
       </div>
       ${s2?.thumbnail?`<img class="sat-thumb" style="cursor:pointer" title="Tocá para ampliar en mapa con zoom" src="${esc(s2.thumbnail)}" alt="Vista previa satelital" loading="lazy" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')" onerror="this.style.display='none'">`:''}
-      <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM + CALOR)</button>
+      <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM + CLIMA + CALOR)</button>
       <div class="prod-foot">Coordenada: ${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)} · Halo térmico marcado en mapa</div>
     `;
   }catch(e){
     if(sSeq!==satSeq||!$('satBox'))return;
-    $('satBox').innerHTML=`<div class="prod-head"><b>TELEMETRÍA SATELITAL</b><span>COPERNICUS</span></div><button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM)</button><div class="prod-foot err">${esc(e.message)}</div>`;
+    $('satBox').innerHTML=`<div class="prod-head"><b>TELEMETRÍA SATELITAL</b><span>COPERNICUS</span></div><button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM + CLIMA)</button><div class="prod-foot err">${esc(e.message)}</div>`;
   }
 }
 
 async function openModule(type){
-  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);current=type;wellMode=type==='pozos';plantasFilter='all';
+  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);current=type;wellMode=type==='pozos';plantasFilter='all';
   $('modal').classList.add('open');
   $('title').textContent=({
     pozos:'CUENCA NEUQUINA · PADRÓN DE POZOS',
@@ -614,7 +719,7 @@ async function openModule(type){
 }
 
 async function openCuyanaModule(sub){
-  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;mzaPlantasFilter='all';
+  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);wellMode=false;mzaPlantasFilter='all';
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='areas'){await loadMendozaProductionAreas();return}
@@ -633,7 +738,7 @@ function rnSubtabs(active){
 }
 
 async function openRioNegroModule(sub){
-  statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;
+  statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);wellMode=false;
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='ambos'){await loadRioNegroAmbos();return}
@@ -644,7 +749,7 @@ async function openRioNegroModule(sub){
 
 async function loadRioNegroAmbos(){
   const seq=++rnReqSeq;
-  statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
+  statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
   $('modal').classList.add('open');
   $('title').textContent='RÍO NEGRO · ÁREAS + POZOS EN MAPA (CAP. IV)';
   $('layer').textContent='ÁREAS + POZOS · RN';
@@ -753,7 +858,7 @@ function renderRioNegroCombined(fit){
 
 async function openRioNegroDuctos(){
   const seq=++rnReqSeq;
-  statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;current='rnDuctos';
+  statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);wellMode=false;current='rnDuctos';
   $('modal').classList.add('open');
   $('title').textContent='RÍO NEGRO · DUCTOS RES. 319/93';
   $('layer').textContent='DUCTOS RÍO NEGRO';
@@ -776,7 +881,7 @@ async function openRioNegroDuctos(){
 
 async function loadRioNegroAreas(){
   const seq=++rnReqSeq;
-  satSeq++;heatSeq++;setStatsLayout(false);current='rnAreas';
+  satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);current='rnAreas';
   $('title').textContent='RÍO NEGRO · ÁREAS PRODUCTIVAS (CAP. IV)';
   $('layer').textContent='ÁREAS RÍO NEGRO';
   map.setView([-39.2,-67.8],8);
@@ -796,7 +901,7 @@ async function loadRioNegroAreas(){
 
 async function loadRioNegroPozos(){
   const seq=++rnReqSeq;
-  satSeq++;heatSeq++;setStatsLayout(false);current='rnPozos';
+  satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);current='rnPozos';
   $('title').textContent='RÍO NEGRO · POZOS DECLARADOS (CAP. IV)';
   $('layer').textContent='POZOS RÍO NEGRO';
   map.setView([-39.2,-67.8],8);
