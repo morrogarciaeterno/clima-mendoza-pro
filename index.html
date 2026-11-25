@@ -324,7 +324,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
   </div>
 </div>
 
-<!-- POPUP INTERNO DE INSPECCIÓN SATELITAL / TERRENO -->
+<!-- POPUP INTERNO DE INSPECCIÓN SATELITAL / MAPA DE CALOR -->
 <div class="modal" id="satPopup">
   <div class="sat-dialog">
     <div class="head">
@@ -340,7 +340,8 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
-let map,groupLayer,rnAreasGroup,rnPozosGroup,satMiniMap,satBaseLayer,satOverlayGroup,current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,statsCache={},satCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
+let map,groupLayer,rnAreasGroup,rnPozosGroup,mainHeatGroup,satMiniMap,satBaseLayer,satOverlayGroup,satHeatGroup,showHeatLayer=true;
+let current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,heatSeq=0,statsCache={},satCache={},heatCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
 let statsCompareAB=false,abType='empresas',abItemA='',abItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
@@ -369,10 +370,11 @@ function closeSatPopup(){
     satMiniMap=null;
     satBaseLayer=null;
     satOverlayGroup=null;
+    satHeatGroup=null;
   }
   $('satPopup').classList.remove('open');
 }
-function closeModal(){rnReqSeq++;statsSeq++;satSeq++;closeSatPopup();setStatsLayout(false);$('modal').classList.remove('open')}
+function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;closeSatPopup();if(mainHeatGroup)mainHeatGroup.clearLayers();setStatsLayout(false);$('modal').classList.remove('open')}
 
 function initMap(){
   if(map)return;
@@ -381,6 +383,54 @@ function initMap(){
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
+  mainHeatGroup=L.layerGroup().addTo(map);
+}
+
+function heatColorByFrp(frp){
+  const v=Number(frp)||0;
+  if(v>=25)return'#ff3b30';
+  if(v>=8)return'#ff7a1a';
+  return'#ffd029';
+}
+
+function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación'){
+  if(!targetGroup)return;
+  targetGroup.clearLayers();
+  if(!showHeatLayer||!heatData)return;
+
+  L.circle([lat,lon],{
+    radius:(heatData.radio_km||15)*1000,
+    color:'#ff9f1c',
+    weight:1,
+    dashArray:'4 4',
+    fillColor:'#ff9f1c',
+    fillOpacity:.03
+  }).addTo(targetGroup);
+
+  for(const f of (heatData.focos||[])){
+    const col=heatColorByFrp(f.frp_mw);
+    const radHalo=Math.min(950,Math.max(260,220+(Number(f.frp_mw)||0)*16));
+    L.circle([f.lat,f.lon],{
+      radius:radHalo,
+      color:col,
+      weight:1,
+      fillColor:col,
+      fillOpacity:.22
+    }).addTo(targetGroup);
+
+    L.circleMarker([f.lat,f.lon],{
+      radius:5,
+      color:'#071018',
+      weight:1.2,
+      fillColor:col,
+      fillOpacity:.95
+    }).bindTooltip(`${esc(f.satelite||'FIRMS')} · FRP ${esc(f.frp_mw)} MW · ${esc(f.distancia_km)} km de ${esc(label)} · ${esc(f.fecha)} ${esc(f.hora_utc||'')} UTC`).addTo(targetGroup);
+  }
+}
+
+function toggleHeatVisibility(){
+  showHeatLayer=!showHeatLayer;
+  if(!showHeatLayer&&mainHeatGroup)mainHeatGroup.clearLayers();
 }
 
 function setSatBaseTile(mode){
@@ -390,6 +440,8 @@ function setSatBaseTile(mode){
     ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'})
     :L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Esri World Imagery'});
   satBaseLayer.addTo(satMiniMap);
+  if(satHeatGroup)satHeatGroup.bringToFront();
+  if(satOverlayGroup)satOverlayGroup.bringToFront();
   const bSat=$('btnSatImagery'),bOsm=$('btnSatOsm');
   if(bSat)bSat.classList.toggle('active',mode!=='osm');
   if(bOsm)bOsm.classList.toggle('active',mode==='osm');
@@ -401,10 +453,12 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     satMiniMap=null;
     satBaseLayer=null;
     satOverlayGroup=null;
+    satHeatGroup=null;
   }
 
   const key=`${Number(lat).toFixed(4)},${Number(lon).toFixed(4)}`;
   const cached=satCache[key];
+  const hCached=heatCache[key];
   const s2=cached?.optico_s2?.ultima||null;
   const s1=cached?.radar_s1?.ultima||null;
   const fmt=iso=>{
@@ -413,26 +467,28 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     return isNaN(d)?String(iso):d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   };
 
-  $('satPopupTitle').textContent=`ZOOM SATELITAL · ${String(label).toUpperCase()}`;
+  $('satPopupTitle').textContent=`ZOOM SATELITAL & CALOR · ${String(label).toUpperCase()}`;
   $('satPopupBody').innerHTML=`
     <div class="sat-switch">
       <button type="button" id="btnSatImagery" class="active" onclick="setSatBaseTile('sat')">SATÉLITE (ZOOM DETALLE)</button>
       <button type="button" id="btnSatOsm" onclick="setSatBaseTile('osm')">MAPA / CALLES (OSM)</button>
-      <button type="button" onclick="if(satMiniMap)satMiniMap.setView([${lat},${lon}],16)">CENTRAR 16X</button>
+      <button type="button" onclick="if(satMiniMap)satMiniMap.setView([${lat},${lon}],15)">CENTRAR 15X</button>
     </div>
     <div id="satMap"></div>
     <div class="metrics">
       <div class="metric"><span>ÓPTICO (${esc(s2?.satelite||'SENTINEL-2')})</span><strong class="c">${esc(s2?s2.nubosidad_pct+'% nubes':'Sin dato')}</strong><small>${esc(fmt(s2?.fecha))}</small></div>
       <div class="metric"><span>RADAR SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><strong>${esc(s1?.orbita||'SAR')}</strong><small>${esc(fmt(s1?.fecha))}</small></div>
-      <div class="metric"><span>COORDENADA EXACTA</span><strong class="a">${Number(lat).toFixed(5)}, ${Number(lon).toFixed(5)}</strong><small>Círculo: 500 m · Pasadas limpias (45d): ${esc(cached?.optico_s2?.total_limpias??'—')}</small></div>
+      <div class="metric"><span>MAPA DE CALOR (15 KM · 7D)</span><strong class="a">${esc(hCached?hCached.total_focos+' focos':'Consultando')}</strong><small>${esc(hCached?.foco_mas_cercano?`Más cercano: ${hCached.foco_mas_cercano.distancia_km} km (${hCached.foco_mas_cercano.frp_mw} MW)`:'Sin focos en radio')}</small></div>
     </div>
   `;
   $('satPopup').classList.add('open');
 
   requestAnimationFrame(()=>{
-    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],15);
+    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],14);
+    satHeatGroup=L.layerGroup().addTo(satMiniMap);
     satOverlayGroup=L.layerGroup().addTo(satMiniMap);
     setSatBaseTile('sat');
+    paintHeatOnGroup(satHeatGroup,hCached,lat,lon,label);
     L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.5,fillColor:'#24d6d0',fillOpacity:.08}).addTo(satOverlayGroup);
     L.circleMarker([lat,lon],{radius:6,color:'#071018',weight:1.5,fillColor:'#f4b544',fillOpacity:1}).bindTooltip(esc(label)).addTo(satOverlayGroup);
     setTimeout(()=>satMiniMap&&satMiniMap.invalidateSize(),60);
@@ -458,7 +514,7 @@ function extractLatLon(geom, propsObj){
 
 function satBlockHtml(coords, label='Elemento'){
   if(!coords)return'';
-  return`<div id="satBox" class="prod" data-sat-label="${esc(label)}"><div class="loading">Consultando pasadas Sentinel-2 y Sentinel-1…</div></div>`;
+  return`<div id="satBox" class="prod" data-sat-label="${esc(label)}"><div class="loading">Consultando pasadas Sentinel y mapa de calor…</div></div>`;
 }
 
 async function loadSatelitePanel(coords){
@@ -466,8 +522,10 @@ async function loadSatelitePanel(coords){
   if(!box||!coords)return;
   const label=box.getAttribute('data-sat-label')||'Elemento';
   const safeLabel=esc(label).replace(/'/g,"\\'");
-  const seq=++satSeq;
+  const sSeq=++satSeq;
+  const hSeq=++heatSeq;
   const key=`${coords.lat.toFixed(4)},${coords.lon.toFixed(4)}`;
+
   try{
     let j=satCache[key];
     if(!j){
@@ -477,10 +535,26 @@ async function loadSatelitePanel(coords){
       if(!r.ok||!j.ok)throw Error(j.error||'Sin respuesta satelital');
       satCache[key]=j;
     }
-    if(seq!==satSeq||!$('satBox'))return;
+
+    let h=heatCache[key];
+    if(!h){
+      const hu=`${API}/api/calor?lat=${encodeURIComponent(coords.lat)}&lon=${encodeURIComponent(coords.lon)}&radio=15&ventana=7d`;
+      const hr=await fetch(hu,{cache:'no-store'});
+      h=await hr.json();
+      if(hr.ok&&h.ok)heatCache[key]=h;
+      else h=null;
+    }
+
+    if(h&&hSeq===heatSeq&&mainHeatGroup){
+      paintHeatOnGroup(mainHeatGroup,h,coords.lat,coords.lon,label);
+      if(satMiniMap&&satHeatGroup)$('satPopup')?.classList.contains('open')&&paintHeatOnGroup(satHeatGroup,h,coords.lat,coords.lon,label);
+    }
+
+    if(sSeq!==satSeq||!$('satBox'))return;
 
     const s2=j.optico_s2?.ultima||null;
     const s1=j.radar_s1?.ultima||null;
+    const near=h?.foco_mas_cercano||null;
     const fmt=iso=>{
       if(!iso)return'Sin pasada reciente';
       const d=new Date(iso);
@@ -488,24 +562,25 @@ async function loadSatelitePanel(coords){
     };
 
     $('satBox').innerHTML=`
-      <div class="prod-head"><b>TELEMETRÍA SATELITAL (1 KM)</b><span>S2 · S1</span></div>
+      <div class="prod-head"><b>TELEMETRÍA &amp; CALOR (15 KM)</b><span>S2 · S1 · FIRMS</span></div>
       <div class="kv">
         <div class="row"><span>Óptico (${esc(s2?.satelite||'SENTINEL-2')})</span><b>${esc(fmt(s2?.fecha))}${s2?` · ${esc(s2.nubosidad_pct)}% nubes`:''}</b></div>
         <div class="row"><span>Radar SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><b>${esc(fmt(s1?.fecha))}${s1?.orbita?` · ${esc(s1.orbita)}`:''}</b></div>
-        <div class="row"><span>Pasadas limpias (45d)</span><b>${esc(j.optico_s2?.total_limpias ?? 0)} ópticas · ${esc(j.radar_s1?.total_pasadas ?? 0)} SAR</b></div>
+        <div class="row"><span>Focos térmicos (7d · 15 km)</span><b>${h?`${esc(h.total_focos)} detecciones`:'No disponible'}</b></div>
+        ${near?`<div class="row"><span>Foco más cercano</span><b>${esc(near.distancia_km)} km · ${esc(near.frp_mw)} MW (${esc(near.periodo)})</b></div>`:''}
       </div>
       ${s2?.thumbnail?`<img class="sat-thumb" style="cursor:pointer" title="Tocá para ampliar en mapa con zoom" src="${esc(s2.thumbnail)}" alt="Vista previa satelital" loading="lazy" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')" onerror="this.style.display='none'">`:''}
-      <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM)</button>
-      <div class="prod-foot">Coordenada: ${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)} · Tocá la imagen o el botón para acercar</div>
+      <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM + CALOR)</button>
+      <div class="prod-foot">Coordenada: ${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)} · Halo térmico marcado en mapa</div>
     `;
   }catch(e){
-    if(seq!==satSeq||!$('satBox'))return;
-    $('satBox').innerHTML=`<div class="prod-head"><b>TELEMETRÍA SATELITAL (1 KM)</b><span>COPERNICUS</span></div><button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM)</button><div class="prod-foot err">${esc(e.message)}</div>`;
+    if(sSeq!==satSeq||!$('satBox'))return;
+    $('satBox').innerHTML=`<div class="prod-head"><b>TELEMETRÍA SATELITAL</b><span>COPERNICUS</span></div><button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM)</button><div class="prod-foot err">${esc(e.message)}</div>`;
   }
 }
 
 async function openModule(type){
-  rnReqSeq++;statsSeq++;satSeq++;setStatsLayout(false);current=type;wellMode=type==='pozos';plantasFilter='all';
+  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);current=type;wellMode=type==='pozos';plantasFilter='all';
   $('modal').classList.add('open');
   $('title').textContent=({
     pozos:'CUENCA NEUQUINA · PADRÓN DE POZOS',
@@ -527,7 +602,7 @@ async function openModule(type){
 }
 
 async function openCuyanaModule(sub){
-  rnReqSeq++;statsSeq++;satSeq++;setStatsLayout(false);wellMode=false;mzaPlantasFilter='all';
+  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;mzaPlantasFilter='all';
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='areas'){await loadMendozaProductionAreas();return}
@@ -546,7 +621,7 @@ function rnSubtabs(active){
 }
 
 async function openRioNegroModule(sub){
-  statsSeq++;satSeq++;setStatsLayout(false);wellMode=false;
+  statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='ambos'){await loadRioNegroAmbos();return}
@@ -557,7 +632,7 @@ async function openRioNegroModule(sub){
 
 async function loadRioNegroAmbos(){
   const seq=++rnReqSeq;
-  statsSeq++;satSeq++;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
+  statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
   $('modal').classList.add('open');
   $('title').textContent='RÍO NEGRO · ÁREAS + POZOS EN MAPA (CAP. IV)';
   $('layer').textContent='ÁREAS + POZOS · RN';
@@ -666,7 +741,7 @@ function renderRioNegroCombined(fit){
 
 async function openRioNegroDuctos(){
   const seq=++rnReqSeq;
-  statsSeq++;satSeq++;setStatsLayout(false);wellMode=false;current='rnDuctos';
+  statsSeq++;satSeq++;heatSeq++;setStatsLayout(false);wellMode=false;current='rnDuctos';
   $('modal').classList.add('open');
   $('title').textContent='RÍO NEGRO · DUCTOS RES. 319/93';
   $('layer').textContent='DUCTOS RÍO NEGRO';
@@ -689,7 +764,7 @@ async function openRioNegroDuctos(){
 
 async function loadRioNegroAreas(){
   const seq=++rnReqSeq;
-  satSeq++;setStatsLayout(false);current='rnAreas';
+  satSeq++;heatSeq++;setStatsLayout(false);current='rnAreas';
   $('title').textContent='RÍO NEGRO · ÁREAS PRODUCTIVAS (CAP. IV)';
   $('layer').textContent='ÁREAS RÍO NEGRO';
   map.setView([-39.2,-67.8],8);
@@ -709,7 +784,7 @@ async function loadRioNegroAreas(){
 
 async function loadRioNegroPozos(){
   const seq=++rnReqSeq;
-  satSeq++;setStatsLayout(false);current='rnPozos';
+  satSeq++;heatSeq++;setStatsLayout(false);current='rnPozos';
   $('title').textContent='RÍO NEGRO · POZOS DECLARADOS (CAP. IV)';
   $('layer').textContent='POZOS RÍO NEGRO';
   map.setView([-39.2,-67.8],8);
