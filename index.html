@@ -411,32 +411,35 @@ function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación')
   L.circle([lat,lon],{
     radius:radioKm*1000,
     color:'#ff9f1c',
-    weight:1.8,
+    weight:1.2,
+    opacity:.55,
     dashArray:'6 6',
     fillColor:'#ff9f1c',
-    fillOpacity:.06
+    fillOpacity:.015
   }).addTo(targetGroup);
 
   for(const f of (heatData.focos||[])){
     const fLat=Number(f.lat), fLon=Number(f.lon);
     if(!Number.isFinite(fLat)||!Number.isFinite(fLon))continue;
     const col=heatColorByFrp(f.frp_mw);
-    const radHalo=Math.min(1600,Math.max(550,450+(Number(f.frp_mw)||0)*22));
+    const radHalo=Math.min(1200,Math.max(380,320+(Number(f.frp_mw)||0)*18));
 
     L.circle([fLat,fLon],{
       radius:radHalo,
       color:col,
-      weight:1.8,
+      weight:1.2,
+      opacity:.7,
       fillColor:col,
-      fillOpacity:.35
+      fillOpacity:.07
     }).addTo(targetGroup);
 
     L.circleMarker([fLat,fLon],{
-      radius:9,
-      color:'#ffffff',
-      weight:2,
+      radius:6.5,
+      color:'#071018',
+      weight:1.6,
+      opacity:.9,
       fillColor:col,
-      fillOpacity:1
+      fillOpacity:.85
     }).bindTooltip(`🔥 ${esc(f.satelite||'FIRMS')} · FRP ${esc(f.frp_mw)} MW · ${esc(f.distancia_km)} km de ${esc(label)} · ${esc(f.fecha)} ${esc(f.hora_utc||'')} UTC`).addTo(targetGroup);
   }
 }
@@ -573,7 +576,7 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     <div class="sat-switch">
       <button type="button" id="btnSatImagery" class="active" onclick="setSatBaseTile('sat')">SATÉLITE (ZOOM DETALLE)</button>
       <button type="button" id="btnSatOsm" onclick="setSatBaseTile('osm')">MAPA / CALLES (OSM)</button>
-      <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],15);satMiniMap.invalidateSize();}">CENTRAR 15X</button>
+      <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],16);satMiniMap.invalidateSize();}">VER PLANTA (ZOOM 16X)</button>
       <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],11);satMiniMap.invalidateSize();}">VER RADIO 15 KM (CALOR)</button>
     </div>
     <div id="satMap"></div>
@@ -594,12 +597,12 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
   loadPopupWeather(lat,lon);
 
   setTimeout(()=>{
-    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],14);
+    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],15);
     satHeatGroup=L.layerGroup().addTo(satMiniMap);
     satOverlayGroup=L.layerGroup().addTo(satMiniMap);
     setSatBaseTile('sat');
     paintHeatOnGroup(satHeatGroup,hCached,lat,lon,label);
-    L.circle([lat,lon],{radius:500,color:'#24d6d0',weight:1.8,fillColor:'#24d6d0',fillOpacity:.12}).addTo(satOverlayGroup);
+    L.circle([lat,lon],{radius:250,color:'#24d6d0',weight:1.6,opacity:.85,fillColor:'#24d6d0',fillOpacity:.06}).addTo(satOverlayGroup);
     L.circleMarker([lat,lon],{radius:8,color:'#ffffff',weight:2,fillColor:'#24d6d0',fillOpacity:1}).bindTooltip('Instalación: '+esc(label)).addTo(satOverlayGroup);
     satMiniMap.invalidateSize();
   },120);
