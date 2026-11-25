@@ -349,7 +349,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const API='https://territoria-energy-api.elexpreso17.workers.dev';
-let map,groupLayer,rnAreasGroup,rnPozosGroup,mainHeatGroup,satMiniMap,satBaseLayer,satOverlayGroup,satHeatGroup,showHeatLayer=true,lastSatCoords=null,lastSatLabel='Instalación';
+let map,groupLayer,rnAreasGroup,rnPozosGroup,mainHeatGroup,satMiniMap,satBaseLayer,satOverlayGroup,satHeatGroup,showHeatLayer=true,satHeatMode='7d',lastSatCoords=null,lastSatLabel='Instalación';
 let current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',wellMode=false,rnReqSeq=0,statsSeq=0,satSeq=0,heatSeq=0,wxSeq=0,statsCache={},satCache={},heatCache={},wxCache={},statsCuenca='NEUQUINA',statsProvincia='',statsFluid='oil',statsMonth='',plantasFilter='all',mzaPlantasFilter='all';
 let statsCompareAB=false,abType='empresas',abItemA='',abItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
@@ -402,7 +402,13 @@ function heatColorByFrp(frp){
   return'#ffd029';
 }
 
-function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación'){
+function getFilteredFocos(heatData, mode='7d'){
+  const list=heatData?.focos||[];
+  if(mode==='24h')return list.filter(x=>Boolean(x.ultimas_24h));
+  return list;
+}
+
+function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación', mode='7d'){
   if(!targetGroup)return;
   targetGroup.clearLayers();
   if(!showHeatLayer||!heatData)return;
@@ -418,7 +424,8 @@ function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación')
     fillOpacity:.015
   }).addTo(targetGroup);
 
-  for(const f of (heatData.focos||[])){
+  const focos=getFilteredFocos(heatData,mode);
+  for(const f of focos){
     const fLat=Number(f.lat), fLon=Number(f.lon);
     if(!Number.isFinite(fLat)||!Number.isFinite(fLon))continue;
     const col=heatColorByFrp(f.frp_mw);
@@ -440,7 +447,64 @@ function paintHeatOnGroup(targetGroup, heatData, lat, lon, label='Instalación')
       opacity:.9,
       fillColor:col,
       fillOpacity:.85
-    }).bindTooltip(`🔥 ${esc(f.satelite||'FIRMS')} · FRP ${esc(f.frp_mw)} MW · ${esc(f.distancia_km)} km de ${esc(label)} · ${esc(f.fecha)} ${esc(f.hora_utc||'')} UTC`).addTo(targetGroup);
+    }).bindTooltip(`🔥 ${esc(f.satelite||'FIRMS')} · FRP ${esc(f.frp_mw)} MW · ${esc(f.periodo||'')} · ${esc(f.distancia_km)} km de ${esc(label)} · ${esc(f.fecha)} ${esc(f.hora_utc||'')} UTC`).addTo(targetGroup);
+  }
+}
+
+function paintFirmsSummaryCard(heatData, mode='7d'){
+  const el=$('satPopupFirmsSummary');
+  if(!el)return;
+  if(!heatData){
+    el.innerHTML=`
+      <div class="wx-box"><span>FOCOS TÉRMICOS (7D / 24H)</span><strong>Consultando…</strong><small>VIIRS SNPP · NOAA-20 · MODIS C6.1</small></div>
+      <div class="wx-box"><span>NOCHE VS DÍA (VENTEO)</span><strong>—</strong><small>Detección nocturna vs diurna</small></div>
+      <div class="wx-box"><span>FRP MÁXIMO</span><strong>—</strong><small>Potencia radiativa MW</small></div>
+      <div class="wx-box"><span>FOCO MÁS CERCANO</span><strong>—</strong><small>Distancia y satélite</small></div>
+    `;
+    return;
+  }
+  const activeFocos=getFilteredFocos(heatData,mode);
+  const noct=activeFocos.filter(x=>x.es_nocturno).length;
+  const diur=activeFocos.length-noct;
+  const maxFrp=activeFocos.reduce((m,x)=>Math.max(m,Number(x.frp_mw)||0),0);
+  const near=activeFocos[0]||null;
+  const count24h=heatData.focos_24h ?? (heatData.focos||[]).filter(x=>x.ultimas_24h).length;
+  const count7d=heatData.total_focos ?? (heatData.focos||[]).length;
+
+  el.innerHTML=`
+    <div class="wx-box">
+      <span>FOCOS ${mode==='24h'?'ÚLTIMAS 24H':'ÚLTIMOS 7 DÍAS'}</span>
+      <strong class="a">${mode==='24h'?count24h+' focos (24h)':count7d+' focos (7d)'}</strong>
+      <small>24h: ${count24h} · 7d: ${count7d} · Radio ${esc(heatData.radio_km||15)} km</small>
+    </div>
+    <div class="wx-box">
+      <span>NOCHE VS DÍA (VENTEO)</span>
+      <strong class="c">${noct} noche · ${diur} día</strong>
+      <small>Focos nocturnos facilitan detectar antorchas/venteo</small>
+    </div>
+    <div class="wx-box">
+      <span>FRP MÁXIMO</span>
+      <strong>${formatNum(maxFrp)} MW</strong>
+      <small>Potencia radiativa máxima en filtro</small>
+    </div>
+    <div class="wx-box">
+      <span>FOCO MÁS CERCANO</span>
+      <strong>${near?formatNum(near.distancia_km)+' km':'Sin focos'}</strong>
+      <small>${near?esc(`${near.satelite||'FIRMS'} · ${formatNum(near.frp_mw)} MW · ${near.fecha} ${near.hora_utc||''} UTC`):'Sin detecciones en este filtro'}</small>
+    </div>
+  `;
+}
+
+function setSatHeatMode(mode){
+  satHeatMode=mode==='24h'?'24h':'7d';
+  const b7=$('btnHeat7d'),b24=$('btnHeat24h');
+  if(b7)b7.classList.toggle('active',satHeatMode==='7d');
+  if(b24)b24.classList.toggle('active',satHeatMode==='24h');
+  if(lastSatCoords){
+    const key=`${Number(lastSatCoords.lat).toFixed(4)},${Number(lastSatCoords.lon).toFixed(4)}`;
+    const hData=heatCache[key];
+    paintHeatOnGroup(satHeatGroup,hData,lastSatCoords.lat,lastSatCoords.lon,lastSatLabel,satHeatMode);
+    paintFirmsSummaryCard(hData,satHeatMode);
   }
 }
 
@@ -540,7 +604,7 @@ function setSatBaseTile(mode){
   satBaseLayer.addTo(satMiniMap);
   if(lastSatCoords){
     const key=`${Number(lastSatCoords.lat).toFixed(4)},${Number(lastSatCoords.lon).toFixed(4)}`;
-    paintHeatOnGroup(satHeatGroup,heatCache[key],lastSatCoords.lat,lastSatCoords.lon,lastSatLabel);
+    paintHeatOnGroup(satHeatGroup,heatCache[key],lastSatCoords.lat,lastSatCoords.lon,lastSatLabel,satHeatMode);
   }
   const bSat=$('btnSatImagery'),bOsm=$('btnSatOsm');
   if(bSat)bSat.classList.toggle('active',mode!=='osm');
@@ -550,6 +614,7 @@ function setSatBaseTile(mode){
 function openSatInternalPopup(lat, lon, label='Instalación'){
   lastSatCoords={lat:Number(lat),lon:Number(lon)};
   lastSatLabel=label;
+  satHeatMode='7d';
 
   if(satMiniMap){
     satMiniMap.remove();
@@ -571,15 +636,18 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     return isNaN(d)?String(iso):d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   };
 
-  $('satPopupTitle').textContent=`ZOOM SATELITAL, CLIMA & CALOR · ${String(label).toUpperCase()}`;
+  $('satPopupTitle').textContent=`ZOOM SATELITAL, CLIMA & FIRMS · ${String(label).toUpperCase()}`;
   $('satPopupBody').innerHTML=`
     <div class="sat-switch">
       <button type="button" id="btnSatImagery" class="active" onclick="setSatBaseTile('sat')">SATÉLITE (ZOOM DETALLE)</button>
       <button type="button" id="btnSatOsm" onclick="setSatBaseTile('osm')">MAPA / CALLES (OSM)</button>
       <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],16);satMiniMap.invalidateSize();}">VER PLANTA (ZOOM 16X)</button>
       <button type="button" onclick="if(satMiniMap){satMiniMap.setView([${lat},${lon}],11);satMiniMap.invalidateSize();}">VER RADIO 15 KM (CALOR)</button>
+      <button type="button" id="btnHeat7d" class="active" onclick="setSatHeatMode('7d')">HISTÓRICO 7D</button>
+      <button type="button" id="btnHeat24h" onclick="setSatHeatMode('24h')">ÚLTIMAS 24H</button>
     </div>
     <div id="satMap"></div>
+    <div class="wx-strip" id="satPopupFirmsSummary"></div>
     <div class="wx-strip" id="satPopupWeather">
       <div class="wx-box"><span>VIENTO &amp; CLIMA</span><strong>Consultando…</strong><small>Obteniendo viento, sentido, nubes y lluvia…</small></div>
       <div class="wx-box"><span>SENTIDO HACIA DONDE CORRE</span><strong>—</strong><small>Rumbo de desplazamiento</small></div>
@@ -589,10 +657,11 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     <div class="metrics" id="satPopupMetrics">
       <div class="metric"><span>ÓPTICO (${esc(s2?.satelite||'SENTINEL-2')})</span><strong class="c">${esc(s2?s2.nubosidad_pct+'% nubes':'Sin dato')}</strong><small>${esc(fmt(s2?.fecha))}</small></div>
       <div class="metric"><span>RADAR SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><strong>${esc(s1?.orbita||'SAR')}</strong><small>${esc(fmt(s1?.fecha))}</small></div>
-      <div class="metric"><span>MAPA DE CALOR (15 KM · 7D)</span><strong class="a">${esc(hCached?hCached.total_focos+' focos':'Consultando…')}</strong><small>${esc(hCached?.foco_mas_cercano?`Más cercano: ${hCached.foco_mas_cercano.distancia_km} km (${hCached.foco_mas_cercano.frp_mw} MW)`:(hCached?'Sin focos en radio':'Cargando focos FIRMS…'))}</small></div>
+      <div class="metric"><span>FUENTES FIRMS</span><strong class="a">VIIRS · MODIS</strong><small>Pasadas térmicas activas en 15 km</small></div>
     </div>
   `;
   $('satPopup').classList.add('open');
+  paintFirmsSummaryCard(hCached,satHeatMode);
   if(wCached)paintWeatherStrip(wCached);
   loadPopupWeather(lat,lon);
 
@@ -601,7 +670,7 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
     satHeatGroup=L.layerGroup().addTo(satMiniMap);
     satOverlayGroup=L.layerGroup().addTo(satMiniMap);
     setSatBaseTile('sat');
-    paintHeatOnGroup(satHeatGroup,hCached,lat,lon,label);
+    paintHeatOnGroup(satHeatGroup,hCached,lat,lon,label,satHeatMode);
     L.circle([lat,lon],{radius:250,color:'#24d6d0',weight:1.6,opacity:.85,fillColor:'#24d6d0',fillOpacity:.06}).addTo(satOverlayGroup);
     L.circleMarker([lat,lon],{radius:8,color:'#ffffff',weight:2,fillColor:'#24d6d0',fillOpacity:1}).bindTooltip('Instalación: '+esc(label)).addTo(satOverlayGroup);
     satMiniMap.invalidateSize();
@@ -627,7 +696,7 @@ function extractLatLon(geom, propsObj){
 
 function satBlockHtml(coords, label='Elemento'){
   if(!coords)return'';
-  return`<div id="satBox" class="prod" data-sat-label="${esc(label)}"><div class="loading">Consultando pasadas Sentinel y mapa de calor…</div></div>`;
+  return`<div id="satBox" class="prod" data-sat-label="${esc(label)}"><div class="loading">Consultando pasadas Sentinel y focos térmicos FIRMS…</div></div>`;
 }
 
 async function loadSatelitePanel(coords){
@@ -659,14 +728,11 @@ async function loadSatelitePanel(coords){
     }
 
     if(h&&hSeq===heatSeq){
-      if(mainHeatGroup)paintHeatOnGroup(mainHeatGroup,h,coords.lat,coords.lon,label);
+      if(mainHeatGroup)paintHeatOnGroup(mainHeatGroup,h,coords.lat,coords.lon,label,'7d');
       if(satMiniMap&&satHeatGroup&&$('satPopup')?.classList.contains('open')){
-        paintHeatOnGroup(satHeatGroup,h,coords.lat,coords.lon,label);
+        paintHeatOnGroup(satHeatGroup,h,coords.lat,coords.lon,label,satHeatMode);
+        paintFirmsSummaryCard(h,satHeatMode);
         satMiniMap.invalidateSize();
-        const mEl=$('satPopupMetrics');
-        if(mEl&&mEl.children[2]){
-          mEl.children[2].innerHTML=`<span>MAPA DE CALOR (15 KM · 7D)</span><strong class="a">${esc(h.total_focos)} focos</strong><small>${esc(h.foco_mas_cercano?`Más cercano: ${h.foco_mas_cercano.distancia_km} km (${h.foco_mas_cercano.frp_mw} MW)`:'Sin focos en radio')}</small>`;
-        }
       }
     }
 
@@ -675,6 +741,8 @@ async function loadSatelitePanel(coords){
     const s2=j.optico_s2?.ultima||null;
     const s1=j.radar_s1?.ultima||null;
     const near=h?.foco_mas_cercano||null;
+    const noctCount=h?(h.nocturnos ?? (h.focos||[]).filter(x=>x.es_nocturno).length):0;
+    const count24h=h?(h.focos_24h ?? (h.focos||[]).filter(x=>x.ultimas_24h).length):0;
     const fmt=iso=>{
       if(!iso)return'Sin pasada reciente';
       const d=new Date(iso);
@@ -682,16 +750,17 @@ async function loadSatelitePanel(coords){
     };
 
     $('satBox').innerHTML=`
-      <div class="prod-head"><b>TELEMETRÍA &amp; CALOR (15 KM)</b><span>S2 · S1 · FIRMS</span></div>
+      <div class="prod-head"><b>TELEMETRÍA &amp; FIRMS (15 KM)</b><span>VIIRS · MODIS</span></div>
       <div class="kv">
         <div class="row"><span>Óptico (${esc(s2?.satelite||'SENTINEL-2')})</span><b>${esc(fmt(s2?.fecha))}${s2?` · ${esc(s2.nubosidad_pct)}% nubes`:''}</b></div>
         <div class="row"><span>Radar SAR (${esc(s1?.satelite||'SENTINEL-1')})</span><b>${esc(fmt(s1?.fecha))}${s1?.orbita?` · ${esc(s1.orbita)}`:''}</b></div>
-        <div class="row"><span>Focos térmicos (7d · 15 km)</span><b>${h?`${esc(h.total_focos)} detecciones`:'No disponible'}</b></div>
-        ${near?`<div class="row"><span>Foco más cercano</span><b>${esc(near.distancia_km)} km · ${esc(near.frp_mw)} MW (${esc(near.periodo)})</b></div>`:''}
+        <div class="row"><span>Focos térmicos (7d / 24h)</span><b>${h?`${esc(h.total_focos)} (7d) · ${esc(count24h)} (24h)`:'No disponible'}</b></div>
+        <div class="row"><span>Nocturnos / FRP máx.</span><b>${h?`${esc(noctCount)} noche · máx. ${formatNum(h.frp_max_mw||0)} MW`:'—'}</b></div>
+        ${near?`<div class="row"><span>Foco más cercano</span><b>${esc(near.distancia_km)} km · ${esc(near.satelite||'FIRMS')} (${esc(near.frp_mw)} MW)</b></div>`:''}
       </div>
       ${s2?.thumbnail?`<img class="sat-thumb" style="cursor:pointer" title="Tocá para ampliar en mapa con zoom" src="${esc(s2.thumbnail)}" alt="Vista previa satelital" loading="lazy" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')" onerror="this.style.display='none'">`:''}
-      <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (ZOOM + CLIMA + CALOR)</button>
-      <div class="prod-foot">Coordenada: ${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)} · Halo térmico marcado en mapa</div>
+      <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLabel}')">AMPLIAR EN POPUP INTERNO (FIRMS + CLIMA + ZOOM)</button>
+      <div class="prod-foot">Coordenada: ${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)} · Focos térmicos VIIRS/MODIS en 15 km</div>
     `;
   }catch(e){
     if(sSeq!==satSeq||!$('satBox'))return;
