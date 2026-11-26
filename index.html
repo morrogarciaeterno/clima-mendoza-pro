@@ -354,6 +354,15 @@ let current='areas',raw=[],rnAreasData=[],rnPozosData=[],rnOverlayMode='both',we
 let statsCompareAB=false,abType='empresas',abItemA='',abItemB='';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
 
+function attachPointerCursor(layer){
+  layer.on('mouseover',()=>{
+    if(map&&map.getContainer())map.getContainer().style.cursor='pointer';
+  });
+  layer.on('mouseout',()=>{
+    if(map&&map.getContainer())map.getContainer().style.cursor='';
+  });
+}
+
 function showHome(){
   $('homeSelector').style.display='';
   $('viewNeuquina').classList.remove('active');
@@ -387,8 +396,8 @@ function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatP
 
 function initMap(){
   if(map)return;
-  map=L.map('map',{preferCanvas:true}).setView([-38.4,-69.1],7);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);
+  map=L.map('map',{preferCanvas:true,maxZoom:19}).setView([-38.4,-69.1],7);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
@@ -622,8 +631,8 @@ function setSatBaseTile(mode){
   if(!satMiniMap)return;
   if(satBaseLayer)satMiniMap.removeLayer(satBaseLayer);
   satBaseLayer=mode==='osm'
-    ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'})
-    :L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Esri World Imagery'});
+    ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'})
+    :L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'});
   satBaseLayer.addTo(satMiniMap);
   if(lastSatCoords){
     const key=`${Number(lastSatCoords.lat).toFixed(4)},${Number(lastSatCoords.lon).toFixed(4)}`;
@@ -690,7 +699,7 @@ function openSatInternalPopup(lat, lon, label='Instalación'){
   loadPopupWeather(lat,lon);
 
   setTimeout(()=>{
-    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:18}).setView([lat,lon],15);
+    satMiniMap=L.map('satMap',{preferCanvas:true,maxZoom:19}).setView([lat,lon],15);
     satHeatGroup=L.layerGroup().addTo(satMiniMap);
     satOverlayGroup=L.layerGroup().addTo(satMiniMap);
     setSatBaseTile('sat');
@@ -904,27 +913,40 @@ function renderRioNegroCombined(fit){
   const areasGeo=showAreas?areasFiltered.filter(f=>f.geometry&&f.geometry.type):[];
   const pozosGeo=showPozos?pozosFiltered.filter(f=>f.geometry&&f.geometry.type):[];
   const sinGeoTotal=Math.max(0,(showAreas?areasFiltered.length-areasGeo.length:0)+(showPozos?pozosFiltered.length-pozosGeo.length:0));
+  const rnCanvas=L.canvas({padding:0.5});
 
   const gjAreas=areasGeo.length?L.geoJSON({type:'FeatureCollection',features:areasGeo},{
-    pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:8,color:'#071018',weight:1.5,fillColor:'#f4b544',fillOpacity:.8}),
+    renderer:rnCanvas,
+    pointToLayer:(f,ll)=>L.circleMarker(ll,{renderer:rnCanvas,interactive:true,radius:8,color:'#071018',weight:1.5,fillColor:'#f4b544',fillOpacity:.8}),
     onEachFeature:(f,l)=>{
       const p=f.properties||{};
       l.bindTooltip('Área: '+esc(p.nombre_area||'Área'));
-      l.on('click',()=>showMendozaProductionArea(p,extractLatLon(f.geometry,p)));
+      attachPointerCursor(l);
+      l.on('click',()=>{
+        const coords=extractLatLon(f.geometry,p);
+        if(coords&&map)map.setView([coords.lat,coords.lon],Math.max(map.getZoom(),12),{animate:true});
+        showMendozaProductionArea(p,coords);
+      });
     }
   }).addTo(rnAreasGroup):null;
 
   const gjPozos=pozosGeo.length?L.geoJSON({type:'FeatureCollection',features:pozosGeo},{
+    renderer:rnCanvas,
     pointToLayer:(f,ll)=>{
       const p=f.properties||{};
       const st=String(p.tipoestado||'').toLowerCase();
       const fill=st.includes('aband')?'#ff5e68':st.includes('reserva')?'#31d67b':'#24d6d0';
-      return L.circleMarker(ll,{radius:4.5,color:'#ffffff',weight:1,fillColor:fill,fillOpacity:.95});
+      return L.circleMarker(ll,{renderer:rnCanvas,interactive:true,radius:5,color:'#ffffff',weight:1.1,fillColor:fill,fillOpacity:.95});
     },
     onEachFeature:(f,l)=>{
       const p=f.properties||{};
       l.bindTooltip('Pozo: '+esc(p.sigla||'Pozo'));
-      l.on('click',()=>showMendozaWell(p,extractLatLon(f.geometry,p)));
+      attachPointerCursor(l);
+      l.on('click',()=>{
+        const coords=extractLatLon(f.geometry,p);
+        if(coords&&map)map.setView([coords.lat,coords.lon],Math.max(map.getZoom(),15),{animate:true});
+        showMendozaWell(p,coords);
+      });
     }
   }).addTo(rnPozosGroup):null;
 
@@ -1085,7 +1107,7 @@ function render(fit){
     pointToLayer:(f,ll)=>{
       const med=current==='plantas'&&forceMed;
       return L.circleMarker(ll,{
-        renderer,radius:med?6:5,
+        interactive:true,renderer,radius:med?6:5,
         color:med?'#071018':'#ffffff',weight:med?1.5:1,
         fillColor:med?'#ff9f1c':'#24d6d0',fillOpacity:1
       });
@@ -1093,6 +1115,7 @@ function render(fit){
     onEachFeature:(f,l)=>{
       const p=props(f);
       if(current==='plantas'||current==='ductos')l.bindTooltip(esc(titleOf(p)));
+      attachPointerCursor(l);
       l.on('click',()=>show(f));
     }
   });
@@ -1635,8 +1658,10 @@ function renderCuencaLayer(fit){
 
   const geoItems=list.filter(f=>f.geometry&&f.geometry.type);
   const sinGeo=Math.max(0,list.length-geoItems.length);
+  const mzaCanvas=L.canvas({padding:0.5});
 
   const gj=geoItems.length?L.geoJSON({type:'FeatureCollection',features:geoItems},{
+    renderer:mzaCanvas,
     style:f=>{
       const p=f.properties||{};
       if(current==='mendozaDuctos'||current==='rnDuctos'){
@@ -1653,15 +1678,23 @@ function renderCuencaLayer(fit){
       const p=f.properties||{};
       if(current==='mendozaPlantas'){
         const col=mzaPlantCatColor(p._CATEGORIA_MZA||'upstream');
-        return L.circleMarker(ll,{radius:5.5,color:'#071018',weight:1.2,fillColor:col,fillOpacity:.95});
+        return L.circleMarker(ll,{renderer:mzaCanvas,interactive:true,radius:6,color:'#071018',weight:1.4,fillColor:col,fillOpacity:.95});
       }
       const st=String(p.tipoestado||'').toLowerCase(),fill=st.includes('aband')?'#ff5e68':st.includes('reserva')?'#f4b544':'#24d6d0';
-      return L.circleMarker(ll,{radius:4.5,color:'#fff',weight:1,fillColor:fill,fillOpacity:.92});
+      return L.circleMarker(ll,{renderer:mzaCanvas,interactive:true,radius:5.5,color:'#ffffff',weight:1.2,fillColor:fill,fillOpacity:.95});
     },
     onEachFeature:(f,l)=>{
       const p=f.properties||{};
       l.bindTooltip(esc(p.nombre_area||p.area||p.sigla||p.nombre_tramo||p.ducto||p.NOMBRE||p.nombre||p.CAPA||'Elemento'));
-      l.on('click',()=>showCuencaFeature(f));
+      attachPointerCursor(l);
+      l.on('click',()=>{
+        const coords=extractLatLon(f.geometry,p);
+        if(coords&&map){
+          const targetZoom=['mendozaPozos','rnPozos'].includes(current)?15:Math.max(map.getZoom(),12);
+          map.setView([coords.lat,coords.lon],Math.max(map.getZoom(),targetZoom),{animate:true});
+        }
+        showCuencaFeature(f);
+      });
     }
   }).addTo(groupLayer):null;
 
