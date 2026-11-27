@@ -1477,6 +1477,10 @@ function paintEstadisticas(){
   const toolbar=`<div class="stats-toolbar"><div class="stats-cuencas"><button type="button" class="${statsCuenca==='NEUQUINA'&&!statsProvincia?'active':''}" onclick="setStatsScope('NEUQUINA','')">CUENCA NEUQUINA</button><button type="button" class="${statsCuenca==='CUYANA'&&!statsProvincia?'active':''}" onclick="setStatsScope('CUYANA','')">CUENCA CUYANA</button><button type="button" class="${statsProvincia==='RIO NEGRO'?'active':''}" onclick="setStatsScope('TODAS','RIO NEGRO')">RÍO NEGRO</button><button type="button" class="${statsCuenca==='TODAS'&&!statsProvincia?'active':''}" onclick="setStatsScope('TODAS','')">ARGENTINA (TODAS)</button><button type="button" class="${statsCompareAB?'active':''}" onclick="statsCompareAB=!statsCompareAB;paintEstadisticas()">COMPARAR A vs B</button>${monthControl}</div><div class="fluid-switch" style="margin:0;min-width:200px"><button type="button" class="${statsFluid==='oil'?'active':''}" onclick="setStatsFluid('oil')">OIL</button><button type="button" class="${statsFluid==='gas'?'active':''}" onclick="setStatsFluid('gas')">GAS</button></div></div>`;
   const activeData=statsCache[cacheKey];
   if(!activeData){$('detail').innerHTML=toolbar+'<div class="loading">Calculando serie histórica, comparativa mensual y rankings…</div>';return}
+  if(activeData.fuente_no_disponible){
+    $('detail').innerHTML=toolbar+`<div class="loading err">${esc(activeData.aviso||'La fuente oficial de datos energéticos tardó en responder.')}<br><button type="button" class="native-cta" style="max-width:240px;margin:12px auto 0" onclick="delete statsCache['${esc(cacheKey)}'];loadEstadisticasData()">REINTENTAR CONSULTA OFICIAL</button></div>`;
+    return;
+  }
   if(!activeData.periodo){$('detail').innerHTML=toolbar+'<div class="loading err">Sin datos disponibles para el mes o jurisdicción seleccionada.</div>';return}
   const m=activeData.resumen_mes||{},cmp=activeData.comparacion_mes_anterior||{},isGas=statsFluid==='gas';
   const areaValKey=isGas?'gas_miles_m3':'petroleo_mbbl_d',areaUnit=isGas?'Mm³':'Mbbl/d';
