@@ -735,6 +735,14 @@ function extractLatLon(geom, propsObj){
     const pt=walk(geom.coordinates);
     if(pt&&Number.isFinite(pt[0])&&Number.isFinite(pt[1]))return{lat:pt[0],lon:pt[1]};
   }
+  const shapeWkt = propsObj?.Shape ?? propsObj?.SHAPE;
+  if (typeof shapeWkt === "string") {
+    const m = shapeWkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+    if (m) {
+      const lonW = Number(m[1]), latW = Number(m[2]);
+      if (Number.isFinite(latW) && Number.isFinite(lonW)) return { lat: latW, lon: lonW };
+    }
+  }
   const lat=Number(propsObj?.lat??propsObj?.LAT??propsObj?.latitud??propsObj?.LATITUD);
   const lon=Number(propsObj?.lon??propsObj?.LON??propsObj?.longitud??propsObj?.LONGITUD);
   if(Number.isFinite(lat)&&Number.isFinite(lon))return{lat,lon};
@@ -743,7 +751,11 @@ function extractLatLon(geom, propsObj){
 
 function satBlockHtml(coords, label='Elemento'){
   if(!coords)return'';
-  return`<div id="satBox" class="prod" data-sat-label="${esc(label)}"><div class="loading">Consultando pasadas Sentinel y focos térmicos FIRMS…</div></div>`;
+  const safeLbl = esc(label).replace(/'/g, "\\'");
+  return`<div id="satBox" class="prod" data-sat-label="${esc(label)}">
+    <div class="loading">Consultando pasadas Sentinel y focos térmicos FIRMS…</div>
+    <button type="button" class="native-cta" onclick="openSatInternalPopup(${coords.lat},${coords.lon},'${safeLbl}')">AMPLIAR EN POPUP INTERNO (FIRMS + CLIMA + ZOOM)</button>
+  </div>`;
 }
 
 async function loadSatelitePanel(coords){
