@@ -411,7 +411,7 @@ function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatP
 function initMap(){
   if(map)return;
   map=L.map('map',{preferCanvas:true,maxZoom:19}).setView([-38.4,-69.1],7);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap · © CARTO'}).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Street Map · Boundaries & Roads'}).addTo(map);
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
@@ -645,7 +645,7 @@ function setSatBaseTile(mode){
   if(!satMiniMap)return;
   if(satBaseLayer)satMiniMap.removeLayer(satBaseLayer);
   satBaseLayer=mode==='osm'
-    ?L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap · © CARTO'})
+    ?L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Street Map · Boundaries & Roads'})
     :L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'});
   satBaseLayer.addTo(satMiniMap);
   if(lastSatCoords){
