@@ -97,6 +97,17 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .banner b{display:block;font-size:17px;color:#fff;overflow-wrap:anywhere}
 .banner small{display:block;margin-top:4px;color:var(--a);font-size:9px;letter-spacing:.08em;overflow-wrap:anywhere}
 .kv,.duct-grid{display:grid;grid-template-columns:1fr;gap:0}
+.cmp-table-wrap{width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#071923}
+.cmp-table{width:100%;border-collapse:collapse;font-size:10px}
+.cmp-table th,.cmp-table td{padding:8px 10px;border-bottom:1px solid #2f4b5b88;text-align:left;vertical-align:top}
+.cmp-table thead th{background:#0b1e2b;color:var(--mut);font-size:9px;letter-spacing:.08em;border-bottom:1px solid #295368}
+.cmp-table thead th.col-a{color:var(--c);font-size:11px}
+.cmp-table thead th.col-b{color:var(--a);font-size:11px}
+.cmp-table td.col-field{color:var(--mut);font-weight:700;width:34%}
+.cmp-table td.col-a{color:var(--c);font-weight:600;width:33%;overflow-wrap:anywhere}
+.cmp-table td.col-b{color:var(--a);font-weight:600;width:33%;overflow-wrap:anywhere}
+.cmp-table tr.diff-row{background:#0d253444}
+
 .row{padding:6px 0;border-bottom:1px solid #2f4b5b88;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;min-width:0}
 .row span{font-size:10px;color:var(--mut);flex:0 0 auto}
 .row b{font-size:10px;text-align:right;min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:normal}
@@ -815,7 +826,7 @@ async function openModule(type){
   initMap();setTimeout(()=>map.invalidateSize(),80);
   $('detail').innerHTML='<div class="loading">Consultando fuente oficial…</div>';
   try{
-    if(localCortesDisponibles[type]){
+    if(typeof localCortesDisponibles !== 'undefined' && localCortesDisponibles[type]){
       try{
         const registrosLocales=await leerCorteNeuquenLocal(localCortesDisponibles[type]);
         if(registrosLocales.length){
@@ -1490,7 +1501,7 @@ function paintEstadisticas(){
   const activeData=statsCache[cacheKey];
   if(!activeData){$('detail').innerHTML=toolbar+'<div class="loading">Calculando serie histórica, comparativa mensual y rankings…</div>';return}
   if(activeData.fuente_no_disponible){
-    $('detail').innerHTML=toolbar+`<div class="loading err">${esc(activeData.aviso||'La fuente oficial de datos energéticos tardó en responder.')}<br><button type="button" class="native-cta" style="max-width:240px;margin:12px auto 0" onclick="delete statsCache['${esc(cacheKey)}'];loadEstadisticasData()">REINTENTAR CONSULTA OFICIAL</button></div>`;
+    $('detail').innerHTML=toolbar+`<div class="banner"><b>COMPARADOR LOCAL NEUQUÉN · MODO OFFLINE</b><small>DATOS LOCALES EN PUERTO 8085 · SIN DEPENDENCIA DE FUENTE REMOTA</small></div><div class="loading">Usá el comparador rápido de cortes locales de abajo o elegí otro mes/cuenca disponible.</div>`;
     return;
   }
   if(!activeData.periodo){$('detail').innerHTML=toolbar+'<div class="loading err">Sin datos disponibles para el mes o jurisdicción seleccionada.</div>';return}
@@ -1544,9 +1555,10 @@ async function loadEstadisticasData(){
     if(!r.ok||!j.ok)throw Error(j.error||'Error consultando estadísticas');
     statsCache[cacheKey]=j;
     paintEstadisticas();
-  }catch(e){
+  }catch(_){
     if(seq!==statsSeq||current!=='estadisticas')return;
-    $('detail').innerHTML='<div class="loading err">'+esc(e.message)+'</div>';
+    statsCache[cacheKey]={fuente_no_disponible:true};
+    paintEstadisticas();
   }
 }
 
@@ -1870,6 +1882,8 @@ function showMendozaWell(p,coords=null){
 // =========================================================================
 // MÓDULO DE CORTES LOCALES NEUQUÉN (PUERTO 8085) Y COMPARADOR OFFLINE A vs B
 // =========================================================================
+// MÓDULO ÚNICO DE CORTES LOCALES NEUQUÉN (PUERTO 8085) · SIN DUPLICADOS
+// =========================================================================
 const LOCAL_CORTES_URL = "http://localhost:8085";
 const localCortesCache = {};
 const localCortesDisponibles = {
@@ -1880,15 +1894,22 @@ const localCortesDisponibles = {
   areas: "nqn_areas.json",
   pozos_vm: "nqn_pozos_vm.json"
 };
+window._ultimosRegistrosLocales = [];
 
 async function leerCorteNeuquenLocal(archivo) {
   if (localCortesCache[archivo]) return localCortesCache[archivo];
-  const resp = await fetch(`${LOCAL_CORTES_URL}/${archivo}`, { cache: "no-store" });
-  if (!resp.ok) throw new Error(`HTTP ${resp.status} en ${archivo}`);
-  const data = await resp.json();
-  const registros = Array.isArray(data.registros) ? data.registros : (Array.isArray(data) ? data : []);
-  localCortesCache[archivo] = registros;
-  return registros;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3000);
+  try {
+    const resp = await fetch(`${LOCAL_CORTES_URL}/${archivo}`, { cache: "no-store", signal: controller.signal });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status} en ${archivo}`);
+    const data = await resp.json();
+    const registros = Array.isArray(data.registros) ? data.registros : (Array.isArray(data) ? data : []);
+    localCortesCache[archivo] = registros;
+    return registros;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function parseWktPoint(shapeStr) {
@@ -1926,45 +1947,209 @@ function registrosToFeatures(registros) {
   });
 }
 
-async function cargarComparadorLocalNqn() {
-  const capaSel = $("localCmpCapa");
+window._soloDiferenciasCmp = false;
+window._operadoraCmpSel = "";
+
+function obtenerOperadorRegistroLocal(r) {
+  if (!r || typeof r !== "object") return "";
+  const v = r.OPERADOR || r.OPERADOR_I || r.TITULAR || r.empresa || r.operador || "";
+  return String(v).trim();
+}
+
+function toggleSoloDiferenciasCmp() {
+  window._soloDiferenciasCmp = !window._soloDiferenciasCmp;
+  renderizarComparacionLocalNqn();
+}
+
+function etiquetaCampoLegible(k) {
+  const mapa = {
+    FID: "ID registro",
+    NRO_ORDEN_: "Nro. orden",
+    ID_NQN: "ID Neuquén",
+    SIGLA: "Sigla",
+    ID_NACION: "ID Nación",
+    AREA: "Área",
+    AREA_LEGAL: "Área legal",
+    OPERADOR: "Operador",
+    OPERADOR_I: "Operador",
+    INSTALACIO: "Instalación",
+    NOMBRE: "Nombre",
+    WELL_NAME: "Pozo",
+    WELL_S_NAME: "Nombre corto",
+    FIELD_NAME: "Yacimiento / Campo",
+    UWI_NQN: "UWI Neuquén",
+    UWI_SEN: "UWI Nación",
+    TIPO_INST: "Tipo de instalación",
+    ESTADO: "Estado",
+    ESTADO_GIS: "Estado GIS",
+    ORIGINAL_STATUS: "Estado original",
+    SIST_EXTRACCION: "Sistema de extracción",
+    FLUIDO: "Fluido",
+    CLASS_NAME: "Clase",
+    Q_DISEÑO_G: "Diseño gas",
+    Q_DISEÑO_P: "Diseño petróleo",
+    Q_ACTUAL_G: "Gas actual",
+    Q_ACTUAL_P: "Petróleo actual",
+    CAP_GAS_OC: "Capacidad ociosa gas",
+    CAP_PET_OC: "Capacidad ociosa petróleo",
+    GAS_COMBUS: "Gas combustible",
+    ORIGEN_PRO: "Origen de producción",
+    ENTREGA_GA: "Entrega de gas",
+    ENTREGA_LI: "Entrega de líquidos",
+    CANT_COMPR: "Cant. compresores",
+    CAP_COMPRE: "Cap. compresión",
+    CANT_TANQU: "Cant. tanques",
+    VOL_TANQUE: "Volumen tanques",
+    CANT_VRU: "Cant. VRU",
+    CAP_VRU: "Capacidad VRU",
+    VENTEO: "Venteo",
+    ACTA: "Acta",
+    OBSERVACIO: "Observaciones",
+    VERIFICADO: "Verificado",
+    LATITUD: "Latitud",
+    LONGITUD: "Longitud"
+  };
+  return mapa[k] || k.replace(/_/g, " ");
+}
+
+function poblarOpcionesElementoCmp(registros, operFiltro) {
   const selA = $("localCmpA");
   const selB = $("localCmpB");
+  if (!selA || !selB) return;
+
+  const filtrados = registros
+    .map((r, origIdx) => ({ r, origIdx }))
+    .filter(({ r }) => !operFiltro || normOp(obtenerOperadorRegistroLocal(r)) === operFiltro)
+    .slice(0, 3000);
+
+  const etiqueta = r => {
+    const base = r.WELL_NAME || r.NOMBRE || r.INSTALACIO || r.AREA_LEGAL || r.AREA || r.UWI_NQN || r.ID_INST || r.FID || "Sin nombre";
+    const op = obtenerOperadorRegistroLocal(r);
+    const area = r.AREA_LEGAL || r.AREA || r.FIELD_NAME || "";
+    const extra = [op, area].filter(Boolean).join(" · ");
+    return extra ? `${base} — ${extra}` : String(base);
+  };
+
+  if (!filtrados.length) {
+    selA.innerHTML = '<option value="">Sin elementos para esta operadora</option>';
+    selB.innerHTML = '<option value="">Sin elementos para esta operadora</option>';
+    return;
+  }
+
+  const opts = filtrados.map(({ r, origIdx }) => `<option value="${origIdx}">${esc(etiqueta(r))}</option>`).join("");
+  selA.innerHTML = opts;
+  selB.innerHTML = opts;
+  selA.selectedIndex = 0;
+  selB.selectedIndex = filtrados.length > 1 ? 1 : 0;
+}
+
+async function cargarComparadorLocalNqn() {
+  const capaSel = $("localCmpCapa");
+  const opSel = $("localCmpOperadora");
   const out = $("localCmpResultado");
-  if (!capaSel || !selA || !selB || !out) return;
+  if (!capaSel || !out) return;
 
   const archivo = capaSel.value;
   out.innerHTML = '<div class="loading">Cargando corte local desde http://localhost:8085…</div>';
   try {
     const registros = await leerCorteNeuquenLocal(archivo);
-    const etiqueta = r => r.WELL_NAME || r.NOMBRE || r.INSTALACIO || r.AREA_LEGAL || r.AREA || r.UWI_NQN || r.ID_INST || r.FID || "Sin nombre";
-    const opts = registros.slice(0, 1500).map((r, i) => `<option value="${i}">${esc(etiqueta(r))}</option>`).join("");
-    selA.innerHTML = opts;
-    selB.innerHTML = opts;
-    if (registros.length > 1) selB.selectedIndex = 1;
-    renderizarComparacionLocalNqn(registros);
+    window._ultimosRegistrosLocales = registros;
+
+    const opsMap = new Map();
+    for (const r of registros) {
+      const label = obtenerOperadorRegistroLocal(r);
+      const key = normOp(label);
+      if (key && !opsMap.has(key)) opsMap.set(key, label);
+    }
+    const sortedOps = [...opsMap.entries()].sort((a, b) => a[1].localeCompare(b[1], "es"));
+    if (opSel) {
+      opSel.innerHTML = '<option value="">Todas las operadoras NQN</option>' +
+        sortedOps.map(([k, lbl]) => `<option value="${esc(k)}">${esc(lbl)}</option>`).join("");
+      opSel.value = "";
+    }
+    window._operadoraCmpSel = "";
+
+    poblarOpcionesElementoCmp(registros, "");
+    renderizarComparacionLocalNqn();
   } catch (err) {
     out.innerHTML = `<div class="loading err">Sin conexión a http://localhost:8085 (${esc(err.message)}). Verificá que servir_cortes.ps1 esté abierto.</div>`;
   }
 }
 
-function renderizarComparacionLocalNqn(registros) {
+function onChangeOperadoraCmp() {
+  const opSel = $("localCmpOperadora");
+  const registros = window._ultimosRegistrosLocales || [];
+  const opVal = opSel ? opSel.value : "";
+  window._operadoraCmpSel = opVal;
+  poblarOpcionesElementoCmp(registros, opVal);
+  renderizarComparacionLocalNqn();
+}
+
+function renderizarComparacionLocalNqn() {
   const selA = $("localCmpA");
   const selB = $("localCmpB");
   const out = $("localCmpResultado");
-  if (!selA || !selB || !out) return;
-  const a = registros[Number(selA.value) || 0] || {};
-  const b = registros[Number(selB.value) || 0] || {};
-  const claves = Array.from(new Set([...Object.keys(a), ...Object.keys(b)])).filter(k => k !== "Shape").slice(0, 20);
+  const registros = window._ultimosRegistrosLocales || [];
+  if (!selA || !selB || !out || !registros.length) return;
+
+  if (selA.value === "" || selB.value === "") {
+    out.innerHTML = '<div class="loading">No hay registros para la operadora seleccionada en esta capa.</div>';
+    return;
+  }
+
+  const idxA = Number(selA.value);
+  const idxB = Number(selB.value);
+  const a = registros[Number.isFinite(idxA) && registros[idxA] ? idxA : 0] || {};
+  const b = registros[Number.isFinite(idxB) && registros[idxB] ? idxB : 0] || {};
+
+  const ocultar = new Set(["Shape", "SHAPE", "geom", "GEOM", "ID_INST"]);
+  const todasClaves = Array.from(new Set([...Object.keys(a), ...Object.keys(b)])).filter(k => !ocultar.has(k));
+
+  const normVal = v => String(v ?? "").trim();
+  const filas = todasClaves
+    .map(k => {
+      const va = normVal(a[k]);
+      const vb = normVal(b[k]);
+      const distinto = va !== vb;
+      return { k, va: va || "—", vb: vb || "—", distinto };
+    })
+    .filter(item => {
+      if (window._soloDiferenciasCmp) return item.distinto;
+      return item.va !== "—" || item.vb !== "—";
+    });
+
+  const tituloA = a.WELL_NAME || a.NOMBRE || a.INSTALACIO || a.AREA_LEGAL || a.AREA || a.FID || "Elemento A";
+  const tituloB = b.WELL_NAME || b.NOMBRE || b.INSTALACIO || b.AREA_LEGAL || b.AREA || b.FID || "Elemento B";
+  const subA = [obtenerOperadorRegistroLocal(a), a.AREA || a.AREA_LEGAL].filter(Boolean).join(" · ");
+  const subB = [obtenerOperadorRegistroLocal(b), b.AREA || b.AREA_LEGAL].filter(Boolean).join(" · ");
+  const cantDiff = todasClaves.filter(k => normVal(a[k]) !== normVal(b[k])).length;
 
   out.innerHTML = `
-    <div class="metrics" style="margin-bottom:10px">
-      <div class="metric"><span>ELEMENTO A</span><strong class="c">${esc(a.WELL_NAME || a.NOMBRE || a.INSTALACIO || a.AREA_LEGAL || a.FID || "A")}</strong><small>${esc(a.OPERADOR || a.OPERADOR_I || a.TITULAR || "")}</small></div>
-      <div class="metric"><span>ELEMENTO B</span><strong class="a">${esc(b.WELL_NAME || b.NOMBRE || b.INSTALACIO || b.AREA_LEGAL || b.FID || "B")}</strong><small>${esc(b.OPERADOR || b.OPERADOR_I || b.TITULAR || "")}</small></div>
-      <div class="metric"><span>ORIGEN</span><strong>LOCAL 8085</strong><small>Sin llamada remota</small></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <span style="font-size:10px;color:var(--mut)">Diferencias detectadas: <b style="color:var(--txt)">${cantDiff}</b> · Origen: <b style="color:var(--c)">LOCAL 8085</b></span>
+      <button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9.5px" onclick="toggleSoloDiferenciasCmp()">
+        ${window._soloDiferenciasCmp ? "VER TODOS CON DATO" : "VER SOLO DIFERENCIAS"}
+      </button>
     </div>
-    <div class="kv">
-      ${claves.map(k => `<div class="row"><span>${esc(k)}</span><b>A: ${esc(a[k] ?? "—")} · B: ${esc(b[k] ?? "—")}</b></div>`).join("")}
+    <div class="cmp-table-wrap">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>DATO COMPARADO</th>
+            <th class="col-a">${esc(tituloA)}${subA ? `<div style="font-size:8.5px;font-weight:400;color:var(--mut);margin-top:2px">${esc(subA)}</div>` : ""}</th>
+            <th class="col-b">${esc(tituloB)}${subB ? `<div style="font-size:8.5px;font-weight:400;color:var(--mut);margin-top:2px">${esc(subB)}</div>` : ""}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filas.length ? filas.map(item => `
+            <tr class="${item.distinto ? "diff-row" : ""}">
+              <td class="col-field">${esc(etiquetaCampoLegible(item.k))}</td>
+              <td class="col-a">${esc(item.va)}</td>
+              <td class="col-b">${esc(item.vb)}</td>
+            </tr>
+          `).join("") : '<tr><td colspan="3" class="loading">No hay diferencias entre ambos elementos en este filtro.</td></tr>'}
+        </tbody>
+      </table>
     </div>
   `;
 }
@@ -1972,14 +2157,15 @@ function renderizarComparacionLocalNqn(registros) {
 (function injectLocalCmpBox() {
   const modalBody = $("modalBody");
   if (!modalBody) return;
+  if ($("localCortesCard")) return;
   const box = document.createElement("section");
   box.className = "card";
   box.id = "localCortesCard";
   box.style.marginTop = "10px";
   box.innerHTML = `
-    <div class="ch"><h3>COMPARADOR RÁPIDO · CORTES LOCALES NEUQUÉN (PUERTO 8085)</h3><span>OFFLINE / SIN TIMEOUT</span></div>
+    <div class="ch"><h3>COMPARADOR RÁPIDO · CORTES LOCALES NEUQUÉN</h3><span>PUERTO 8085 · SIN TIMEOUT</span></div>
     <div class="cb">
-      <div class="filters" style="grid-template-columns:180px 1fr 1fr;margin-bottom:10px">
+      <div class="filters" style="grid-template-columns:160px 1fr 1fr 1fr;margin-bottom:10px">
         <select id="localCmpCapa" onchange="cargarComparadorLocalNqn()">
           <option value="nqn_pozos.json">Pozos Neuquén</option>
           <option value="nqn_instalaciones.json">Instalaciones / Baterías</option>
@@ -1987,8 +2173,11 @@ function renderizarComparacionLocalNqn(registros) {
           <option value="nqn_areas.json">Áreas Neuquén</option>
           <option value="nqn_pozos_vm.json">Pozos Vaca Muerta</option>
         </select>
-        <select id="localCmpA" onchange="cargarCorteNeuquenLocal($('localCmpCapa').value).then(r=>renderizarComparacionLocalNqn(r))"></select>
-        <select id="localCmpB" onchange="cargarCorteNeuquenLocal($('localCmpCapa').value).then(r=>renderizarComparacionLocalNqn(r))"></select>
+        <select id="localCmpOperadora" onchange="onChangeOperadoraCmp()">
+          <option value="">Todas las operadoras NQN</option>
+        </select>
+        <select id="localCmpA" onchange="renderizarComparacionLocalNqn()"></select>
+        <select id="localCmpB" onchange="renderizarComparacionLocalNqn()"></select>
       </div>
       <div id="localCmpResultado"><div class="loading">Seleccioná una capa o <a href="#" style="color:var(--c)" onclick="event.preventDefault();cargarComparadorLocalNqn()">cargá los datos locales ahora</a>.</div></div>
     </div>
