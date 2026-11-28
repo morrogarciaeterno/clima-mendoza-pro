@@ -736,7 +736,7 @@ async function loadSatelitePanel(coords){
   const box=$('satBox');
   if(!box||!coords)return;
   const label=box.getAttribute('data-sat-label')||'Elemento';
-  const safeLabel=esc(label).replace(/'/g,"\\'");
+  const safeLabel=esc(label).replace(/'/g,"\'");
   const sSeq=++satSeq;
   const hSeq=++heatSeq;
   const key=`${coords.lat.toFixed(4)},${coords.lon.toFixed(4)}`;
@@ -815,6 +815,18 @@ async function openModule(type){
   initMap();setTimeout(()=>map.invalidateSize(),80);
   $('detail').innerHTML='<div class="loading">Consultando fuente oficial…</div>';
   try{
+    if(localCortesDisponibles[type]){
+      try{
+        const registrosLocales=await leerCorteNeuquenLocal(localCortesDisponibles[type]);
+        if(registrosLocales.length){
+          raw=registrosToFeatures(registrosLocales);
+          $('layer').textContent=`LOCAL · ${localCortesDisponibles[type]}`;
+          buildGroups();render(true);
+          $('apiStatus').textContent='CORTE LOCAL · NEUQUÉN (8085)';
+          return;
+        }
+      }catch(_){}
+    }
     const u=wellMode?API+'/api/pozos?inicio=0&limite=2000':API+'/api/infraestructura?tipo='+type;
     const r=await fetch(u,{cache:'no-store'}),j=await r.json();
     if(!r.ok||!j.ok)throw Error(j.error||'Sin respuesta');
@@ -1039,14 +1051,14 @@ async function loadRioNegroPozos(){
 }
 
 function props(f){return f.properties||{}}
-function titleOf(p){return p.WELL_NAME||p.SIGLA_NACION||p.NOMBRE||p.nombre||p.nombre_tramo||p.ducto||p.LOC_NOMBRE||p.YACIMIENTO||p.OPERADOR||p.CAPA||'Elemento GIS'}
-function normOp(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase().replace(/\s+/g,' ')}
+function titleOf(p){return p.WELL_NAME||p.SIGLA_NACION||p.NOMBRE||p.nombre||p.nombre_tramo||p.ducto||p.LOC_NOMBRE||p.INSTALACIO||p.YACIMIENTO||p.OPERADOR||p.OPERADOR_I||p.CAPA||'Elemento GIS'}
+function normOp(v){return String(v||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toUpperCase().replace(/\s+/g,' ')}
 function operatorOf(p){
   if(!p||typeof p!=='object')return'';
-  const rawOp=p.OPERADOR??p.operador??p.OPERADORA??p.operadora??p.empresa_informante??p.EMPRESA_INFORMANTE??p.EMPRESA??p.empresa??p.TITULAR??p.titular??p.Operador25??'';
+  const rawOp=p.OPERADOR??p.OPERADOR_I??p.operador??p.OPERADORA??p.operadora??p.empresa_informante??p.EMPRESA_INFORMANTE??p.EMPRESA??p.empresa??p.TITULAR??p.titular??p.Operador25??'';
   return String(rawOp).trim().replace(/\s+/g,' ');
 }
-function locGroupOf(p){return String(p.LOC_TIPO||p.LOC_AGRUPA||p.CAPA||'').trim().replace(/\s+/g,' ')}
+function locGroupOf(p){return String(p.LOC_TIPO||p.LOC_AGRUPA||p.TIPO_INST||p.CAPA||'').trim().replace(/\s+/g,' ')}
 
 function buildGroups(){
   const mapOps=new Map();
@@ -1083,7 +1095,7 @@ function render(fit){
   });
   $('count').textContent=list.length+' ELEMENTOS';
 
-  const cleanTxt=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const cleanTxt=v=>String(v||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
   const isMedicion=p=>{
     const cap=cleanTxt(p.CAPA);
     const tipo=cleanTxt(p.TIPO_INST||p.TIPO||p.INSTALACIO);
@@ -1154,12 +1166,12 @@ function formatNum(v){return Number(v).toLocaleString('es-AR',{maximumFractionDi
 function stamp(v){if(!v)return'Sin dato';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleString('es-AR')}
 
 async function show(f){
-  const p={...props(f)},t=titleOf(p),sub=[p.ID_NQN,p.ID_DUCTO,p.LOC_ID,p.CAPA].filter(Boolean).join(' · ');
+  const p={...props(f)},t=titleOf(p),sub=[p.ID_NQN,p.ID_INST,p.ID_DUCTO,p.LOC_ID,p.CAPA].filter(Boolean).join(' · ');
   const coords=extractLatLon(f.geometry,p);
   const satHtml=satBlockHtml(coords,t);
 
   if(current==='areas'){
-    const keys=[['ID Neuquén',p.ID_NQN],['Nombre',p.NOMBRE],['Bloque',p.BLOQUE],['Tipo de área',p.TIPO_AREA||p.TIPO],['Titular',p.TITULAR],['Operador',p.OPERADOR],['Superficie legal',p.SUP_LEGAL||p.SUPERFICIE],['Participación',p.PARTICIPACION],['Tipo de contrato',p.TIPO_CONTRATO],['Norma legal',p.NORMA_LEGAL],['Inicio contrato',p.INICIO_CONTRATO],['Fin contrato',p.FIN_CONTRATO],['Mensura',p.MENSURA],['Observaciones',p.OBSERVACIONES]];
+    const keys=[['ID Neuquén',p.ID_NQN],['Nombre',p.NOMBRE],['Bloque',p.BLOQUE],['Tipo de área',p.TIPO_AREA||p.TIPO],['Titular',p.TITULAR],['Operador',p.OPERADOR],['Superficie legal',p.SUP_LEGAL||p.SUPERFICIE],['Participación',p.PARTICIPACION||p.PARTICIPAC],['Tipo de contrato',p.TIPO_CONTRATO||p.TIPO_CONTR],['Norma legal',p.NORMA_LEGAL||p.NORMA_LEGA],['Inicio contrato',p.INICIO_CONTRATO||p.INI_CONTRA],['Fin contrato',p.FIN_CONTRATO||p.FIN_CONTRA],['Mensura',p.MENSURA],['Observaciones',p.OBSERVACIONES||p.OBSERVA]];
     $('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc(sub||'ÁREA GIS · NEUQUÉN')}</small></div><div class="kv">${keys.map(x=>row(...x)).join('')}</div>${satHtml}<div id="areaProd" class="prod"><div class="loading">Consultando producción real del área…</div></div>`;
     await Promise.all([loadArea(p.NOMBRE||p.AREA||p.BLOQUE||t),loadSatelitePanel(coords)]);
     return;
@@ -1191,7 +1203,7 @@ async function loadArea(name){const box=$('areaProd');if(!box)return;try{const r
 
 async function showWell(p,coords=null){
   const name=p.WELL_NAME||p.UWI_NQN||'Pozo seleccionado';
-  $('detail').innerHTML=`<div class="banner"><b class="well-name">${esc(name)}</b><small>${esc(p.YACIMIENTO||p.FIELD_NAME||'GIS NEUQUÉN')} · ${esc(operatorOf(p)||'Sin operadora')}</small></div><div id="wellProd" class="prod"><div class="loading">Consultando producción declarada…</div></div>${satBlockHtml(coords,name)}<div class="kv">${[['UWI Neuquén',p.UWI_NQN],['UWI Nación',p.UWI_SEN],['Estado',p.ESTADO_GIS],['Operadora',p.OPERADOR],['Área',p.AREA_LEGAL],['Yacimiento',p.YACIMIENTO],['Formación',p.FORM_PROD],['Reservorio',p.RESERVORIO],['Profundidad',p.PROFUNDIDAD_MEDIDA],['Sistema extracción',p.SIST_EXTRACCION]].map(x=>row(...x)).join('')}</div>`;
+  $('detail').innerHTML=`<div class="banner"><b class="well-name">${esc(name)}</b><small>${esc(p.YACIMIENTO||p.FIELD_NAME||'GIS NEUQUÉN')} · ${esc(operatorOf(p)||'Sin operadora')}</small></div><div id="wellProd" class="prod"><div class="loading">Consultando producción declarada…</div></div>${satBlockHtml(coords,name)}<div class="kv">${[['UWI Neuquén',p.UWI_NQN],['UWI Nación',p.UWI_SEN],['Estado',p.ESTADO_GIS],['Operadora',p.OPERADOR],['Área',p.AREA_LEGAL],['Yacimiento',p.YACIMIENTO||p.FIELD_NAME],['Formación',p.FORM_PROD],['Reservorio',p.RESERVORIO],['Profundidad',p.PROFUNDIDAD_MEDIDA],['Sistema extracción',p.SIST_EXTRACCION]].map(x=>row(...x)).join('')}</div>`;
   loadSatelitePanel(coords);
   const sigla=p.WELL_NAME||p.SIGLA_NACION||'',id=p.UWI_SEN||'';
   try{
@@ -1854,6 +1866,136 @@ function showMendozaWell(p,coords=null){
   $('detail').innerHTML=tabs+`<div class="banner"><b>${esc(wellTitle)}</b><small>${esc(p.area||'')} · ${esc(p.cuenca||'')}</small></div>${satBlockHtml(coords,wellTitle)}<div class="kv">${row('Empresa',p.empresa)}${row('Área',p.area)}${row('Código área',p.cod_area)}${row('Yacimiento',p.yacimiento)}${row('Código yacimiento',p.cod_yacimiento)}${row('Formación',p.formacion)}${row('Últ. período',p.periodo)}${row('Prod. petróleo (m³)',p.prod_pet)}${row('Prod. gas (Mm³)',p.prod_gas)}${row('Prod. agua (m³)',p.prod_agua)}${row('Profundidad',p.profundidad!=null?formatNum(p.profundidad)+' m':null)}${row('Cota',p.cota!=null?formatNum(p.cota)+' m':null)}${row('Clasificación',p.clasificacion)}${row('Subclasificación',p.subclasificacion)}${row('Recurso',p.tipo_recurso)}${row('Tipo pozo',p.tipopozo)}${row('Extracción',p.tipoextraccion)}${row('Estado',p.tipoestado)}</div>`;
   loadSatelitePanel(coords);
 }
+
+// =========================================================================
+// MÓDULO DE CORTES LOCALES NEUQUÉN (PUERTO 8085) Y COMPARADOR OFFLINE A vs B
+// =========================================================================
+const LOCAL_CORTES_URL = "http://localhost:8085";
+const localCortesCache = {};
+const localCortesDisponibles = {
+  pozos: "nqn_pozos.json",
+  locaciones: "nqn_locaciones.json",
+  plantas: "nqn_instalaciones.json",
+  instalaciones: "nqn_instalaciones.json",
+  areas: "nqn_areas.json",
+  pozos_vm: "nqn_pozos_vm.json"
+};
+
+async function leerCorteNeuquenLocal(archivo) {
+  if (localCortesCache[archivo]) return localCortesCache[archivo];
+  const resp = await fetch(`${LOCAL_CORTES_URL}/${archivo}`, { cache: "no-store" });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} en ${archivo}`);
+  const data = await resp.json();
+  const registros = Array.isArray(data.registros) ? data.registros : (Array.isArray(data) ? data : []);
+  localCortesCache[archivo] = registros;
+  return registros;
+}
+
+function parseWktPoint(shapeStr) {
+  if (!shapeStr || typeof shapeStr !== "string") return null;
+  const m = shapeStr.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+  if (!m) return null;
+  const lon = Number(m[1]), lat = Number(m[2]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  return { type: "Point", coordinates: [lon, lat] };
+}
+
+function parseWktMultiPolygon(shapeStr) {
+  if (!shapeStr || typeof shapeStr !== "string") return null;
+  const m = shapeStr.match(/MULTIPOLYGON\s*\(\(\((.+)\)\)\)/i);
+  if (!m) return null;
+  const coords = m[1].split(",").map(par => {
+    const [x, y] = par.trim().split(/\s+/).map(Number);
+    return (Number.isFinite(x) && Number.isFinite(y)) ? [x, y] : null;
+  }).filter(Boolean);
+  if (coords.length < 3) return null;
+  return { type: "Polygon", coordinates: [coords] };
+}
+
+function registrosToFeatures(registros) {
+  return registros.map((row, idx) => {
+    const geom = parseWktPoint(row.Shape) || parseWktMultiPolygon(row.Shape) || null;
+    const propsClean = { ...row };
+    delete propsClean.Shape;
+    return {
+      type: "Feature",
+      id: row.FID || row.ID_INST || row.UWI_NQN || idx,
+      geometry: geom,
+      properties: propsClean
+    };
+  });
+}
+
+async function cargarComparadorLocalNqn() {
+  const capaSel = $("localCmpCapa");
+  const selA = $("localCmpA");
+  const selB = $("localCmpB");
+  const out = $("localCmpResultado");
+  if (!capaSel || !selA || !selB || !out) return;
+
+  const archivo = capaSel.value;
+  out.innerHTML = '<div class="loading">Cargando corte local desde http://localhost:8085…</div>';
+  try {
+    const registros = await leerCorteNeuquenLocal(archivo);
+    const etiqueta = r => r.WELL_NAME || r.NOMBRE || r.INSTALACIO || r.AREA_LEGAL || r.AREA || r.UWI_NQN || r.ID_INST || r.FID || "Sin nombre";
+    const opts = registros.slice(0, 1500).map((r, i) => `<option value="${i}">${esc(etiqueta(r))}</option>`).join("");
+    selA.innerHTML = opts;
+    selB.innerHTML = opts;
+    if (registros.length > 1) selB.selectedIndex = 1;
+    renderizarComparacionLocalNqn(registros);
+  } catch (err) {
+    out.innerHTML = `<div class="loading err">Sin conexión a http://localhost:8085 (${esc(err.message)}). Verificá que servir_cortes.ps1 esté abierto.</div>`;
+  }
+}
+
+function renderizarComparacionLocalNqn(registros) {
+  const selA = $("localCmpA");
+  const selB = $("localCmpB");
+  const out = $("localCmpResultado");
+  if (!selA || !selB || !out) return;
+  const a = registros[Number(selA.value) || 0] || {};
+  const b = registros[Number(selB.value) || 0] || {};
+  const claves = Array.from(new Set([...Object.keys(a), ...Object.keys(b)])).filter(k => k !== "Shape").slice(0, 20);
+
+  out.innerHTML = `
+    <div class="metrics" style="margin-bottom:10px">
+      <div class="metric"><span>ELEMENTO A</span><strong class="c">${esc(a.WELL_NAME || a.NOMBRE || a.INSTALACIO || a.AREA_LEGAL || a.FID || "A")}</strong><small>${esc(a.OPERADOR || a.OPERADOR_I || a.TITULAR || "")}</small></div>
+      <div class="metric"><span>ELEMENTO B</span><strong class="a">${esc(b.WELL_NAME || b.NOMBRE || b.INSTALACIO || b.AREA_LEGAL || b.FID || "B")}</strong><small>${esc(b.OPERADOR || b.OPERADOR_I || b.TITULAR || "")}</small></div>
+      <div class="metric"><span>ORIGEN</span><strong>LOCAL 8085</strong><small>Sin llamada remota</small></div>
+    </div>
+    <div class="kv">
+      ${claves.map(k => `<div class="row"><span>${esc(k)}</span><b>A: ${esc(a[k] ?? "—")} · B: ${esc(b[k] ?? "—")}</b></div>`).join("")}
+    </div>
+  `;
+}
+
+(function injectLocalCmpBox() {
+  const modalBody = $("modalBody");
+  if (!modalBody) return;
+  const box = document.createElement("section");
+  box.className = "card";
+  box.id = "localCortesCard";
+  box.style.marginTop = "10px";
+  box.innerHTML = `
+    <div class="ch"><h3>COMPARADOR RÁPIDO · CORTES LOCALES NEUQUÉN (PUERTO 8085)</h3><span>OFFLINE / SIN TIMEOUT</span></div>
+    <div class="cb">
+      <div class="filters" style="grid-template-columns:180px 1fr 1fr;margin-bottom:10px">
+        <select id="localCmpCapa" onchange="cargarComparadorLocalNqn()">
+          <option value="nqn_pozos.json">Pozos Neuquén</option>
+          <option value="nqn_instalaciones.json">Instalaciones / Baterías</option>
+          <option value="nqn_locaciones.json">Locaciones</option>
+          <option value="nqn_areas.json">Áreas Neuquén</option>
+          <option value="nqn_pozos_vm.json">Pozos Vaca Muerta</option>
+        </select>
+        <select id="localCmpA" onchange="cargarCorteNeuquenLocal($('localCmpCapa').value).then(r=>renderizarComparacionLocalNqn(r))"></select>
+        <select id="localCmpB" onchange="cargarCorteNeuquenLocal($('localCmpCapa').value).then(r=>renderizarComparacionLocalNqn(r))"></select>
+      </div>
+      <div id="localCmpResultado"><div class="loading">Seleccioná una capa o <a href="#" style="color:var(--c)" onclick="event.preventDefault();cargarComparadorLocalNqn()">cargá los datos locales ahora</a>.</div></div>
+    </div>
+  `;
+  const side = modalBody.querySelector("aside.side");
+  if (side) side.appendChild(box);
+})();
 
 fetch(API+'/health').then(r=>r.json()).then(j=>{$('apiStatus').textContent=j.ok?'API ONLINE · NQN · MZA · RN':'API SIN RESPUESTA'}).catch(()=>{$('apiStatus').textContent='API SIN RESPUESTA';document.querySelector('.dot').style.background='var(--r)'});
 </script>
