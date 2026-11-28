@@ -749,6 +749,12 @@ function extractLatLon(geom, propsObj){
   return null;
 }
 
+function resolveNeuquenCoordsOrFallback(geom, propsObj) {
+  const c = extractLatLon(geom, propsObj);
+  if (c && Math.abs(c.lat) <= 90 && Math.abs(c.lon) <= 180) return c;
+  return { lat: -38.95, lon: -68.95 };
+}
+
 function satBlockHtml(coords, label='Elemento'){
   if(!coords)return'';
   const safeLbl = esc(label).replace(/'/g, "\\'");
@@ -1134,9 +1140,8 @@ function render(fit){
 
   const allInst=current==='plantas'?list.filter(f=>!isMedicion(props(f))):list;
   const allMed=current==='plantas'?list.filter(f=>isMedicion(props(f))):[];
-  const hideUnfilteredPlantasDots = (current === 'plantas' && !g && !q);
-  const instList = hideUnfilteredPlantasDots ? [] : (current==='plantas'&&plantasFilter==='med'?[]:allInst);
-  const medList = hideUnfilteredPlantasDots ? [] : (current==='plantas'&&plantasFilter==='inst'?[]:allMed);
+  const instList = current==='plantas'&&plantasFilter==='med'?[]:allInst;
+  const medList = current==='plantas'&&plantasFilter==='inst'?[]:allMed;
 
   const instRenderer=L.canvas({padding:0.5});
   const medRenderer=L.canvas({padding:0.5});
@@ -1198,7 +1203,7 @@ function stamp(v){if(!v)return'Sin dato';const d=new Date(v);return isNaN(d)?Str
 
 async function show(f){
   const p={...props(f)},t=titleOf(p),sub=[p.ID_NQN,p.ID_INST,p.ID_DUCTO,p.LOC_ID,p.CAPA].filter(Boolean).join(' · ');
-  const coords=extractLatLon(f.geometry,p);
+  const coords=resolveNeuquenCoordsOrFallback(f.geometry,p);
   const satHtml=satBlockHtml(coords,t);
 
   if(current==='areas'){
@@ -1233,6 +1238,7 @@ async function show(f){
 async function loadArea(name){const box=$('areaProd');if(!box)return;try{const r=await fetch(API+'/api/produccion/areas?area='+encodeURIComponent(name),{cache:'no-store'}),j=await r.json();if(!r.ok||!j.ok)throw Error(j.error||'Error');const a=j.area;if(!a||!a.periodo){box.innerHTML='<div class="loading">Sin declaraciones asociadas a esta área.</div>';return}box.innerHTML=`<div class="prod-head"><b>PRODUCCIÓN DEL ÁREA</b><span>${esc(a.periodo)}</span></div><div class="metrics"><div class="metric"><span>PETRÓLEO</span><strong class="c">${formatNum(a.petroleo_m3)}</strong><small>m³/mes</small></div><div class="metric"><span>GAS</span><strong>${formatNum(a.gas_miles_m3)}</strong><small>miles m³/mes</small></div><div class="metric"><span>AGUA</span><strong>${formatNum(a.agua_m3)}</strong><small>m³/mes</small></div></div><div class="prod-foot"><b>${formatNum(a.cantidad_pozos)} pozos incluidos</b><br>Operadora/s: ${esc((a.empresas||[]).join(', ')||'Sin dato')}<br>Actualización de fuente: ${esc(stamp(a.fecha_actualizacion))}<br>Fuente: ${esc(a.fuente||j.recurso||'Capítulo IV')}</div>`}catch(e){if(box)box.innerHTML='<div class="loading err">'+esc(e.message)+'</div>'}}
 
 async function showWell(p,coords=null){
+  coords=coords||resolveNeuquenCoordsOrFallback(null,p);
   const name=p.WELL_NAME||p.UWI_NQN||'Pozo seleccionado';
   $('detail').innerHTML=`<div class="banner"><b class="well-name">${esc(name)}</b><small>${esc(p.YACIMIENTO||p.FIELD_NAME||'GIS NEUQUÉN')} · ${esc(operatorOf(p)||'Sin operadora')}</small></div><div id="wellProd" class="prod"><div class="loading">Consultando producción declarada…</div></div>${satBlockHtml(coords,name)}<div class="kv">${[['UWI Neuquén',p.UWI_NQN],['UWI Nación',p.UWI_SEN],['Estado',p.ESTADO_GIS],['Operadora',p.OPERADOR],['Área',p.AREA_LEGAL],['Yacimiento',p.YACIMIENTO||p.FIELD_NAME],['Formación',p.FORM_PROD],['Reservorio',p.RESERVORIO],['Profundidad',p.PROFUNDIDAD_MEDIDA],['Sistema extracción',p.SIST_EXTRACCION]].map(x=>row(...x)).join('')}</div>`;
   loadSatelitePanel(coords);
