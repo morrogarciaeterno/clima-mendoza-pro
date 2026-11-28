@@ -411,7 +411,7 @@ function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatP
 function initMap(){
   if(map)return;
   map=L.map('map',{preferCanvas:true,maxZoom:19}).setView([-38.4,-69.1],7);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap · © CARTO'}).addTo(map);
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
@@ -645,7 +645,7 @@ function setSatBaseTile(mode){
   if(!satMiniMap)return;
   if(satBaseLayer)satMiniMap.removeLayer(satBaseLayer);
   satBaseLayer=mode==='osm'
-    ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'})
+    ?L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap · © CARTO'})
     :L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'});
   satBaseLayer.addTo(satMiniMap);
   if(lastSatCoords){
@@ -2173,6 +2173,8 @@ function renderizarComparacionLocalNqn() {
 
   const a = tieneA ? registros[Number(selA.value)] : null;
   const b = tieneB ? registros[Number(selB.value)] : null;
+  const ptA = a ? extractLatLon(parseWktPoint(a?.Shape || ""), a) : null;
+  const ptB = b ? extractLatLon(parseWktPoint(b?.Shape || ""), b) : null;
   marcarDosEnMapa(a || {}, b || {});
 
   const refA = a || {};
@@ -2195,12 +2197,21 @@ function renderizarComparacionLocalNqn() {
   const subB = b ? [obtenerOperadorRegistroLocal(b), b.AREA || b.AREA_LEGAL].filter(Boolean).join(" · ") : "";
   const cantDiff = claves.filter(k => (a ? normVal(a[k]) : "") !== (b ? normVal(b[k]) : "")).length;
 
+  const safeTitA = esc(tituloA).replace(/'/g, "\\'");
+  const safeTitB = esc(tituloB).replace(/'/g, "\\'");
+  const btnPopupA = ptA ? `<button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9px;color:var(--c);border-color:var(--c)" onclick="openSatInternalPopup(${ptA.lat},${ptA.lon},'${safeTitA}')">POPUP FIRMS/CLIMA A</button>` : "";
+  const btnPopupB = ptB ? `<button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9px;color:var(--a);border-color:var(--a)" onclick="openSatInternalPopup(${ptB.lat},${ptB.lon},'${safeTitB}')">POPUP FIRMS/CLIMA B</button>` : "";
+
   out.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       <span style="font-size:10px;color:var(--mut)">Diferencias: <b style="color:var(--txt)">${cantDiff}</b> · A (celeste) y B (amarillo) en el mapa</span>
-      <button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9.5px" onclick="toggleSoloDiferenciasCmp()">
-        ${window._soloDiferenciasCmp ? "VER TODOS CON DATO" : "VER SOLO DIFERENCIAS"}
-      </button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${btnPopupA}
+        ${btnPopupB}
+        <button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9.5px" onclick="toggleSoloDiferenciasCmp()">
+          ${window._soloDiferenciasCmp ? "VER TODOS CON DATO" : "VER SOLO DIFERENCIAS"}
+        </button>
+      </div>
     </div>
     <div class="cmp-table-wrap">
       <table class="cmp-table">
