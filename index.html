@@ -1089,7 +1089,11 @@ $('search').oninput=()=>{
 };
 $('group').onchange=()=>{
   if(current==='rnAmbos'){renderRioNegroCombined(false);return}
-  ['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos','rnAreas','rnPozos'].includes(current)?renderCuencaLayer(false):render(false);
+  if(['mendozaAreas','mendozaPozos','mendozaDuctos','mendozaPlantas','rnDuctos','rnAreas','rnPozos'].includes(current)){
+    renderCuencaLayer(false);
+  } else {
+    render(true);
+  }
 };
 function setPlantasFilter(f){plantasFilter=f;render(false)}
 function setMzaPlantasFilter(f){mzaPlantasFilter=f;renderCuencaLayer(false)}
@@ -1115,8 +1119,9 @@ function render(fit){
 
   const allInst=current==='plantas'?list.filter(f=>!isMedicion(props(f))):list;
   const allMed=current==='plantas'?list.filter(f=>isMedicion(props(f))):[];
-  const instList=current==='plantas'&&plantasFilter==='med'?[]:allInst;
-  const medList=current==='plantas'&&plantasFilter==='inst'?[]:allMed;
+  const hideUnfilteredPlantasDots = (current === 'plantas' && !g && !q);
+  const instList = hideUnfilteredPlantasDots ? [] : (current==='plantas'&&plantasFilter==='med'?[]:allInst);
+  const medList = hideUnfilteredPlantasDots ? [] : (current==='plantas'&&plantasFilter==='inst'?[]:allMed);
 
   const instRenderer=L.canvas({padding:0.5});
   const medRenderer=L.canvas({padding:0.5});
@@ -2022,18 +2027,19 @@ function marcarDosEnMapa(a, b) {
   window._cmpMarkersLayer.clearLayers();
   const bounds = [];
 
-  const ptA = extractLatLon(parseWktPoint(a?.Shape || ""), a);
+  // Marcar únicamente los 2 elementos comparados: A (celeste) y B (amarillo)
+  const ptA = a ? extractLatLon(parseWktPoint(a?.Shape || ""), a) : null;
   if (ptA) {
-    const nomA = a.WELL_NAME || a.NOMBRE || a.INSTALACIO || "Pozo A";
+    const nomA = a.WELL_NAME || a.NOMBRE || a.INSTALACIO || "Elemento A";
     L.circleMarker([ptA.lat, ptA.lon], {
       radius: 10, color: "#ffffff", weight: 2.5, fillColor: "#24d6d0", fillOpacity: 1
     }).bindTooltip("A: " + esc(nomA)).addTo(window._cmpMarkersLayer);
     bounds.push([ptA.lat, ptA.lon]);
   }
 
-  const ptB = extractLatLon(parseWktPoint(b?.Shape || ""), b);
+  const ptB = b ? extractLatLon(parseWktPoint(b?.Shape || ""), b) : null;
   if (ptB) {
-    const nomB = b.WELL_NAME || b.NOMBRE || b.INSTALACIO || "Pozo B";
+    const nomB = b.WELL_NAME || b.NOMBRE || b.INSTALACIO || "Elemento B";
     L.circleMarker([ptB.lat, ptB.lon], {
       radius: 10, color: "#071018", weight: 2.5, fillColor: "#f4b544", fillOpacity: 1
     }).bindTooltip("B: " + esc(nomB)).addTo(window._cmpMarkersLayer);
