@@ -83,7 +83,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .close:hover{color:#fff;border-color:var(--r)}
 .body{min-height:0;display:grid;grid-template-columns:minmax(280px,1fr) minmax(480px,580px);gap:10px;padding:10px}
 .body.stats-mode{grid-template-columns:1fr}
-.body.stats-mode .map{display:none}
+.body.stats-mode .map,.body.stats-mode .map-wrap{display:none}
 .map{height:100%;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#09141d}
 .side{min-height:0;height:100%;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:10px;padding-right:2px}
 .card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,var(--p2),var(--p));flex-shrink:0}
@@ -177,6 +177,138 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .leaflet-control-attribution a{color:var(--c)!important}
 @media(max-width:1180px){.basin-selector{grid-template-columns:repeat(2,minmax(0,1fr))}.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1000px){.basin-selector,.launch,.launch.cuyana-grid,.launch.rn-grid{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{max-height:45vh}.body.stats-mode .side{max-height:none}.stats-grid,.cmp-grid,.wx-strip{grid-template-columns:1fr}.hub{padding:20px;height:auto;min-height:100%}.hub h1{font-size:30px}}
+
+/* === ESTILO SCADA / IGNITION PERSPECTIVE HMI === */
+:root{
+  --bg:#060b11;
+  --p:#0c1520;
+  --p2:#111d2b;
+  --line:#22384d;
+  --txt:#e8f1f8;
+  --mut:#7d96ad;
+  --c:#29c7d9;
+  --g:#28c76f;
+  --a:#eab308;
+  --r:#ef4444;
+}
+body{
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(to right, rgba(41,199,217,.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(41,199,217,.035) 1px, transparent 1px);
+  background-size:24px 24px;
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+header{
+  background:#070d14;
+  border-bottom:1px solid #253f57;
+  box-shadow:0 2px 12px rgba(0,0,0,.45);
+}
+.brand{
+  font-size:15px;
+  letter-spacing:.14em;
+}
+.status{
+  background:#0b1926;
+  border:1px solid #26465e;
+  border-radius:4px;
+  font-family:'Consolas','JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.hub{
+  border-radius:6px;
+  border:1px solid #243c52;
+  background:linear-gradient(180deg,#0d1724 0%,#080f18 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 20px 50px rgba(0,0,0,.65);
+}
+.basin-card,.launch button{
+  border-radius:6px;
+  border:1px solid #22384d;
+  background:linear-gradient(180deg,#101c2a 0%,#0b131d 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+.basin-card:hover,.launch button:hover{
+  border-color:var(--c);
+  background:linear-gradient(180deg,#142537 0%,#0d1926 100%);
+}
+.basin-topbar{
+  border-radius:6px;
+  border:1px solid #22384d;
+  background:#0a131d;
+}
+.back-btn,.close,.subtabs button,.fluid-switch button,.stats-cuencas button,.month-picker,.native-cta{
+  border-radius:4px;
+  font-family:'Consolas','JetBrains Mono',monospace;
+  letter-spacing:.06em;
+}
+.window,.sat-dialog{
+  border-radius:6px;
+  border:1px solid #294660;
+  background:#09111a;
+}
+.head{
+  background:#070e16;
+  border-bottom:1px solid #22384d;
+}
+.head h2{
+  font-family:'Consolas','JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.11em;
+}
+.card{
+  border-radius:6px;
+  border:1px solid #22384d;
+  background:linear-gradient(180deg,#0e1926 0%,#09111a 100%);
+}
+.ch{
+  height:34px;
+  background:#081018;
+  border-bottom:1px solid #1e3246;
+}
+.ch h3{
+  font-family:'Consolas','JetBrains Mono',monospace;
+  font-size:9.5px;
+  letter-spacing:.12em;
+  color:#9bb8d1;
+}
+.ch span{
+  font-family:'Consolas','JetBrains Mono',monospace;
+  font-size:9px;
+  color:var(--c);
+}
+.banner{
+  border-radius:5px;
+  border:1px solid #264761;
+  background:linear-gradient(90deg,#0d1f30 0%,#091420 100%);
+}
+.metric,.wx-box,.prod,.route-box,.chart-card,.stats-panel{
+  border-radius:5px;
+  border-color:#20364b;
+  background:#070e16;
+}
+.metric strong,.wx-box strong,.row b,.cmp-table td{
+  font-variant-numeric:tabular-nums;
+}
+.map,#satMap{
+  border-radius:6px;
+  border:1px solid #243d54;
+}
+footer{
+  background:#060b11;
+  border-top:1px solid #1e3246;
+  font-family:'Consolas','JetBrains Mono',monospace;
+  letter-spacing:.06em;
+}
+
+
+.map-wrap{position:relative;height:100%;min-height:0}
+.map-layer-toggle{position:absolute;top:10px;right:10px;z-index:1000;display:flex;gap:2px;background:#070e16e6;border:1px solid #22384d;border-radius:3px;padding:2px;box-shadow:0 2px 10px rgba(0,0,0,.55)}
+.map-layer-toggle button{height:21px;padding:0 7px;border:1px solid transparent;border-radius:2px;background:transparent;color:#7d96ad;font-family:'Consolas','JetBrains Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.map-layer-toggle button.active{background:#102536;border-color:#29c7d9;color:#29c7d9}
+.map-layer-toggle button:hover:not(.active){color:#e8f1f8}
+
 </style>
 </head>
 <body>
@@ -317,7 +449,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
     </div>
   </main>
 
-  <footer><span>TERRITORIA ENERGY</span><span>GIS NEUQUÉN · MENDOZA · RÍO NEGRO · RES. 319/93</span><span id="foot">SISTEMA LISTO</span></footer>
+  <footer><span>TERRITORIA ENERGY</span><span>SCADA HMI · NEUQUÉN · MENDOZA · RÍO NEGRO · RES. 319/93</span><span id="foot">SISTEMA LISTO</span></footer>
 </div>
 
 <div class="modal" id="modal">
@@ -329,7 +461,14 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
       </div>
     </div>
     <div class="body" id="modalBody">
-      <div id="map" class="map"></div>
+      <div class="map-wrap">
+        <div class="map-layer-toggle" id="mainMapLayerToggle">
+          <button type="button" id="btnMainBaseStreet" class="active" onclick="setMainBaseTile('street')">MAPA POLÍTICO</button>
+          <button type="button" id="btnMainBaseSat" onclick="setMainBaseTile('sat')">SATELITAL REAL</button>
+          <button type="button" id="btnPlotAllDuctos" onclick="togglePlotAllDuctos()">TODOS LOS DUCTOS</button>
+        </div>
+        <div id="map" class="map"></div>
+      </div>
       <aside class="side">
         <section class="card" id="filterCard">
           <div class="ch"><h3>FILTRO</h3><span id="count">0 ELEMENTOS</span></div>
@@ -392,7 +531,8 @@ function setStatsLayout(isStats){
   if(isStats && window._cmpMarkersLayer) window._cmpMarkersLayer.clearLayers();
   const card=$('localCortesCard');
   if(card) card.style.display = (!isStats && esModuloNeuquenConComparador()) ? '' : 'none';
-  $('filterCard').style.display=isStats?'none':'';
+  const isNqnMod = ['pozos','locaciones','ductos','plantas','areas'].includes(current);
+  $('filterCard').style.display=(isStats || isNqnMod)?'none':'';
   $('detailTitle').textContent=isStats?'TABLERO ESTADÍSTICO · 12 MESES & COMPARATIVA MENSUAL':'DETALLE DEL ELEMENTO';
   if(!isStats&&map)setTimeout(()=>map.invalidateSize(),80);
 }
@@ -406,12 +546,70 @@ function closeSatPopup(){
   }
   $('satPopup').classList.remove('open');
 }
-function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatPopup();if(mainHeatGroup)mainHeatGroup.clearLayers();setStatsLayout(false);$('modal').classList.remove('open')}
+function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatPopup();plotAllDuctosActive=false;if($('btnPlotAllDuctos'))$('btnPlotAllDuctos').classList.remove('active');if(ductosAllLayer)ductosAllLayer.clearLayers();if(mainHeatGroup)mainHeatGroup.clearLayers();setStatsLayout(false);$('modal').classList.remove('open')}
 
+let mainBaseLayer=null;
+let ductosAllLayer=null;
+let plotAllDuctosActive=false;
+
+async function togglePlotAllDuctos(){
+  plotAllDuctosActive = !plotAllDuctosActive;
+  const btn = $('btnPlotAllDuctos');
+  if(btn) btn.classList.toggle('active', plotAllDuctosActive);
+  initMap();
+  if(!ductosAllLayer) ductosAllLayer = L.layerGroup().addTo(map);
+  ductosAllLayer.clearLayers();
+  if(!plotAllDuctosActive){
+    if(map && map.getContainer()) map.getContainer().style.cursor='';
+    return;
+  }
+  try{
+    let ductosFeatures = (current === 'ductos' && Array.isArray(raw) && raw.length) ? raw : [];
+    if(!ductosFeatures.length){
+      const r = await fetch(API+'/api/infraestructura?tipo=ductos',{cache:'no-store'});
+      const j = await r.json();
+      if(r.ok && j.ok) ductosFeatures = j.features || [];
+    }
+    if(!ductosFeatures.length) return;
+    const dCanvas = L.canvas({padding:0.5});
+    const gjDuctos = L.geoJSON({type:'FeatureCollection',features:ductosFeatures},{
+      renderer:dCanvas,
+      style:f=>{
+        const p=f.properties||{};
+        const gas=/GAS/.test(String(p.FLUIDO||p.TIPO||'').toUpperCase());
+        return{color:gas?'#f4b544':'#29c7d9',weight:2.6,opacity:0.9};
+      },
+      onEachFeature:(f,l)=>{
+        const p=f.properties||{};
+        const nom=p.NOMBRE||p.nombre||p.nombre_tramo||p.ducto||p.ID_DUCTO||'Ducto';
+        const op=operatorOf(p)||'Sin operadora';
+        l.bindTooltip(`${esc(nom)} · ${esc(op)}`);
+        attachPointerCursor(l);
+        l.on('click',()=>show(f));
+      }
+    }).addTo(ductosAllLayer);
+    if(gjDuctos.getBounds().isValid()){
+      map.invalidateSize();
+      map.fitBounds(gjDuctos.getBounds(),{padding:[30,30],maxZoom:12});
+    }
+  }catch(_){}
+}
+
+function setMainBaseTile(mode){
+  if(!map)return;
+  if(mainBaseLayer)map.removeLayer(mainBaseLayer);
+  mainBaseLayer = mode==='sat'
+    ? L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'})
+    : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Street Map · Boundaries & Roads'});
+  mainBaseLayer.addTo(map);
+  const bSt=$('btnMainBaseStreet'), bSa=$('btnMainBaseSat');
+  if(bSt)bSt.classList.toggle('active',mode!=='sat');
+  if(bSa)bSa.classList.toggle('active',mode==='sat');
+}
 function initMap(){
   if(map)return;
   map=L.map('map',{preferCanvas:true,maxZoom:19}).setView([-38.4,-69.1],7);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Street Map · Boundaries & Roads'}).addTo(map);
+  setMainBaseTile('street');
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
@@ -835,7 +1033,22 @@ async function loadSatelitePanel(coords){
 }
 
 async function openModule(type){
-  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;current=type;wellMode=type==='pozos';plantasFilter='all';setStatsLayout(false);sincronizarVisibilidadComparadorCuenca();
+  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;current=type;wellMode=type==='pozos';plantasFilter='all';
+  if(window._cmpMarkersLayer)window._cmpMarkersLayer.clearLayers();
+  if(mainHeatGroup)mainHeatGroup.clearLayers();
+  if(groupLayer)groupLayer.clearLayers();
+  const capaSel=$('localCmpCapa');
+  const mapCapa={pozos:'nqn_pozos.json',plantas:'nqn_instalaciones.json',locaciones:'nqn_locaciones.json',areas:'nqn_areas.json'};
+  if(capaSel && mapCapa[type] && capaSel.value!==mapCapa[type]){
+    capaSel.value=mapCapa[type];
+    window._ultimosRegistrosLocales=[];
+    if($('localCmpOpA'))$('localCmpOpA').innerHTML='<option value="">Elegí operadora…</option>';
+    if($('localCmpOpB'))$('localCmpOpB').innerHTML='<option value="">Elegí operadora…</option>';
+    if($('localCmpA'))$('localCmpA').innerHTML='';
+    if($('localCmpB'))$('localCmpB').innerHTML='';
+    if($('localCmpResultado'))$('localCmpResultado').innerHTML='<div class="loading">Seleccioná operadoras para comparar en este módulo.</div>';
+  }
+  setStatsLayout(false);sincronizarVisibilidadComparadorCuenca();
   $('modal').classList.add('open');
   $('title').textContent=({
     pozos:'CUENCA NEUQUINA · PADRÓN DE POZOS',
@@ -854,6 +1067,7 @@ async function openModule(type){
           raw=registrosToFeatures(registrosLocales);
           $('layer').textContent=`LOCAL · ${localCortesDisponibles[type]}`;
           buildGroups();render(true);
+          cargarComparadorLocalNqn();
           $('apiStatus').textContent='CORTE LOCAL · NEUQUÉN (8085)';
           return;
         }
@@ -1123,7 +1337,18 @@ function render(fit){
   initMap();
   if(!map.hasLayer(groupLayer))groupLayer.addTo(map);
   groupLayer.clearLayers();
-  const q=$('search').value.trim().toLowerCase(),g=$('group').value;
+  const isNqnAll = ['pozos','locaciones','ductos','plantas','areas'].includes(current);
+  if(isNqnAll){
+    $('count').textContent=raw.length+' ELEMENTOS';
+    if(fit){
+      map.invalidateSize();
+      map.setView([-38.4,-69.1],7);
+    }
+    $('detail').innerHTML='<div class="loading">Mapa limpio listo. Elegí Operadora A y B en el comparador para ubicarlos en el mapa y ver su yacimiento y datos.</div>';
+    return;
+  }
+  const q=$('search').value.trim().toLowerCase();
+  const g=$('group').value;
   const list=raw.filter(f=>{
     const p=props(f);
     const opKey=current==='locaciones'?normOp(locGroupOf(p)):normOp(operatorOf(p));
@@ -1216,8 +1441,28 @@ async function show(f){
     const tipo=p.TIPO_INST||p.TIPO||p.CAPA||'Instalación';
     const oper=operatorOf(p)||'Sin dato';
     const areaName=p.AREA||p.CONCESION||p.YACIMIENTO||'';
-    const entries=Object.entries(p).filter(([,v])=>v!==null&&v!==''&&String(v).trim()!=='');
-    $('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc(sub||'PLANTA / INSTALACIÓN · NEUQUÉN')}</small></div><div class="metrics" style="margin-bottom:10px"><div class="metric"><span>TIPO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div><div class="metric"><span>OPERADOR</span><strong title="${esc(oper)}">${esc(oper)}</strong></div><div class="metric"><span>ÁREA</span><strong class="a" title="${esc(areaName||'Sin dato')}">${esc(areaName||'Sin dato')}</strong></div></div><div class="kv">${entries.map(([k,v])=>row(k,v)).join('')}</div>${satHtml}${areaName?`<div id="areaProd" class="prod"><div class="loading">Consultando producción real del área ${esc(areaName)}…</div></div>`:''}`;
+    const camposPlantas=[
+      ['Tipo de instalación',tipo],
+      ['Operador',oper],
+      ['Área / Yacimiento',areaName],
+      ['Estado',p.ESTADO],
+      ['Diseño gas',p.Q_DISEÑO_G],
+      ['Gas actual',p.Q_ACTUAL_G],
+      ['Capacidad ociosa gas',p.CAP_GAS_OC],
+      ['Diseño petróleo',p.Q_DISEÑO_P],
+      ['Petróleo actual',p.Q_ACTUAL_P],
+      ['Capacidad ociosa petróleo',p.CAP_PET_OC],
+      ['Gas combustible',p.GAS_COMBUS],
+      ['Origen de producción',p.ORIGEN_PRO],
+      ['Entrega de gas',p.ENTREGA_GA],
+      ['Entrega de líquidos',p.ENTREGA_LI],
+      ['Cant. tanques',p.CANT_TANQU],
+      ['Volumen tanques',p.VOL_TANQUE],
+      ['Cant. compresores',p.CANT_COMPR],
+      ['Cap. compresión',p.CAP_COMPRE],
+      ['Sistema venteo',p.SISTEMA_VE||p.VENTEO]
+    ];
+    $('detail').innerHTML=`<div class="banner"><b>${esc(t)}</b><small>${esc(sub||'PLANTA / INSTALACIÓN · NEUQUÉN')}</small></div><div class="metrics" style="margin-bottom:10px"><div class="metric"><span>TIPO</span><strong class="c" title="${esc(tipo)}">${esc(tipo)}</strong></div><div class="metric"><span>OPERADOR</span><strong title="${esc(oper)}">${esc(oper)}</strong></div><div class="metric"><span>ÁREA</span><strong class="a" title="${esc(areaName||'Sin dato')}">${esc(areaName||'Sin dato')}</strong></div></div><div class="kv">${camposPlantas.map(x=>row(...x)).join('')}</div>${satHtml}${areaName?`<div id="areaProd" class="prod"><div class="loading">Consultando producción real del área ${esc(areaName)}…</div></div>`:''}`;
     await Promise.all([areaName?loadArea(areaName):Promise.resolve(),loadSatelitePanel(coords)]);
     return;
   }
@@ -1239,8 +1484,34 @@ async function loadArea(name){const box=$('areaProd');if(!box)return;try{const r
 
 async function showWell(p,coords=null){
   coords=coords||resolveNeuquenCoordsOrFallback(null,p);
-  const name=p.WELL_NAME||p.UWI_NQN||'Pozo seleccionado';
-  $('detail').innerHTML=`<div class="banner"><b class="well-name">${esc(name)}</b><small>${esc(p.YACIMIENTO||p.FIELD_NAME||'GIS NEUQUÉN')} · ${esc(operatorOf(p)||'Sin operadora')}</small></div><div id="wellProd" class="prod"><div class="loading">Consultando producción declarada…</div></div>${satBlockHtml(coords,name)}<div class="kv">${[['UWI Neuquén',p.UWI_NQN],['UWI Nación',p.UWI_SEN],['Estado',p.ESTADO_GIS],['Operadora',p.OPERADOR],['Área',p.AREA_LEGAL],['Yacimiento',p.YACIMIENTO||p.FIELD_NAME],['Formación',p.FORM_PROD],['Reservorio',p.RESERVORIO],['Profundidad',p.PROFUNDIDAD_MEDIDA],['Sistema extracción',p.SIST_EXTRACCION]].map(x=>row(...x)).join('')}</div>`;
+  const name=p.WELL_NAME||p.SIGLA_NACION||p.UWI_NQN||'Pozo seleccionado';
+  const yac=p.YACIMIENTO||p.FIELD_NAME||p.AREA_LEGAL||'Sin yacimiento informado';
+  const area=p.AREA_LEGAL||p.AREA||'Sin dato';
+  const op=operatorOf(p)||'Sin operadora';
+  const est=p.ESTADO_GIS||p.ESTADO||'Sin dato';
+  $('detail').innerHTML=`
+    <div class="banner">
+      <b class="well-name">${esc(name)}</b>
+      <small>YACIMIENTO: ${esc(yac)} · ${esc(op)}</small>
+    </div>
+    <div class="metrics" style="margin-bottom:10px">
+      <div class="metric"><span>YACIMIENTO</span><strong class="c" title="${esc(yac)}">${esc(yac)}</strong></div>
+      <div class="metric"><span>OPERADORA</span><strong title="${esc(op)}">${esc(op)}</strong></div>
+      <div class="metric"><span>ESTADO</span><strong class="a" title="${esc(est)}">${esc(est)}</strong></div>
+    </div>
+    <div class="kv">${[
+      ['Yacimiento',yac],
+      ['Área / Concesión',area],
+      ['Operadora',op],
+      ['Formación productiva',p.FORM_PROD],
+      ['Reservorio',p.RESERVORIO],
+      ['Sistema extracción',p.SIST_EXTRACCION],
+      ['Tipo / Clase',p.CLASS_NAME||p.TIPO_POZO],
+      ['Profundidad medida',p.PROFUNDIDAD_MEDIDA]
+    ].map(x=>row(...x)).join('')}</div>
+    <div id="wellProd" class="prod"><div class="loading">Consultando producción declarada…</div></div>
+    ${satBlockHtml(coords,name)}
+  `;
   loadSatelitePanel(coords);
   const sigla=p.WELL_NAME||p.SIGLA_NACION||'',id=p.UWI_SEN||'';
   try{
@@ -1938,13 +2209,31 @@ async function leerCorteNeuquenLocal(archivo) {
   }
 }
 
+
+function gaussKrugerToLatLon(xEast, yNorth){
+  // Argentina GK Faja 2 (central meridian -69 deg, false easting 2500000)
+  const east = Number(xEast), north = Number(yNorth);
+  if(!Number.isFinite(east) || !Number.isFinite(north)) return null;
+  if(east > 1000000 && east < 4000000 && north > 4000000 && north < 7500000){
+    const lat = -(north / 111132.95);
+    const lon = -69.0 + ((east - 2500000) / (111319.49 * Math.cos(lat * Math.PI / 180)));
+    if(lat >= -56 && lat <= -21 && lon >= -74 && lon <= -53) return { lat, lon };
+  }
+  return null;
+}
+
 function parseWktPoint(shapeStr) {
   if (!shapeStr || typeof shapeStr !== "string") return null;
-  const m = shapeStr.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+  const m = shapeStr.match(/POINT\s*(?:Z|M|ZM)?\s*\(\s*([-\d.]+)\s+([-\d.]+)/i);
   if (!m) return null;
-  const lon = Number(m[1]), lat = Number(m[2]);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-  return { type: "Point", coordinates: [lon, lat] };
+  const c1 = Number(m[1]), c2 = Number(m[2]);
+  if (!Number.isFinite(c1) || !Number.isFinite(c2)) return null;
+  if (Math.abs(c2) <= 90 && Math.abs(c1) <= 180) {
+    return { type: "Point", coordinates: [c1, c2] };
+  }
+  const gk = gaussKrugerToLatLon(c1, c2) || gaussKrugerToLatLon(c2, c1);
+  if (gk) return { type: "Point", coordinates: [gk.lon, gk.lat] };
+  return null;
 }
 
 function parseWktMultiPolygon(shapeStr) {
@@ -1961,7 +2250,17 @@ function parseWktMultiPolygon(shapeStr) {
 
 function registrosToFeatures(registros) {
   return registros.map((row, idx) => {
-    const geom = parseWktPoint(row.Shape) || parseWktMultiPolygon(row.Shape) || null;
+    let geom = parseWktPoint(row.Shape) || parseWktMultiPolygon(row.Shape) || null;
+    if (!geom) {
+      const lat = Number(row.LATITUD ?? row.latitud ?? row.LAT ?? row.lat);
+      const lon = Number(row.LONGITUD ?? row.longitud ?? row.LON ?? row.lon);
+      if (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && (lat !== 0 || lon !== 0)) {
+        geom = { type: "Point", coordinates: [lon, lat] };
+      } else if (row.COORD_X != null && row.COORD_Y != null) {
+        const gk = gaussKrugerToLatLon(row.COORD_X, row.COORD_Y) || gaussKrugerToLatLon(row.COORD_Y, row.COORD_X);
+        if (gk) geom = { type: "Point", coordinates: [gk.lon, gk.lat] };
+      }
+    }
     const propsClean = { ...row };
     delete propsClean.Shape;
     return {
@@ -2002,6 +2301,7 @@ function etiquetaCampoLegible(k) {
     NOMBRE: "Nombre",
     WELL_NAME: "Pozo",
     WELL_S_NAME: "Nombre corto",
+    YACIMIENTO: "Yacimiento",
     FIELD_NAME: "Yacimiento / Campo",
     UWI_NQN: "UWI Neuquén",
     UWI_SEN: "UWI Nación",
@@ -2051,6 +2351,11 @@ function sincronizarVisibilidadComparadorCuenca() {
   }
 }
 
+function obtenerYacimientoOArea(r){
+  if(!r || typeof r !== "object") return "";
+  return String(r.YACIMIENTO || r.FIELD_NAME || r.AREA || r.AREA_LEGAL || r.CONCESION || "").trim();
+}
+
 function marcarDosEnMapa(a, b) {
   if (!esModuloNeuquenConComparador()) return;
   initMap();
@@ -2066,18 +2371,26 @@ function marcarDosEnMapa(a, b) {
   const ptA = a ? extractLatLon(parseWktPoint(a?.Shape || ""), a) : null;
   if (ptA) {
     const nomA = a.WELL_NAME || a.NOMBRE || a.INSTALACIO || "Elemento A";
+    const yacA = obtenerYacimientoOArea(a);
     L.circleMarker([ptA.lat, ptA.lon], {
       radius: 10, color: "#ffffff", weight: 2.5, fillColor: "#24d6d0", fillOpacity: 1
-    }).bindTooltip("A: " + esc(nomA)).addTo(window._cmpMarkersLayer);
+    })
+    .bindTooltip("A: " + esc(nomA) + (yacA ? " · Yac/Área: " + esc(yacA) : ""))
+    .on("click", () => show({ type: "Feature", geometry: { type: "Point", coordinates: [ptA.lon, ptA.lat] }, properties: a }))
+    .addTo(window._cmpMarkersLayer);
     bounds.push([ptA.lat, ptA.lon]);
   }
 
   const ptB = b ? extractLatLon(parseWktPoint(b?.Shape || ""), b) : null;
   if (ptB) {
     const nomB = b.WELL_NAME || b.NOMBRE || b.INSTALACIO || "Elemento B";
+    const yacB = obtenerYacimientoOArea(b);
     L.circleMarker([ptB.lat, ptB.lon], {
       radius: 10, color: "#071018", weight: 2.5, fillColor: "#f4b544", fillOpacity: 1
-    }).bindTooltip("B: " + esc(nomB)).addTo(window._cmpMarkersLayer);
+    })
+    .bindTooltip("B: " + esc(nomB) + (yacB ? " · Yac/Área: " + esc(yacB) : ""))
+    .on("click", () => show({ type: "Feature", geometry: { type: "Point", coordinates: [ptB.lon, ptB.lat] }, properties: b }))
+    .addTo(window._cmpMarkersLayer);
     bounds.push([ptB.lat, ptB.lon]);
   }
 
@@ -2109,12 +2422,102 @@ function llenarPozosDeOperadora(selectPozoEl, registros, opKey) {
 
   selectPozoEl.innerHTML = pozosOp.map(({ r, idx }) => {
     const nombre = r.WELL_NAME || r.NOMBRE || r.INSTALACIO || r.AREA_LEGAL || r.AREA || r.UWI_NQN || r.FID || ("#" + (idx + 1));
-    const area = r.AREA_LEGAL || r.AREA || r.FIELD_NAME || "";
-    const label = area ? `${nombre} (${area})` : String(nombre);
+    const yac = obtenerYacimientoOArea(r);
+    const label = yac ? `${nombre} · Yac/Área: ${yac}` : String(nombre);
     return `<option value="${idx}">${esc(label)}</option>`;
   }).join("");
   selectPozoEl.selectedIndex = 0;
   selectPozoEl.value = String(pozosOp[0].idx);
+}
+
+
+function haversineKm(lat1, lon1, lat2, lon2){
+  const R = 6371.0088;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function calcularKmFeatureDucto(feat){
+  const p = feat?.properties || feat || {};
+  const lenRaw = p.LONGITUD_M ?? p.longitud_m ?? p.LARGO ?? p.largo ?? p.LONGITUD ?? p.longitud ?? p.SHAPE_LEN ?? p.Shape_Leng ?? null;
+  if(lenRaw !== null && lenRaw !== undefined && String(lenRaw).trim() !== ''){
+    const num = Number(String(lenRaw).replace(',', '.'));
+    if(Number.isFinite(num) && num > 0){
+      // If value looks like meters (> 250) convert to km; if already in km (< 250) keep as km
+      return num > 250 ? (num / 1000) : num;
+    }
+  }
+  const geom = feat?.geometry;
+  if(!geom || !geom.coordinates) return 0;
+  const sumLine = coords => {
+    let km = 0;
+    for(let i = 1; i < coords.length; i++){
+      const [lon1, lat1] = coords[i-1];
+      const [lon2, lat2] = coords[i];
+      if([lat1, lon1, lat2, lon2].every(Number.isFinite)){
+        km += haversineKm(lat1, lon1, lat2, lon2);
+      }
+    }
+    return km;
+  };
+  if(geom.type === 'LineString') return sumLine(geom.coordinates);
+  if(geom.type === 'MultiLineString') return geom.coordinates.reduce((acc, line) => acc + sumLine(line), 0);
+  return 0;
+}
+
+function agruparOleoductosPorOperadora(features){
+  const grupos = new Map();
+  let totalKm = 0;
+  for(const f of (features || [])){
+    const p = f.properties || {};
+    const opLabel = operatorOf(p) || p.OPERADOR || p.OPERADOR_I || p.TITULAR || 'SIN OPERADORA';
+    const opKey = normOp(opLabel) || 'SIN OPERADORA';
+    const km = calcularKmFeatureDucto(f);
+    totalKm += km;
+    if(!grupos.has(opKey)){
+      grupos.set(opKey, { key: opKey, operadora: opLabel, km: 0, tramos: 0, items: [] });
+    }
+    const g = grupos.get(opKey);
+    g.km += km;
+    g.tramos += 1;
+    g.items.push({ f, km });
+  }
+  const lista = [...grupos.values()].sort((a, b) => b.km - a.km);
+  return { totalKm, totalTramos: (features || []).length, grupos: lista };
+}
+
+function pintarDesgloseOleoductosPorOperadora(){
+  const features = window._ultimosDuctosFeatures || [];
+  const res = agruparOleoductosPorOperadora(features);
+  const out = $("localCmpResultado");
+  if(!out) return;
+  const filasHtml = res.grupos.map((g, idx) => {
+    const pct = res.totalKm > 0 ? Math.min(100, (g.km / res.totalKm) * 100) : 0;
+    return `
+      <div class="bar-item" style="margin-bottom:10px">
+        <div class="bar-top">
+          <b>${idx + 1}. ${esc(g.operadora)}</b>
+          <span style="color:var(--c)">${formatNum(g.km)} km · ${g.tramos} tramos</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
+      </div>
+    `;
+  }).join('');
+
+  out.innerHTML = `
+    <div class="banner" style="margin-bottom:10px">
+      <b>OLEODUCTOS Y DUCTOS POR OPERADORA</b>
+      <small>TOTAL: ${formatNum(res.totalKm)} KM · ${res.totalTramos} TRAMOS · ${res.grupos.length} OPERADORAS</small>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9px;color:var(--c);border-color:var(--c)" onclick="if(!plotAllDuctosActive)togglePlotAllDuctos()">DIBUJAR TODOS EN MAPA</button>
+      <button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9px" onclick="if(plotAllDuctosActive)togglePlotAllDuctos()">OCULTAR TRAZAS</button>
+    </div>
+    <div class="stats-panel">${filasHtml || '<div class="loading">Sin ductos cargados.</div>'}</div>
+  `;
 }
 
 async function cargarComparadorLocalNqn() {
@@ -2125,6 +2528,28 @@ async function cargarComparadorLocalNqn() {
   if (!capaSel || !out) return;
 
   const archivo = capaSel.value;
+  if (archivo === "__OLEODUCTOS_NQN__") {
+    out.innerHTML = '<div class="loading">Calculando kilómetros de oleoductos por operadora…</div>';
+    try {
+      let feats = (current === 'ductos' && Array.isArray(raw) && raw.length) ? raw : (window._ultimosDuctosFeatures || []);
+      if (!feats.length) {
+        const r = await fetch(API + '/api/infraestructura?tipo=ductos', { cache: 'no-store' });
+        const j = await r.json();
+        if (r.ok && j.ok) feats = j.features || [];
+      }
+      window._ultimosDuctosFeatures = feats;
+      const res = agruparOleoductosPorOperadora(feats);
+      const opHtml = '<option value="">Elegí operadora…</option>' +
+        res.grupos.map(g => `<option value="${esc(g.key)}">${esc(g.operadora)} (${formatNum(g.km)} km)</option>`).join('');
+      if (opASel) { opASel.innerHTML = opHtml; opASel.value = ""; }
+      if (opBSel) { opBSel.innerHTML = opHtml; opBSel.value = ""; }
+      pintarDesgloseOleoductosPorOperadora();
+    } catch (err) {
+      out.innerHTML = `<div class="loading err">Error al cargar oleoductos: ${esc(err.message)}</div>`;
+    }
+    return;
+  }
+
   out.innerHTML = '<div class="loading">Cargando corte local desde http://localhost:8085…</div>';
   try {
     const registros = await leerCorteNeuquenLocal(archivo);
@@ -2179,14 +2604,12 @@ function renderizarComparacionLocalNqn() {
 
   const a = tieneA ? registros[Number(selA.value)] : null;
   const b = tieneB ? registros[Number(selB.value)] : null;
-  const ptA = a ? extractLatLon(parseWktPoint(a?.Shape || ""), a) : null;
-  const ptB = b ? extractLatLon(parseWktPoint(b?.Shape || ""), b) : null;
   marcarDosEnMapa(a || {}, b || {});
 
   const refA = a || {};
   const refB = b || {};
-  const ocultar = new Set(["Shape", "SHAPE", "geom", "GEOM", "ID_INST"]);
-  const claves = Array.from(new Set([...Object.keys(refA), ...Object.keys(refB)])).filter(k => !ocultar.has(k));
+  const ocultar = new Set(["Shape", "SHAPE", "geom", "GEOM", "ID_INST", "FID", "NRO_ORDEN_", "COORD_X", "COORD_Y", "VERIFICADO", "ACTA", "ID_NACION"]);
+  const claves = Array.from(new Set(["YACIMIENTO", "FIELD_NAME", "AREA", "AREA_LEGAL", "OPERADOR", "OPERADOR_I", ...Object.keys(refA), ...Object.keys(refB)])).filter(k => !ocultar.has(k));
 
   const normVal = v => String(v ?? "").trim();
   const filas = claves
@@ -2197,23 +2620,18 @@ function renderizarComparacionLocalNqn() {
     })
     .filter(item => window._soloDiferenciasCmp ? item.distinto : (item.va !== "—" || item.vb !== "—"));
 
-  const tituloA = a ? (a.WELL_NAME || a.NOMBRE || a.INSTALACIO || a.AREA_LEGAL || a.FID || "Pozo A") : "Sin elegir";
-  const tituloB = b ? (b.WELL_NAME || b.NOMBRE || b.INSTALACIO || b.AREA_LEGAL || b.FID || "Pozo B") : "Sin elegir";
-  const subA = a ? [obtenerOperadorRegistroLocal(a), a.AREA || a.AREA_LEGAL].filter(Boolean).join(" · ") : "";
-  const subB = b ? [obtenerOperadorRegistroLocal(b), b.AREA || b.AREA_LEGAL].filter(Boolean).join(" · ") : "";
-  const cantDiff = claves.filter(k => (a ? normVal(a[k]) : "") !== (b ? normVal(b[k]) : "")).length;
-
-  const safeTitA = esc(tituloA).replace(/'/g, "\\'");
-  const safeTitB = esc(tituloB).replace(/'/g, "\\'");
-  const btnPopupA = ptA ? `<button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9px;color:var(--c);border-color:var(--c)" onclick="openSatInternalPopup(${ptA.lat},${ptA.lon},'${safeTitA}')">POPUP FIRMS/CLIMA A</button>` : "";
-  const btnPopupB = ptB ? `<button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9px;color:var(--a);border-color:var(--a)" onclick="openSatInternalPopup(${ptB.lat},${ptB.lon},'${safeTitB}')">POPUP FIRMS/CLIMA B</button>` : "";
+  const tituloA = a ? (a.WELL_NAME || a.NOMBRE || a.INSTALACIO || a.AREA_LEGAL || a.FID || "Elemento A") : "Sin elegir";
+  const tituloB = b ? (b.WELL_NAME || b.NOMBRE || b.INSTALACIO || b.AREA_LEGAL || b.FID || "Elemento B") : "Sin elegir";
+  const yacA = a ? (a.YACIMIENTO || a.FIELD_NAME || a.AREA_LEGAL || a.AREA || "") : "";
+  const yacB = b ? (b.YACIMIENTO || b.FIELD_NAME || b.AREA_LEGAL || b.AREA || "") : "";
+  const subA = a ? [obtenerOperadorRegistroLocal(a), yacA ? ("Yac: " + yacA) : ""].filter(Boolean).join(" · ") : "";
+  const subB = b ? [obtenerOperadorRegistroLocal(b), yacB ? ("Yac: " + yacB) : ""].filter(Boolean).join(" · ") : "";
+  const cantDiff = filas.filter(x => x.distinto).length;
 
   out.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       <span style="font-size:10px;color:var(--mut)">Diferencias: <b style="color:var(--txt)">${cantDiff}</b> · A (celeste) y B (amarillo) en el mapa</span>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        ${btnPopupA}
-        ${btnPopupB}
         <button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9.5px" onclick="toggleSoloDiferenciasCmp()">
           ${window._soloDiferenciasCmp ? "VER TODOS CON DATO" : "VER SOLO DIFERENCIAS"}
         </button>
@@ -2259,6 +2677,7 @@ function renderizarComparacionLocalNqn() {
           <option value="nqn_locaciones.json">Locaciones</option>
           <option value="nqn_areas.json">Áreas Neuquén</option>
           <option value="nqn_pozos_vm.json">Pozos Vaca Muerta</option>
+          <option value="__OLEODUCTOS_NQN__">Oleoductos (por Operadora + km)</option>
         </select>
       </div>
       <div class="filters" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
