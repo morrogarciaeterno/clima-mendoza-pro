@@ -389,6 +389,9 @@ function selectBasin(b){
 
 function setStatsLayout(isStats){
   $('modalBody').classList.toggle('stats-mode',isStats);
+  if(isStats && window._cmpMarkersLayer) window._cmpMarkersLayer.clearLayers();
+  const card=$('localCortesCard');
+  if(card) card.style.display = (!isStats && esModuloNeuquenConComparador()) ? '' : 'none';
   $('filterCard').style.display=isStats?'none':'';
   $('detailTitle').textContent=isStats?'TABLERO ESTADÍSTICO · 12 MESES & COMPARATIVA MENSUAL':'DETALLE DEL ELEMENTO';
   if(!isStats&&map)setTimeout(()=>map.invalidateSize(),80);
@@ -408,7 +411,7 @@ function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatP
 function initMap(){
   if(map)return;
   map=L.map('map',{preferCanvas:true,maxZoom:19}).setView([-38.4,-69.1],7);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'}).addTo(map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
@@ -814,7 +817,7 @@ async function loadSatelitePanel(coords){
 }
 
 async function openModule(type){
-  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);current=type;wellMode=type==='pozos';plantasFilter='all';
+  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;current=type;wellMode=type==='pozos';plantasFilter='all';setStatsLayout(false);sincronizarVisibilidadComparadorCuenca();
   $('modal').classList.add('open');
   $('title').textContent=({
     pozos:'CUENCA NEUQUINA · PADRÓN DE POZOS',
@@ -848,7 +851,7 @@ async function openModule(type){
 }
 
 async function openCuyanaModule(sub){
-  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);wellMode=false;mzaPlantasFilter='all';
+  rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;wellMode=false;mzaPlantasFilter='all';current='mendoza'+sub.charAt(0).toUpperCase()+sub.slice(1);setStatsLayout(false);sincronizarVisibilidadComparadorCuenca();
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='areas'){await loadMendozaProductionAreas();return}
@@ -867,7 +870,7 @@ function rnSubtabs(active){
 }
 
 async function openRioNegroModule(sub){
-  statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);wellMode=false;
+  statsSeq++;satSeq++;heatSeq++;wxSeq++;wellMode=false;current='rn'+sub.charAt(0).toUpperCase()+sub.slice(1);setStatsLayout(false);sincronizarVisibilidadComparadorCuenca();
   $('modal').classList.add('open');
   initMap();setTimeout(()=>map.invalidateSize(),80);
   if(sub==='ambos'){await loadRioNegroAmbos();return}
@@ -878,7 +881,7 @@ async function openRioNegroModule(sub){
 
 async function loadRioNegroAmbos(){
   const seq=++rnReqSeq;
-  statsSeq++;satSeq++;heatSeq++;wxSeq++;setStatsLayout(false);wellMode=false;current='rnAmbos';rnOverlayMode='both';
+  statsSeq++;satSeq++;heatSeq++;wxSeq++;wellMode=false;current='rnAmbos';rnOverlayMode='both';setStatsLayout(false);sincronizarVisibilidadComparadorCuenca();
   $('modal').classList.add('open');
   $('title').textContent='RÍO NEGRO · ÁREAS + POZOS EN MAPA (CAP. IV)';
   $('layer').textContent='ÁREAS + POZOS · RN';
@@ -2017,7 +2020,21 @@ function etiquetaCampoLegible(k) {
   return mapa[k] || k.replace(/_/g, " ");
 }
 
+function esModuloNeuquenConComparador() {
+  return ["pozos", "locaciones", "ductos", "plantas", "areas"].includes(current);
+}
+
+function sincronizarVisibilidadComparadorCuenca() {
+  const card = $("localCortesCard");
+  const mostrar = esModuloNeuquenConComparador();
+  if (card) card.style.display = mostrar ? "" : "none";
+  if (!mostrar && window._cmpMarkersLayer) {
+    window._cmpMarkersLayer.clearLayers();
+  }
+}
+
 function marcarDosEnMapa(a, b) {
+  if (!esModuloNeuquenConComparador()) return;
   initMap();
   setStatsLayout(false);
   if ($("modal")) $("modal").classList.add("open");
@@ -2244,6 +2261,7 @@ function renderizarComparacionLocalNqn() {
   `;
   const side = modalBody.querySelector("aside.side");
   if (side) side.appendChild(box);
+  sincronizarVisibilidadComparadorCuenca();
 })();
 
 fetch(API+'/health').then(r=>r.json()).then(j=>{$('apiStatus').textContent=j.ok?'API ONLINE · NQN · MZA · RN':'API SIN RESPUESTA'}).catch(()=>{$('apiStatus').textContent='API SIN RESPUESTA';document.querySelector('.dot').style.background='var(--r)'});
