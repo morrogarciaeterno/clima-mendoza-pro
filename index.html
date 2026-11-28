@@ -730,11 +730,15 @@ function extractLatLon(geom, propsObj){
       return null;
     };
     const pt=walk(geom.coordinates);
-    if(pt&&Number.isFinite(pt[0])&&Number.isFinite(pt[1]))return{lat:pt[0],lon:pt[1]};
+    if(pt&&Number.isFinite(pt[0])&&Number.isFinite(pt[1])&&pt[0]>=-42&&pt[0]<=-35&&pt[1]>=-73&&pt[1]<=-65){
+      return{lat:pt[0],lon:pt[1]};
+    }
   }
-  const lat=Number(propsObj?.lat??propsObj?.LAT??propsObj?.latitud??propsObj?.LATITUD);
-  const lon=Number(propsObj?.lon??propsObj?.LON??propsObj?.longitud??propsObj?.LONGITUD);
-  if(Number.isFinite(lat)&&Number.isFinite(lon))return{lat,lon};
+  const lat=Number(propsObj?.LATITUD??propsObj?.latitud??propsObj?.lat??propsObj?.LAT);
+  const lon=Number(propsObj?.LONGITUD??propsObj?.longitud??propsObj?.lon??propsObj?.LON);
+  if(Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=-42&&lat<=-35&&lon>=-73&&lon<=-65){
+    return{lat,lon};
+  }
   return null;
 }
 
@@ -1115,8 +1119,15 @@ function render(fit){
 
   const allInst=current==='plantas'?list.filter(f=>!isMedicion(props(f))):list;
   const allMed=current==='plantas'?list.filter(f=>isMedicion(props(f))):[];
-  const instList=current==='plantas'&&plantasFilter==='med'?[]:allInst;
-  const medList=current==='plantas'&&plantasFilter==='inst'?[]:allMed;
+  const withFallbackPt = f => {
+    if (f.geometry && f.geometry.type) return f;
+    const p = props(f);
+    const c = extractLatLon(null, p);
+    if (!c) return f;
+    return { ...f, geometry: { type: "Point", coordinates: [c.lon, c.lat] } };
+  };
+  const instList=(current==='plantas'&&plantasFilter==='med'?[]:allInst).map(withFallbackPt);
+  const medList=(current==='plantas'&&plantasFilter==='inst'?[]:allMed).map(withFallbackPt);
 
   const instRenderer=L.canvas({padding:0.5});
   const medRenderer=L.canvas({padding:0.5});
@@ -1916,9 +1927,12 @@ function parseWktPoint(shapeStr) {
   if (!shapeStr || typeof shapeStr !== "string") return null;
   const m = shapeStr.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
   if (!m) return null;
-  const lon = Number(m[1]), lat = Number(m[2]);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-  return { type: "Point", coordinates: [lon, lat] };
+  const x = Number(m[1]), y = Number(m[2]);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  if (x >= -73 && x <= -65 && y >= -42 && y <= -35) {
+    return { type: "Point", coordinates: [x, y] };
+  }
+  return null;
 }
 
 function parseWktMultiPolygon(shapeStr) {
