@@ -81,7 +81,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 1
 .close{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:7px;background:var(--p2);color:var(--mut);padding:7px 10px;font-size:10px;white-space:nowrap;cursor:pointer}
 .close svg{width:12px;height:12px;flex:0 0 12px}
 .close:hover{color:#fff;border-color:var(--r)}
-.body{min-height:0;display:grid;grid-template-columns:1fr 450px;gap:10px;padding:10px}
+.body{min-height:0;display:grid;grid-template-columns:minmax(280px,1fr) minmax(480px,580px);gap:10px;padding:10px}
 .body.stats-mode{grid-template-columns:1fr}
 .body.stats-mode .map{display:none}
 .map{height:100%;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#09141d}
@@ -408,7 +408,7 @@ function closeModal(){rnReqSeq++;statsSeq++;satSeq++;heatSeq++;wxSeq++;closeSatP
 function initMap(){
   if(map)return;
   map=L.map('map',{preferCanvas:true,maxZoom:19}).setView([-38.4,-69.1],7);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'}).addTo(map);
   groupLayer=L.layerGroup().addTo(map);
   rnAreasGroup=L.layerGroup().addTo(groupLayer);
   rnPozosGroup=L.layerGroup().addTo(groupLayer);
@@ -730,15 +730,11 @@ function extractLatLon(geom, propsObj){
       return null;
     };
     const pt=walk(geom.coordinates);
-    if(pt&&Number.isFinite(pt[0])&&Number.isFinite(pt[1])&&pt[0]>=-42&&pt[0]<=-35&&pt[1]>=-73&&pt[1]<=-65){
-      return{lat:pt[0],lon:pt[1]};
-    }
+    if(pt&&Number.isFinite(pt[0])&&Number.isFinite(pt[1]))return{lat:pt[0],lon:pt[1]};
   }
-  const lat=Number(propsObj?.LATITUD??propsObj?.latitud??propsObj?.lat??propsObj?.LAT);
-  const lon=Number(propsObj?.LONGITUD??propsObj?.longitud??propsObj?.lon??propsObj?.LON);
-  if(Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=-42&&lat<=-35&&lon>=-73&&lon<=-65){
-    return{lat,lon};
-  }
+  const lat=Number(propsObj?.lat??propsObj?.LAT??propsObj?.latitud??propsObj?.LATITUD);
+  const lon=Number(propsObj?.lon??propsObj?.LON??propsObj?.longitud??propsObj?.LONGITUD);
+  if(Number.isFinite(lat)&&Number.isFinite(lon))return{lat,lon};
   return null;
 }
 
@@ -1119,15 +1115,8 @@ function render(fit){
 
   const allInst=current==='plantas'?list.filter(f=>!isMedicion(props(f))):list;
   const allMed=current==='plantas'?list.filter(f=>isMedicion(props(f))):[];
-  const withFallbackPt = f => {
-    if (f.geometry && f.geometry.type) return f;
-    const p = props(f);
-    const c = extractLatLon(null, p);
-    if (!c) return f;
-    return { ...f, geometry: { type: "Point", coordinates: [c.lon, c.lat] } };
-  };
-  const instList=(current==='plantas'&&plantasFilter==='med'?[]:allInst).map(withFallbackPt);
-  const medList=(current==='plantas'&&plantasFilter==='inst'?[]:allMed).map(withFallbackPt);
+  const instList=current==='plantas'&&plantasFilter==='med'?[]:allInst;
+  const medList=current==='plantas'&&plantasFilter==='inst'?[]:allMed;
 
   const instRenderer=L.canvas({padding:0.5});
   const medRenderer=L.canvas({padding:0.5});
@@ -1927,12 +1916,9 @@ function parseWktPoint(shapeStr) {
   if (!shapeStr || typeof shapeStr !== "string") return null;
   const m = shapeStr.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
   if (!m) return null;
-  const x = Number(m[1]), y = Number(m[2]);
-  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
-  if (x >= -73 && x <= -65 && y >= -42 && y <= -35) {
-    return { type: "Point", coordinates: [x, y] };
-  }
-  return null;
+  const lon = Number(m[1]), lat = Number(m[2]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  return { type: "Point", coordinates: [lon, lat] };
 }
 
 function parseWktMultiPolygon(shapeStr) {
@@ -1962,7 +1948,7 @@ function registrosToFeatures(registros) {
 }
 
 window._soloDiferenciasCmp = false;
-window._operadoraCmpSel = "";
+window._cmpMarkersLayer = null;
 
 function obtenerOperadorRegistroLocal(r) {
   if (!r || typeof r !== "object") return "";
@@ -2026,40 +2012,74 @@ function etiquetaCampoLegible(k) {
   return mapa[k] || k.replace(/_/g, " ");
 }
 
-function poblarOpcionesElementoCmp(registros, operFiltro) {
-  const selA = $("localCmpA");
-  const selB = $("localCmpB");
-  if (!selA || !selB) return;
+function marcarDosEnMapa(a, b) {
+  initMap();
+  setStatsLayout(false);
+  if ($("modal")) $("modal").classList.add("open");
+  if (!window._cmpMarkersLayer) {
+    window._cmpMarkersLayer = L.layerGroup().addTo(map);
+  }
+  window._cmpMarkersLayer.clearLayers();
+  const bounds = [];
 
-  const filtrados = registros
-    .map((r, origIdx) => ({ r, origIdx }))
-    .filter(({ r }) => !operFiltro || normOp(obtenerOperadorRegistroLocal(r)) === operFiltro)
-    .slice(0, 3000);
+  const ptA = extractLatLon(parseWktPoint(a?.Shape || ""), a);
+  if (ptA) {
+    const nomA = a.WELL_NAME || a.NOMBRE || a.INSTALACIO || "Pozo A";
+    L.circleMarker([ptA.lat, ptA.lon], {
+      radius: 10, color: "#ffffff", weight: 2.5, fillColor: "#24d6d0", fillOpacity: 1
+    }).bindTooltip("A: " + esc(nomA)).addTo(window._cmpMarkersLayer);
+    bounds.push([ptA.lat, ptA.lon]);
+  }
 
-  const etiqueta = r => {
-    const base = r.WELL_NAME || r.NOMBRE || r.INSTALACIO || r.AREA_LEGAL || r.AREA || r.UWI_NQN || r.ID_INST || r.FID || "Sin nombre";
-    const op = obtenerOperadorRegistroLocal(r);
-    const area = r.AREA_LEGAL || r.AREA || r.FIELD_NAME || "";
-    const extra = [op, area].filter(Boolean).join(" · ");
-    return extra ? `${base} — ${extra}` : String(base);
-  };
+  const ptB = extractLatLon(parseWktPoint(b?.Shape || ""), b);
+  if (ptB) {
+    const nomB = b.WELL_NAME || b.NOMBRE || b.INSTALACIO || "Pozo B";
+    L.circleMarker([ptB.lat, ptB.lon], {
+      radius: 10, color: "#071018", weight: 2.5, fillColor: "#f4b544", fillOpacity: 1
+    }).bindTooltip("B: " + esc(nomB)).addTo(window._cmpMarkersLayer);
+    bounds.push([ptB.lat, ptB.lon]);
+  }
 
-  if (!filtrados.length) {
-    selA.innerHTML = '<option value="">Sin elementos para esta operadora</option>';
-    selB.innerHTML = '<option value="">Sin elementos para esta operadora</option>';
+  setTimeout(() => {
+    map.invalidateSize();
+    if (bounds.length === 2) map.fitBounds(bounds, { padding: [55, 55], maxZoom: 14 });
+    else if (bounds.length === 1) map.setView(bounds[0], 14);
+  }, 80);
+}
+
+function llenarPozosDeOperadora(selectPozoEl, registros, opKey) {
+  if (!selectPozoEl) return;
+  if (!opKey) {
+    selectPozoEl.innerHTML = '<option value="">Elegí operadora primero…</option>';
+    selectPozoEl.value = "";
     return;
   }
 
-  const opts = filtrados.map(({ r, origIdx }) => `<option value="${origIdx}">${esc(etiqueta(r))}</option>`).join("");
-  selA.innerHTML = opts;
-  selB.innerHTML = opts;
-  selA.selectedIndex = 0;
-  selB.selectedIndex = filtrados.length > 1 ? 1 : 0;
+  const pozosOp = registros
+    .map((r, idx) => ({ r, idx }))
+    .filter(({ r }) => normOp(obtenerOperadorRegistroLocal(r)) === opKey)
+    .slice(0, 3000);
+
+  if (!pozosOp.length) {
+    selectPozoEl.innerHTML = '<option value="">Sin pozos en esta operadora</option>';
+    selectPozoEl.value = "";
+    return;
+  }
+
+  selectPozoEl.innerHTML = pozosOp.map(({ r, idx }) => {
+    const nombre = r.WELL_NAME || r.NOMBRE || r.INSTALACIO || r.AREA_LEGAL || r.AREA || r.UWI_NQN || r.FID || ("#" + (idx + 1));
+    const area = r.AREA_LEGAL || r.AREA || r.FIELD_NAME || "";
+    const label = area ? `${nombre} (${area})` : String(nombre);
+    return `<option value="${idx}">${esc(label)}</option>`;
+  }).join("");
+  selectPozoEl.selectedIndex = 0;
+  selectPozoEl.value = String(pozosOp[0].idx);
 }
 
 async function cargarComparadorLocalNqn() {
   const capaSel = $("localCmpCapa");
-  const opSel = $("localCmpOperadora");
+  const opASel = $("localCmpOpA");
+  const opBSel = $("localCmpOpB");
   const out = $("localCmpResultado");
   if (!capaSel || !out) return;
 
@@ -2076,26 +2096,29 @@ async function cargarComparadorLocalNqn() {
       if (key && !opsMap.has(key)) opsMap.set(key, label);
     }
     const sortedOps = [...opsMap.entries()].sort((a, b) => a[1].localeCompare(b[1], "es"));
-    if (opSel) {
-      opSel.innerHTML = '<option value="">Todas las operadoras NQN</option>' +
-        sortedOps.map(([k, lbl]) => `<option value="${esc(k)}">${esc(lbl)}</option>`).join("");
-      opSel.value = "";
-    }
-    window._operadoraCmpSel = "";
+    const opHtml = '<option value="">Elegí operadora…</option>' +
+      sortedOps.map(([k, lbl]) => `<option value="${esc(k)}">${esc(lbl)}</option>`).join("");
 
-    poblarOpcionesElementoCmp(registros, "");
+    if (opASel) { opASel.innerHTML = opHtml; opASel.value = ""; }
+    if (opBSel) { opBSel.innerHTML = opHtml; opBSel.value = ""; }
+
+    llenarPozosDeOperadora($("localCmpA"), registros, "");
+    llenarPozosDeOperadora($("localCmpB"), registros, "");
     renderizarComparacionLocalNqn();
   } catch (err) {
     out.innerHTML = `<div class="loading err">Sin conexión a http://localhost:8085 (${esc(err.message)}). Verificá que servir_cortes.ps1 esté abierto.</div>`;
   }
 }
 
-function onChangeOperadoraCmp() {
-  const opSel = $("localCmpOperadora");
-  const registros = window._ultimosRegistrosLocales || [];
-  const opVal = opSel ? opSel.value : "";
-  window._operadoraCmpSel = opVal;
-  poblarOpcionesElementoCmp(registros, opVal);
+function alCambiarOperadoraA() {
+  const opKey = $("localCmpOpA") ? $("localCmpOpA").value : "";
+  llenarPozosDeOperadora($("localCmpA"), window._ultimosRegistrosLocales || [], opKey);
+  renderizarComparacionLocalNqn();
+}
+
+function alCambiarOperadoraB() {
+  const opKey = $("localCmpOpB") ? $("localCmpOpB").value : "";
+  llenarPozosDeOperadora($("localCmpB"), window._ultimosRegistrosLocales || [], opKey);
   renderizarComparacionLocalNqn();
 }
 
@@ -2106,41 +2129,40 @@ function renderizarComparacionLocalNqn() {
   const registros = window._ultimosRegistrosLocales || [];
   if (!selA || !selB || !out || !registros.length) return;
 
-  if (selA.value === "" || selB.value === "") {
-    out.innerHTML = '<div class="loading">No hay registros para la operadora seleccionada en esta capa.</div>';
+  const tieneA = selA.value !== "" && registros[Number(selA.value)];
+  const tieneB = selB.value !== "" && registros[Number(selB.value)];
+  if (!tieneA && !tieneB) {
+    out.innerHTML = '<div class="loading">Elegí la Operadora A para ver su lista de pozos y la Operadora B para ver su lista de pozos.</div>';
     return;
   }
 
-  const idxA = Number(selA.value);
-  const idxB = Number(selB.value);
-  const a = registros[Number.isFinite(idxA) && registros[idxA] ? idxA : 0] || {};
-  const b = registros[Number.isFinite(idxB) && registros[idxB] ? idxB : 0] || {};
+  const a = tieneA ? registros[Number(selA.value)] : null;
+  const b = tieneB ? registros[Number(selB.value)] : null;
+  marcarDosEnMapa(a || {}, b || {});
 
+  const refA = a || {};
+  const refB = b || {};
   const ocultar = new Set(["Shape", "SHAPE", "geom", "GEOM", "ID_INST"]);
-  const todasClaves = Array.from(new Set([...Object.keys(a), ...Object.keys(b)])).filter(k => !ocultar.has(k));
+  const claves = Array.from(new Set([...Object.keys(refA), ...Object.keys(refB)])).filter(k => !ocultar.has(k));
 
   const normVal = v => String(v ?? "").trim();
-  const filas = todasClaves
+  const filas = claves
     .map(k => {
-      const va = normVal(a[k]);
-      const vb = normVal(b[k]);
-      const distinto = va !== vb;
-      return { k, va: va || "—", vb: vb || "—", distinto };
+      const va = a ? (normVal(a[k]) || "—") : "—";
+      const vb = b ? (normVal(b[k]) || "—") : "—";
+      return { k, va, vb, distinto: va !== vb };
     })
-    .filter(item => {
-      if (window._soloDiferenciasCmp) return item.distinto;
-      return item.va !== "—" || item.vb !== "—";
-    });
+    .filter(item => window._soloDiferenciasCmp ? item.distinto : (item.va !== "—" || item.vb !== "—"));
 
-  const tituloA = a.WELL_NAME || a.NOMBRE || a.INSTALACIO || a.AREA_LEGAL || a.AREA || a.FID || "Elemento A";
-  const tituloB = b.WELL_NAME || b.NOMBRE || b.INSTALACIO || b.AREA_LEGAL || b.AREA || b.FID || "Elemento B";
-  const subA = [obtenerOperadorRegistroLocal(a), a.AREA || a.AREA_LEGAL].filter(Boolean).join(" · ");
-  const subB = [obtenerOperadorRegistroLocal(b), b.AREA || b.AREA_LEGAL].filter(Boolean).join(" · ");
-  const cantDiff = todasClaves.filter(k => normVal(a[k]) !== normVal(b[k])).length;
+  const tituloA = a ? (a.WELL_NAME || a.NOMBRE || a.INSTALACIO || a.AREA_LEGAL || a.FID || "Pozo A") : "Sin elegir";
+  const tituloB = b ? (b.WELL_NAME || b.NOMBRE || b.INSTALACIO || b.AREA_LEGAL || b.FID || "Pozo B") : "Sin elegir";
+  const subA = a ? [obtenerOperadorRegistroLocal(a), a.AREA || a.AREA_LEGAL].filter(Boolean).join(" · ") : "";
+  const subB = b ? [obtenerOperadorRegistroLocal(b), b.AREA || b.AREA_LEGAL].filter(Boolean).join(" · ") : "";
+  const cantDiff = claves.filter(k => (a ? normVal(a[k]) : "") !== (b ? normVal(b[k]) : "")).length;
 
   out.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <span style="font-size:10px;color:var(--mut)">Diferencias detectadas: <b style="color:var(--txt)">${cantDiff}</b> · Origen: <b style="color:var(--c)">LOCAL 8085</b></span>
+      <span style="font-size:10px;color:var(--mut)">Diferencias: <b style="color:var(--txt)">${cantDiff}</b> · A (celeste) y B (amarillo) en el mapa</span>
       <button type="button" class="back-btn" style="height:28px;padding:0 10px;font-size:9.5px" onclick="toggleSoloDiferenciasCmp()">
         ${window._soloDiferenciasCmp ? "VER TODOS CON DATO" : "VER SOLO DIFERENCIAS"}
       </button>
@@ -2149,7 +2171,7 @@ function renderizarComparacionLocalNqn() {
       <table class="cmp-table">
         <thead>
           <tr>
-            <th>DATO COMPARADO</th>
+            <th>DATO</th>
             <th class="col-a">${esc(tituloA)}${subA ? `<div style="font-size:8.5px;font-weight:400;color:var(--mut);margin-top:2px">${esc(subA)}</div>` : ""}</th>
             <th class="col-b">${esc(tituloB)}${subB ? `<div style="font-size:8.5px;font-weight:400;color:var(--mut);margin-top:2px">${esc(subB)}</div>` : ""}</th>
           </tr>
@@ -2161,7 +2183,7 @@ function renderizarComparacionLocalNqn() {
               <td class="col-a">${esc(item.va)}</td>
               <td class="col-b">${esc(item.vb)}</td>
             </tr>
-          `).join("") : '<tr><td colspan="3" class="loading">No hay diferencias entre ambos elementos en este filtro.</td></tr>'}
+          `).join("") : '<tr><td colspan="3" class="loading">Sin diferencias en este filtro.</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -2170,28 +2192,46 @@ function renderizarComparacionLocalNqn() {
 
 (function injectLocalCmpBox() {
   const modalBody = $("modalBody");
-  if (!modalBody) return;
-  if ($("localCortesCard")) return;
+  if (!modalBody || $("localCortesCard")) return;
   const box = document.createElement("section");
   box.className = "card";
   box.id = "localCortesCard";
   box.style.marginTop = "10px";
   box.innerHTML = `
-    <div class="ch"><h3>COMPARADOR RÁPIDO · CORTES LOCALES NEUQUÉN</h3><span>PUERTO 8085 · SIN TIMEOUT</span></div>
+    <div class="ch"><h3>COMPARADOR POR OPERADORA · CORTES NEUQUÉN</h3><span>PUERTO 8085 · SIN TIMEOUT</span></div>
     <div class="cb">
-      <div class="filters" style="grid-template-columns:160px 1fr 1fr 1fr;margin-bottom:10px">
-        <select id="localCmpCapa" onchange="cargarComparadorLocalNqn()">
+      <div style="margin-bottom:8px">
+        <select id="localCmpCapa" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--line);background:#08141f;color:var(--txt);padding:0 10px" onchange="cargarComparadorLocalNqn()">
           <option value="nqn_pozos.json">Pozos Neuquén</option>
           <option value="nqn_instalaciones.json">Instalaciones / Baterías</option>
           <option value="nqn_locaciones.json">Locaciones</option>
           <option value="nqn_areas.json">Áreas Neuquén</option>
           <option value="nqn_pozos_vm.json">Pozos Vaca Muerta</option>
         </select>
-        <select id="localCmpOperadora" onchange="onChangeOperadoraCmp()">
-          <option value="">Todas las operadoras NQN</option>
-        </select>
-        <select id="localCmpA" onchange="renderizarComparacionLocalNqn()"></select>
-        <select id="localCmpB" onchange="renderizarComparacionLocalNqn()"></select>
+      </div>
+      <div class="filters" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;color:var(--c);font-weight:700;margin-bottom:4px">1. OPERADORA A</div>
+          <select id="localCmpOpA" onchange="alCambiarOperadoraA()">
+            <option value="">Elegí operadora…</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--a);font-weight:700;margin-bottom:4px">2. POZOS DE OPERADORA A</div>
+          <select id="localCmpA" onchange="renderizarComparacionLocalNqn()"></select>
+        </div>
+      </div>
+      <div class="filters" style="grid-template-columns:1fr 1fr;margin-bottom:10px">
+        <div>
+          <div style="font-size:9px;color:var(--c);font-weight:700;margin-bottom:4px">3. OPERADORA B</div>
+          <select id="localCmpOpB" onchange="alCambiarOperadoraB()">
+            <option value="">Elegí operadora…</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--a);font-weight:700;margin-bottom:4px">4. POZOS DE OPERADORA B</div>
+          <select id="localCmpB" onchange="renderizarComparacionLocalNqn()"></select>
+        </div>
       </div>
       <div id="localCmpResultado"><div class="loading">Seleccioná una capa o <a href="#" style="color:var(--c)" onclick="event.preventDefault();cargarComparadorLocalNqn()">cargá los datos locales ahora</a>.</div></div>
     </div>
